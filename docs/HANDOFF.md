@@ -2,25 +2,38 @@
 
 ## Current state - October 4, 2026
 
-Move-ready documentation scaffold prepared inside the learner-created quant-methods-practice folder. No application implementation, manifests/lockfiles, initialized nested Git repository, active content, provider credentials, learner history or release artifacts. Source directories contain .gitkeep placeholders.
+Stage 00 is complete and Stage 01 is implemented and verified. The standalone repository is active on branch `main` at `https://github.com/trustdan/quant-methods-practice.git`.
 
-Created root requirements/overview/plan and shared Codex/Claude instruction entry points; technical contracts for architecture, numerics, course evidence, bank/review, pedagogy, mastery, navigation, local API/security/storage, AI notes/provider connections, figures, arcade, testing and release. Added strict starting schemas, an explicitly unapproved seven-stage binomial reference fixture and a stdlib-only scaffold validator.
+### Stage 00 Record
+- Toolchain versions: Go `go1.27.1` (windows/amd64), Node `v22.21.1`, npm `10.9.4`, Python `3.13.15`, Windows 11 amd64 (Microsoft Edge available).
+- Module path: `github.com/trustdan/quant-methods-practice`.
+- Course material inventory: Confirmed `course-materials/private` is empty (`.gitkeep` only). Baseline learner-reported topics remain recorded in [docs/COURSE-MAP.md](COURSE-MAP.md).
+- Stale move/setup instructions updated across `README.md`, `PLAN.md`, `docs/BOOTSTRAP.md`, `docs/COURSE-MAP.md`, and `docs/DECISIONS.md`.
 
-The accounting app was inspected as a feature reference. No accounting code/bank/data or personal files were copied. User's supplied module headings and covered topics are the only quant course evidence; syllabus/slides/datasets remain absent.
+### Stage 01 Implementation
+- Go backend: Loopback HTTP server in [internal/httpapi](file:///internal/httpapi/server.go) and CLI entry point in [cmd/quant-practice](file:///cmd/quant-practice/main.go) with embedded production frontend assets in [internal/assets](file:///internal/assets/assets.go).
+- Security boundaries: Loopback-only binding, Host header validation (DNS rebinding prevention), Origin validation on mutating requests, HttpOnly SameSite session cookies, single-use bootstrap tokens via URL fragment `#bootstrap=<token>`, strict Content-Security-Policy headers, and SPA route fallback.
+- Web frontend: React 18, TypeScript strict, Vite, Vanilla CSS design system, [MathMarkdown](file:///web/src/components/MathMarkdown.tsx) component with DOMPurify sanitization and MathJax typeset lifecycle, [StageStrip](file:///web/src/components/StageStrip.tsx) (7 stages), [QuestionStrip](file:///web/src/components/QuestionStrip.tsx), central keyboard command resolver [keymap.ts](file:///web/src/navigation/keymap.ts), and static ungraded math demonstration shell.
+- MathJax bundling: MathJax v3 TeX-SVG bundled completely locally in `web/public/vendor/mathjax/` via `web/scripts/copy-mathjax.js` with deterministic prebuild hook. Zero external CDN or network requests required.
+- Build & test pipeline: `scripts/build.ps1`, `scripts/build.sh`, `scripts/test.ps1`, `scripts/test.sh`, and GitHub Actions CI in `.github/workflows/ci.yml`.
 
 ## Checks
 
-- `python scripts/validate_scaffold.py` passed: 31 Markdown files, 49 local links, three JSON files and 35 planned source directories; seven-stage draft shape/evidence and exact small binomial calculation checked.
-- All three JSON documents parse; all 11 internal JSON Schema references resolve. Python validator source parses with ast.parse. A full JSON Schema implementation was not installed or run; starting schemas require runtime reconciliation/validation at Stage 02.
-- An initial check caught missing placeholder directories and incorrect LaTeX JSON escaping; both were corrected before the passing run. No active content was created.
-- Local links resolve inside the scaffold and no machine-specific absolute paths were found. Parent Git status showed only the new folder before its handoff update. No nested Git initialization, dependency installation or remote publication.
-- Final validator run from the parent working directory also passed. All 72 scaffold files passed UTF-8/final-newline/trailing-whitespace checks; decoded LaTeX contains no unexpected control characters. Parent git diff --check passed with the existing LF/CRLF advisory; final changes are this folder plus the parent handoff record.
-- No Go/frontend/application/provider/browser/native-release check applies until implementation exists. Draft fixture is not approved by creating or validating it.
+- `python scripts/validate_scaffold.py`: Passed (31 Markdown files, 50 local links, 20 JSON files, 35 source directories).
+- `go test -v ./internal/... ./cmd/...`: Passed (5 unit tests covering health status, single-use bootstrap token exchange, host header rejection, cross-origin mutation rejection, and SPA fallback).
+- `go vet ./internal/... ./cmd/...`: Passed (0 warnings).
+- `gofmt -s -l cmd internal`: Passed (clean formatting).
+- `npm run typecheck` (in `web/`): Passed (strict TypeScript, 0 errors).
+- `npm run test` (in `web/`): Passed (17 unit tests covering keymap resolution, editable field exclusions, MathMarkdown sanitization, StageStrip, QuestionStrip, and App shell navigation).
+- `npm run build` (in `web/`): Passed (outputting compiled HTML/JS/CSS to `internal/assets/dist`).
+- `go build -o bin/quant-practice.exe ./cmd/quant-practice`: Passed (standalone binary built).
+- Local loopback server smoke: Launched `.\bin\quant-practice.exe --port 8976 --no-browser`. Verified `GET /api/health` returned HTTP 200 with status ok and version `0.1.0-dev`. Verified `GET /vendor/mathjax/tex-svg.js` returned HTTP 200 with 2,108,580 bytes of local JavaScript.
+- Automated browser subagent: Playwright browser environment reported driver download failure (404 from external Playwright CDN); loopback HTTP verified.
 
 ## Next action
 
-Move the whole folder to the new repo location. Start Stage 00: inspect toolchains and course sources, establish repository/module/license decisions, then Stage 01 builds the local Go + browser shell with fully local math assets. Read README/contract/requirements/plan before edits. Do not attempt the whole roadmap in the first session.
+Proceed to Stage 02: Domain and bank contracts (stable IDs, parameters/constraints, answer/assistance types, versions, schemas, family registry, strict parsing, and reconciling the draft binomial fixture with runtime Go types).
 
 ## Unresolved external gates
 
-Actual course notation/objectives/exam rules; dependency versions; actual ChatGPT-plan account access and native vault/runtime tests; optional Google project OAuth; advanced test/regression methods; license/use rights and empirical learning effectiveness. Current official docs do not support offering a third-party Claude.ai consumer login; Gemini consumer subscription inference is unverified.
+Actual course syllabus/slides/notation; ChatGPT-plan sign-in account access; native vault integration tests; optional Google project OAuth; continuous distribution/test/regression course details.

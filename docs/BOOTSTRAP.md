@@ -2,12 +2,19 @@
 
 Use this after moving the scaffold into its own repo. Do not run a bulk generator that overwrites these documents.
 
-## Stage 00
+## Stage 00 [COMPLETE]
 
-- Inspect existing files, instructions, Git status and HANDOFF.
-- Inventory Go, Node/package manager, browser and platform versions. Record installed and selected supported versions separately.
-- Inventory actual course files under course-materials/private; update COURSE-MAP. No source files are present in this scaffold.
-- Choose the Git remote/module path and project license when known. Do not guess a GitHub owner.
+- Inspect existing files, instructions, Git status and HANDOFF: Complete. Clean git status on `main` branch.
+- Inventory Go, Node/package manager, browser and platform versions:
+  - Installed Go: `go1.27.1` (windows/amd64).
+  - Installed Node: `v22.21.1`.
+  - Installed Package Manager: `npm 10.9.4`.
+  - Installed Python: `Python 3.13.15` (scaffold validator).
+  - Platform / OS: Windows 11 amd64; Microsoft Edge installed.
+- Inventory actual course files under course-materials/private: Confirmed empty (`.gitkeep` only). Baseline learner-provided topics recorded in [docs/COURSE-MAP.md](COURSE-MAP.md).
+- Git remote and module path:
+  - Git remote: `https://github.com/trustdan/quant-methods-practice.git` (origin).
+  - Go module path: `github.com/trustdan/quant-methods-practice`.
 
 ## Stage 01
 

@@ -3,6 +3,9 @@ node_modules/
 web/dist/
 dist/
 bin/
+internal/assets/dist/*
+!internal/assets/dist/.gitkeep
+web/public/vendor/
 .cache/
 coverage/
 playwright-report/

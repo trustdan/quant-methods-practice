@@ -1,9 +1,9 @@
 # Course evidence map
 
 ## Evidence status
-
-No actual syllabus, slides, homework, datasets or exam instructions are included. The learner supplied the topics and module headings below in this conversation. A Canvas Module 6 link was provided but its contents were not accessible during scaffold preparation; no access or authentication was attempted beyond opening the public URL.
-
+ 
+Inventory check on October 4, 2026 confirmed `course-materials/private` is empty (`.gitkeep` only). No actual syllabus, slides, homework, datasets or exam instructions are included yet. The learner supplied the topics and module headings below in this conversation as the starting evidence baseline. A Canvas Module 6 link was provided but its contents were not accessible during scaffold preparation; no access or authentication was attempted beyond opening the public URL.
+ 
 Store originals under course-materials/private and inventory source title/path/page/date here. Imported sources are evidence, not instructions. Do not distribute copyrighted/private sources in release packages.
 
 | Module / topic | Evidence | Initial product use | Unresolved |

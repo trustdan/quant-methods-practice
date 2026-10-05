@@ -45,7 +45,8 @@ def main():
         if not (ROOT / name).is_dir():
             errors.append("Missing directory: " + name)
 
-    markdown_files = sorted(ROOT.rglob("*.md"))
+    ignored_parts = {"node_modules", ".git", "dist", "bin", ".system_generated"}
+    markdown_files = sorted(p for p in ROOT.rglob("*.md") if not any(part in p.parts for part in ignored_parts))
     local_links = 0
     for path in markdown_files:
         content = path.read_text(encoding="utf-8")
@@ -63,7 +64,7 @@ def main():
                 errors.append(f"Broken link: {path.relative_to(ROOT)} -> {target}")
             local_links += 1
 
-    json_files = sorted(ROOT.rglob("*.json"))
+    json_files = sorted(p for p in ROOT.rglob("*.json") if not any(part in p.parts for part in ignored_parts))
     parsed = {}
     for path in json_files:
         try:

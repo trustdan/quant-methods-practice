@@ -2,15 +2,15 @@
 
 A planned local, keyboard-driven probability and statistics tutor with readable mathematics, progressive problems, persistent practice history, optional AI help, saved explanations, and a skippable space arcade.
 
-**Status: documentation scaffold, October 4, 2026. No runnable application or approved question bank yet.** Move this entire folder into its own repository before implementation. All project links and instructions are self-contained; the accounting repository is reference material, not a runtime dependency.
+**Status: Stage 00 and Stage 01 complete; Stage 02 next, October 4, 2026.** Standalone repository established at `https://github.com/trustdan/quant-methods-practice.git` with Go module `github.com/trustdan/quant-methods-practice`. Go loopback server and React/TypeScript shell verified offline with local MathJax math rendering, full keyboard navigation, and complete test suites.
 
 ## Start building
 
 1. Read [OVERVIEW.md](OVERVIEW.md), [REQUIREMENTS.md](REQUIREMENTS.md), and [docs/AGENT-CONTRACT.md](docs/AGENT-CONTRACT.md).
 2. Resume from [docs/HANDOFF.md](docs/HANDOFF.md), then perform the first unfinished stage in [PLAN.md](PLAN.md).
 3. Inventory actual course materials using [docs/COURSE-MAP.md](docs/COURSE-MAP.md). The module headings supplied by the learner are evidence of broad scope; they are not a full syllabus.
-4. Initialize this folder as a separate Git repository. Choose the license and remote there; neither is assumed here.
-5. Use [docs/BOOTSTRAP.md](docs/BOOTSTRAP.md) as the implementation checklist. Select and lock dependencies during Stage 01. Empty source directories are intentional.
+4. Stages 00 and 01 are complete. Use `scripts/test.ps1` or `scripts/test.sh` to run the full verification suite.
+5. Proceed to Stage 02 (Domain and bank contracts) in [PLAN.md](PLAN.md).
 
 Codex reads [AGENTS.md](AGENTS.md); Claude Code reads [CLAUDE.md](CLAUDE.md). Both point to the same contract. Suggested opening prompt:
 

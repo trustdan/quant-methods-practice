@@ -16,9 +16,11 @@ Recorded October 4, 2026; revisit with explicit reasons rather than quietly chan
 | Anthropic key only; Google project OAuth optional | Reviewed official guidance does not establish equivalent consumer-login routes |
 | No manifests/source application in scaffold | User asked for a move-ready plan before starting implementation in new repo |
 | Full parity staged after offline drill | All desired workflows tracked without implementing everything simultaneously |
+| Module path `github.com/trustdan/quant-methods-practice` | Established at Stage 00; remote `https://github.com/trustdan/quant-methods-practice.git` on branch `main` |
+| Toolchain baseline | Go `go1.27.1` (windows/amd64), Node `v22.21.1`, npm `10.9.4`, Python `3.13.15` |
 
 ## Open facts
 
-Actual syllabus/slides, professor notation and exam rules; complete later distribution/test/regression list; datasets and use rights; project remote/module path/license; exact toolchain/package versions; target browser support; OS vault library and native build implications; last-tab shutdown policy; game balance/playtesting; optional symbolic grammar; optional desktop wrapper. No open fact prevents creating the starter documentation or standard offline binomial slice.
+Actual syllabus/slides, professor notation and exam rules; complete later distribution/test/regression list; datasets and use rights; project license; target browser support; OS vault library and native build implications; last-tab shutdown policy; game balance/playtesting; optional symbolic grammar; optional desktop wrapper. No open fact prevents building the local application shell or standard offline binomial slice.
 
 No empirical effectiveness/retention claims are established. No provider auth/inference or native package smoke has run for this new project.
