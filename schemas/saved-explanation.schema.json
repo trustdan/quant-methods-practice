@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Saved explanation export v1 (starting contract)",
+  "type": "object", "additionalProperties": false,
+  "required": ["schema_version", "id", "title", "content_markdown", "source", "provider", "model", "billing_route", "question_instance_id", "stage_id", "concept_ids", "created_at", "saved_at", "advisory"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "id": {"type": "string", "minLength": 1},
+    "title": {"type": "string", "minLength": 1},
+    "content_markdown": {"type": "string", "minLength": 1},
+    "source": {"enum": ["ai", "offline", "user"]},
+    "provider": {"type": ["string", "null"]},
+    "model": {"type": ["string", "null"]},
+    "billing_route": {"enum": ["chatgpt_plan", "openai_api", "anthropic_api", "gemini_api", "offline", "none"]},
+    "question_instance_id": {"type": ["string", "null"]},
+    "stage_id": {"type": ["string", "null"]},
+    "concept_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "created_at": {"type": "string", "format": "date-time"},
+    "saved_at": {"type": "string", "format": "date-time"},
+    "advisory": {"const": true},
+    "parent_note_id": {"type": ["string", "null"]}
+  }
+}

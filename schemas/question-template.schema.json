@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Fixed reference question template v1 (starting contract)",
+  "description": "Illustrative fixed-parameter fixtures only; generalized runtime templates require reviewed schema evolution. Expected answers are regression expectations, never an alternate grading authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "template_kind", "id", "version", "status", "family_id", "rule_version", "module_id", "title", "scenario_markdown", "parameters", "assumptions", "concept_ids", "setting_group", "source_refs", "approval", "stages"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "template_kind": {"const": "fixed_reference"},
+    "id": {"$ref": "#/$defs/id"},
+    "version": {"type": "integer", "minimum": 1},
+    "status": {"enum": ["draft", "active", "retired"]},
+    "family_id": {"const": "binomial_pmf"},
+    "rule_version": {"type": "integer", "minimum": 1},
+    "module_id": {"const": "module_2"},
+    "title": {"type": "string", "minLength": 1},
+    "scenario_markdown": {"type": "string", "minLength": 1},
+    "parameters": {
+      "type": "object", "additionalProperties": false,
+      "required": ["n", "p", "k"],
+      "properties": {
+        "n": {"type": "integer", "minimum": 0},
+        "p": {"type": "number", "minimum": 0, "maximum": 1},
+        "k": {"type": "integer", "minimum": 0}
+      }
+    },
+    "assumptions": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "concept_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/id"}},
+    "setting_group": {"$ref": "#/$defs/id"},
+    "source_refs": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "approval": {
+      "oneOf": [
+        {"type": "null"},
+        {
+          "type": "object", "additionalProperties": false,
+          "required": ["reviewer", "reviewed_at", "notes", "delegation_basis"],
+          "properties": {
+            "reviewer": {"type": "string", "minLength": 1},
+            "reviewed_at": {"type": "string", "format": "date-time"},
+            "notes": {"type": "string", "minLength": 1},
+            "delegation_basis": {"type": ["string", "null"]}
+          }
+        }
+      ]
+    },
+    "stages": {"type": "array", "minItems": 1, "maxItems": 7, "items": {"$ref": "#/$defs/stage"}}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"status": {"const": "active"}}},
+      "then": {"properties": {"approval": {"type": "object"}}}
+    }
+  ],
+  "$defs": {
+    "id": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
+    "option": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "text_markdown", "misconception_id", "hint_markdown"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "text_markdown": {"type": "string", "minLength": 1},
+        "misconception_id": {"type": ["string", "null"]},
+        "hint_markdown": {"type": ["string", "null"]}
+      }
+    },
+    "expected_answer": {
+      "oneOf": [
+        {
+          "type": "object", "additionalProperties": false,
+          "required": ["kind", "option_id"],
+          "properties": {"kind": {"const": "choice"}, "option_id": {"$ref": "#/$defs/id"}}
+        },
+        {
+          "type": "object", "additionalProperties": false,
+          "required": ["kind", "value", "units"],
+          "properties": {"kind": {"const": "numeric"}, "value": {"type": "number"}, "units": {"const": "probability"}}
+        }
+      ]
+    },
+    "numeric_policy": {
+      "type": "object", "additionalProperties": false,
+      "required": ["version", "absolute_tolerance", "relative_tolerance", "allowed_forms", "display_decimals"],
+      "properties": {
+        "version": {"type": "integer", "minimum": 1},
+        "absolute_tolerance": {"type": "number", "minimum": 0},
+        "relative_tolerance": {"type": "number", "minimum": 0},
+        "allowed_forms": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["decimal", "percent", "fraction"]}},
+        "display_decimals": {"type": ["integer", "null"], "minimum": 0, "maximum": 12}
+      }
+    },
+    "stage": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "kind", "prompt_markdown", "options", "expected_answer", "evidence_concept_ids", "explanation_markdown", "numeric_policy"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "kind": {"enum": ["choice", "numeric"]},
+        "prompt_markdown": {"type": "string", "minLength": 1},
+        "options": {"type": "array", "maxItems": 4, "items": {"$ref": "#/$defs/option"}},
+        "expected_answer": {"$ref": "#/$defs/expected_answer"},
+        "evidence_concept_ids": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/id"}},
+        "explanation_markdown": {"type": "string", "minLength": 1},
+        "numeric_policy": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/numeric_policy"}]}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"kind": {"const": "choice"}}},
+          "then": {"properties": {"options": {"minItems": 2}, "numeric_policy": {"type": "null"}, "expected_answer": {"properties": {"kind": {"const": "choice"}}}}},
+          "else": {"properties": {"options": {"maxItems": 0}, "numeric_policy": {"type": "object"}, "expected_answer": {"properties": {"kind": {"const": "numeric"}}}}}
+        }
+      ]
+    }
+  }
+}
