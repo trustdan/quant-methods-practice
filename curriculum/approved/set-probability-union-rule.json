@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "set_probability_union_rule",
+  "version": 1,
+  "status": "active",
+  "family_id": "set_probability",
+  "rule_version": 1,
+  "module_id": "module_1",
+  "title": "Probability of union of two events",
+  "scenario_markdown": "In a consumer market survey, 60% of respondents use Brand A ($P(A) = 0.60$), 50% use Brand B ($P(B) = 0.50$), and 30% use both brands ($P(A \\cap B) = 0.30$). Find the probability that a randomly chosen consumer uses at least one of the two brands ($P(A \\cup B)$).",
+  "parameters": {
+    "operation": "union",
+    "p_a": 0.6,
+    "p_b": 0.5,
+    "p_intersection": 0.3
+  },
+  "assumptions": ["Valid probability space", "Fréchet inequality bounds satisfied: max(0, 0.6+0.5-1)=0.1 <= 0.3 <= min(0.6, 0.5)=0.5", "Events are not disjoint because intersection is non-zero"],
+  "concept_ids": ["addition_rule_formula", "addition_rule_calculation", "disjoint_concept"],
+  "setting_group": "set_union_rule",
+  "source_refs": ["Generic introductory reference fixture", "docs/COURSE-MAP.md"],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-05T17:00:00Z",
+    "notes": "Reviewed derivation: P(A union B) = P(A) + P(B) - P(A cap B) = 0.6 + 0.5 - 0.3 = 0.80. Verified Frechet bounds and disjointness check.",
+    "delegation_basis": "Stage 07 user prompt authorization"
+  },
+  "stages": [
+    {
+      "id": "identify_formula",
+      "kind": "choice",
+      "prompt_markdown": "Which formula correctly gives the probability of the union $P(A \\cup B)$?",
+      "options": [
+        {"id": "general_addition", "text_markdown": "$P(A \\cup B) = P(A) + P(B) - P(A \\cap B)$", "misconception_id": null, "hint_markdown": null},
+        {"id": "disjoint_only", "text_markdown": "$P(A \\cup B) = P(A) + P(B)$", "misconception_id": "assume_disjoint_without_check", "hint_markdown": "If you just add P(A) + P(B), what happens to the consumers who use both brands?"},
+        {"id": "multiplication", "text_markdown": "$P(A \\cup B) = P(A) \\times P(B)$", "misconception_id": "multiply_for_union", "hint_markdown": "Multiplication relates to independent intersections, not unions."}
+      ],
+      "expected_answer": {"kind": "choice", "option_id": "general_addition"},
+      "evidence_concept_ids": ["addition_rule_formula"],
+      "explanation_markdown": "The general addition rule subtracts the intersection $P(A \\cap B)$ because elements in both sets are counted twice when adding $P(A) + P(B)$.",
+      "numeric_policy": null
+    },
+    {
+      "id": "calculate_union",
+      "kind": "numeric",
+      "prompt_markdown": "Calculate $P(A \\cup B) = 0.60 + 0.50 - 0.30$. Enter as decimal, percent, or fraction.",
+      "options": [],
+      "expected_answer": {"kind": "numeric", "value": 0.8, "units": "probability"},
+      "evidence_concept_ids": ["addition_rule_calculation"],
+      "explanation_markdown": "$P(A \\cup B) = 0.60 + 0.50 - 0.30 = 0.80$ (or $80\\%$ or $4/5$).",
+      "numeric_policy": {
+        "version": 1,
+        "allowed_forms": ["decimal", "percent", "fraction"],
+        "absolute_tolerance": 0.001,
+        "relative_tolerance": 0.002
+      }
+    },
+    {
+      "id": "disjoint_check",
+      "kind": "choice",
+      "prompt_markdown": "Are events A and B mutually exclusive (disjoint)?",
+      "options": [
+        {"id": "not_disjoint", "text_markdown": "No, because $P(A \\cap B) = 0.30 \\ne 0$ (they have elements in common).", "misconception_id": null, "hint_markdown": null},
+        {"id": "disjoint_yes", "text_markdown": "Yes, because their union is less than 1.0.", "misconception_id": "union_less_than_one_as_disjoint", "hint_markdown": "What is the mathematical condition for disjoint events?"},
+        {"id": "disjoint_because_independent", "text_markdown": "Yes, because disjoint is the same as independent.", "misconception_id": "disjoint_implies_independent", "hint_markdown": "Disjoint means they cannot happen together; independent means one happening doesn't alter the chance of the other."}
+      ],
+      "expected_answer": {"kind": "choice", "option_id": "not_disjoint"},
+      "evidence_concept_ids": ["disjoint_concept"],
+      "explanation_markdown": "Events are mutually exclusive (disjoint) if and only if $P(A \\cap B) = 0$. Since $P(A \\cap B) = 0.30 > 0$, they are not disjoint.",
+      "numeric_policy": null
+    }
+  ]
+}

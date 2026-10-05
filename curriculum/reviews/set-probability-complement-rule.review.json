@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "template_id": "set_probability_complement_rule",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-05T17:00:00Z",
+  "delegation_basis": "Stage 07 user prompt authorization",
+  "mathematical_audit": {
+    "family_id": "set_probability",
+    "parameters": {
+      "operation": "complement",
+      "p_a": 0.35
+    },
+    "canonical_probability": 0.65,
+    "canonical_rational": "13/20",
+    "moments": {
+      "mean": 0.65,
+      "variance": 0.2275,
+      "standard_deviation": 0.47697
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.001,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 2,
+    "concept_count": 2,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "complement_definition", "kind": "choice", "evidence": "complement_formula"},
+      {"id": "calculate_complement", "kind": "numeric", "evidence": "complement_calculation"}
+    ],
+    "numeric_policy": {
+      "version": 1,
+      "allowed_forms": ["decimal", "percent", "fraction"],
+      "absolute_tolerance": 0.001,
+      "relative_tolerance": 0.002
+    }
+  },
+  "notes": "Verified mathematically: P(A^c) = 1 - 0.35 = 0.65 = 13/20."
+}

@@ -10,10 +10,16 @@ import (
 	"mime"
 	"net"
 	"net/http"
+	"os"
 	"path"
+	"sort"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/trustdan/quant-methods-practice/internal/bank"
+	"github.com/trustdan/quant-methods-practice/internal/domain"
+	"github.com/trustdan/quant-methods-practice/internal/drill"
 )
 
 type Config struct {
@@ -21,6 +27,9 @@ type Config struct {
 	AssetsFS          fs.FS
 	Version           string
 	AllowedDevOrigins []string
+	Bank              *bank.Bank
+	SessionManager    *drill.SessionManager
+	Store             drill.SessionStore
 }
 
 type Server struct {
@@ -30,6 +39,9 @@ type Server struct {
 	bootstrapToken    string
 	bootstrapConsumed bool
 	sessionToken      string
+	bank              *bank.Bank
+	sessionManager    *drill.SessionManager
+	lastSessionID     string
 	mu                sync.RWMutex
 }
 
@@ -39,6 +51,28 @@ func NewServer(cfg Config) (*Server, error) {
 	}
 	if cfg.Version == "" {
 		cfg.Version = "0.1.0-dev"
+	}
+	if cfg.SessionManager == nil {
+		if cfg.Store != nil {
+			cfg.SessionManager = drill.NewSessionManagerWithStore(cfg.Store, nil)
+		} else {
+			cfg.SessionManager = drill.NewSessionManager(nil)
+		}
+	}
+	if cfg.Bank == nil {
+		bankDirs := []string{"curriculum/approved", "../curriculum/approved", "../../curriculum/approved"}
+		for _, dir := range bankDirs {
+			if fi, err := os.Stat(dir); err == nil && fi.IsDir() {
+				b, err := bank.LoadActiveBank(dir, nil)
+				if err == nil && b.Count() > 0 {
+					cfg.Bank = b
+					break
+				}
+			}
+		}
+		if cfg.Bank == nil {
+			cfg.Bank = bank.NewBank()
+		}
 	}
 
 	tokenBytes := make([]byte, 24)
@@ -50,11 +84,17 @@ func NewServer(cfg Config) (*Server, error) {
 	s := &Server{
 		config:         cfg,
 		bootstrapToken: bootstrapToken,
+		bank:           cfg.Bank,
+		sessionManager: cfg.SessionManager,
 	}
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/api/health", s.handleHealth)
 	mux.HandleFunc("/api/local-session", s.handleLocalSession)
+	mux.HandleFunc("/api/settings", s.handleSettings)
+	mux.HandleFunc("/api/bank", s.handleBank)
+	mux.HandleFunc("/api/practice/sessions", s.handlePracticeSessions)
+	mux.HandleFunc("/api/practice/sessions/", s.handlePracticeSessionByID)
 	mux.HandleFunc("/", s.handleStaticOrSPA)
 
 	wrapped := s.securityMiddleware(mux)
@@ -227,6 +267,307 @@ func (s *Server) handleLocalSession(w http.ResponseWriter, r *http.Request) {
 		Status:       "ok",
 		SessionToken: s.sessionToken,
 	})
+}
+
+type createSessionRequest struct {
+	TemplateID    string   `json:"template_id,omitempty"`
+	QuestionCount int      `json:"question_count,omitempty"`
+	ModuleIDs     []string `json:"module_ids,omitempty"`
+	Intensity     string   `json:"intensity,omitempty"`
+	Seed          int64    `json:"seed,omitempty"`
+}
+
+func (s *Server) handlePracticeSessions(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodPost:
+		var req createSessionRequest
+		if r.Body != nil && r.ContentLength > 0 {
+			_ = json.NewDecoder(r.Body).Decode(&req)
+		}
+
+		s.mu.Lock()
+		defer s.mu.Unlock()
+
+		if s.bank == nil || s.bank.Count() == 0 {
+			http.Error(w, "no approved question templates available", http.StatusBadRequest)
+			return
+		}
+
+		var sess *drill.DrillSession
+		var err error
+
+		if req.TemplateID != "" {
+			tmpl, ok := s.bank.Get(req.TemplateID)
+			if !ok {
+				http.Error(w, fmt.Sprintf("template %q not found", req.TemplateID), http.StatusBadRequest)
+				return
+			}
+			sess, err = s.sessionManager.CreateSession(tmpl, req.Seed)
+		} else {
+			allTemplates := s.bank.List()
+			var filtered []*domain.QuestionTemplate
+			if len(req.ModuleIDs) > 0 {
+				modMap := make(map[string]bool)
+				for _, m := range req.ModuleIDs {
+					modMap[m] = true
+				}
+				for _, tmpl := range allTemplates {
+					if modMap[tmpl.ModuleID] {
+						filtered = append(filtered, tmpl)
+					}
+				}
+			}
+			if len(filtered) == 0 {
+				filtered = allTemplates
+			}
+
+			// Ensure canonical introductory template is placed first if present
+			sort.SliceStable(filtered, func(i, j int) bool {
+				if filtered[i].ID == "binomial_fair_coin_exactly_two" {
+					return true
+				}
+				if filtered[j].ID == "binomial_fair_coin_exactly_two" {
+					return false
+				}
+				return filtered[i].ID < filtered[j].ID
+			})
+
+			qCount := req.QuestionCount
+			if qCount <= 0 {
+				if s.bank.Count() == 1 {
+					qCount = 1
+				} else {
+					qCount = 10
+				}
+			}
+
+			selected := make([]*domain.QuestionTemplate, 0, qCount)
+			for i := 0; i < qCount; i++ {
+				selected = append(selected, filtered[i%len(filtered)])
+			}
+
+			settings := domain.SessionSettings{
+				QuestionCount: qCount,
+				ModuleIDs:     req.ModuleIDs,
+				Intensity:     req.Intensity,
+			}
+			if settings.Intensity == "" {
+				settings.Intensity = "standard"
+			}
+
+			sess, err = s.sessionManager.CreateMultiQuestionSession(selected, settings, req.Seed)
+		}
+
+		if err != nil {
+			http.Error(w, fmt.Sprintf("failed to create session: %v", err), http.StatusInternalServerError)
+			return
+		}
+
+		s.lastSessionID = sess.ID
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusCreated)
+		_ = json.NewEncoder(w).Encode(sess.ToPublicView())
+
+	case http.MethodGet:
+		s.mu.RLock()
+		lastID := s.lastSessionID
+		s.mu.RUnlock()
+
+		if lastID != "" {
+			if sess, ok := s.sessionManager.GetSession(lastID); ok {
+				w.Header().Set("Content-Type", "application/json")
+				_ = json.NewEncoder(w).Encode(sess.ToPublicView())
+				return
+			}
+		}
+
+		// Check persistent storage for an active session
+		if sess, ok := s.sessionManager.GetActiveSession(); ok {
+			s.mu.Lock()
+			s.lastSessionID = sess.ID
+			s.mu.Unlock()
+			w.Header().Set("Content-Type", "application/json")
+			_ = json.NewEncoder(w).Encode(sess.ToPublicView())
+			return
+		}
+
+		// If no active session, create one
+		s.mu.Lock()
+		defer s.mu.Unlock()
+
+		if s.bank == nil || s.bank.Count() == 0 {
+			http.Error(w, "no approved question templates available", http.StatusNotFound)
+			return
+		}
+
+		allTemplates := s.bank.List()
+		sort.SliceStable(allTemplates, func(i, j int) bool {
+			if allTemplates[i].ID == "binomial_fair_coin_exactly_two" {
+				return true
+			}
+			if allTemplates[j].ID == "binomial_fair_coin_exactly_two" {
+				return false
+			}
+			return allTemplates[i].ID < allTemplates[j].ID
+		})
+		qCount := 10
+		if s.bank.Count() < 10 {
+			qCount = s.bank.Count()
+		}
+		selected := make([]*domain.QuestionTemplate, 0, qCount)
+		for i := 0; i < qCount; i++ {
+			selected = append(selected, allTemplates[i%len(allTemplates)])
+		}
+
+		settings := domain.SessionSettings{
+			QuestionCount: qCount,
+			Intensity:     "standard",
+		}
+		sess, err := s.sessionManager.CreateMultiQuestionSession(selected, settings, 0)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("failed to create session: %v", err), http.StatusInternalServerError)
+			return
+		}
+
+		s.lastSessionID = sess.ID
+		w.Header().Set("Content-Type", "application/json")
+		_ = json.NewEncoder(w).Encode(sess.ToPublicView())
+
+	default:
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+	}
+}
+
+func (s *Server) handleSettings(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodGet:
+		w.Header().Set("Content-Type", "application/json")
+		if s.config.Store != nil {
+			if val, err := s.config.Store.GetSettings(r.Context(), "user_preferences"); err == nil && val != "" {
+				_, _ = w.Write([]byte(val))
+				return
+			}
+		}
+		_ = json.NewEncoder(w).Encode(map[string]any{
+			"question_count": 10,
+			"module_ids":     []string{},
+			"intensity":      "standard",
+		})
+
+	case http.MethodPost:
+		body, err := io.ReadAll(io.LimitReader(r.Body, 64*1024))
+		if err != nil {
+			http.Error(w, "failed to read request body", http.StatusBadRequest)
+			return
+		}
+		if s.config.Store != nil {
+			_ = s.config.Store.SaveSettings(r.Context(), "user_preferences", string(body))
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write(body)
+
+	default:
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+	}
+}
+
+type templateSummary struct {
+	ID          string   `json:"id"`
+	Version     int      `json:"version"`
+	Title       string   `json:"title"`
+	ModuleID    string   `json:"module_id"`
+	FamilyID    string   `json:"family_id"`
+	ConceptIDs  []string `json:"concept_ids"`
+	StagesCount int      `json:"stages_count"`
+}
+
+func (s *Server) handleBank(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	if s.bank == nil {
+		_ = json.NewEncoder(w).Encode([]templateSummary{})
+		return
+	}
+
+	list := s.bank.List()
+	summaries := make([]templateSummary, len(list))
+	for i, tmpl := range list {
+		summaries[i] = templateSummary{
+			ID:          tmpl.ID,
+			Version:     tmpl.Version,
+			Title:       tmpl.Title,
+			ModuleID:    tmpl.ModuleID,
+			FamilyID:    tmpl.FamilyID,
+			ConceptIDs:  tmpl.ConceptIDs,
+			StagesCount: len(tmpl.Stages),
+		}
+	}
+	_ = json.NewEncoder(w).Encode(summaries)
+}
+
+func (s *Server) handlePracticeSessionByID(w http.ResponseWriter, r *http.Request) {
+	rest := strings.TrimPrefix(r.URL.Path, "/api/practice/sessions/")
+	parts := strings.Split(strings.Trim(rest, "/"), "/")
+	if len(parts) == 0 || parts[0] == "" {
+		http.NotFound(w, r)
+		return
+	}
+
+	sessionID := parts[0]
+	sess, ok := s.sessionManager.GetSession(sessionID)
+	if !ok {
+		http.Error(w, fmt.Sprintf("session %q not found", sessionID), http.StatusNotFound)
+		return
+	}
+
+	if len(parts) == 1 {
+		if r.Method != http.MethodGet {
+			http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_ = json.NewEncoder(w).Encode(sess.ToPublicView())
+		return
+	}
+
+	if len(parts) == 2 && parts[1] == "commands" {
+		if r.Method != http.MethodPost {
+			http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+
+		var cmd drill.SessionCommand
+		if err := json.NewDecoder(r.Body).Decode(&cmd); err != nil {
+			http.Error(w, fmt.Sprintf("invalid command body: %v", err), http.StatusBadRequest)
+			return
+		}
+
+		res, err := sess.ExecuteCommand(cmd, nil)
+		w.Header().Set("Content-Type", "application/json")
+		if err == drill.ErrRevisionConflict {
+			w.WriteHeader(http.StatusConflict)
+		} else if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+		} else {
+			w.WriteHeader(http.StatusOK)
+		}
+
+		if res != nil {
+			_ = json.NewEncoder(w).Encode(res)
+		} else {
+			_ = json.NewEncoder(w).Encode(map[string]any{
+				"success":       false,
+				"error_message": err.Error(),
+			})
+		}
+		return
+	}
+
+	http.NotFound(w, r)
 }
 
 func (s *Server) handleStaticOrSPA(w http.ResponseWriter, r *http.Request) {

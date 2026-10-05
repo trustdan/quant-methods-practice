@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "template_id": "binomial_fair_coin_exactly_two",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-05T16:00:00Z",
+  "delegation_basis": "Stage 04 user prompt authorization",
+  "mathematical_audit": {
+    "family_id": "binomial_pmf",
+    "parameters": {"n": 4, "p": 0.5, "k": 2},
+    "canonical_probability": 0.375,
+    "canonical_rational": "3/8",
+    "moments": {
+      "mean": 2.0,
+      "variance": 1.0,
+      "standard_deviation": 1.0
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.000001,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 7,
+    "concept_count": 7,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "define_variable", "kind": "choice", "evidence": "random_variable_definition"},
+      {"id": "choose_model", "kind": "choice", "evidence": "distribution_selection"},
+      {"id": "check_parameters", "kind": "choice", "evidence": "binomial_conditions"},
+      {"id": "translate_event", "kind": "choice", "evidence": "event_translation"},
+      {"id": "build_expression", "kind": "choice", "evidence": "binomial_expression"},
+      {"id": "calculate_probability", "kind": "numeric", "evidence": "probability_calculation"},
+      {"id": "interpret_probability", "kind": "choice", "evidence": "probability_interpretation"}
+    ],
+    "numeric_policy": {
+      "version": 1,
+      "allowed_forms": ["decimal", "percent", "fraction"],
+      "absolute_tolerance": 0.0000005,
+      "relative_tolerance": 0.000001
+    }
+  },
+  "notes": "Verified mathematically against exact rational arithmetic in Go mathengine. Distractors carry targeted causal hints without leaking key. Numeric stage accepts 0.375, 37.5%, and 3/8 under documented tolerance policy."
+}

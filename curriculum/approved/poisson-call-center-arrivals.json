@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "poisson_call_center_arrivals",
+  "version": 1,
+  "status": "active",
+  "family_id": "poisson_pmf",
+  "rule_version": 1,
+  "module_id": "module_2",
+  "title": "Call center arrivals with rate three",
+  "scenario_markdown": "Incoming support calls arrive at an average rate of $\\lambda = 3$ calls per minute according to a Poisson process. Find the probability of receiving exactly two calls in a given minute.",
+  "parameters": {"lambda": 3.0, "k": 2},
+  "assumptions": ["Constant arrival rate lambda = 3.0 per minute", "Independent non-overlapping time intervals", "Zero probability of simultaneous arrivals", "Memoryless arrival process"],
+  "concept_ids": ["poisson_distribution_selection", "poisson_parameters", "poisson_calculation", "poisson_moments"],
+  "setting_group": "poisson_rate_discrete",
+  "source_refs": ["Generic introductory reference fixture", "docs/COURSE-MAP.md"],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-05T17:00:00Z",
+    "notes": "Reviewed derivation for lambda=3, k=2: P(X=2) = 3^2 * exp(-3) / 2! = 4.5 * 0.049787 = 0.22404. Verified moments and distractors.",
+    "delegation_basis": "Stage 07 user prompt authorization"
+  },
+  "stages": [
+    {
+      "id": "model_selection",
+      "kind": "choice",
+      "prompt_markdown": "Why is the Poisson distribution appropriate for modeling incoming calls?",
+      "options": [
+        {"id": "poisson_rate", "text_markdown": "Calls arrive continuously at a constant average rate $\\lambda$ over a time interval without a fixed upper trial bound.", "misconception_id": null, "hint_markdown": null},
+        {"id": "fixed_trials", "text_markdown": "There are exactly 3 customers in the whole world.", "misconception_id": "rate_as_fixed_population", "hint_markdown": "Average rate $\\lambda=3$ per minute does not mean the total population is 3."},
+        {"id": "bell_curve", "text_markdown": "The number of calls is a continuous real number with decimal points.", "misconception_id": "continuous_for_call_count", "hint_markdown": "Can you receive 2.5 calls?"}
+      ],
+      "expected_answer": {"kind": "choice", "option_id": "poisson_rate"},
+      "evidence_concept_ids": ["poisson_distribution_selection"],
+      "explanation_markdown": "The Poisson distribution models counts of independent events occurring at a known average rate in a fixed interval.",
+      "numeric_policy": null
+    },
+    {
+      "id": "parameter_identification",
+      "kind": "choice",
+      "prompt_markdown": "Identify the parameters and target event count from the scenario.",
+      "options": [
+        {"id": "lambda3_k2", "text_markdown": "$\\lambda = 3.0$ per minute, target count $k = 2$", "misconception_id": null, "hint_markdown": null},
+        {"id": "lambda2_k3", "text_markdown": "$\\lambda = 2.0$, target count $k = 3$", "misconception_id": "swap_rate_and_count", "hint_markdown": "Which number is the average arrival rate and which is the count of interest?"},
+        {"id": "lambda6", "text_markdown": "$\\lambda = 6.0$ because $3 \\times 2 = 6$", "misconception_id": "multiply_rate_and_count", "hint_markdown": "The interval is one minute, so the rate remains 3.0."}
+      ],
+      "expected_answer": {"kind": "choice", "option_id": "lambda3_k2"},
+      "evidence_concept_ids": ["poisson_parameters"],
+      "explanation_markdown": "The scenario gives rate $\\lambda = 3.0$ and asks for the probability of $k = 2$ calls.",
+      "numeric_policy": null
+    },
+    {
+      "id": "calculate_pmf",
+      "kind": "numeric",
+      "prompt_markdown": "Calculate $P(X = 2) = \\frac{\\lambda^k e^{-\\lambda}}{k!}$. Enter as a decimal or percent.",
+      "options": [],
+      "expected_answer": {"kind": "numeric", "value": 0.22404, "units": "probability"},
+      "evidence_concept_ids": ["poisson_calculation"],
+      "explanation_markdown": "$P(X=2) = \\frac{3^2 e^{-3}}{2!} = \\frac{9 \\times 0.049787}{2} = 0.22404$.",
+      "numeric_policy": {
+        "version": 1,
+        "allowed_forms": ["decimal", "percent", "fraction"],
+        "absolute_tolerance": 0.001,
+        "relative_tolerance": 0.005
+      }
+    },
+    {
+      "id": "moments_check",
+      "kind": "choice",
+      "prompt_markdown": "What are the theoretical mean and variance of this arrival distribution?",
+      "options": [
+        {"id": "mean3_var3", "text_markdown": "$\\operatorname{E}[X] = 3.0$ and $\\operatorname{Var}(X) = 3.0$ (mean equals variance)", "misconception_id": null, "hint_markdown": null},
+        {"id": "mean3_var9", "text_markdown": "$\\operatorname{E}[X] = 3.0$ and $\\operatorname{Var}(X) = 9.0$ (variance is square of mean)", "misconception_id": "square_rate_for_variance", "hint_markdown": "In a Poisson distribution, how does variance relate to $\\lambda$?"},
+        {"id": "mean3_var_zero", "text_markdown": "$\\operatorname{Var}(X) = 0$ because rate is constant", "misconception_id": "constant_rate_zero_variance", "hint_markdown": "The rate is constant, but actual arrivals vary randomly from minute to minute."}
+      ],
+      "expected_answer": {"kind": "choice", "option_id": "mean3_var3"},
+      "evidence_concept_ids": ["poisson_moments"],
+      "explanation_markdown": "A defining characteristic of the Poisson distribution is that $\\operatorname{E}[X] = \\lambda$ and $\\operatorname{Var}(X) = \\lambda$. Here both equal 3.0.",
+      "numeric_policy": null
+    }
+  ]
+}

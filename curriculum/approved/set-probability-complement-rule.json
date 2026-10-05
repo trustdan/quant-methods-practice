@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "set_probability_complement_rule",
+  "version": 1,
+  "status": "active",
+  "family_id": "set_probability",
+  "rule_version": 1,
+  "module_id": "module_1",
+  "title": "Complement of market surge",
+  "scenario_markdown": "An economic forecasting model estimates a 35% probability ($P(A) = 0.35$) that the market will surge in the upcoming quarter. Find the probability that the market does NOT experience a surge ($P(A^c)$).",
+  "parameters": {
+    "operation": "complement",
+    "p_a": 0.35
+  },
+  "assumptions": ["Valid probability space with sample space S", "Surge and non-surge partition the sample space: A union A^c = S and A cap A^c = empty"],
+  "concept_ids": ["complement_formula", "complement_calculation"],
+  "setting_group": "set_complement_rule",
+  "source_refs": ["Generic introductory reference fixture", "docs/COURSE-MAP.md"],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-05T17:00:00Z",
+    "notes": "Reviewed derivation: P(A^c) = 1 - P(A) = 1 - 0.35 = 0.65. Verified partition axiom.",
+    "delegation_basis": "Stage 07 user prompt authorization"
+  },
+  "stages": [
+    {
+      "id": "complement_definition",
+      "kind": "choice",
+      "prompt_markdown": "Which fundamental probability rule relates an event $A$ to its complement $A^c$?",
+      "options": [
+        {"id": "one_minus_pa", "text_markdown": "$P(A^c) = 1 - P(A)$ because an event and its complement partition the sample space", "misconception_id": null, "hint_markdown": null},
+        {"id": "reciprocal_pa", "text_markdown": "$P(A^c) = \\frac{1}{P(A)}$", "misconception_id": "complement_as_reciprocal", "hint_markdown": "Probability cannot exceed one. If P(A)=0.35, 1/0.35 > 1."},
+        {"id": "negative_pa", "text_markdown": "$P(A^c) = -P(A)$", "misconception_id": "complement_as_negative", "hint_markdown": "Probabilities must always be non-negative numbers in [0, 1]."}
+      ],
+      "expected_answer": {"kind": "choice", "option_id": "one_minus_pa"},
+      "evidence_concept_ids": ["complement_formula"],
+      "explanation_markdown": "By the complement axiom, $P(A) + P(A^c) = P(S) = 1$, which gives $P(A^c) = 1 - P(A)$.",
+      "numeric_policy": null
+    },
+    {
+      "id": "calculate_complement",
+      "kind": "numeric",
+      "prompt_markdown": "Calculate $P(A^c) = 1 - 0.35$. Enter as a decimal, percent, or fraction.",
+      "options": [],
+      "expected_answer": {"kind": "numeric", "value": 0.65, "units": "probability"},
+      "evidence_concept_ids": ["complement_calculation"],
+      "explanation_markdown": "$P(A^c) = 1.0 - 0.35 = 0.65$ (or $65\\%$ or $13/20$).",
+      "numeric_policy": {
+        "version": 1,
+        "allowed_forms": ["decimal", "percent", "fraction"],
+        "absolute_tolerance": 0.001,
+        "relative_tolerance": 0.002
+      }
+    }
+  ]
+}

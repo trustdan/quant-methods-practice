@@ -416,3 +416,65 @@ html, body {
   white-space: nowrap;
   border: 0;
 }
+
+/* Responsive Layout & Math Rendering (Mobile & Narrow Screens) */
+@media (max-width: 768px) {
+  .app-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+  }
+  .app-header > div {
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+  .question-strip-bar {
+    flex-direction: column;
+    align-items: stretch !important;
+  }
+  .question-strip-bar > div {
+    flex-wrap: wrap !important;
+    max-width: 100%;
+  }
+  .question-strip {
+    flex-wrap: wrap !important;
+  }
+  .options-grid {
+    grid-template-columns: 1fr;
+  }
+  .card {
+    padding: 1rem;
+  }
+  .strip-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .app-footer {
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+  }
+}
+
+.math-markdown {
+  max-width: 100%;
+  overflow-x: auto;
+  word-break: break-word;
+}
+
+.math-markdown mjx-container {
+  max-width: 100%;
+}
+
+.math-markdown mjx-container svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.math-markdown mjx-container[jax="SVG"][display="true"] {
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+

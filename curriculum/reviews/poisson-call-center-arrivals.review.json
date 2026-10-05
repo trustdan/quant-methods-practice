@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "template_id": "poisson_call_center_arrivals",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-05T17:00:00Z",
+  "delegation_basis": "Stage 07 user prompt authorization",
+  "mathematical_audit": {
+    "family_id": "poisson_pmf",
+    "parameters": {"lambda": 3.0, "k": 2},
+    "canonical_probability": 0.22404,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 3.0,
+      "variance": 3.0,
+      "standard_deviation": 1.73205
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.001,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 4,
+    "concept_count": 4,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "model_selection", "kind": "choice", "evidence": "poisson_distribution_selection"},
+      {"id": "parameter_identification", "kind": "choice", "evidence": "poisson_parameters"},
+      {"id": "calculate_pmf", "kind": "numeric", "evidence": "poisson_calculation"},
+      {"id": "moments_check", "kind": "choice", "evidence": "poisson_moments"}
+    ],
+    "numeric_policy": {
+      "version": 1,
+      "allowed_forms": ["decimal", "percent", "fraction"],
+      "absolute_tolerance": 0.001,
+      "relative_tolerance": 0.005
+    }
+  },
+  "notes": "Verified mathematically: P(X=2) = 4.5 * exp(-3) = 0.22404. Moments mean=3, var=3. 4 pedagogical stages."
+}

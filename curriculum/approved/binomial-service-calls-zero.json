@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "binomial_service_calls_zero",
+  "version": 1,
+  "status": "active",
+  "family_id": "binomial_pmf",
+  "rule_version": 1,
+  "module_id": "module_2",
+  "title": "Zero service requests in three trials",
+  "scenario_markdown": "Over 3 independent customer visits, each customer has a 20% probability ($p=0.20$) of requesting technical service. Find the probability that none of the three customers request service.",
+  "parameters": {"n": 3, "p": 0.2, "k": 0},
+  "assumptions": ["Three fixed trials", "Independent customer requests", "Constant request probability 0.20", "Two outcomes per visit: service or no service"],
+  "concept_ids": ["event_translation", "probability_calculation", "probability_interpretation"],
+  "setting_group": "binomial_zero_success",
+  "source_refs": ["Generic introductory reference fixture", "docs/COURSE-MAP.md"],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-05T17:00:00Z",
+    "notes": "Reviewed derivation for n=3, p=0.2, k=0 yielding P(X=0) = (0.8)^3 = 0.512. 3 stages with 1-to-1 concept evidence mapping.",
+    "delegation_basis": "Stage 07 user prompt authorization"
+  },
+  "stages": [
+    {
+      "id": "define_event",
+      "kind": "choice",
+      "prompt_markdown": "Which event formulation represents 'none of the three customers request service'?",
+      "options": [
+        {"id": "equal_zero", "text_markdown": "$P(X = 0)$ where $X \\sim \\operatorname{Binomial}(n=3, p=0.20)$", "misconception_id": null, "hint_markdown": null},
+        {"id": "at_most_one", "text_markdown": "$P(X \\le 1)$", "misconception_id": "none_as_at_most_one", "hint_markdown": "Does 'none' allow one service request?"},
+        {"id": "equal_one", "text_markdown": "$P(X = 1)$", "misconception_id": "none_as_single", "hint_markdown": "None means zero successes, not one."}
+      ],
+      "expected_answer": {"kind": "choice", "option_id": "equal_zero"},
+      "evidence_concept_ids": ["event_translation"],
+      "explanation_markdown": "'None' corresponds to zero service requests, so the event is $X = 0$.",
+      "numeric_policy": null
+    },
+    {
+      "id": "calculate_zero_success",
+      "kind": "numeric",
+      "prompt_markdown": "Calculate $P(X = 0)$. Enter decimal, percent, or fraction.",
+      "options": [],
+      "expected_answer": {"kind": "numeric", "value": 0.512, "units": "probability"},
+      "evidence_concept_ids": ["probability_calculation"],
+      "explanation_markdown": "$P(X = 0) = \\binom{3}{0} (0.2)^0 (0.8)^3 = 1 \\times 1 \\times 0.512 = 0.512$.",
+      "numeric_policy": {
+        "version": 1,
+        "allowed_forms": ["decimal", "percent", "fraction"],
+        "absolute_tolerance": 0.001,
+        "relative_tolerance": 0.002
+      }
+    },
+    {
+      "id": "interpret_result",
+      "kind": "choice",
+      "prompt_markdown": "What does $P(X = 0) = 0.512$ tell us about the frequency of zero-request visits?",
+      "options": [
+        {"id": "majority", "text_markdown": "In slightly more than half of all three-visit sets (51.2%), no customer requests service.", "misconception_id": null, "hint_markdown": null},
+        {"id": "rare", "text_markdown": "Zero requests is an extremely rare outlier event.", "misconception_id": "misinterpret_50_percent", "hint_markdown": "A probability of 0.512 is greater than 50%."},
+        {"id": "certain", "text_markdown": "Zero requests is guaranteed to occur on every visit.", "misconception_id": "probability_as_certainty", "hint_markdown": "0.512 is not 1.0; requests can and do occur."}
+      ],
+      "expected_answer": {"kind": "choice", "option_id": "majority"},
+      "evidence_concept_ids": ["probability_interpretation"],
+      "explanation_markdown": "$0.512$ translates to $51.2\\%$, meaning a majority of three-visit sets will see zero requests.",
+      "numeric_policy": null
+    }
+  ]
+}

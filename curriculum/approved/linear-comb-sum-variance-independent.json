@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "linear_comb_sum_variance_independent",
+  "version": 1,
+  "status": "active",
+  "family_id": "linear_combination",
+  "rule_version": 1,
+  "module_id": "module_2",
+  "title": "Sum and variance of independent indicator variables",
+  "scenario_markdown": "Let $X$ and $Y$ be two independent indicator random variables for project milestones, where $X \\sim \\operatorname{Bernoulli}(p_1 = 0.40)$ and $Y \\sim \\operatorname{Bernoulli}(p_2 = 0.50)$. Let $S = X + Y$ be the total number of milestones achieved. Find the probability that exactly one milestone is achieved, $P(S = 1)$.",
+  "parameters": {
+    "operation": "variance_independent",
+    "a": 1.0,
+    "b": 1.0,
+    "e_x": 0.4,
+    "e_y": 0.5,
+    "var_x": 0.24,
+    "var_y": 0.25
+  },
+  "assumptions": ["Independence: Cov(X, Y) = 0", "Bernoulli distributions: Var(X) = p1(1-p1) = 0.24, Var(Y) = p2(1-p2) = 0.25", "Support of sum S is {0, 1, 2}"],
+  "concept_ids": ["linearity_of_expectation", "variance_of_independent_sum", "sum_probability_calculation", "covariance_independence_property"],
+  "setting_group": "linear_comb_indicators",
+  "source_refs": ["Generic introductory reference fixture", "docs/COURSE-MAP.md"],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-05T17:00:00Z",
+    "notes": "Reviewed derivation: E[S]=0.4+0.5=0.9, Var(S)=0.24+0.25=0.49 under independence. P(S=1) = (0.4)(0.5) + (0.6)(0.5) = 0.50.",
+    "delegation_basis": "Stage 07 user prompt authorization"
+  },
+  "stages": [
+    {
+      "id": "expectation_linearity",
+      "kind": "choice",
+      "prompt_markdown": "What is the expected total number of completed milestones $\\operatorname{E}[S] = \\operatorname{E}[X + Y]$?",
+      "options": [
+        {"id": "sum_of_means", "text_markdown": "$\\operatorname{E}[X] + \\operatorname{E}[Y] = 0.40 + 0.50 = 0.90$, which holds regardless of whether X and Y are independent.", "misconception_id": null, "hint_markdown": null},
+        {"id": "product_of_means", "text_markdown": "$0.40 \\times 0.50 = 0.20$", "misconception_id": "multiply_means_for_sum", "hint_markdown": "Expectation is additive for sums: E[X + Y] = E[X] + E[Y]."},
+        {"id": "average_of_means", "text_markdown": "$(0.40 + 0.50)/2 = 0.45$", "misconception_id": "average_instead_of_sum", "hint_markdown": "We are counting the total sum of both milestones, not their average."}
+      ],
+      "expected_answer": {"kind": "choice", "option_id": "sum_of_means"},
+      "evidence_concept_ids": ["linearity_of_expectation"],
+      "explanation_markdown": "Linearity of expectation holds universally: $\\operatorname{E}[X + Y] = \\operatorname{E}[X] + \\operatorname{E}[Y] = 0.40 + 0.50 = 0.90$.",
+      "numeric_policy": null
+    },
+    {
+      "id": "variance_additivity",
+      "kind": "choice",
+      "prompt_markdown": "Given $\\operatorname{Var}(X) = 0.24$ and $\\operatorname{Var}(Y) = 0.25$, what is $\\operatorname{Var}(X + Y)$ for independent $X$ and $Y$?",
+      "options": [
+        {"id": "sum_of_variances", "text_markdown": "$\\operatorname{Var}(X) + \\operatorname{Var}(Y) = 0.24 + 0.25 = 0.49$ because $\\operatorname{Cov}(X, Y) = 0$.", "misconception_id": null, "hint_markdown": null},
+        {"id": "square_of_sum", "text_markdown": "$(0.24 + 0.25)^2 = 0.2401$", "misconception_id": "square_variance_sum", "hint_markdown": "For independent variables, variances add directly: Var(X + Y) = Var(X) + Var(Y)."},
+        {"id": "sqrt_of_variances", "text_markdown": "$\\sqrt{0.24} + \\sqrt{0.25} = 0.9899$", "misconception_id": "add_standard_deviations", "hint_markdown": "Standard deviations do not add; variances add."}
+      ],
+      "expected_answer": {"kind": "choice", "option_id": "sum_of_variances"},
+      "evidence_concept_ids": ["variance_of_independent_sum"],
+      "explanation_markdown": "For independent random variables, covariance is zero and variances sum directly: $\\operatorname{Var}(X + Y) = 0.24 + 0.25 = 0.49$.",
+      "numeric_policy": null
+    },
+    {
+      "id": "calculate_probability",
+      "kind": "numeric",
+      "prompt_markdown": "Calculate $P(S = 1) = P(X=1, Y=0) + P(X=0, Y=1)$. Enter as decimal, percent, or fraction.",
+      "options": [],
+      "expected_answer": {"kind": "numeric", "value": 0.5, "units": "probability"},
+      "evidence_concept_ids": ["sum_probability_calculation"],
+      "explanation_markdown": "$P(S = 1) = (0.40)(0.50) + (0.60)(0.50) = 0.20 + 0.30 = 0.50$ (or $50\\%$ or $1/2$).",
+      "numeric_policy": {
+        "version": 1,
+        "allowed_forms": ["decimal", "percent", "fraction"],
+        "absolute_tolerance": 0.001,
+        "relative_tolerance": 0.001
+      }
+    },
+    {
+      "id": "covariance_role",
+      "kind": "choice",
+      "prompt_markdown": "If the milestones were positively correlated instead of independent, how would $\\operatorname{Var}(X + Y)$ compare to 0.49?",
+      "options": [
+        {"id": "variance_greater", "text_markdown": "$\\operatorname{Var}(X + Y) > 0.49$ because $+2\\operatorname{Cov}(X, Y) > 0$ increases the total variance.", "misconception_id": null, "hint_markdown": null},
+        {"id": "variance_smaller", "text_markdown": "$\\operatorname{Var}(X + Y) < 0.49$ because positive correlation stabilizes milestones.", "misconception_id": "confuse_hedging_sign", "hint_markdown": "Notice that for a sum X + Y, the cross-term has a POSITIVE sign: +2Cov(X, Y)."},
+        {"id": "variance_same", "text_markdown": "Variance is identical because correlation only affects the product $XY$.", "misconception_id": "ignore_covariance_in_sum", "hint_markdown": "The general formula is Var(X + Y) = Var(X) + Var(Y) + 2Cov(X, Y)."}
+      ],
+      "expected_answer": {"kind": "choice", "option_id": "variance_greater"},
+      "evidence_concept_ids": ["covariance_independence_property"],
+      "explanation_markdown": "$\\operatorname{Var}(X + Y) = \\operatorname{Var}(X) + \\operatorname{Var}(Y) + 2\\operatorname{Cov}(X, Y)$. When $\\operatorname{Cov}(X, Y) > 0$, the sum variance exceeds $0.49$.",
+      "numeric_policy": null
+    }
+  ]
+}

@@ -1,0 +1,125 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "binomial_fair_coin_exactly_two",
+  "version": 1,
+  "status": "active",
+  "family_id": "binomial_pmf",
+  "rule_version": 1,
+  "module_id": "module_2",
+  "title": "Exactly two heads in four tosses",
+  "scenario_markdown": "A fair coin is tossed four times independently. Find the probability of getting exactly two heads.",
+  "parameters": {"n": 4, "p": 0.5, "k": 2},
+  "assumptions": ["Four fixed trials", "Independent tosses", "Two outcomes per toss", "Constant head probability 0.5"],
+  "concept_ids": ["random_variable_definition", "distribution_selection", "binomial_conditions", "event_translation", "binomial_expression", "probability_calculation", "probability_interpretation"],
+  "setting_group": "binomial_fixed_independent_exact_count",
+  "source_refs": ["Generic introductory reference fixture", "docs/PEDAGOGY.md"],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-05T16:00:00Z",
+    "notes": "Reviewed canonical derivation n=4, p=0.5, k=2 yielding exact rational 3/8 (0.375). Verified all 8 distractor misconceptions, 7 stages, and 1-to-1 evidence concept mapping.",
+    "delegation_basis": "Stage 04 user prompt authorization"
+  },
+  "stages": [
+    {
+      "id": "define_variable",
+      "kind": "choice",
+      "prompt_markdown": "What should $X$ represent?",
+      "options": [
+        {"id": "count_heads", "text_markdown": "The number of heads in four tosses", "misconception_id": null, "hint_markdown": null},
+        {"id": "chance_one_head", "text_markdown": "The probability of a head on one toss", "misconception_id": "parameter_as_random_variable", "hint_markdown": "Which quantity changes from one four-toss experiment to another?"},
+        {"id": "number_tosses", "text_markdown": "The number of tosses", "misconception_id": "fixed_count_as_random_variable", "hint_markdown": "The experiment fixes the number of tosses. What outcome count is still unknown?"}
+      ],
+      "expected_answer": {"kind": "choice", "option_id": "count_heads"},
+      "evidence_concept_ids": ["random_variable_definition"],
+      "explanation_markdown": "$X$ counts heads in the whole experiment, so its possible values are $0,1,2,3,4$.",
+      "numeric_policy": null
+    },
+    {
+      "id": "choose_model",
+      "kind": "choice",
+      "prompt_markdown": "Which distribution models this count?",
+      "options": [
+        {"id": "binomial", "text_markdown": "Binomial", "misconception_id": null, "hint_markdown": null},
+        {"id": "poisson", "text_markdown": "Poisson", "misconception_id": "poisson_for_fixed_trials", "hint_markdown": "Are we counting events during exposure, or successes across a fixed number of two-outcome trials?"},
+        {"id": "normal", "text_markdown": "Continuous normal", "misconception_id": "continuous_for_discrete_count", "hint_markdown": "Can the number of heads take fractional values?"}
+      ],
+      "expected_answer": {"kind": "choice", "option_id": "binomial"},
+      "evidence_concept_ids": ["distribution_selection"],
+      "explanation_markdown": "The experiment counts successes in a fixed number of independent Bernoulli trials with the same success probability.",
+      "numeric_policy": null
+    },
+    {
+      "id": "check_parameters",
+      "kind": "choice",
+      "prompt_markdown": "Which parameter/condition statement fits?",
+      "options": [
+        {"id": "n4_p_half", "text_markdown": "$n=4$, $p=0.5$, with independent tosses and constant success probability", "misconception_id": null, "hint_markdown": null},
+        {"id": "n2_p_half", "text_markdown": "$n=2$, $p=0.5$, because two heads are requested", "misconception_id": "target_as_trial_count", "hint_markdown": "Separate the total number of trials from the number of successes requested."},
+        {"id": "n4_p2", "text_markdown": "$n=4$, $p=2$, because two heads are requested", "misconception_id": "count_as_probability", "hint_markdown": "A probability must be between zero and one. What is the chance of heads on one toss?"}
+      ],
+      "expected_answer": {"kind": "choice", "option_id": "n4_p_half"},
+      "evidence_concept_ids": ["binomial_conditions"],
+      "explanation_markdown": "$n$ is the fixed number of tosses. $p$ is the single-toss head probability. The problem states independence and fairness.",
+      "numeric_policy": null
+    },
+    {
+      "id": "translate_event",
+      "kind": "choice",
+      "prompt_markdown": "Which event means exactly two heads?",
+      "options": [
+        {"id": "equal_two", "text_markdown": "$X=2$", "misconception_id": null, "hint_markdown": null},
+        {"id": "at_most_two", "text_markdown": "$X\\leq 2$", "misconception_id": "exactly_as_at_most", "hint_markdown": "Would zero or one head satisfy exactly two?"},
+        {"id": "at_least_two", "text_markdown": "$X\\geq 2$", "misconception_id": "exactly_as_at_least", "hint_markdown": "Would three or four heads satisfy exactly two?"}
+      ],
+      "expected_answer": {"kind": "choice", "option_id": "equal_two"},
+      "evidence_concept_ids": ["event_translation"],
+      "explanation_markdown": "Exactly specifies one count, not a range. We need $P(X=2)$.",
+      "numeric_policy": null
+    },
+    {
+      "id": "build_expression",
+      "kind": "choice",
+      "prompt_markdown": "Which expression includes all possible orders of the two heads?",
+      "options": [
+        {"id": "with_combination", "text_markdown": "$\\binom{4}{2}(0.5)^2(0.5)^2$", "misconception_id": null, "hint_markdown": null},
+        {"id": "one_order_only", "text_markdown": "$(0.5)^2(0.5)^2$", "misconception_id": "missing_combination", "hint_markdown": "Does that count every ordering of two heads, or just one ordered sequence?"},
+        {"id": "heads_only", "text_markdown": "$\\binom{4}{2}(0.5)^2$", "misconception_id": "missing_failure_factor", "hint_markdown": "Exactly two heads also requires what outcomes on the other two tosses?"}
+      ],
+      "expected_answer": {"kind": "choice", "option_id": "with_combination"},
+      "evidence_concept_ids": ["binomial_expression"],
+      "explanation_markdown": "$\\binom{4}{2}=6$ counts the positions of the two heads. Each sequence has probability $(0.5)^4$.",
+      "numeric_policy": null
+    },
+    {
+      "id": "calculate_probability",
+      "kind": "numeric",
+      "prompt_markdown": "Calculate $P(X=2)$. Enter a decimal, explicit percent, or fraction; no specific rounding is required.",
+      "options": [],
+      "expected_answer": {"kind": "numeric", "value": 0.375, "units": "probability"},
+      "evidence_concept_ids": ["probability_calculation"],
+      "explanation_markdown": "$6\\times(0.5)^4=6/16=3/8=0.375=37.5\\%$.",
+      "numeric_policy": {
+        "version": 1,
+        "absolute_tolerance": 0.0000005,
+        "relative_tolerance": 0.000001,
+        "allowed_forms": ["decimal", "percent", "fraction"],
+        "display_decimals": null
+      }
+    },
+    {
+      "id": "interpret_probability",
+      "kind": "choice",
+      "prompt_markdown": "What does this probability describe?",
+      "options": [
+        {"id": "whole_experiment", "text_markdown": "The chance that a four-toss experiment produces exactly two heads", "misconception_id": null, "hint_markdown": null},
+        {"id": "single_toss", "text_markdown": "The chance of heads on each individual toss", "misconception_id": "experiment_as_single_trial", "hint_markdown": "The requested event concerns one toss or the complete group of four?"},
+        {"id": "guaranteed_outcome", "text_markdown": "A guarantee that the next four tosses will produce two heads", "misconception_id": "probability_as_guarantee", "hint_markdown": "Can an event have a positive probability without being certain?"}
+      ],
+      "expected_answer": {"kind": "choice", "option_id": "whole_experiment"},
+      "evidence_concept_ids": ["probability_interpretation"],
+      "explanation_markdown": "The probability belongs to the event $X=2$ for the entire experiment. It does not guarantee the next outcome.",
+      "numeric_policy": null
+    }
+  ]
+}

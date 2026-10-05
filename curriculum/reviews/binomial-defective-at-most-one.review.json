@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "template_id": "binomial_defective_at_most_one",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-05T17:00:00Z",
+  "delegation_basis": "Stage 07 user prompt authorization",
+  "mathematical_audit": {
+    "family_id": "binomial_pmf",
+    "parameters": {"n": 5, "p": 0.1, "k": 1},
+    "canonical_probability": 0.91854,
+    "canonical_rational": "45927/50000",
+    "moments": {
+      "mean": 0.5,
+      "variance": 0.45,
+      "standard_deviation": 0.67082
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.001,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 4,
+    "concept_count": 4,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "choose_distribution", "kind": "choice", "evidence": "distribution_selection"},
+      {"id": "event_translation", "kind": "choice", "evidence": "event_translation"},
+      {"id": "calculate_cumulative", "kind": "numeric", "evidence": "probability_calculation"},
+      {"id": "complement_check", "kind": "choice", "evidence": "probability_interpretation"}
+    ],
+    "numeric_policy": {
+      "version": 1,
+      "allowed_forms": ["decimal", "percent", "fraction"],
+      "absolute_tolerance": 0.001,
+      "relative_tolerance": 0.002
+    }
+  },
+  "notes": "Verified mathematically: P(X<=1) = (0.9)^5 + 5(0.1)(0.9)^4 = 0.59049 + 0.32805 = 0.91854. Distractors address strict vs non-strict inequalities."
+}

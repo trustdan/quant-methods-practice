@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "template_id": "linear_comb_sum_variance_independent",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-05T17:00:00Z",
+  "delegation_basis": "Stage 07 user prompt authorization",
+  "mathematical_audit": {
+    "family_id": "linear_combination",
+    "parameters": {
+      "operation": "variance_independent",
+      "a": 1.0,
+      "b": 1.0,
+      "e_x": 0.4,
+      "e_y": 0.5,
+      "var_x": 0.24,
+      "var_y": 0.25
+    },
+    "canonical_probability": 0.5,
+    "canonical_rational": "1/2",
+    "moments": {
+      "mean": 0.9,
+      "variance": 0.49,
+      "standard_deviation": 0.70
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.001,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 4,
+    "concept_count": 4,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "expectation_linearity", "kind": "choice", "evidence": "linearity_of_expectation"},
+      {"id": "variance_additivity", "kind": "choice", "evidence": "variance_of_independent_sum"},
+      {"id": "calculate_probability", "kind": "numeric", "evidence": "sum_probability_calculation"},
+      {"id": "covariance_role", "kind": "choice", "evidence": "covariance_independence_property"}
+    ],
+    "numeric_policy": {
+      "version": 1,
+      "allowed_forms": ["decimal", "percent", "fraction"],
+      "absolute_tolerance": 0.001,
+      "relative_tolerance": 0.001
+    }
+  },
+  "notes": "Verified mathematically: E[X+Y]=0.9, Var(X+Y)=0.49. P(S=1)=(0.4)(0.5)+(0.6)(0.5)=0.50=1/2."
+}

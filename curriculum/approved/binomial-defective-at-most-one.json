@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "binomial_defective_at_most_one",
+  "version": 1,
+  "status": "active",
+  "family_id": "binomial_pmf",
+  "rule_version": 1,
+  "module_id": "module_2",
+  "title": "At most one defective component in five",
+  "scenario_markdown": "A quality inspection samples 5 components independently from a manufacturing line with a 10% defect rate ($p=0.10$). Find the probability of observing at most one defective component.",
+  "parameters": {"n": 5, "p": 0.1, "k": 1},
+  "assumptions": ["Fixed five trials", "Independent components", "Constant defect probability 0.10", "Binary classification: defective or conforming"],
+  "concept_ids": ["distribution_selection", "event_translation", "probability_calculation", "probability_interpretation"],
+  "setting_group": "binomial_inspection_at_most",
+  "source_refs": ["Generic introductory reference fixture", "docs/COURSE-MAP.md"],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-05T17:00:00Z",
+    "notes": "Reviewed derivation for n=5, p=0.1, P(X<=1) = P(X=0)+P(X=1) = 0.59049 + 0.32805 = 0.91854. Verified distractors, 4 stages, and 1-to-1 concept evidence mapping.",
+    "delegation_basis": "Stage 07 user prompt authorization"
+  },
+  "stages": [
+    {
+      "id": "choose_distribution",
+      "kind": "choice",
+      "prompt_markdown": "Which model fits counting defective components in this fixed batch?",
+      "options": [
+        {"id": "binomial", "text_markdown": "Binomial ($n=5, p=0.10$)", "misconception_id": null, "hint_markdown": null},
+        {"id": "poisson", "text_markdown": "Poisson with rate $\\lambda = 5$", "misconception_id": "poisson_for_fixed_trials", "hint_markdown": "Is the number of components fixed in advance, or arriving over continuous time?"},
+        {"id": "uniform", "text_markdown": "Discrete uniform", "misconception_id": "uniform_for_skewed_rates", "hint_markdown": "Are 0 and 5 defects equally likely when the defect rate is only 10%?"}
+      ],
+      "expected_answer": {"kind": "choice", "option_id": "binomial"},
+      "evidence_concept_ids": ["distribution_selection"],
+      "explanation_markdown": "The scenario counts successes (defects) across a fixed number $n=5$ of independent trials with identical success probability $p=0.10$.",
+      "numeric_policy": null
+    },
+    {
+      "id": "event_translation",
+      "kind": "choice",
+      "prompt_markdown": "Which mathematical expression corresponds to 'at most one defective'?",
+      "options": [
+        {"id": "at_most_one", "text_markdown": "$P(X \\le 1) = P(X=0) + P(X=1)$", "misconception_id": null, "hint_markdown": null},
+        {"id": "strictly_less", "text_markdown": "$P(X < 1) = P(X=0)$", "misconception_id": "at_most_as_strictly_less", "hint_markdown": "Does 'at most one' include the value one itself?"},
+        {"id": "exactly_one", "text_markdown": "$P(X = 1)$", "misconception_id": "at_most_as_exactly", "hint_markdown": "Can a batch have zero defects and still satisfy 'at most one'?"}
+      ],
+      "expected_answer": {"kind": "choice", "option_id": "at_most_one"},
+      "evidence_concept_ids": ["event_translation"],
+      "explanation_markdown": "'At most one' includes zero and one: $P(X \\le 1) = P(X=0) + P(X=1)$.",
+      "numeric_policy": null
+    },
+    {
+      "id": "calculate_cumulative",
+      "kind": "numeric",
+      "prompt_markdown": "Calculate $P(X \\le 1)$. Enter as a decimal or percent rounded to at least three decimal places.",
+      "options": [],
+      "expected_answer": {"kind": "numeric", "value": 0.91854, "units": "probability"},
+      "evidence_concept_ids": ["probability_calculation"],
+      "explanation_markdown": "$P(X=0) = (0.9)^5 = 0.59049$. $P(X=1) = 5(0.1)(0.9)^4 = 0.32805$. Sum = $0.59049 + 0.32805 = 0.91854$.",
+      "numeric_policy": {
+        "version": 1,
+        "allowed_forms": ["decimal", "percent", "fraction"],
+        "absolute_tolerance": 0.001,
+        "relative_tolerance": 0.002
+      }
+    },
+    {
+      "id": "complement_check",
+      "kind": "choice",
+      "prompt_markdown": "What is the probability of finding two or more defective components?",
+      "options": [
+        {"id": "complement_val", "text_markdown": "$1 - P(X \\le 1) = 1 - 0.91854 = 0.08146$", "misconception_id": null, "hint_markdown": null},
+        {"id": "sum_to_two", "text_markdown": "$P(X \\le 1) + 2 = 2.91854$", "misconception_id": "invalid_complement_algebra", "hint_markdown": "Probabilities cannot exceed one. How do complementary events partition the sample space?"},
+        {"id": "equal_to_p", "text_markdown": "$p^2 = 0.01$", "misconception_id": "single_outcome_scaling", "hint_markdown": "Use the complement rule $P(X \\ge 2) = 1 - P(X \\le 1)$."}
+      ],
+      "expected_answer": {"kind": "choice", "option_id": "complement_val"},
+      "evidence_concept_ids": ["probability_interpretation"],
+      "explanation_markdown": "Since $\\{X \\le 1\\}$ and $\\{X \\ge 2\\}$ are mutually exclusive and exhaustive, $P(X \\ge 2) = 1 - P(X \\le 1) = 0.08146$.",
+      "numeric_policy": null
+    }
+  ]
+}

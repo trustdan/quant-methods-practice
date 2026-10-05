@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "template_id": "poisson_server_failures_zero",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-05T17:00:00Z",
+  "delegation_basis": "Stage 07 user prompt authorization",
+  "mathematical_audit": {
+    "family_id": "poisson_pmf",
+    "parameters": {"lambda": 2.0, "k": 0},
+    "canonical_probability": 0.1353,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 2.0,
+      "variance": 2.0,
+      "standard_deviation": 1.41421
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.001,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "event_formula", "kind": "choice", "evidence": "poisson_zero_rate"},
+      {"id": "calculate_probability", "kind": "numeric", "evidence": "poisson_zero_calculation"},
+      {"id": "interpret_at_least_one", "kind": "choice", "evidence": "poisson_complement"}
+    ],
+    "numeric_policy": {
+      "version": 1,
+      "allowed_forms": ["decimal", "percent", "fraction"],
+      "absolute_tolerance": 0.001,
+      "relative_tolerance": 0.005
+    }
+  },
+  "notes": "Verified mathematically: P(X=0) = exp(-2) = 0.135335. P(X>=1) = 1 - 0.1353 = 0.8647."
+}

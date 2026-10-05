@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "template_id": "set_probability_conditional",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-05T17:00:00Z",
+  "delegation_basis": "Stage 07 user prompt authorization",
+  "mathematical_audit": {
+    "family_id": "set_probability",
+    "parameters": {
+      "operation": "conditional",
+      "p_a": 0.4,
+      "p_b": 0.6,
+      "p_intersection": 0.24
+    },
+    "canonical_probability": 0.4,
+    "canonical_rational": "2/5",
+    "moments": {
+      "mean": 0.4,
+      "variance": 0.24,
+      "standard_deviation": 0.4899
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.001,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "conditional_formula", "kind": "choice", "evidence": "conditional_probability_formula"},
+      {"id": "calculate_conditional", "kind": "numeric", "evidence": "conditional_probability_calculation"},
+      {"id": "independence_determination", "kind": "choice", "evidence": "independence_concept"}
+    ],
+    "numeric_policy": {
+      "version": 1,
+      "allowed_forms": ["decimal", "percent", "fraction"],
+      "absolute_tolerance": 0.001,
+      "relative_tolerance": 0.002
+    }
+  },
+  "notes": "Verified mathematically: P(A|B) = 0.24 / 0.60 = 0.40 = 2/5. Proves independence condition P(A|B) = P(A)."
+}

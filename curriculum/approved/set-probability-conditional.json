@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "set_probability_conditional",
+  "version": 1,
+  "status": "active",
+  "family_id": "set_probability",
+  "rule_version": 1,
+  "module_id": "module_1",
+  "title": "Conditional probability and independence check",
+  "scenario_markdown": "In a financial portfolio, the probability of Tech sector growth is $P(A) = 0.40$, Health sector growth is $P(B) = 0.60$, and simultaneous growth in both is $P(A \\cap B) = 0.24$. Find the conditional probability of Tech sector growth given Health sector growth, $P(A \\mid B)$.",
+  "parameters": {
+    "operation": "conditional",
+    "p_a": 0.4,
+    "p_b": 0.6,
+    "p_intersection": 0.24
+  },
+  "assumptions": ["Conditioning event has positive probability: P(B) = 0.60 > 0", "Valid joint probability: P(A cap B) = 0.24 <= P(B)", "Independent events because P(A cap B) = P(A)*P(B)"],
+  "concept_ids": ["conditional_probability_formula", "conditional_probability_calculation", "independence_concept"],
+  "setting_group": "set_conditional_rule",
+  "source_refs": ["Generic introductory reference fixture", "docs/COURSE-MAP.md"],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-05T17:00:00Z",
+    "notes": "Reviewed derivation: P(A|B) = P(A cap B) / P(B) = 0.24 / 0.60 = 0.40 = P(A). Proves statistical independence.",
+    "delegation_basis": "Stage 07 user prompt authorization"
+  },
+  "stages": [
+    {
+      "id": "conditional_formula",
+      "kind": "choice",
+      "prompt_markdown": "Which formula defines the conditional probability $P(A \\mid B)$?",
+      "options": [
+        {"id": "joint_over_prior", "text_markdown": "$P(A \\mid B) = \\frac{P(A \\cap B)}{P(B)}$", "misconception_id": null, "hint_markdown": null},
+        {"id": "joint_over_target", "text_markdown": "$P(A \\mid B) = \\frac{P(A \\cap B)}{P(A)}$", "misconception_id": "swap_conditioned_and_conditioning", "hint_markdown": "Which event is given as already having occurred?"},
+        {"id": "product_formula", "text_markdown": "$P(A \\mid B) = P(A) \\times P(B)$", "misconception_id": "product_for_conditional", "hint_markdown": "Conditional probability reduces the sample space to the conditioning event B."}
+      ],
+      "expected_answer": {"kind": "choice", "option_id": "joint_over_prior"},
+      "evidence_concept_ids": ["conditional_probability_formula"],
+      "explanation_markdown": "Conditional probability $P(A \\mid B)$ evaluates the likelihood of $A$ within the reduced sample space of $B$: $\\frac{P(A \\cap B)}{P(B)}$.",
+      "numeric_policy": null
+    },
+    {
+      "id": "calculate_conditional",
+      "kind": "numeric",
+      "prompt_markdown": "Calculate $P(A \\mid B) = \\frac{0.24}{0.60}$. Enter as a decimal, percent, or fraction.",
+      "options": [],
+      "expected_answer": {"kind": "numeric", "value": 0.4, "units": "probability"},
+      "evidence_concept_ids": ["conditional_probability_calculation"],
+      "explanation_markdown": "$P(A \\mid B) = \\frac{0.24}{0.60} = 0.40$ (or $40\\%$ or $2/5$).",
+      "numeric_policy": {
+        "version": 1,
+        "allowed_forms": ["decimal", "percent", "fraction"],
+        "absolute_tolerance": 0.001,
+        "relative_tolerance": 0.002
+      }
+    },
+    {
+      "id": "independence_determination",
+      "kind": "choice",
+      "prompt_markdown": "Are events A (Tech growth) and B (Health growth) statistically independent?",
+      "options": [
+        {"id": "independent_yes", "text_markdown": "Yes, because $P(A \\mid B) = P(A) = 0.40$ (learning that B occurred does not change the probability of A).", "misconception_id": null, "hint_markdown": null},
+        {"id": "independent_no_overlap", "text_markdown": "No, because $P(A \\cap B) = 0.24 \\ne 0$.", "misconception_id": "confuse_disjoint_and_independent", "hint_markdown": "Independent events with positive probabilities MUST overlap ($P(A \\cap B) = P(A)P(B) > 0$)."},
+        {"id": "independent_never", "text_markdown": "No, because sectors in the same economy are never independent.", "misconception_id": "anecdotal_vs_mathematical", "hint_markdown": "Judge by the mathematical condition: does $P(A \\cap B) = P(A)P(B)$?"}
+      ],
+      "expected_answer": {"kind": "choice", "option_id": "independent_yes"},
+      "evidence_concept_ids": ["independence_concept"],
+      "explanation_markdown": "Events are independent if and only if $P(A \\mid B) = P(A)$, or equivalently $P(A \\cap B) = P(A)P(B)$. Here $0.40 \\times 0.60 = 0.24$, so they are independent.",
+      "numeric_policy": null
+    }
+  ]
+}

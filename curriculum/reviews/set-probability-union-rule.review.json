@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "template_id": "set_probability_union_rule",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-05T17:00:00Z",
+  "delegation_basis": "Stage 07 user prompt authorization",
+  "mathematical_audit": {
+    "family_id": "set_probability",
+    "parameters": {
+      "operation": "union",
+      "p_a": 0.6,
+      "p_b": 0.5,
+      "p_intersection": 0.3
+    },
+    "canonical_probability": 0.8,
+    "canonical_rational": "4/5",
+    "moments": {
+      "mean": 0.8,
+      "variance": 0.16,
+      "standard_deviation": 0.4
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.001,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "identify_formula", "kind": "choice", "evidence": "addition_rule_formula"},
+      {"id": "calculate_union", "kind": "numeric", "evidence": "addition_rule_calculation"},
+      {"id": "disjoint_check", "kind": "choice", "evidence": "disjoint_concept"}
+    ],
+    "numeric_policy": {
+      "version": 1,
+      "allowed_forms": ["decimal", "percent", "fraction"],
+      "absolute_tolerance": 0.001,
+      "relative_tolerance": 0.002
+    }
+  },
+  "notes": "Verified mathematically: P(A union B) = 0.6 + 0.5 - 0.3 = 0.8 = 4/5. Frechet bounds verified."
+}

@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "poisson_server_failures_zero",
+  "version": 1,
+  "status": "active",
+  "family_id": "poisson_pmf",
+  "rule_version": 1,
+  "module_id": "module_2",
+  "title": "Zero server hardware alerts",
+  "scenario_markdown": "A datacenter cluster experiences hardware alert events at an average rate of $\\lambda = 2.0$ alerts per day following a Poisson process. What is the probability that a day passes with zero alerts?",
+  "parameters": {"lambda": 2.0, "k": 0},
+  "assumptions": ["Constant alert rate lambda = 2.0 per day", "Independent non-overlapping day intervals", "Zero probability of multiple simultaneous alerts"],
+  "concept_ids": ["poisson_zero_rate", "poisson_zero_calculation", "poisson_complement"],
+  "setting_group": "poisson_zero_events",
+  "source_refs": ["Generic introductory reference fixture", "docs/COURSE-MAP.md"],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-05T17:00:00Z",
+    "notes": "Reviewed derivation for lambda=2.0, k=0: P(X=0) = exp(-2) = 0.135335. Verified complement relation P(X>=1) = 1 - exp(-2).",
+    "delegation_basis": "Stage 07 user prompt authorization"
+  },
+  "stages": [
+    {
+      "id": "event_formula",
+      "kind": "choice",
+      "prompt_markdown": "Which formula gives the probability of zero events in a Poisson process with rate $\\lambda$?",
+      "options": [
+        {"id": "exp_neg_lambda", "text_markdown": "$P(X = 0) = \\frac{\\lambda^0 e^{-\\lambda}}{0!} = e^{-\\lambda}$", "misconception_id": null, "hint_markdown": null},
+        {"id": "zero_always", "text_markdown": "$P(X = 0) = 0$ because arrivals are expected", "misconception_id": "zero_probability_for_zero_events", "hint_markdown": "Zero arrivals is a valid realization of the Poisson process."},
+        {"id": "one_minus_lambda", "text_markdown": "$P(X = 0) = 1 - \\lambda$", "misconception_id": "linear_subtraction_for_zero", "hint_markdown": "If lambda > 1, 1 - lambda would be negative, which is impossible."}
+      ],
+      "expected_answer": {"kind": "choice", "option_id": "exp_neg_lambda"},
+      "evidence_concept_ids": ["poisson_zero_rate"],
+      "explanation_markdown": "For $k=0$, $\\lambda^0 = 1$ and $0! = 1$, reducing the Poisson PMF to $P(X=0) = e^{-\\lambda}$.",
+      "numeric_policy": null
+    },
+    {
+      "id": "calculate_probability",
+      "kind": "numeric",
+      "prompt_markdown": "Calculate $P(X = 0) = e^{-2.0}$. Enter as a decimal rounded to at least three places.",
+      "options": [],
+      "expected_answer": {"kind": "numeric", "value": 0.1353, "units": "probability"},
+      "evidence_concept_ids": ["poisson_zero_calculation"],
+      "explanation_markdown": "$e^{-2.0} \\approx 0.135335$.",
+      "numeric_policy": {
+        "version": 1,
+        "allowed_forms": ["decimal", "percent", "fraction"],
+        "absolute_tolerance": 0.001,
+        "relative_tolerance": 0.005
+      }
+    },
+    {
+      "id": "interpret_at_least_one",
+      "kind": "choice",
+      "prompt_markdown": "Using $P(X=0) \\approx 0.1353$, what is the probability of observing at least one alert ($X \\ge 1$)?",
+      "options": [
+        {"id": "complement_one", "text_markdown": "$P(X \\ge 1) = 1 - P(X = 0) = 1 - 0.1353 = 0.8647$", "misconception_id": null, "hint_markdown": null},
+        {"id": "double_rate", "text_markdown": "$P(X \\ge 1) = 2 \\times 0.1353 = 0.2706$", "misconception_id": "double_for_at_least_one", "hint_markdown": "The complement of 'zero events' is 'at least one event'."},
+        {"id": "equal_to_mean", "text_markdown": "$P(X \\ge 1) = \\lambda = 2.0$", "misconception_id": "rate_as_probability", "hint_markdown": "Probabilities cannot exceed one."}
+      ],
+      "expected_answer": {"kind": "choice", "option_id": "complement_one"},
+      "evidence_concept_ids": ["poisson_complement"],
+      "explanation_markdown": "'At least one' is the exact complement of 'zero': $P(X \\ge 1) = 1 - P(X = 0) = 0.8647$.",
+      "numeric_policy": null
+    }
+  ]
+}

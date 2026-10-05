@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "template_id": "poisson_rare_event_one",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-05T17:00:00Z",
+  "delegation_basis": "Stage 07 user prompt authorization",
+  "mathematical_audit": {
+    "family_id": "poisson_pmf",
+    "parameters": {"lambda": 1.0, "k": 1},
+    "canonical_probability": 0.3679,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 1.0,
+      "variance": 1.0,
+      "standard_deviation": 1.0
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.001,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "rate_parameter", "kind": "choice", "evidence": "poisson_rate_scaling"},
+      {"id": "calculate_one_event", "kind": "numeric", "evidence": "poisson_unit_calculation"},
+      {"id": "mean_vs_mode", "kind": "choice", "evidence": "poisson_properties"}
+    ],
+    "numeric_policy": {
+      "version": 1,
+      "allowed_forms": ["decimal", "percent", "fraction"],
+      "absolute_tolerance": 0.001,
+      "relative_tolerance": 0.005
+    }
+  },
+  "notes": "Verified mathematically: P(X=1) = 1.0 * exp(-1) = 0.367879. Unit rate symmetry P(X=0)=P(X=1)."
+}
