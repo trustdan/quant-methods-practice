@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/exec"
 	"os/signal"
+	"path/filepath"
 	"runtime"
 	"strconv"
 	"strings"
@@ -20,6 +21,7 @@ import (
 	"github.com/trustdan/quant-methods-practice/internal/httpapi"
 	"github.com/trustdan/quant-methods-practice/internal/mathengine"
 	"github.com/trustdan/quant-methods-practice/internal/storage"
+	"github.com/trustdan/quant-methods-practice/internal/tutor"
 )
 
 const version = "0.1.0-dev"
@@ -41,6 +43,9 @@ func main() {
 		intensityFlag    = flag.String("intensity", "standard", "Practice intensity: gentle, standard, or intensive")
 		seedFlag         = flag.Int64("seed", 0, "Seed for reproducible question generation")
 		evalBinomialFlag = flag.String("eval-binomial", "", "Evaluate binomial derivation (format: n=4,p=0.5,k=2)")
+		masteryFlag      = flag.Bool("mastery", false, "Display curriculum concept mastery and transfer projections and exit")
+		notesFlag        = flag.Bool("notes", false, "List saved explanations and notes in personal library and exit")
+		exportNotesFlag  = flag.String("export-notes", "", "Export all saved notes as UTF-8 Markdown files to specified directory and exit")
 	)
 
 	flag.Parse()
@@ -103,6 +108,21 @@ func main() {
 	}
 
 	store := storage.NewStore(db, nil)
+
+	if *masteryFlag {
+		runMastery(store)
+		return
+	}
+
+	if *notesFlag {
+		runNotes(store)
+		return
+	}
+
+	if *exportNotesFlag != "" {
+		runExportNotes(store, *exportNotesFlag)
+		return
+	}
 
 	// Persist initial user preferences if configured via CLI flags
 	if *questionsFlag != 10 || *moduleFlag != "" || *intensityFlag != "standard" || *seedFlag != 0 {
@@ -352,4 +372,105 @@ func runListBank(bankPath string) {
 			tmpl.Title,
 		)
 	}
+}
+
+func runMastery(store *storage.Store) {
+	ctx := context.Background()
+	summary, err := store.GetMasterySummary(ctx, nil, time.Now())
+	if err != nil {
+		log.Fatalf("failed to derive mastery summary: %v", err)
+	}
+
+	fmt.Println("=== Concept Mastery & Transfer Projections ===")
+	fmt.Printf("Policy Version: %d | Overall Mastery: %.1f%% | Generated: %s\n",
+		summary.PolicyVersion, summary.OverallScore*100, summary.GeneratedAt.Format("2006-01-02 15:04:05"))
+	fmt.Printf("Mastered: %d | Transferring: %d | Learning: %d | New: %d\n\n",
+		summary.TotalMastered, summary.TotalTransferring, summary.TotalLearning, summary.TotalNew)
+
+	if len(summary.Concepts) == 0 {
+		fmt.Println("No concept evidence recorded yet. Complete practice drills to build mastery.")
+		return
+	}
+
+	fmt.Printf("%-34s %-14s %-14s %-8s %-14s %-8s %-12s\n",
+		"CONCEPT ID", "STATUS", "SCAFFOLD", "SCORE", "SUCCESS/ERR", "GROUPS", "TRANSFER?")
+	fmt.Println(strings.Repeat("-", 110))
+
+	for _, c := range summary.Concepts {
+		transferStr := "pending"
+		if c.DelayedTransferAchieved {
+			transferStr = "achieved"
+		}
+		fmt.Printf("%-34s %-14s %-14s %-7.1f%% %-14s %-8d %-12s\n",
+			c.ConceptID,
+			string(c.Status),
+			string(c.ScaffoldLevel),
+			c.DecayedScore*100,
+			fmt.Sprintf("%d / %d (%d)", c.IndependentSuccesses, c.IndependentErrors, c.AssistedCount),
+			len(c.SettingGroupsSeen),
+			transferStr,
+		)
+	}
+}
+
+func runNotes(store *storage.Store) {
+	ctx := context.Background()
+	notes, err := store.ListExplanations(ctx, "", "")
+	if err != nil {
+		log.Fatalf("failed to list saved notes: %v", err)
+	}
+
+	fmt.Printf("=== Saved Explanations & Notes Library (%d note(s)) ===\n\n", len(notes))
+	if len(notes) == 0 {
+		fmt.Println("No saved notes found. Save explanations during practice drills to build your library.")
+		return
+	}
+
+	fmt.Printf("%-24s %-22s %-30s %-10s %s\n", "ID", "TOPIC", "TITLE", "PROVIDER", "SAVED AT")
+	fmt.Println(strings.Repeat("-", 110))
+	for _, n := range notes {
+		title := n.ProviderInfo.Title
+		if title == "" {
+			title = "(untitled)"
+		}
+		if len(title) > 28 {
+			title = title[:25] + "..."
+		}
+		fmt.Printf("%-24s %-22s %-30s %-10s %s\n",
+			n.ID,
+			n.Topic,
+			title,
+			n.ProviderInfo.Provider,
+			n.UpdatedAt.Format("2006-01-02 15:04"),
+		)
+	}
+}
+
+func runExportNotes(store *storage.Store, outDir string) {
+	if outDir == "" {
+		fmt.Fprintf(os.Stderr, "Error: -export-notes requires a destination directory\n")
+		os.Exit(1)
+	}
+	if err := os.MkdirAll(outDir, 0755); err != nil {
+		log.Fatalf("failed to create export directory %q: %v", outDir, err)
+	}
+
+	ctx := context.Background()
+	notes, err := store.ListExplanations(ctx, "", "")
+	if err != nil {
+		log.Fatalf("failed to retrieve notes for export: %v", err)
+	}
+
+	fmt.Printf("Exporting %d saved note(s) to %s...\n", len(notes), outDir)
+	for _, n := range notes {
+		md := tutor.ExportNoteToMarkdown(n, "")
+		filename := fmt.Sprintf("%s.md", n.ID)
+		filePath := filepath.Join(outDir, filename)
+		if err := os.WriteFile(filePath, []byte(md), 0644); err != nil {
+			log.Printf("Warning: failed to write %s: %v", filePath, err)
+			continue
+		}
+		fmt.Printf("  -> Exported: %s\n", filePath)
+	}
+	fmt.Println("Export complete.")
 }

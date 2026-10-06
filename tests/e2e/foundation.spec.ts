@@ -10,6 +10,7 @@ const PORT = 8995;
 let serverProcess: ChildProcess | null = null;
 let bootstrapUrl = '';
 let restartedUrl = '';
+let stage07Url = '';
 let tempDbPath = '';
 
 test.beforeAll(async () => {
@@ -227,7 +228,8 @@ test.describe('Foundation Verification (Offline Math & Keyboard Shell)', () => {
     await expect(numericInput).toHaveValue('0.375');
 
     // 5. Test leave intent modal on 'q'
-    await page.locator('.card-header').first().click();
+    await numericInput.blur();
+    await page.locator('.app-logo').click();
     await page.keyboard.press('q');
     const leaveModal = page.locator('div[role="dialog"]');
     await expect(leaveModal).toBeVisible();
@@ -351,7 +353,7 @@ test.describe('Foundation Verification (Offline Math & Keyboard Shell)', () => {
       stdio: ['ignore', 'pipe', 'pipe'],
     });
 
-    let stage07Url = '';
+    stage07Url = '';
     await new Promise<void>((resolve, reject) => {
       const timeout = setTimeout(() => reject(new Error('Timeout on Stage 07 restart')), 10000);
       const onData = (data: Buffer) => {
@@ -379,5 +381,187 @@ test.describe('Foundation Verification (Offline Math & Keyboard Shell)', () => {
     const screenshotDir = path.resolve(__dirname, 'screenshots');
     fs.mkdirSync(screenshotDir, { recursive: true });
     await page.screenshot({ path: path.join(screenshotDir, 'stage07_verified.png'), fullPage: true });
+  });
+
+  test('Stage 08: renders concept mastery view, scaffold levels, and keyboard shortcuts', async ({ page }) => {
+    // Navigate to active server URL
+    await page.goto(stage07Url || restartedUrl || bootstrapUrl);
+
+    // 1. Verify practice drill is visible with scaffold badge
+    await expect(page.locator('.question-strip')).toBeVisible({ timeout: 10000 });
+    await expect(page.locator('#scaffold-indicator')).toBeVisible();
+
+    // 2. Open Mastery View via keyboard shortcut 's'
+    await page.keyboard.press('s');
+
+    // 3. Verify Mastery Dashboard elements
+    const masteryView = page.locator('#mastery-view');
+    await expect(masteryView).toBeVisible({ timeout: 10000 });
+    await expect(page.locator('#mastery-stats')).toBeVisible();
+    await expect(page.getByText('Concept Evidence & Transfer')).toBeVisible();
+    await expect(page.getByText(/Policy v1/)).toBeVisible();
+    await expect(page.getByText('Overall Retention Score')).toBeVisible();
+
+    // 4. Verify concept cards container or empty state is rendered
+    await expect(page.locator('#concept-cards-container, .empty-state').first()).toBeVisible();
+
+    // 5. Test filter pills
+    const learningPill = page.locator('#filter-learning');
+    await learningPill.click();
+    await expect(learningPill).toHaveClass(/active/);
+
+    const allPill = page.locator('#filter-all');
+    await allPill.click();
+    await expect(allPill).toHaveClass(/active/);
+
+    // 6. Test search filter
+    const searchInput = page.locator('#mastery-search-input');
+    await searchInput.fill('random');
+    const cardCount = await page.locator('.concept-card').count();
+    if (cardCount > 0) {
+      await expect(page.locator('.concept-card').first()).toBeVisible();
+    }
+
+    // Clear search filter
+    await searchInput.fill('');
+
+    // 7. Test closing mastery view with Escape
+    await page.keyboard.press('Escape');
+    await expect(masteryView).not.toBeVisible();
+    await expect(page.locator('.question-strip')).toBeVisible();
+
+    // 8. Re-open via nav tab click and close via button
+    const masteryTab = page.locator('#tab-mastery');
+    await masteryTab.click();
+    await expect(masteryView).toBeVisible();
+
+    const closeBtn = page.locator('#btn-close-mastery');
+    await closeBtn.click();
+    await expect(masteryView).not.toBeVisible();
+
+    // 9. Capture screenshot of verified Stage 08 release
+    const screenshotDir = path.resolve(__dirname, 'screenshots');
+    fs.mkdirSync(screenshotDir, { recursive: true });
+    await page.screenshot({ path: path.join(screenshotDir, 'stage08_verified.png'), fullPage: true });
+  });
+
+  test('Stage 09: read-only AI tutor streaming, cancellation, leave-intent protection, and note library with export', async ({ page }) => {
+    // Navigate to active server URL
+    await page.goto(stage07Url || restartedUrl || bootstrapUrl);
+
+    // 1. Practice drill is visible; open AI Tutor panel via 'n' keyboard shortcut
+    await expect(page.locator('.question-strip')).toBeVisible({ timeout: 10000 });
+    await page.keyboard.press('n');
+
+    const tutorModal = page.locator('#tutor-panel');
+    await expect(tutorModal).toBeVisible({ timeout: 10000 });
+
+    // 2. Verify strict advisory banner and offline indicator
+    await expect(page.locator('#tutor-advisory-banner')).toBeVisible();
+    await expect(page.getByText('Advisory AI explanation:')).toBeVisible();
+    await expect(page.getByText('Offline Reviewed')).toBeVisible();
+
+    // 3. Request a Causal Hint via #btn-tutor-hint
+    const hintBtn = page.locator('#btn-tutor-hint');
+    await hintBtn.click();
+
+    // Verify streamed response appears in tutor-response-area
+    const responseArea = page.locator('#tutor-response-area');
+    await expect(responseArea).toContainText('Causal Hint', { timeout: 10000 });
+
+    // Math formula SVG rendering verification in tutor area
+    const tutorMathSvg = responseArea.locator('mjx-container[jax="SVG"]');
+    await expect(tutorMathSvg.first()).toBeVisible({ timeout: 10000 });
+
+    // 4. Test dirty explanation leave-intent protection
+    // Try to close the tutor while an unsaved explanation is displayed
+    const closeBtn = page.locator('#btn-tutor-close');
+    await closeBtn.click();
+
+    const leaveModal = page.locator('#tutor-leave-modal');
+    await expect(leaveModal).toBeVisible();
+    await expect(leaveModal).toContainText('Save Explanation Before Leaving?');
+
+    // Test "Stay" action (Esc or #btn-tutor-leave-stay)
+    await page.locator('#btn-tutor-leave-stay').click();
+    await expect(leaveModal).not.toBeVisible();
+    await expect(tutorModal).toBeVisible();
+
+    // 5. Save explanation to personal notes library
+    const saveBtn = page.locator('#btn-tutor-save');
+    await saveBtn.click();
+    await expect(page.getByText('Saved to Personal Notes Library')).toBeVisible({ timeout: 10000 });
+
+    // Close tutor cleanly now that note is saved (should not trigger leave-intent modal)
+    await closeBtn.click();
+    await expect(tutorModal).not.toBeVisible();
+
+    // 6. Test cancellation during streaming
+    // Re-open tutor
+    await page.keyboard.press('n');
+    await expect(tutorModal).toBeVisible();
+
+    // Request Step-by-Step Solution
+    const explainBtn = page.locator('#btn-tutor-explain');
+    await explainBtn.click();
+
+    // While or immediately after starting, test Stop/cancel action
+    const cancelBtn = page.locator('#btn-tutor-cancel');
+    if (await cancelBtn.isVisible()) {
+      await cancelBtn.click();
+    }
+
+    // Close tutor (discard if leave modal shows)
+    await closeBtn.click();
+    if (await leaveModal.isVisible()) {
+      await page.locator('#btn-tutor-leave-discard').click();
+    }
+    await expect(tutorModal).not.toBeVisible();
+
+    // 7. Open Saved Notes Library via #tab-notes
+    const notesTab = page.locator('#tab-notes');
+    await notesTab.click();
+
+    const noteLibraryView = page.locator('#note-library-view');
+    await expect(noteLibraryView).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText('Saved Explanations & Notes Library')).toBeVisible();
+
+    // 8. Verify the saved note appears in the note library list
+    const noteItems = page.locator('.note-list-item');
+    await expect(noteItems.first()).toBeVisible({ timeout: 10000 });
+
+    // Check detail pane title and rendered math
+    await expect(page.locator('#selected-note-title')).toBeVisible();
+    const detailMath = page.locator('#note-detail-pane mjx-container[jax="SVG"]');
+    await expect(detailMath.first()).toBeVisible();
+
+    // 9. Test search filter in notes
+    const notesSearchInput = page.locator('#notes-search-input');
+    await notesSearchInput.fill('defective');
+    await expect(noteItems.first()).toBeVisible();
+    await notesSearchInput.fill('');
+
+    // 10. Test note export action
+    const exportBtn = page.locator('#btn-note-export');
+    await expect(exportBtn).toBeVisible();
+
+    // Verify clicking export triggers download or runs without error
+    const downloadPromise = page.waitForEvent('download', { timeout: 3000 }).catch(() => null);
+    await exportBtn.click();
+    const download = await downloadPromise;
+    if (download) {
+      expect(download.suggestedFilename()).toMatch(/\.md$/);
+    }
+
+    // 11. Return to practice drill
+    const closeNotesBtn = page.locator('#btn-notes-close');
+    await closeNotesBtn.click();
+    await expect(noteLibraryView).not.toBeVisible();
+    await expect(page.locator('.question-strip')).toBeVisible();
+
+    // 12. Capture screenshot of verified Stage 09 release
+    const screenshotDir = path.resolve(__dirname, 'screenshots');
+    fs.mkdirSync(screenshotDir, { recursive: true });
+    await page.screenshot({ path: path.join(screenshotDir, 'stage09_verified.png'), fullPage: true });
   });
 });

@@ -2,19 +2,28 @@
 
 A planned local, keyboard-driven probability and statistics tutor with readable mathematics, progressive problems, persistent practice history, optional AI help, saved explanations, and a skippable space arcade.
 
-**Status: Stage 00 and Stage 01 complete; Stage 02 next, October 4, 2026.** Standalone repository established at `https://github.com/trustdan/quant-methods-practice.git` with Go module `github.com/trustdan/quant-methods-practice`. Go loopback server and React/TypeScript shell verified offline with local MathJax math rendering, full keyboard navigation, and complete test suites.
+**Status: Stages 00 through 08 complete; Stage 09 next, October 5, 2026.** Standalone repository established at `https://github.com/trustdan/quant-methods-practice.git`. Standalone Go executable and React web interface are fully working offline with local MathJax math rendering, 10-question reviewed curriculum bank, deliberate practice scheduling & transfer engine, concept mastery dashboard, offline formula reference library, responsive layout, and complete keyboard navigation.
+
+## Launching the application
+
+To start the local application and open it in your browser immediately:
+
+- **PowerShell**: `.\scripts\start.ps1`
+- **Windows Command Prompt**: `.\scripts\start.bat`
+- **Linux / macOS**: `./scripts/start.sh`
+- **Or launch the binary directly**: `.\bin\quant-practice.exe`
+
+CLI inspection tools:
+- `.\bin\quant-practice.exe -list-bank` — View all approved active curriculum questions.
+- `.\bin\quant-practice.exe -mastery` — View current concept retention and transfer status.
 
 ## Start building
 
 1. Read [OVERVIEW.md](OVERVIEW.md), [REQUIREMENTS.md](REQUIREMENTS.md), and [docs/AGENT-CONTRACT.md](docs/AGENT-CONTRACT.md).
 2. Resume from [docs/HANDOFF.md](docs/HANDOFF.md), then perform the first unfinished stage in [PLAN.md](PLAN.md).
-3. Inventory actual course materials using [docs/COURSE-MAP.md](docs/COURSE-MAP.md). The module headings supplied by the learner are evidence of broad scope; they are not a full syllabus.
-4. Stages 00 and 01 are complete. Use `scripts/test.ps1` or `scripts/test.sh` to run the full verification suite.
-5. Proceed to Stage 02 (Domain and bank contracts) in [PLAN.md](PLAN.md).
-
-Codex reads [AGENTS.md](AGENTS.md); Claude Code reads [CLAUDE.md](CLAUDE.md). Both point to the same contract. Suggested opening prompt:
-
-> Read AGENTS.md, README.md, OVERVIEW.md, REQUIREMENTS.md, PLAN.md, and docs/HANDOFF.md. Follow docs/AGENT-CONTRACT.md. Complete the earliest unfinished stage whose dependencies are satisfied, preserve existing work, run its checks, and update the handoff. Start with the offline application; do not implement the whole roadmap at once.
+3. Inventory actual course materials using [docs/COURSE-MAP.md](docs/COURSE-MAP.md).
+4. Run tests with `.\scripts\test.ps1` or `./scripts/test.sh`.
+5. Proceed to Stage 09 (Read-only tutor and note library) in [PLAN.md](PLAN.md).
 
 ## Selected design
 

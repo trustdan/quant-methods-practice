@@ -1,6 +1,7 @@
 package httpapi
 
 import (
+	"context"
 	"crypto/rand"
 	"encoding/hex"
 	"encoding/json"
@@ -20,6 +21,8 @@ import (
 	"github.com/trustdan/quant-methods-practice/internal/bank"
 	"github.com/trustdan/quant-methods-practice/internal/domain"
 	"github.com/trustdan/quant-methods-practice/internal/drill"
+	"github.com/trustdan/quant-methods-practice/internal/mastery"
+	"github.com/trustdan/quant-methods-practice/internal/tutor"
 )
 
 type Config struct {
@@ -30,6 +33,8 @@ type Config struct {
 	Bank              *bank.Bank
 	SessionManager    *drill.SessionManager
 	Store             drill.SessionStore
+	NoteStore         NoteStore
+	TutorManager      *tutor.TutorManager
 }
 
 type Server struct {
@@ -41,6 +46,8 @@ type Server struct {
 	sessionToken      string
 	bank              *bank.Bank
 	sessionManager    *drill.SessionManager
+	noteStore         NoteStore
+	tutorManager      *tutor.TutorManager
 	lastSessionID     string
 	mu                sync.RWMutex
 }
@@ -81,11 +88,39 @@ func NewServer(cfg Config) (*Server, error) {
 	}
 	bootstrapToken := hex.EncodeToString(tokenBytes)
 
+	noteStore := cfg.NoteStore
+	if noteStore == nil && cfg.Store != nil {
+		if ns, ok := cfg.Store.(NoteStore); ok {
+			noteStore = ns
+		}
+	}
+
+	tutorManager := cfg.TutorManager
+	if tutorManager == nil {
+		tutorManager = tutor.NewTutorManager(nil)
+	}
+
 	s := &Server{
 		config:         cfg,
 		bootstrapToken: bootstrapToken,
 		bank:           cfg.Bank,
 		sessionManager: cfg.SessionManager,
+		noteStore:      noteStore,
+		tutorManager:   tutorManager,
+	}
+
+	if s.sessionManager != nil && s.bank != nil {
+		s.sessionManager.SetContrastFinder(func(originID, misID string) (*domain.QuestionTemplate, bool) {
+			partnerID, found := mastery.FindContrastPartner(originID, misID)
+			if !found {
+				return nil, false
+			}
+			partnerTmpl, ok := s.bank.Get(partnerID)
+			if !ok || partnerTmpl.Status != domain.StatusActive {
+				return nil, false
+			}
+			return partnerTmpl, true
+		})
 	}
 
 	mux := http.NewServeMux()
@@ -93,8 +128,15 @@ func NewServer(cfg Config) (*Server, error) {
 	mux.HandleFunc("/api/local-session", s.handleLocalSession)
 	mux.HandleFunc("/api/settings", s.handleSettings)
 	mux.HandleFunc("/api/bank", s.handleBank)
+	mux.HandleFunc("/api/mastery", s.handleMastery)
 	mux.HandleFunc("/api/practice/sessions", s.handlePracticeSessions)
 	mux.HandleFunc("/api/practice/sessions/", s.handlePracticeSessionByID)
+	mux.HandleFunc("/api/tutor/requests", s.handleTutorRequests)
+	mux.HandleFunc("/api/tutor/requests/", s.handleTutorRequestByID)
+	mux.HandleFunc("/api/notes", s.handleNotes)
+	mux.HandleFunc("/api/notes/", s.handleNoteByID)
+	mux.HandleFunc("/api/exports", s.handleExports)
+	mux.HandleFunc("/api/tutor/drafts/", s.handleTutorDrafts)
 	mux.HandleFunc("/", s.handleStaticOrSPA)
 
 	wrapped := s.securityMiddleware(mux)
@@ -102,7 +144,7 @@ func NewServer(cfg Config) (*Server, error) {
 	s.httpServer = &http.Server{
 		Handler:      wrapped,
 		ReadTimeout:  15 * time.Second,
-		WriteTimeout: 30 * time.Second,
+		WriteTimeout: 120 * time.Second,
 		IdleTimeout:  60 * time.Second,
 	}
 
@@ -341,9 +383,36 @@ func (s *Server) handlePracticeSessions(w http.ResponseWriter, r *http.Request) 
 				}
 			}
 
-			selected := make([]*domain.QuestionTemplate, 0, qCount)
-			for i := 0; i < qCount; i++ {
-				selected = append(selected, filtered[i%len(filtered)])
+			// Load learner's mastery profile from store if available
+			var masteryMap map[string]*mastery.ConceptMastery
+			if s.config.Store != nil {
+				if storeWithMastery, ok := s.config.Store.(interface {
+					GetAllMasteryProjections(ctx context.Context) (map[string]*mastery.ConceptMastery, error)
+				}); ok {
+					masteryMap, _ = storeWithMastery.GetAllMasteryProjections(r.Context())
+				}
+			}
+
+			// Seeded weighted selection with floor, mixed review, and anti-repeat penalties
+			selectionOpts := mastery.SelectionOptions{
+				CandidateTemplates: filtered,
+				MasteryMap:         masteryMap,
+				QuestionCount:      qCount,
+				Intensity:          req.Intensity,
+				Seed:               req.Seed,
+				Now:                time.Now(),
+			}
+			selected := mastery.SelectQuestions(selectionOpts)
+			if len(selected) == 0 {
+				for i := 0; i < qCount; i++ {
+					selected = append(selected, filtered[i%len(filtered)])
+				}
+			}
+
+			// Determine scaffold level for each problem
+			scaffolds := make([]mastery.ScaffoldLevel, len(selected))
+			for i, tmpl := range selected {
+				scaffolds[i] = mastery.DetermineTemplateScaffold(tmpl, masteryMap)
 			}
 
 			settings := domain.SessionSettings{
@@ -355,7 +424,7 @@ func (s *Server) handlePracticeSessions(w http.ResponseWriter, r *http.Request) 
 				settings.Intensity = "standard"
 			}
 
-			sess, err = s.sessionManager.CreateMultiQuestionSession(selected, settings, req.Seed)
+			sess, err = s.sessionManager.CreateMultiQuestionSessionWithScaffolds(selected, scaffolds, settings, req.Seed)
 		}
 
 		if err != nil {
@@ -507,6 +576,39 @@ func (s *Server) handleBank(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	_ = json.NewEncoder(w).Encode(summaries)
+}
+
+func (s *Server) handleMastery(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+
+	if s.config.Store != nil {
+		if storeWithMastery, ok := s.config.Store.(interface {
+			GetMasterySummary(ctx context.Context, ledger *mastery.EvidenceLedger, now time.Time) (*mastery.MasterySummary, error)
+		}); ok {
+			summary, err := storeWithMastery.GetMasterySummary(r.Context(), nil, time.Now())
+			if err == nil && summary != nil {
+				_ = json.NewEncoder(w).Encode(summary)
+				return
+			}
+		}
+	}
+
+	// Fallback to empty summary if store not available or error
+	_ = json.NewEncoder(w).Encode(map[string]any{
+		"policy_version":     mastery.EvidencePolicyVersion,
+		"overall_score":      0.0,
+		"total_mastered":     0,
+		"total_transferring": 0,
+		"total_learning":     0,
+		"total_new":          0,
+		"concepts":           []any{},
+		"generated_at":       time.Now(),
+	})
 }
 
 func (s *Server) handlePracticeSessionByID(w http.ResponseWriter, r *http.Request) {

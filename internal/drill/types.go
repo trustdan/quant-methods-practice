@@ -69,6 +69,9 @@ type DrillSession struct {
 	CurrentQuestionIndex int                    `json:"current_question_index"`
 	Questions            []QuestionState        `json:"questions,omitempty"`
 	Settings             domain.SessionSettings `json:"settings"`
+	ContrastCount        int                    `json:"contrast_count,omitempty"`
+
+	contrastFinder func(originID, misID string) (*domain.QuestionTemplate, bool)
 }
 
 // QuestionState tracks progress and stages for one question within a multi-question drill session.
@@ -81,6 +84,9 @@ type QuestionState struct {
 	CurrentStageIndex int                     `json:"current_stage_index"`
 	Completed         bool                    `json:"completed"`
 	Recap             *DrillRecap             `json:"recap,omitempty"`
+	ScaffoldLevel     string                  `json:"scaffold_level,omitempty"`
+	IsContrast        bool                    `json:"is_contrast,omitempty"`
+	ContrastPartnerID string                  `json:"contrast_partner_id,omitempty"`
 }
 
 // SetStore binds a persistence store to the session.
@@ -103,6 +109,19 @@ func (s *DrillSession) GetCachedResult(cmdID string) (*CommandResult, bool) {
 	}
 	res, ok := s.commandCache[cmdID]
 	return res, ok
+}
+
+// SetContrastFinder registers a callback to locate contrast partners for misconceptions.
+func (s *DrillSession) SetContrastFinder(fn func(originID, misID string) (*domain.QuestionTemplate, bool)) {
+	s.contrastFinder = fn
+}
+
+// CurrentQuestionIsContrast returns true if the active question is a guided contrast problem.
+func (s *DrillSession) CurrentQuestionIsContrast() bool {
+	if len(s.Questions) > 0 && s.CurrentQuestionIndex >= 0 && s.CurrentQuestionIndex < len(s.Questions) {
+		return s.Questions[s.CurrentQuestionIndex].IsContrast
+	}
+	return false
 }
 
 // CommandType represents actions dispatched by the client.
@@ -178,9 +197,11 @@ type PublicStageView struct {
 
 // PublicQuestionInfo provides summary status of a question within a multi-question session.
 type PublicQuestionInfo struct {
-	Index  int    `json:"index"`
-	Title  string `json:"title"`
-	Status string `json:"status"` // "pending", "in_progress", "completed", "skipped"
+	Index         int    `json:"index"`
+	Title         string `json:"title"`
+	Status        string `json:"status"` // "pending", "in_progress", "completed", "skipped"
+	ScaffoldLevel string `json:"scaffold_level,omitempty"`
+	IsContrast    bool   `json:"is_contrast,omitempty"`
 }
 
 // PublicSessionView is the sanitized projection sent to the web frontend.
@@ -201,6 +222,8 @@ type PublicSessionView struct {
 	TotalQuestions       int                  `json:"total_questions"`
 	Questions            []PublicQuestionInfo `json:"questions"`
 	AllCompleted         bool                 `json:"all_completed"`
+	ScaffoldLevel        string               `json:"scaffold_level,omitempty"`
+	IsContrast           bool                 `json:"is_contrast,omitempty"`
 }
 
 // StageSummary records stage performance for the post-drill recap.

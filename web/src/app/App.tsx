@@ -10,10 +10,14 @@ import {
 } from '../types/practice';
 import { ReferenceLibrary } from '../features/reference/ReferenceLibrary';
 import { SettingsModal, SessionConfig } from '../features/settings/SettingsModal';
+import { MasteryView } from '../features/mastery/MasteryView';
+import { NoteLibraryView } from '../features/notes/NoteLibraryView';
+import { AITutorPanel } from '../features/tutor/AITutorPanel';
 
 export const App: React.FC = () => {
   const [session, setSession] = useState<PublicSessionView>(DEFAULT_BINOMIAL_SESSION);
-  const [activeTab, setActiveTab] = useState<'drill' | 'reference' | 'gallery'>('drill');
+  const [activeTab, setActiveTab] = useState<'drill' | 'reference' | 'gallery' | 'mastery' | 'notes'>('drill');
+  const [showTutorModal, setShowTutorModal] = useState<boolean>(false);
   const [showSettingsModal, setShowSettingsModal] = useState<boolean>(false);
   const [settingsConfig, setSettingsConfig] = useState<SessionConfig>({
     question_count: 10,
@@ -513,10 +517,14 @@ export const App: React.FC = () => {
           e.preventDefault();
           if (showSettingsModal) {
             setShowSettingsModal(false);
+          } else if (showTutorModal) {
+            setShowTutorModal(false);
           } else if (showHelpModal) {
             handleCloseHelp();
           } else if (showLeaveModal) {
             handleLeaveCancel();
+          } else if (activeTab === 'mastery' || activeTab === 'reference' || activeTab === 'notes') {
+            setActiveTab('drill');
           }
           break;
 
@@ -580,15 +588,36 @@ export const App: React.FC = () => {
           }
           break;
 
+        case 'VIEW_MASTERY':
+          if (!isFieldActive) {
+            e.preventDefault();
+            setActiveTab((prev) => (prev === 'mastery' ? 'drill' : 'mastery'));
+          }
+          break;
+
         case 'VIEW_SETTINGS':
           if (!isFieldActive) {
             e.preventDefault();
             setShowSettingsModal(true);
           }
           break;
+
+        case 'VIEW_SAVED_NOTES':
+          if (!isFieldActive) {
+            e.preventDefault();
+            setActiveTab((prev) => (prev === 'notes' ? 'drill' : 'notes'));
+          }
+          break;
+
+        case 'VIEW_AI_REQUEST':
+          if (!isFieldActive) {
+            e.preventDefault();
+            setShowTutorModal(true);
+          }
+          break;
       }
     },
-    [showHelpModal, showLeaveModal, showSettingsModal, activeTab, session]
+    [showHelpModal, showLeaveModal, showSettingsModal, showTutorModal, activeTab, session]
   );
 
   useEffect(() => {
@@ -618,12 +647,40 @@ export const App: React.FC = () => {
             Practice Drill
           </button>
           <button
+            className={`btn ${activeTab === 'mastery' ? 'btn-primary' : 'btn-outline'}`}
+            onClick={() => setActiveTab('mastery')}
+            id="tab-mastery"
+            style={{ fontSize: '0.85rem', padding: '0.35rem 0.75rem' }}
+            title="Concept Mastery & Transfer (s)"
+          >
+            <span className="kbd">s</span> Mastery
+          </button>
+          <button
             className={`btn ${activeTab === 'reference' ? 'btn-primary' : 'btn-outline'}`}
             onClick={() => setActiveTab('reference')}
+            id="tab-reference"
             style={{ fontSize: '0.85rem', padding: '0.35rem 0.75rem' }}
             title="Reference Library (r)"
           >
             <span className="kbd">r</span> Reference Library
+          </button>
+          <button
+            className={`btn ${activeTab === 'notes' ? 'btn-primary' : 'btn-outline'}`}
+            onClick={() => setActiveTab('notes')}
+            id="tab-notes"
+            style={{ fontSize: '0.85rem', padding: '0.35rem 0.75rem' }}
+            title="Saved Notes & Explanations (V)"
+          >
+            <span className="kbd">V</span> Notes
+          </button>
+          <button
+            className="btn btn-outline"
+            onClick={() => setShowTutorModal(true)}
+            id="tab-tutor"
+            style={{ fontSize: '0.85rem', padding: '0.35rem 0.75rem' }}
+            title="AI Tutor Panel (n)"
+          >
+            <span className="kbd">n</span> 💡 AI Tutor
           </button>
           <button
             className={`btn ${activeTab === 'gallery' ? 'btn-primary' : 'btn-outline'}`}
@@ -704,6 +761,17 @@ export const App: React.FC = () => {
 
       {/* Main Workspace */}
       <main className="app-main" ref={readingContainerRef}>
+        {activeTab === 'mastery' && (
+          <MasteryView onClose={() => setActiveTab('drill')} />
+        )}
+
+        {activeTab === 'notes' && (
+          <NoteLibraryView
+            onClose={() => setActiveTab('drill')}
+            onOpenTutorWithNote={() => setShowTutorModal(true)}
+          />
+        )}
+
         {activeTab === 'drill' && (
           <PracticeDrill
             session={session}
@@ -712,6 +780,7 @@ export const App: React.FC = () => {
             onNavigateQuestion={handleNavigateQuestion}
             onResetDrill={handleResetDrill}
             onDraftChange={setHasUnsavedDraft}
+            onOpenTutor={() => setShowTutorModal(true)}
           />
         )}
 
@@ -998,6 +1067,17 @@ export const App: React.FC = () => {
         onClose={() => setShowSettingsModal(false)}
         onStartSession={handleStartConfiguredSession}
         currentSettings={settingsConfig}
+      />
+      {/* AI Tutor Panel */}
+      <AITutorPanel
+        isOpen={showTutorModal}
+        onClose={() => setShowTutorModal(false)}
+        sessionId={session.id}
+        instanceId={session.template_id}
+        stageId={session.stages[session.current_stage_index]?.id}
+        instanceTitle={session.title}
+        topic={session.stages[session.current_stage_index]?.label || 'Probability'}
+        concepts={[session.template_id]}
       />
     </>
   );

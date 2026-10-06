@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"path/filepath"
+	"strings"
 	"testing"
 	"testing/fstest"
 
@@ -580,5 +581,272 @@ func TestMultiQuestionPracticeSessionAPI(t *testing.T) {
 	}
 	if cmdRes.SessionState.CurrentQuestionIndex != 3 {
 		t.Errorf("expected CurrentQuestionIndex=3 after navigation, got %d", cmdRes.SessionState.CurrentQuestionIndex)
+	}
+}
+
+func TestMasteryEndpoint(t *testing.T) {
+	tmpDir := t.TempDir()
+	db, err := storage.Open(filepath.Join(tmpDir, "mastery_api_test.db"))
+	if err != nil {
+		t.Fatalf("Open failed: %v", err)
+	}
+	defer db.Close()
+	if err := storage.RunMigrations(context.Background(), db, nil); err != nil {
+		t.Fatalf("RunMigrations failed: %v", err)
+	}
+
+	store := storage.NewStore(db, nil)
+	srv, err := NewServer(Config{
+		Addr:    "127.0.0.1:0",
+		Store:   store,
+		Version: "0.1.0-test",
+	})
+	if err != nil {
+		t.Fatalf("NewServer failed: %v", err)
+	}
+	defer srv.Close()
+
+	// GET /api/mastery
+	reqGet := httptest.NewRequest(http.MethodGet, "/api/mastery", nil)
+	reqGet.Host = "127.0.0.1"
+	recGet := httptest.NewRecorder()
+	srv.httpServer.Handler.ServeHTTP(recGet, reqGet)
+
+	if recGet.Code != http.StatusOK {
+		t.Fatalf("expected 200 OK on /api/mastery, got %d: %s", recGet.Code, recGet.Body.String())
+	}
+
+	var summary map[string]any
+	if err := json.NewDecoder(recGet.Body).Decode(&summary); err != nil {
+		t.Fatalf("failed to decode mastery summary: %v", err)
+	}
+
+	if _, ok := summary["policy_version"]; !ok {
+		t.Errorf("expected policy_version in mastery response")
+	}
+	if _, ok := summary["concepts"]; !ok {
+		t.Errorf("expected concepts in mastery response")
+	}
+}
+
+func TestTutorRequestAndCancellationEndpoint(t *testing.T) {
+	srv := newTestServer(t)
+
+	// 1. POST /api/tutor/requests
+	reqBody, _ := json.Marshal(map[string]any{
+		"action":   "explain",
+		"provider": "offline",
+	})
+	postReq := httptest.NewRequest(http.MethodPost, "/api/tutor/requests", bytes.NewReader(reqBody))
+	postReq.Host = "127.0.0.1"
+	postRec := httptest.NewRecorder()
+	srv.httpServer.Handler.ServeHTTP(postRec, postReq)
+
+	if postRec.Code != http.StatusOK {
+		t.Fatalf("expected 200 OK from /api/tutor/requests, got %d: %s", postRec.Code, postRec.Body.String())
+	}
+
+	var postData map[string]string
+	if err := json.NewDecoder(postRec.Body).Decode(&postData); err != nil {
+		t.Fatalf("failed to decode response: %v", err)
+	}
+	reqID := postData["request_id"]
+	if reqID == "" {
+		t.Fatalf("expected non-empty request_id")
+	}
+
+	// 2. DELETE /api/tutor/requests/{id} (cancellation)
+	delReq := httptest.NewRequest(http.MethodDelete, "/api/tutor/requests/"+reqID, nil)
+	delReq.Host = "127.0.0.1"
+	delRec := httptest.NewRecorder()
+	srv.httpServer.Handler.ServeHTTP(delRec, delReq)
+
+	if delRec.Code != http.StatusOK {
+		t.Fatalf("expected 200 OK on cancel, got %d", delRec.Code)
+	}
+
+	var delData map[string]string
+	_ = json.NewDecoder(delRec.Body).Decode(&delData)
+	if delData["status"] != "cancelled" {
+		t.Errorf("expected status cancelled, got %v", delData["status"])
+	}
+}
+
+func TestNotesCRUDAndExportEndpoint(t *testing.T) {
+	tmpDir := t.TempDir()
+	db, err := storage.Open(filepath.Join(tmpDir, "notes_api_test.db"))
+	if err != nil {
+		t.Fatalf("Open failed: %v", err)
+	}
+	defer db.Close()
+	if err := storage.RunMigrations(context.Background(), db, nil); err != nil {
+		t.Fatalf("RunMigrations failed: %v", err)
+	}
+
+	store := storage.NewStore(db, nil)
+	srv, err := NewServer(Config{
+		Addr:    "127.0.0.1:0",
+		Store:   store,
+		Version: "0.1.0-test",
+	})
+	if err != nil {
+		t.Fatalf("NewServer failed: %v", err)
+	}
+	defer srv.Close()
+
+	// 1. POST /api/notes
+	notePayload, _ := json.Marshal(map[string]any{
+		"id":           "note_api_01",
+		"topic":        "Binomial Distribution",
+		"raw_markdown": "Derivation: $P(X=2) = 0.375$",
+		"provider_info": map[string]any{
+			"title":    "Fair Coin Calculation",
+			"concepts": []string{"binomial_pmf"},
+		},
+	})
+	saveReq := httptest.NewRequest(http.MethodPost, "/api/notes", bytes.NewReader(notePayload))
+	saveReq.Host = "127.0.0.1"
+	saveRec := httptest.NewRecorder()
+	srv.httpServer.Handler.ServeHTTP(saveRec, saveReq)
+
+	if saveRec.Code != http.StatusOK {
+		t.Fatalf("expected 200 OK on POST /api/notes, got %d: %s", saveRec.Code, saveRec.Body.String())
+	}
+
+	// 2. GET /api/notes
+	listReq := httptest.NewRequest(http.MethodGet, "/api/notes?topic=binomial", nil)
+	listReq.Host = "127.0.0.1"
+	listRec := httptest.NewRecorder()
+	srv.httpServer.Handler.ServeHTTP(listRec, listReq)
+
+	if listRec.Code != http.StatusOK {
+		t.Fatalf("expected 200 OK on GET /api/notes, got %d", listRec.Code)
+	}
+
+	var notesList []map[string]any
+	if err := json.NewDecoder(listRec.Body).Decode(&notesList); err != nil {
+		t.Fatalf("failed to decode notes list: %v", err)
+	}
+	if len(notesList) != 1 {
+		t.Fatalf("expected 1 note in list, got %d", len(notesList))
+	}
+
+	// 3. GET /api/notes/note_api_01
+	getReq := httptest.NewRequest(http.MethodGet, "/api/notes/note_api_01", nil)
+	getReq.Host = "127.0.0.1"
+	getRec := httptest.NewRecorder()
+	srv.httpServer.Handler.ServeHTTP(getRec, getReq)
+
+	if getRec.Code != http.StatusOK {
+		t.Fatalf("expected 200 OK on GET note by ID, got %d", getRec.Code)
+	}
+
+	// 4. GET /api/notes/note_api_01/export
+	exportReq := httptest.NewRequest(http.MethodGet, "/api/notes/note_api_01/export", nil)
+	exportReq.Host = "127.0.0.1"
+	exportRec := httptest.NewRecorder()
+	srv.httpServer.Handler.ServeHTTP(exportRec, exportReq)
+
+	if exportRec.Code != http.StatusOK {
+		t.Fatalf("expected 200 OK on export note, got %d", exportRec.Code)
+	}
+	mdExport := exportRec.Body.String()
+	if !strings.Contains(mdExport, "Fair Coin Calculation") || !strings.Contains(mdExport, "$P(X=2) = 0.375$") {
+		t.Errorf("export missing expected content: %s", mdExport)
+	}
+
+	// 5. POST /api/exports
+	batchReqBody, _ := json.Marshal(map[string]any{
+		"type":     "notes",
+		"note_ids": []string{"note_api_01"},
+	})
+	batchReq := httptest.NewRequest(http.MethodPost, "/api/exports", bytes.NewReader(batchReqBody))
+	batchReq.Host = "127.0.0.1"
+	batchRec := httptest.NewRecorder()
+	srv.httpServer.Handler.ServeHTTP(batchRec, batchReq)
+
+	if batchRec.Code != http.StatusOK {
+		t.Fatalf("expected 200 OK on POST /api/exports, got %d", batchRec.Code)
+	}
+
+	// 6. DELETE /api/notes/note_api_01
+	delReq := httptest.NewRequest(http.MethodDelete, "/api/notes/note_api_01", nil)
+	delReq.Host = "127.0.0.1"
+	delRec := httptest.NewRecorder()
+	srv.httpServer.Handler.ServeHTTP(delRec, delReq)
+
+	if delRec.Code != http.StatusOK {
+		t.Fatalf("expected 200 OK on DELETE note, got %d", delRec.Code)
+	}
+
+	// Verify gone
+	getReq2 := httptest.NewRequest(http.MethodGet, "/api/notes/note_api_01", nil)
+	getReq2.Host = "127.0.0.1"
+	getRec2 := httptest.NewRecorder()
+	srv.httpServer.Handler.ServeHTTP(getRec2, getReq2)
+	if getRec2.Code != http.StatusNotFound {
+		t.Errorf("expected 404 after deletion, got %d", getRec2.Code)
+	}
+}
+
+func TestTutorDraftRecoveryEndpoint(t *testing.T) {
+	tmpDir := t.TempDir()
+	db, err := storage.Open(filepath.Join(tmpDir, "drafts_api_test.db"))
+	if err != nil {
+		t.Fatalf("Open failed: %v", err)
+	}
+	defer db.Close()
+	if err := storage.RunMigrations(context.Background(), db, nil); err != nil {
+		t.Fatalf("RunMigrations failed: %v", err)
+	}
+
+	store := storage.NewStore(db, nil)
+	srv, err := NewServer(Config{
+		Addr:    "127.0.0.1:0",
+		Store:   store,
+		Version: "0.1.0-test",
+	})
+	if err != nil {
+		t.Fatalf("NewServer failed: %v", err)
+	}
+	defer srv.Close()
+
+	// 1. POST /api/tutor/drafts/test_draft_01
+	payload, _ := json.Marshal(map[string]any{
+		"context_json":  `{"stage":"prob"}`,
+		"recovery_text": "Draft content in progress",
+	})
+	postReq := httptest.NewRequest(http.MethodPost, "/api/tutor/drafts/test_draft_01", bytes.NewReader(payload))
+	postReq.Host = "127.0.0.1"
+	postRec := httptest.NewRecorder()
+	srv.httpServer.Handler.ServeHTTP(postRec, postReq)
+
+	if postRec.Code != http.StatusOK {
+		t.Fatalf("expected 200 OK on save draft, got %d", postRec.Code)
+	}
+
+	// 2. GET /api/tutor/drafts/test_draft_01
+	getReq := httptest.NewRequest(http.MethodGet, "/api/tutor/drafts/test_draft_01", nil)
+	getReq.Host = "127.0.0.1"
+	getRec := httptest.NewRecorder()
+	srv.httpServer.Handler.ServeHTTP(getRec, getReq)
+
+	if getRec.Code != http.StatusOK {
+		t.Fatalf("expected 200 OK on get draft, got %d", getRec.Code)
+	}
+	var draftData map[string]any
+	_ = json.NewDecoder(getRec.Body).Decode(&draftData)
+	if draftData["recovery_text"] != "Draft content in progress" {
+		t.Errorf("unexpected draft content: %v", draftData["recovery_text"])
+	}
+
+	// 3. DELETE /api/tutor/drafts/test_draft_01
+	delReq := httptest.NewRequest(http.MethodDelete, "/api/tutor/drafts/test_draft_01", nil)
+	delReq.Host = "127.0.0.1"
+	delRec := httptest.NewRecorder()
+	srv.httpServer.Handler.ServeHTTP(delRec, delReq)
+
+	if delRec.Code != http.StatusOK {
+		t.Fatalf("expected 200 OK on delete draft, got %d", delRec.Code)
 	}
 }

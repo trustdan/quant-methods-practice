@@ -17,6 +17,7 @@ interface PracticeDrillProps {
   onNavigateQuestion?: (index: number) => void;
   onResetDrill: () => void;
   onDraftChange?: (hasDraft: boolean) => void;
+  onOpenTutor?: () => void;
 }
 
 interface DraftRecord {
@@ -32,6 +33,7 @@ export const PracticeDrill: React.FC<PracticeDrillProps> = ({
   onNavigateQuestion,
   onResetDrill,
   onDraftChange,
+  onOpenTutor,
 }) => {
   const currentStage: PublicStageView | undefined = session.stages[session.current_stage_index];
 
@@ -449,8 +451,22 @@ export const PracticeDrill: React.FC<PracticeDrillProps> = ({
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.4rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.4rem', flexWrap: 'wrap' }}>
               <span className="badge badge-cyan">Approved Scenario</span>
+              {session.is_contrast && (
+                <span className="contrast-badge" id="contrast-badge" title="Guided contrast partner problem with full guidance">
+                  Guided Contrast
+                </span>
+              )}
+              {session.scaffold_level && (
+                <span className="scaffold-indicator" id="scaffold-indicator">
+                  {session.scaffold_level === 'faded'
+                    ? 'Faded (2 stages)'
+                    : session.scaffold_level === 'intermediate'
+                    ? 'Intermediate (4 stages)'
+                    : `Full Guidance (${session.stages.length} stages)`}
+                </span>
+              )}
               <h2 style={{ fontSize: '1.2rem', fontWeight: 600, margin: 0 }}>{session.title}</h2>
             </div>
             <div style={{ fontSize: '1.05rem', color: 'var(--text-main)', marginTop: '0.4rem' }}>
@@ -546,7 +562,7 @@ export const PracticeDrill: React.FC<PracticeDrillProps> = ({
         <div className="card-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
             <span className="badge badge-cyan">
-              Stage {currentStage.number}/7: {currentStage.label}
+              Stage {currentStage.number}/{session.stages.length}: {currentStage.label}
             </span>
             {isCompleted && (
               <span className="badge badge-emerald">
@@ -718,11 +734,33 @@ export const PracticeDrill: React.FC<PracticeDrillProps> = ({
                 >
                   <span className="kbd">?</span> Offline Hint
                 </button>
+                {onOpenTutor && (
+                  <button
+                    id="btn-open-tutor"
+                    className="btn btn-secondary"
+                    onClick={onOpenTutor}
+                    title="Open AI Tutor (n)"
+                  >
+                    <span className="kbd">n</span> 💡 AI Tutor
+                  </button>
+                )}
               </>
             ) : (
-              <button className="btn btn-primary" onClick={handleNextStage}>
-                <span className="kbd">Enter</span> {session.current_stage_index === session.stages.length - 1 ? 'View Complete Recap' : 'Next Stage'} &rarr;
-              </button>
+              <>
+                <button className="btn btn-primary" onClick={handleNextStage}>
+                  <span className="kbd">Enter</span> {session.current_stage_index === session.stages.length - 1 ? 'View Complete Recap' : 'Next Stage'} &rarr;
+                </button>
+                {onOpenTutor && (
+                  <button
+                    id="btn-open-tutor"
+                    className="btn btn-secondary"
+                    onClick={onOpenTutor}
+                    title="Open AI Tutor for deep dive / follow-ups (n)"
+                  >
+                    <span className="kbd">n</span> 💡 AI Tutor
+                  </button>
+                )}
+              </>
             )}
           </div>
 

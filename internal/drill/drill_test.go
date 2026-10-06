@@ -7,6 +7,7 @@ import (
 
 	"github.com/trustdan/quant-methods-practice/internal/bank"
 	"github.com/trustdan/quant-methods-practice/internal/domain"
+	"github.com/trustdan/quant-methods-practice/internal/mastery"
 )
 
 func loadApprovedBinomialTemplate(t *testing.T) *domain.QuestionTemplate {
@@ -524,4 +525,131 @@ func TestMultiQuestionSessionCreationAndNavigation(t *testing.T) {
 		t.Errorf("expected question 0 stage 0 to remain completed, got %s", session.Stages[0].Status)
 	}
 }
+
+func TestMisconceptionQueuesBoundedContrastPartner(t *testing.T) {
+	tmplCoin := loadApprovedBinomialTemplate(t)
+	partnerPath := filepath.Join("..", "..", "curriculum", "approved", "binomial-defective-at-most-one.json")
+	tmplPartner, err := bank.ValidateTemplateFile(partnerPath, nil)
+	if err != nil {
+		t.Fatalf("failed to load partner template: %v", err)
+	}
+
+	mgr := NewSessionManager(nil)
+	mgr.SetContrastFinder(func(originID, misID string) (*domain.QuestionTemplate, bool) {
+		if originID == "binomial_fair_coin_exactly_two" && misID == "exactly_as_at_most" {
+			return tmplPartner, true
+		}
+		return nil, false
+	})
+
+	session, err := mgr.CreateMultiQuestionSession([]*domain.QuestionTemplate{tmplCoin}, domain.SessionSettings{QuestionCount: 1}, 100)
+	if err != nil {
+		t.Fatalf("failed to create session: %v", err)
+	}
+
+	// Navigate to stage 3 (translate_event)
+	// Complete stage 0, 1, 2 first
+	sub := domain.SubmittedAnswer{Kind: domain.StageKindChoice, OptionID: "count_heads"}
+	_, _ = session.ExecuteCommand(SessionCommand{CommandID: "c0", Type: CmdSubmitAnswer, Answer: &sub}, nil)
+	sub = domain.SubmittedAnswer{Kind: domain.StageKindChoice, OptionID: "binomial"}
+	_, _ = session.ExecuteCommand(SessionCommand{CommandID: "c1", Type: CmdSubmitAnswer, Answer: &sub}, nil)
+	sub = domain.SubmittedAnswer{Kind: domain.StageKindChoice, OptionID: "n4_p_half"}
+	_, _ = session.ExecuteCommand(SessionCommand{CommandID: "c2", Type: CmdSubmitAnswer, Answer: &sub}, nil)
+
+	if session.CurrentStageIndex != 3 {
+		t.Fatalf("expected stage index 3, got %d", session.CurrentStageIndex)
+	}
+
+	// Stage 3 (translate_event): submit distractor with misconception "exactly_as_at_most"
+	subMis := domain.SubmittedAnswer{Kind: domain.StageKindChoice, OptionID: "at_most_two"}
+	res, err := session.ExecuteCommand(SessionCommand{CommandID: "c3_mis", Type: CmdSubmitAnswer, Answer: &subMis}, nil)
+	if err != nil || !res.Success {
+		t.Fatalf("submit misconception failed: %v", err)
+	}
+
+	// Verify contrast partner was queued as next question!
+	if len(session.Questions) != 2 {
+		t.Fatalf("expected 2 questions after contrast queue, got %d", len(session.Questions))
+	}
+
+	contrastQ := session.Questions[1]
+	if !contrastQ.IsContrast {
+		t.Errorf("expected question 1 to be marked IsContrast = true")
+	}
+	if contrastQ.ScaffoldLevel != "full" {
+		t.Errorf("contrast question must use full guidance, got %s", contrastQ.ScaffoldLevel)
+	}
+	// Verify contrast assistance was marked
+	if len(contrastQ.Stages[0].Assistance) == 0 || contrastQ.Stages[0].Assistance[0] != domain.AssistanceGuidedContrast {
+		t.Errorf("contrast question stages must be marked with AssistanceGuidedContrast")
+	}
+
+	// Invariant: Contrast cannot chain!
+	// Navigate to question 1 (contrast question)
+	targetQ1 := 1
+	_, errNav := session.ExecuteCommand(SessionCommand{
+		CommandID:           "cmd_nav_contrast",
+		Type:                CmdNavigateQuestion,
+		TargetQuestionIndex: &targetQ1,
+	}, nil)
+	if errNav != nil {
+		t.Fatalf("navigate to contrast question failed: %v", errNav)
+	}
+
+	// Submit incorrect answer on contrast question
+	subWrong := domain.SubmittedAnswer{Kind: domain.StageKindChoice, OptionID: "wrong_choice"}
+	_, _ = session.ExecuteCommand(SessionCommand{CommandID: "c_contrast_wrong", Type: CmdSubmitAnswer, Answer: &subWrong}, nil)
+
+	// Verify session length has NOT increased (cannot chain!)
+	if len(session.Questions) != 2 {
+		t.Errorf("contrast question must not chain to another contrast, got %d questions", len(session.Questions))
+	}
+}
+
+func TestSessionScaffoldDegradation(t *testing.T) {
+	tmplCoin := loadApprovedBinomialTemplate(t)
+	mgr := NewSessionManager(nil)
+
+	// Create session with Faded scaffold (2 stages)
+	sessFaded, err := mgr.CreateMultiQuestionSessionWithScaffolds(
+		[]*domain.QuestionTemplate{tmplCoin},
+		[]mastery.ScaffoldLevel{mastery.ScaffoldFaded},
+		domain.SessionSettings{QuestionCount: 1},
+		200,
+	)
+	if err != nil {
+		t.Fatalf("failed to create faded session: %v", err)
+	}
+
+	if len(sessFaded.Stages) != 2 {
+		t.Errorf("expected 2 stages for faded scaffold, got %d", len(sessFaded.Stages))
+	}
+	if sessFaded.Questions[0].ScaffoldLevel != "faded" {
+		t.Errorf("expected ScaffoldLevel 'faded', got %s", sessFaded.Questions[0].ScaffoldLevel)
+	}
+
+	pv := sessFaded.ToPublicView()
+	if pv.ScaffoldLevel != "faded" {
+		t.Errorf("expected public view ScaffoldLevel 'faded', got %s", pv.ScaffoldLevel)
+	}
+
+	// Create session with Intermediate scaffold (4 stages)
+	sessInter, err := mgr.CreateMultiQuestionSessionWithScaffolds(
+		[]*domain.QuestionTemplate{tmplCoin},
+		[]mastery.ScaffoldLevel{mastery.ScaffoldIntermediate},
+		domain.SessionSettings{QuestionCount: 1},
+		300,
+	)
+	if err != nil {
+		t.Fatalf("failed to create intermediate session: %v", err)
+	}
+
+	if len(sessInter.Stages) != 4 {
+		t.Errorf("expected 4 stages for intermediate scaffold, got %d", len(sessInter.Stages))
+	}
+	if sessInter.Questions[0].ScaffoldLevel != "intermediate" {
+		t.Errorf("expected ScaffoldLevel 'intermediate', got %s", sessInter.Questions[0].ScaffoldLevel)
+	}
+}
+
 

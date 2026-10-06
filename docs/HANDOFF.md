@@ -2,7 +2,7 @@
 
 ## Current state - October 5, 2026
 
-Stage 00, Stage 01, Stage 02, Stage 03, Stage 04, Stage 05, Stage 06, and Stage 07 are complete and verified. The standalone repository is active on branch `main` at `https://github.com/trustdan/quant-methods-practice.git`.
+Stage 00, Stage 01, Stage 02, Stage 03, Stage 04, Stage 05, Stage 06, Stage 07, Stage 08, and Stage 09 are complete and verified. The standalone repository is active on branch `main` at `https://github.com/trustdan/quant-methods-practice.git`.
 
 ### Stage 00 Record
 - Toolchain versions: Go `go1.27.1` (windows/amd64), Node `v22.21.1`, npm `10.9.4`, Python `3.13.15`, Windows 11 amd64 (Microsoft Edge available).
@@ -162,30 +162,89 @@ Stage 00, Stage 01, Stage 02, Stage 03, Stage 04, Stage 05, Stage 06, and Stage 
     6. Complete process termination, loopback server restart on a new port, page reload, and SQLite replay of the 10-question session with active Problem 2 restored.
     7. Captured verified screenshot [tests/e2e/screenshots/stage07_verified.png](file:///tests/e2e/screenshots/stage07_verified.png).
 
+### Stage 08 Implementation
+- Mastery & Scheduling Engine ([internal/mastery](file:///internal/mastery)):
+  - Domain types ([internal/mastery/types.go](file:///internal/mastery/types.go)): `ScaffoldLevel` (`full`, `intermediate`, `faded`), `MasteryStatus` (`new`, `learning`, `transferring`, `mastered`), `EvidenceOutcome`, `ConceptMastery`, `RawExposure`, `MasterySummary`, `EvidencePolicyVersion = 1`.
+  - Bayesian decay & scheduling policy ([internal/mastery/policy.go](file:///internal/mastery/policy.go)): Informative uniform prior ($\alpha=1, \beta=1$), Bayesian mean $(S+1)/(S+E+2)$, 3-day exponential half-life decay computed strictly at read time, clock rollback defense ($t_{\text{now}} < t_{\text{last}}$), scaffold level derivation with decay margin tolerance, status determination, and priority scoring.
+  - Evidence ledger ([internal/mastery/ledger.go](file:///internal/mastery/ledger.go)): Strictly enforces **one contribution per concept per instance** (subsequent attempts on the same instance are ignored), preserves first error on retry, categorizes assistance (`independent_first`, `hinted_retry`, `reference_used`, `revealed`, `guided_contrast`), tracks distinct setting groups, and requires $\ge 2$ distinct setting groups plus $\ge 10$ minutes delayed transfer for graduation.
+  - Scaffold degradation policy ([internal/mastery/scaffold.go](file:///internal/mastery/scaffold.go)): `DegradeStages` degrades 7-stage templates to 4 stages (Intermediate) or 2 stages (Faded) while preserving concept evidence attribution. `DetermineTemplateScaffold` evaluates all template concepts against the learner mastery profile.
+  - Seeded weighted selection ([internal/mastery/selector.go](file:///internal/mastery/selector.go)): Implements non-zero eligibility floor (0.1), concept need weighting, ~20% mixed review allocation, and anti-repeat penalties (exact template and setting group).
+  - Contrast registry & bounded queue ([internal/mastery/contrast.go](file:///internal/mastery/contrast.go)): Pairs eligible misconceptions (`exactly_as_at_most`, `missing_combination`, `independence_concept`, etc.) with approved contrast partners.
+  - Mastery tests ([internal/mastery/mastery_test.go](file:///internal/mastery/mastery_test.go)): 8/8 comprehensive unit tests passing.
+- Durable Mastery Storage & Rebuild ([internal/storage](file:///internal/storage)):
+  - [internal/storage/mastery.go](file:///internal/storage/mastery.go): Implemented `GetHistoricalExposures` extracting attempts and assistance from SQLite, `SaveMasteryProjection`, `GetAllMasteryProjections`, `RebuildMastery` reconstructing projections from historical database records, and `GetMasterySummary`.
+  - [internal/storage/mastery_storage_test.go](file:///internal/storage/mastery_storage_test.go): Tested projection roundtrip persistence and rebuild from historical attempts.
+- Drill Orchestration & Bounded Contrast Queue ([internal/drill](file:///internal/drill)):
+  - [internal/drill/engine.go](file:///internal/drill/engine.go): Added `CreateMultiQuestionSessionWithScaffolds`, contrast partner detection on misconception submissions, and bounded queuing with strict single-contrast limit (`!CurrentQuestionIsContrast() && ContrastCount == 0`), ensuring contrasts **cannot chain or cause unbounded session expansion**.
+  - Dynamic scaffold indicators and contrast badges surfaced in `ToPublicView`.
+  - [internal/drill/drill_test.go](file:///internal/drill/drill_test.go): Added tests verifying contrast partner insertion and scaffold degradation.
+- HTTP API & CLI:
+  - [internal/httpapi/server.go](file:///internal/httpapi/server.go): Added `GET /api/mastery` endpoint returning `MasterySummary`, wired contrast finder and weighted selection in `POST /api/practice/sessions`.
+  - [cmd/quant-practice/main.go](file:///cmd/quant-practice/main.go): Added `-mastery` CLI flag displaying formatted mastery table with status, scaffold level, decayed score, success/error counts, groups, and transfer status.
+- Web UI & E2E Browser Verification:
+  - [web/src/features/mastery/MasteryView.tsx](file:///web/src/features/mastery/MasteryView.tsx): Interactive mastery and transfer dashboard with overall retention score, status filter pills, search input, decayed score bars, and evidence metrics.
+  - [web/src/features/mastery/MasteryView.test.tsx](file:///web/src/features/mastery/MasteryView.test.tsx): 4 Vitest unit tests verifying API fetch, rendering, filtering, search, and error notices.
+  - [web/src/features/practice/PracticeDrill.tsx](file:///web/src/features/practice/PracticeDrill.tsx): Added `#contrast-badge` and `#scaffold-indicator` indicating Full Guidance (7 stages), Intermediate (4 stages), or Faded (2 stages).
+  - [web/src/app/App.tsx](file:///web/src/app/App.tsx): Wired `activeTab === 'mastery'`, `s` key shortcut, `Esc` return to practice, and header Mastery tab.
+  - [tests/e2e/foundation.spec.ts](file:///tests/e2e/foundation.spec.ts): Added dedicated Stage 08 Playwright E2E browser test verifying mastery dashboard, filter pills, search input, scaffold indicators, keyboard shortcuts, and captured verified screenshot [tests/e2e/screenshots/stage08_verified.png](file:///tests/e2e/screenshots/stage08_verified.png).
+
+### Stage 09 Implementation
+- Durable storage engine ([internal/storage](file:///internal/storage)):
+  - [internal/storage/notes.go](file:///internal/storage/notes.go): Implemented persistence methods for `saved_explanations` and `tutor_drafts` tables (`SaveExplanation`, `GetExplanation`, `ListExplanations`, `DeleteExplanation`, `SaveTutorDraft`, `GetTutorDraft`, `ClearTutorDraft`).
+  - [internal/storage/notes_test.go](file:///internal/storage/notes_test.go): 5 unit tests verifying CRUD roundtrip, topic/search filtering, and draft management.
+- Domain & Drill Engine ([internal/domain](file:///internal/domain), [internal/drill](file:///internal/drill)):
+  - Added `AssistanceTutor` to `domain.AssistanceType` in [internal/domain/session.go](file:///internal/domain/session.go).
+  - Integrated `AssistanceTutor` in [internal/mastery/ledger.go](file:///internal/mastery/ledger.go) assistance classification.
+  - Added `RecordTutorAssistance` method to `DrillSession` in [internal/drill/engine.go](file:///internal/drill/engine.go) to track tutor exposure on unresolved stages without modifying grades or answer keys.
+- Tutor Engine ([internal/tutor](file:///internal/tutor)):
+  - [internal/tutor/types.go](file:///internal/tutor/types.go): `TutorAction` (`hint`, `explain`, `follow_up`), `FollowUpKind` (`explain_differently`, `worked_example`, `why_condition_matters`, `compare_concepts`, `custom`), `TutorRequest`, `TutorEvent`, `TutorEventType` (`started`, `text_delta`, `complete`, `cancelled`, `fallback`, `error`), and `ProviderCapabilities`.
+  - [internal/tutor/offline.go](file:///internal/tutor/offline.go): Curriculum-grounded `OfflineTutor` with causal hints, analytical step-by-step solutions (binomial $P(X=2)=0.375=3/8$, moments, Poisson, sets, sums), all 4 follow-up modes, and cancellable chunk streaming.
+  - [internal/tutor/fake_provider.go](file:///internal/tutor/fake_provider.go): Controllable mock provider for simulating async delays, cancellation, and mid-stream error fallback.
+  - [internal/tutor/manager.go](file:///internal/tutor/manager.go): `TutorManager` managing lifecycle, in-flight cancellations, and fallback to `OfflineTutor`.
+  - [internal/tutor/export.go](file:///internal/tutor/export.go): `ExportNoteToMarkdown` formatting clean UTF-8 markdown with YAML frontmatter, advisory warning, problem context, and LaTeX math compatible with Obsidian and Typora.
+  - [internal/tutor/tutor_test.go](file:///internal/tutor/tutor_test.go): 10 unit tests covering hints, math derivations, follow-ups, streaming chunks, cancellations, provider fallback, markdown export, and grade mutation protection.
+- HTTP API ([internal/httpapi](file:///internal/httpapi)):
+  - [internal/httpapi/tutor_notes.go](file:///internal/httpapi/tutor_notes.go): Added endpoints `POST /api/tutor/requests`, SSE `GET /api/tutor/requests/{id}/events`, `DELETE /api/tutor/requests/{id}`, `GET/POST /api/notes`, `GET/DELETE /api/notes/{id}`, `GET /api/notes/{id}/export`, `POST /api/exports`, `GET/POST/DELETE /api/tutor/drafts/{id}`.
+  - Updated [internal/httpapi/server.go](file:///internal/httpapi/server.go): Added `NoteStore` and `TutorManager` to `Config`/`Server`, set `WriteTimeout: 120 * time.Second` for SSE.
+- CLI Integration ([cmd/quant-practice](file:///cmd/quant-practice/main.go)):
+  - Added `-notes` (list saved notes in personal library) and `-export-notes <dir>` (export all notes to markdown files).
+- Web Frontend ([web/src](file:///web/src)):
+  - [web/src/types/tutor.ts](file:///web/src/types/tutor.ts): Strict TypeScript interfaces for tutor requests, events, notes, and drafts.
+  - [web/src/features/tutor/AITutorPanel.tsx](file:///web/src/features/tutor/AITutorPanel.tsx): Interactive tutor panel with streaming MathMarkdown, causal hints, step-by-step solutions, 4 follow-up prompts, custom query input, cancellation, fallback notice, advisory warning banner, save-to-notes button, and leave-intent modal guard (`y`/`n`/`Esc`).
+  - [web/src/features/notes/NoteLibraryView.tsx](file:///web/src/features/notes/NoteLibraryView.tsx): Dual-pane note library with search input, topic filters, keyboard navigation (`j`/`k`/`n`/`p`), MathMarkdown preview, markdown download export, and deletion.
+  - [web/src/features/practice/PracticeDrill.tsx](file:///web/src/features/practice/PracticeDrill.tsx): Added `onOpenTutor` prop and "💡 AI Tutor (n)" button.
+  - [web/src/app/App.tsx](file:///web/src/app/App.tsx): Added `'notes'` tab, `showTutorModal` state, header tabs for Notes (`V`) and AI Tutor (`n`), shortcuts (`VIEW_SAVED_NOTES`, `VIEW_AI_REQUEST`, `ESCAPE`), and integrated both views.
+  - [web/src/features/tutor/AITutorPanel.test.tsx](file:///web/src/features/tutor/AITutorPanel.test.tsx) & [web/src/features/notes/NoteLibraryView.test.tsx](file:///web/src/features/notes/NoteLibraryView.test.tsx): 9 Vitest unit tests added. All 54 frontend unit tests pass (`npm run test`). `npm run typecheck` passes with 0 errors.
+- End-to-end Automated Verification:
+  - [tests/e2e/foundation.spec.ts](file:///tests/e2e/foundation.spec.ts): Added dedicated Stage 09 Playwright E2E browser test verifying AI tutor streaming with offline math rendering, leave-intent protection modal (`y` Save, `n` Discard, `Esc` Stay), streaming cancellation, note library viewing, searching, LaTeX math rendering in detail pane, and note markdown export. Captured verified screenshot [tests/e2e/screenshots/stage09_verified.png](file:///tests/e2e/screenshots/stage09_verified.png).
+
 ## Checks
 
-- `go test -v ./internal/storage/...`: Passed (18 unit tests covering backup, pragmas, path resolution, migrations, checksum tampering detection, upgrade backup triggers, rollback, roundtrip persistence, drafts, settings, close/reopen replay, duplicate command idempotency, immutable bank snapshot preservation, multi-tab revision conflict rejection, draft navigation persistence, and multi-question session persistence and replay).
-- `go test -v ./internal/drill/...`: Passed (9 unit tests covering drill session creation, 7-stage happy path, numeric policy grading variants, distractor targeting, retry, reveal, offline hints, navigation eligibility, multi-question navigation, and command idempotency).
-- `go test -v ./internal/httpapi/...`: Passed (10 unit tests covering health, local session token exchange, host rejection, origin rejection, SPA fallback, practice session API commands, persistent session restart, settings endpoint, bank endpoint, and multi-question session creation).
-- `go test -count=1 ./...`: Passed (85 unit tests across bank, domain, drill, httpapi, mathengine, and storage).
+- `go test -v ./internal/tutor/...`: Passed (10 comprehensive unit tests covering hints, math derivations, follow-ups, streaming chunks, cancellations, provider fallback, markdown export, and grade mutation protection).
+- `go test -v ./internal/storage/...`: Passed (25 unit tests covering storage, migrations, multi-question replay, mastery projection persistence, and note/draft persistence).
+- `go test -v ./internal/mastery/...`: Passed (8 unit tests).
+- `go test -v ./internal/drill/...`: Passed (11 unit tests).
+- `go test -v ./internal/httpapi/...`: Passed (14 unit tests covering all endpoints).
+- `go test -count=1 ./...`: Passed (10/10 packages passed across bank, domain, drill, httpapi, mastery, mathengine, storage, and tutor).
 - `go vet ./internal/... ./cmd/...`: Passed (0 warnings).
 - `gofmt -s -l cmd internal`: Passed (clean formatting).
-- `python scripts/validate_scaffold.py`: Passed (31 Markdown files, 53 local links, 41 JSON files, 35 source directories; draft basics checked).
+- `python scripts/validate_scaffold.py`: Passed (31 Markdown files, 51 local links, 41 JSON files, 35 source directories; draft basics checked).
 - `npm run typecheck` (in `web/`): Passed (strict TypeScript, 0 errors).
-- `npm run test` (in `web/`): Passed (41 unit tests passed in Vitest across keymap, components, PracticeDrill, ReferenceLibrary, SettingsModal, and App).
-- `npm run test:e2e` (in `web/`): Passed (4 Playwright end-to-end browser tests passed with network disabled, verifying offline math/keyboard navigation, persistent drill recovery across backend restart, Stage 06 navigation/draft preservation/leave intent, and Stage 07 multi-question navigation/reference library/settings/375px responsive math/server restart replay).
+- `npm run test` (in `web/`): Passed (54 unit tests passed in Vitest across 11 files).
+- `npm run test:e2e` (in `web/`): Passed (6 Playwright end-to-end browser tests passed with network disabled, verifying offline math/keyboard navigation, persistent drill recovery, Stage 06 navigation/draft preservation, Stage 07 multi-question navigation/reference library/settings/375px responsive math, Stage 08 concept mastery/scaffolds, and Stage 09 read-only AI tutor streaming/leave protection/notes library/export).
 - `powershell -ExecutionPolicy Bypass -File scripts/test.ps1`: Passed (all verification checks passed end-to-end).
 - `powershell -ExecutionPolicy Bypass -File scripts/build.ps1`: Passed (frontend assets bundled with local MathJax and standalone Go binary compiled to `bin\quant-practice.exe`).
-- `.\bin\quant-practice.exe -list-bank`: Passed (lists all 10 approved questions with family, module, and stage counts).
+- `.\bin\quant-practice.exe -notes`: Passed (prints formatted notes library).
+- `.\bin\quant-practice.exe -export-notes <dir>`: Passed (exports markdown files with LaTeX math).
 
 ## Next action
 
-Proceed to Stage 08: Scheduling and transfer:
-- Concept evidence tracking (1 contribution per concept/instance).
-- Decay and reasoning group/pair modeling.
-- Weighted problem selection and transfer queues.
-- Full/four/two scaffold degradation policy.
-- Bounded contrast queue without unbounded chaining.
+Proceed to Stage 10: API-key providers and discovery:
+- Anthropic/Gemini/OpenAI adapters with rate limiting, timeouts, and error handling.
+- Key UI and encrypted storage / OS vault integration.
+- Dynamic model lists, capability discovery, and local cache.
+- Request token and cost budgets.
+- Strict invariant: no external network calls permitted unless explicitly configured and enabled.
 
 ## Unresolved external gates
 

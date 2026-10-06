@@ -6,6 +6,8 @@ export interface QuestionInfo {
   index: number;
   title: string;
   status: QuestionStatus;
+  is_contrast?: boolean;
+  scaffold_level?: string;
 }
 
 export interface QuestionStripProps {

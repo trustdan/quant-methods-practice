@@ -11,6 +11,7 @@ type QuestionInstance struct {
 	Title            string                 `json:"title"`
 	ScenarioMarkdown string                 `json:"scenario_markdown"`
 	Assumptions      []string               `json:"assumptions,omitempty"`
+	SettingGroup     string                 `json:"setting_group,omitempty"`
 	Stages           []StageInstance        `json:"stages"`
 }
 

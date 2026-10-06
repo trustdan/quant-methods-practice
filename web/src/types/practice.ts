@@ -105,6 +105,8 @@ export interface PublicQuestionInfo {
   index: number;
   title: string;
   status: 'pending' | 'in_progress' | 'completed' | 'skipped';
+  scaffold_level?: 'full' | 'intermediate' | 'faded';
+  is_contrast?: boolean;
 }
 
 export interface PublicSessionView {
@@ -124,6 +126,8 @@ export interface PublicSessionView {
   total_questions?: number;
   questions?: PublicQuestionInfo[];
   all_completed?: boolean;
+  scaffold_level?: 'full' | 'intermediate' | 'faded';
+  is_contrast?: boolean;
 }
 
 export interface SessionCommandDTO {
@@ -143,3 +147,35 @@ export interface CommandResultDTO {
   error_message?: string;
   invalid_input?: boolean;
 }
+
+export interface ConceptMastery {
+  concept_id: string;
+  policy_version: number;
+  independent_successes: number;
+  independent_errors: number;
+  assisted_count: number;
+  total_evidence_count: number;
+  last_tested_at?: string;
+  base_score: number;
+  decayed_score: number;
+  retention_factor: number;
+  half_life_days: number;
+  status: 'new' | 'learning' | 'transferring' | 'mastered';
+  scaffold_level: 'full' | 'intermediate' | 'faded';
+  setting_groups_seen: string[];
+  delayed_transfer_achieved: boolean;
+  recent_error: boolean;
+  priority_score: number;
+}
+
+export interface MasterySummary {
+  policy_version: number;
+  overall_score: number;
+  total_mastered: number;
+  total_transferring: number;
+  total_learning: number;
+  total_new: number;
+  concepts: ConceptMastery[];
+  generated_at: string;
+}
+

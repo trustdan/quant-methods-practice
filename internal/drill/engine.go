@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/trustdan/quant-methods-practice/internal/domain"
+	"github.com/trustdan/quant-methods-practice/internal/mastery"
 )
 
 var (
@@ -21,10 +22,11 @@ var (
 
 // SessionManager manages active drill sessions thread-safely.
 type SessionManager struct {
-	mu       sync.RWMutex
-	sessions map[string]*DrillSession
-	store    SessionStore
-	clock    func() time.Time
+	mu             sync.RWMutex
+	sessions       map[string]*DrillSession
+	store          SessionStore
+	clock          func() time.Time
+	contrastFinder func(originID, misID string) (*domain.QuestionTemplate, bool)
 }
 
 // NewSessionManager creates a manager for drill sessions.
@@ -52,8 +54,25 @@ func (sm *SessionManager) SetStore(store SessionStore) {
 	sm.store = store
 }
 
+// SetContrastFinder registers a contrast partner callback across managed sessions.
+func (sm *SessionManager) SetContrastFinder(fn func(originID, misID string) (*domain.QuestionTemplate, bool)) {
+	sm.mu.Lock()
+	defer sm.mu.Unlock()
+	sm.contrastFinder = fn
+}
+
 // CreateMultiQuestionSession instantiates a practice session with multiple question templates.
 func (sm *SessionManager) CreateMultiQuestionSession(tmpls []*domain.QuestionTemplate, settings domain.SessionSettings, seed int64) (*DrillSession, error) {
+	return sm.CreateMultiQuestionSessionWithScaffolds(tmpls, nil, settings, seed)
+}
+
+// CreateMultiQuestionSessionWithScaffolds instantiates a practice session applying specified scaffold levels.
+func (sm *SessionManager) CreateMultiQuestionSessionWithScaffolds(
+	tmpls []*domain.QuestionTemplate,
+	scaffolds []mastery.ScaffoldLevel,
+	settings domain.SessionSettings,
+	seed int64,
+) (*DrillSession, error) {
 	if len(tmpls) == 0 {
 		return nil, errors.New("at least one template is required")
 	}
@@ -66,6 +85,15 @@ func (sm *SessionManager) CreateMultiQuestionSession(tmpls []*domain.QuestionTem
 		if seed != 0 {
 			qSeed = seed + int64(idx*1000)
 		}
+		scaffLevel := mastery.ScaffoldFull
+		if idx < len(scaffolds) && scaffolds[idx] != "" {
+			scaffLevel = scaffolds[idx]
+		}
+		rawStages := mastery.DegradeStages(tmpl, scaffLevel)
+		if len(rawStages) == 0 {
+			rawStages = tmpl.Stages
+		}
+
 		qInst := domain.QuestionInstance{
 			ID:               fmt.Sprintf("inst_%s_%d", tmpl.ID, qSeed),
 			TemplateID:       tmpl.ID,
@@ -75,7 +103,8 @@ func (sm *SessionManager) CreateMultiQuestionSession(tmpls []*domain.QuestionTem
 			Title:            tmpl.Title,
 			ScenarioMarkdown: tmpl.ScenarioMarkdown,
 			Assumptions:      tmpl.Assumptions,
-			Stages:           make([]domain.StageInstance, len(tmpl.Stages)),
+			SettingGroup:     tmpl.SettingGroup,
+			Stages:           make([]domain.StageInstance, len(rawStages)),
 		}
 
 		var rng *rand.Rand
@@ -83,8 +112,8 @@ func (sm *SessionManager) CreateMultiQuestionSession(tmpls []*domain.QuestionTem
 			rng = rand.New(rand.NewSource(qSeed))
 		}
 
-		stages := make([]StageState, len(tmpl.Stages))
-		for i, st := range tmpl.Stages {
+		stages := make([]StageState, len(rawStages))
+		for i, st := range rawStages {
 			stageInst := domain.StageInstance{
 				ID:                  st.ID,
 				Kind:                st.Kind,
@@ -125,6 +154,7 @@ func (sm *SessionManager) CreateMultiQuestionSession(tmpls []*domain.QuestionTem
 			Stages:            stages,
 			CurrentStageIndex: 0,
 			Completed:         false,
+			ScaffoldLevel:     string(scaffLevel),
 		}
 	}
 
@@ -146,6 +176,7 @@ func (sm *SessionManager) CreateMultiQuestionSession(tmpls []*domain.QuestionTem
 		Settings:             settings,
 		commandCache:         make(map[string]*CommandResult),
 		store:                sm.store,
+		contrastFinder:       sm.contrastFinder,
 	}
 
 	if sm.store != nil {
@@ -381,12 +412,26 @@ func (s *DrillSession) handleSubmit(cmd SessionCommand, clock func() time.Time) 
 			stage.Status = StageStatusRetry
 			stage.Assistance = append(stage.Assistance, domain.AssistanceHint)
 			stage.LastFeedback = att.FeedbackMarkdown
+
+			// Check for eligible misconception to queue contrast partner
+			if stage.MisconceptionID != nil && !s.CurrentQuestionIsContrast() && s.ContrastCount == 0 && s.contrastFinder != nil {
+				if partnerTmpl, ok := s.contrastFinder(s.TemplateID, *stage.MisconceptionID); ok && partnerTmpl != nil {
+					s.queueContrastPartner(partnerTmpl, s.Seed+999)
+				}
+			}
 		} else {
 			// Second error: reveal solution, mark completed
 			stage.Revealed = true
 			stage.Status = StageStatusCompleted
 			stage.Assistance = append(stage.Assistance, domain.AssistanceSolutionReveal)
 			stage.LastFeedback = att.FeedbackMarkdown
+
+			// Check for eligible misconception if not queued yet
+			if stage.MisconceptionID != nil && !s.CurrentQuestionIsContrast() && s.ContrastCount == 0 && s.contrastFinder != nil {
+				if partnerTmpl, ok := s.contrastFinder(s.TemplateID, *stage.MisconceptionID); ok && partnerTmpl != nil {
+					s.queueContrastPartner(partnerTmpl, s.Seed+999)
+				}
+			}
 
 			if s.checkAllCompleted() {
 				s.Completed = true
@@ -455,6 +500,37 @@ func (s *DrillSession) handleRequestHint(cmd SessionCommand, clock func() time.T
 		CommandID:    cmd.CommandID,
 		SessionState: s.ToPublicView(),
 	}, nil
+}
+
+// RecordTutorAssistance records tutor assistance on the specified stage if it is active or unresolved.
+func (s *DrillSession) RecordTutorAssistance(stageID string, clock func() time.Time) error {
+	if clock == nil {
+		clock = time.Now
+	}
+
+	for i := range s.Stages {
+		if s.Stages[i].Instance.ID == stageID {
+			if s.Stages[i].Status != StageStatusCompleted {
+				hasTutor := false
+				for _, a := range s.Stages[i].Assistance {
+					if a == domain.AssistanceTutor {
+						hasTutor = true
+						break
+					}
+				}
+				if !hasTutor {
+					s.Stages[i].Assistance = append(s.Stages[i].Assistance, domain.AssistanceTutor)
+					s.Revision++
+					s.UpdatedAt = clock()
+					if s.store != nil {
+						_ = s.store.SaveSession(context.Background(), s)
+					}
+				}
+			}
+			break
+		}
+	}
+	return nil
 }
 
 func (s *DrillSession) handleNavigate(cmd SessionCommand, clock func() time.Time) (*CommandResult, error) {
@@ -771,10 +847,16 @@ func (s *DrillSession) ToPublicView() PublicSessionView {
 			} else if q.CurrentStageIndex > 0 || (len(q.Stages) > 0 && q.Stages[0].Status == StageStatusCompleted) {
 				status = "in_progress"
 			}
+			scaff := q.ScaffoldLevel
+			if scaff == "" {
+				scaff = "full"
+			}
 			qInfos[i] = PublicQuestionInfo{
-				Index:  i,
-				Title:  q.QuestionInstance.Title,
-				Status: status,
+				Index:         i,
+				Title:         q.QuestionInstance.Title,
+				Status:        status,
+				ScaffoldLevel: scaff,
+				IsContrast:    q.IsContrast,
 			}
 		}
 	} else {
@@ -783,9 +865,11 @@ func (s *DrillSession) ToPublicView() PublicSessionView {
 			status = "completed"
 		}
 		qInfos[0] = PublicQuestionInfo{
-			Index:  0,
-			Title:  s.QuestionInstance.Title,
-			Status: status,
+			Index:         0,
+			Title:         s.QuestionInstance.Title,
+			Status:        status,
+			ScaffoldLevel: "full",
+			IsContrast:    false,
 		}
 	}
 
@@ -805,6 +889,15 @@ func (s *DrillSession) ToPublicView() PublicSessionView {
 		assumptions = []string{"Standard assumptions apply"}
 	}
 
+	activeScaffold := "full"
+	activeContrast := false
+	if len(s.Questions) > 0 && s.CurrentQuestionIndex >= 0 && s.CurrentQuestionIndex < len(s.Questions) {
+		if s.Questions[s.CurrentQuestionIndex].ScaffoldLevel != "" {
+			activeScaffold = s.Questions[s.CurrentQuestionIndex].ScaffoldLevel
+		}
+		activeContrast = s.Questions[s.CurrentQuestionIndex].IsContrast
+	}
+
 	view := PublicSessionView{
 		ID:                   s.ID,
 		TemplateID:           s.TemplateID,
@@ -821,6 +914,8 @@ func (s *DrillSession) ToPublicView() PublicSessionView {
 		TotalQuestions:       totalQ,
 		Questions:            qInfos,
 		AllCompleted:         allCompleted,
+		ScaffoldLevel:        activeScaffold,
+		IsContrast:           activeContrast,
 	}
 
 	if s.checkCurrentQuestionCompleted() {
@@ -830,4 +925,95 @@ func (s *DrillSession) ToPublicView() PublicSessionView {
 	}
 
 	return view
+}
+
+// queueContrastPartner instantiates a contrast partner question with full guidance and contrast assistance,
+// inserting it as the next problem in the session without allowing unbounded session chaining.
+func (s *DrillSession) queueContrastPartner(partnerTmpl *domain.QuestionTemplate, seed int64) {
+	if partnerTmpl == nil {
+		return
+	}
+
+	qSeed := seed
+	if qSeed == 0 {
+		qSeed = 999
+	}
+
+	qInst := domain.QuestionInstance{
+		ID:               fmt.Sprintf("inst_%s_contrast_%d", partnerTmpl.ID, qSeed),
+		TemplateID:       partnerTmpl.ID,
+		TemplateVersion:  partnerTmpl.Version,
+		Seed:             qSeed,
+		Parameters:       partnerTmpl.Parameters,
+		Title:            "[Contrast] " + partnerTmpl.Title,
+		ScenarioMarkdown: partnerTmpl.ScenarioMarkdown,
+		Assumptions:      partnerTmpl.Assumptions,
+		SettingGroup:     partnerTmpl.SettingGroup,
+		Stages:           make([]domain.StageInstance, len(partnerTmpl.Stages)),
+	}
+
+	stages := make([]StageState, len(partnerTmpl.Stages))
+	for i, st := range partnerTmpl.Stages {
+		stageInst := domain.StageInstance{
+			ID:                  st.ID,
+			Kind:                st.Kind,
+			PromptMarkdown:      st.PromptMarkdown,
+			Options:             make([]domain.Option, len(st.Options)),
+			ExpectedAnswer:      st.ExpectedAnswer,
+			EvidenceConceptIDs:  st.EvidenceConceptIDs,
+			ExplanationMarkdown: st.ExplanationMarkdown,
+			NumericPolicy:       st.NumericPolicy,
+		}
+		copy(stageInst.Options, st.Options)
+		qInst.Stages[i] = stageInst
+
+		status := StageStatusUnvisited
+		if i == 0 {
+			status = StageStatusActive
+		}
+
+		stages[i] = StageState{
+			Instance:   stageInst,
+			Status:     status,
+			Attempts:   make([]domain.StageAttempt, 0, 2),
+			Assistance: []domain.AssistanceType{domain.AssistanceGuidedContrast},
+		}
+	}
+
+	contrastQ := QuestionState{
+		TemplateID:        partnerTmpl.ID,
+		TemplateVersion:   partnerTmpl.Version,
+		QuestionInstance:  qInst,
+		Stages:            stages,
+		CurrentStageIndex: 0,
+		Completed:         false,
+		ScaffoldLevel:     "full",
+		IsContrast:        true,
+		ContrastPartnerID: partnerTmpl.ID,
+	}
+
+	nextIdx := s.CurrentQuestionIndex + 1
+	if nextIdx < len(s.Questions) {
+		// If the next question has not been started, replace it to preserve session bounds
+		if len(s.Questions[nextIdx].Stages) > 0 && len(s.Questions[nextIdx].Stages[0].Attempts) == 0 {
+			contrastQ.Index = nextIdx
+			s.Questions[nextIdx] = contrastQ
+		} else {
+			// Otherwise insert right after current question
+			contrastQ.Index = nextIdx
+			newQuestions := make([]QuestionState, 0, len(s.Questions)+1)
+			newQuestions = append(newQuestions, s.Questions[:nextIdx]...)
+			newQuestions = append(newQuestions, contrastQ)
+			newQuestions = append(newQuestions, s.Questions[nextIdx:]...)
+			for idx := range newQuestions {
+				newQuestions[idx].Index = idx
+			}
+			s.Questions = newQuestions
+		}
+	} else {
+		contrastQ.Index = nextIdx
+		s.Questions = append(s.Questions, contrastQ)
+	}
+
+	s.ContrastCount++
 }
