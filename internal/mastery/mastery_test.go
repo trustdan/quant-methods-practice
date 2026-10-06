@@ -14,27 +14,27 @@ func TestOneContributionPerConceptPerInstance(t *testing.T) {
 	// Two exposures for the SAME instance and concept (e.g. repeated submission / retry)
 	exposures := []RawExposure{
 		{
-			SessionID:    "s1",
-			InstanceID:   "inst_1",
-			TemplateID:   "tmpl_1",
-			SettingGroup: "group_a",
-			StageID:      "stage_calc",
-			ConceptIDs:   []string{"calc_concept"},
+			SessionID:     "s1",
+			InstanceID:    "inst_1",
+			TemplateID:    "tmpl_1",
+			SettingGroup:  "group_a",
+			StageID:       "stage_calc",
+			ConceptIDs:    []string{"calc_concept"},
 			AttemptNumber: 1,
-			IsCorrect:    false,
-			Timestamp:    now.Add(-20 * time.Minute),
+			IsCorrect:     false,
+			Timestamp:     now.Add(-20 * time.Minute),
 		},
 		{
-			SessionID:    "s1",
-			InstanceID:   "inst_1",
-			TemplateID:   "tmpl_1",
-			SettingGroup: "group_a",
-			StageID:      "stage_calc",
-			ConceptIDs:   []string{"calc_concept"},
+			SessionID:     "s1",
+			InstanceID:    "inst_1",
+			TemplateID:    "tmpl_1",
+			SettingGroup:  "group_a",
+			StageID:       "stage_calc",
+			ConceptIDs:    []string{"calc_concept"},
 			AttemptNumber: 2,
-			IsCorrect:    true,
-			Assistance:   []domain.AssistanceType{domain.AssistanceRetry},
-			Timestamp:    now.Add(-19 * time.Minute),
+			IsCorrect:     true,
+			Assistance:    []domain.AssistanceType{domain.AssistanceRetry},
+			Timestamp:     now.Add(-19 * time.Minute),
 		},
 	}
 
@@ -64,28 +64,28 @@ func TestAssistedAttemptsDoNotAwardIndependentCredit(t *testing.T) {
 
 	exposures := []RawExposure{
 		{
-			SessionID:    "s1",
-			InstanceID:   "inst_1",
-			TemplateID:   "tmpl_1",
-			SettingGroup: "group_a",
-			StageID:      "stage_1",
-			ConceptIDs:   []string{"concept_hinted"},
+			SessionID:     "s1",
+			InstanceID:    "inst_1",
+			TemplateID:    "tmpl_1",
+			SettingGroup:  "group_a",
+			StageID:       "stage_1",
+			ConceptIDs:    []string{"concept_hinted"},
 			AttemptNumber: 1,
-			IsCorrect:    true,
-			Assistance:   []domain.AssistanceType{domain.AssistanceHint}, // Pre-answer hint requested
-			Timestamp:    now.Add(-10 * time.Minute),
+			IsCorrect:     true,
+			Assistance:    []domain.AssistanceType{domain.AssistanceHint}, // Pre-answer hint requested
+			Timestamp:     now.Add(-10 * time.Minute),
 		},
 		{
-			SessionID:    "s2",
-			InstanceID:   "inst_2",
-			TemplateID:   "tmpl_2",
-			SettingGroup: "group_b",
-			StageID:      "stage_1",
-			ConceptIDs:   []string{"concept_contrast"},
+			SessionID:     "s2",
+			InstanceID:    "inst_2",
+			TemplateID:    "tmpl_2",
+			SettingGroup:  "group_b",
+			StageID:       "stage_1",
+			ConceptIDs:    []string{"concept_contrast"},
 			AttemptNumber: 1,
-			IsCorrect:    true,
-			IsContrast:   true, // Guided contrast problem
-			Timestamp:    now.Add(-5 * time.Minute),
+			IsCorrect:     true,
+			IsContrast:    true, // Guided contrast problem
+			Timestamp:     now.Add(-5 * time.Minute),
 		},
 	}
 
@@ -147,37 +147,37 @@ func TestTransferRequiresDistinctGroupsAndDelayedRetrieval(t *testing.T) {
 	// Scenario A: 3 successes in the SAME setting group -> CANNOT graduate (repeated variants cannot graduate)
 	sameGroupExposures := []RawExposure{
 		{
-			SessionID:    "s1",
-			InstanceID:   "inst_1",
-			TemplateID:   "tmpl_coin_1",
-			SettingGroup: "coin_toss",
-			StageID:      "st_1",
-			ConceptIDs:   []string{"concept_a"},
+			SessionID:     "s1",
+			InstanceID:    "inst_1",
+			TemplateID:    "tmpl_coin_1",
+			SettingGroup:  "coin_toss",
+			StageID:       "st_1",
+			ConceptIDs:    []string{"concept_a"},
 			AttemptNumber: 1,
-			IsCorrect:    true,
-			Timestamp:    t0,
+			IsCorrect:     true,
+			Timestamp:     t0,
 		},
 		{
-			SessionID:    "s2",
-			InstanceID:   "inst_2",
-			TemplateID:   "tmpl_coin_2",
-			SettingGroup: "coin_toss", // Same group!
-			StageID:      "st_1",
-			ConceptIDs:   []string{"concept_a"},
+			SessionID:     "s2",
+			InstanceID:    "inst_2",
+			TemplateID:    "tmpl_coin_2",
+			SettingGroup:  "coin_toss", // Same group!
+			StageID:       "st_1",
+			ConceptIDs:    []string{"concept_a"},
 			AttemptNumber: 1,
-			IsCorrect:    true,
-			Timestamp:    t0.Add(15 * time.Minute),
+			IsCorrect:     true,
+			Timestamp:     t0.Add(15 * time.Minute),
 		},
 		{
-			SessionID:    "s3",
-			InstanceID:   "inst_3",
-			TemplateID:   "tmpl_coin_3",
-			SettingGroup: "coin_toss", // Same group!
-			StageID:      "st_1",
-			ConceptIDs:   []string{"concept_a"},
+			SessionID:     "s3",
+			InstanceID:    "inst_3",
+			TemplateID:    "tmpl_coin_3",
+			SettingGroup:  "coin_toss", // Same group!
+			StageID:       "st_1",
+			ConceptIDs:    []string{"concept_a"},
 			AttemptNumber: 1,
-			IsCorrect:    true,
-			Timestamp:    t0.Add(30 * time.Minute),
+			IsCorrect:     true,
+			Timestamp:     t0.Add(30 * time.Minute),
 		},
 	}
 
@@ -196,26 +196,26 @@ func TestTransferRequiresDistinctGroupsAndDelayedRetrieval(t *testing.T) {
 	// Scenario B: Successes in 2 distinct setting groups, but rapid repetition (< 10m) -> CANNOT graduate
 	rapidExposures := []RawExposure{
 		{
-			SessionID:    "s1",
-			InstanceID:   "inst_1",
-			TemplateID:   "tmpl_coin",
-			SettingGroup: "coin_toss",
-			StageID:      "st_1",
-			ConceptIDs:   []string{"concept_b"},
+			SessionID:     "s1",
+			InstanceID:    "inst_1",
+			TemplateID:    "tmpl_coin",
+			SettingGroup:  "coin_toss",
+			StageID:       "st_1",
+			ConceptIDs:    []string{"concept_b"},
 			AttemptNumber: 1,
-			IsCorrect:    true,
-			Timestamp:    t0,
+			IsCorrect:     true,
+			Timestamp:     t0,
 		},
 		{
-			SessionID:    "s2",
-			InstanceID:   "inst_2",
-			TemplateID:   "tmpl_defect",
-			SettingGroup: "inspection_batch", // Distinct group!
-			StageID:      "st_1",
-			ConceptIDs:   []string{"concept_b"},
+			SessionID:     "s2",
+			InstanceID:    "inst_2",
+			TemplateID:    "tmpl_defect",
+			SettingGroup:  "inspection_batch", // Distinct group!
+			StageID:       "st_1",
+			ConceptIDs:    []string{"concept_b"},
 			AttemptNumber: 1,
-			IsCorrect:    true,
-			Timestamp:    t0.Add(3 * time.Minute), // Only 3 minutes! < 10m
+			IsCorrect:     true,
+			Timestamp:     t0.Add(3 * time.Minute), // Only 3 minutes! < 10m
 		},
 	}
 
@@ -231,26 +231,26 @@ func TestTransferRequiresDistinctGroupsAndDelayedRetrieval(t *testing.T) {
 	// Scenario C: Successes in 2 distinct setting groups with >= 10m delayed retrieval -> GRADUATES to Intermediate!
 	transferExposures := []RawExposure{
 		{
-			SessionID:    "s1",
-			InstanceID:   "inst_1",
-			TemplateID:   "tmpl_coin",
-			SettingGroup: "coin_toss",
-			StageID:      "st_1",
-			ConceptIDs:   []string{"concept_c"},
+			SessionID:     "s1",
+			InstanceID:    "inst_1",
+			TemplateID:    "tmpl_coin",
+			SettingGroup:  "coin_toss",
+			StageID:       "st_1",
+			ConceptIDs:    []string{"concept_c"},
 			AttemptNumber: 1,
-			IsCorrect:    true,
-			Timestamp:    t0,
+			IsCorrect:     true,
+			Timestamp:     t0,
 		},
 		{
-			SessionID:    "s2",
-			InstanceID:   "inst_2",
-			TemplateID:   "tmpl_defect",
-			SettingGroup: "inspection_batch", // Distinct group!
-			StageID:      "st_1",
-			ConceptIDs:   []string{"concept_c"},
+			SessionID:     "s2",
+			InstanceID:    "inst_2",
+			TemplateID:    "tmpl_defect",
+			SettingGroup:  "inspection_batch", // Distinct group!
+			StageID:       "st_1",
+			ConceptIDs:    []string{"concept_c"},
 			AttemptNumber: 1,
-			IsCorrect:    true,
-			Timestamp:    t0.Add(15 * time.Minute), // 15 min > 10 min
+			IsCorrect:     true,
+			Timestamp:     t0.Add(15 * time.Minute), // 15 min > 10 min
 		},
 	}
 
@@ -271,37 +271,37 @@ func TestRecentErrorRestoresFullScaffold(t *testing.T) {
 	// Learner achieved faded status (3 successes across 2 groups with delayed retrieval)
 	exposures := []RawExposure{
 		{
-			SessionID:    "s1",
-			InstanceID:   "inst_1",
-			TemplateID:   "tmpl_1",
-			SettingGroup: "group_1",
-			StageID:      "st_1",
-			ConceptIDs:   []string{"c1"},
+			SessionID:     "s1",
+			InstanceID:    "inst_1",
+			TemplateID:    "tmpl_1",
+			SettingGroup:  "group_1",
+			StageID:       "st_1",
+			ConceptIDs:    []string{"c1"},
 			AttemptNumber: 1,
-			IsCorrect:    true,
-			Timestamp:    t0,
+			IsCorrect:     true,
+			Timestamp:     t0,
 		},
 		{
-			SessionID:    "s2",
-			InstanceID:   "inst_2",
-			TemplateID:   "tmpl_2",
-			SettingGroup: "group_2",
-			StageID:      "st_1",
-			ConceptIDs:   []string{"c1"},
+			SessionID:     "s2",
+			InstanceID:    "inst_2",
+			TemplateID:    "tmpl_2",
+			SettingGroup:  "group_2",
+			StageID:       "st_1",
+			ConceptIDs:    []string{"c1"},
 			AttemptNumber: 1,
-			IsCorrect:    true,
-			Timestamp:    t0.Add(15 * time.Minute),
+			IsCorrect:     true,
+			Timestamp:     t0.Add(15 * time.Minute),
 		},
 		{
-			SessionID:    "s3",
-			InstanceID:   "inst_3",
-			TemplateID:   "tmpl_3",
-			SettingGroup: "group_2",
-			StageID:      "st_1",
-			ConceptIDs:   []string{"c1"},
+			SessionID:     "s3",
+			InstanceID:    "inst_3",
+			TemplateID:    "tmpl_3",
+			SettingGroup:  "group_2",
+			StageID:       "st_1",
+			ConceptIDs:    []string{"c1"},
 			AttemptNumber: 1,
-			IsCorrect:    true,
-			Timestamp:    t0.Add(30 * time.Minute),
+			IsCorrect:     true,
+			Timestamp:     t0.Add(30 * time.Minute),
 		},
 	}
 
@@ -313,15 +313,15 @@ func TestRecentErrorRestoresFullScaffold(t *testing.T) {
 
 	// Now learner makes an error on instance 4
 	exposures = append(exposures, RawExposure{
-		SessionID:    "s4",
-		InstanceID:   "inst_4",
-		TemplateID:   "tmpl_4",
-		SettingGroup: "group_1",
-		StageID:      "st_1",
-		ConceptIDs:   []string{"c1"},
+		SessionID:     "s4",
+		InstanceID:    "inst_4",
+		TemplateID:    "tmpl_4",
+		SettingGroup:  "group_1",
+		StageID:       "st_1",
+		ConceptIDs:    []string{"c1"},
 		AttemptNumber: 1,
-		IsCorrect:    false, // ERROR!
-		Timestamp:    t0.Add(45 * time.Minute),
+		IsCorrect:     false, // ERROR!
+		Timestamp:     t0.Add(45 * time.Minute),
 	})
 
 	resAfter := ledger.ProcessExposures(exposures, t0.Add(50*time.Minute))

@@ -61,17 +61,17 @@ type ConceptMastery struct {
 
 // RawExposure captures an immutable event for concept evidence derivation.
 type RawExposure struct {
-	SessionID    string                  `json:"session_id"`
-	InstanceID   string                  `json:"instance_id"`
-	TemplateID   string                  `json:"template_id"`
-	SettingGroup string                  `json:"setting_group"`
-	StageID      string                  `json:"stage_id"`
-	ConceptIDs   []string                `json:"concept_ids"`
-	AttemptNumber int                    `json:"attempt_number"`
-	IsCorrect    bool                    `json:"is_correct"`
-	Assistance   []domain.AssistanceType `json:"assistance"`
-	Timestamp    time.Time               `json:"timestamp"`
-	IsContrast   bool                    `json:"is_contrast"`
+	SessionID     string                  `json:"session_id"`
+	InstanceID    string                  `json:"instance_id"`
+	TemplateID    string                  `json:"template_id"`
+	SettingGroup  string                  `json:"setting_group"`
+	StageID       string                  `json:"stage_id"`
+	ConceptIDs    []string                `json:"concept_ids"`
+	AttemptNumber int                     `json:"attempt_number"`
+	IsCorrect     bool                    `json:"is_correct"`
+	Assistance    []domain.AssistanceType `json:"assistance"`
+	Timestamp     time.Time               `json:"timestamp"`
+	IsContrast    bool                    `json:"is_contrast"`
 }
 
 // MasterySummary bundles the complete curriculum mastery projection for the client.

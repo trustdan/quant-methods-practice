@@ -385,4 +385,3 @@ func TestRejectInvalidLinearCombinationParameters(t *testing.T) {
 		})
 	}
 }
-

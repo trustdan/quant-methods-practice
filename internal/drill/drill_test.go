@@ -651,5 +651,3 @@ func TestSessionScaffoldDegradation(t *testing.T) {
 		t.Errorf("expected ScaffoldLevel 'intermediate', got %s", sessInter.Questions[0].ScaffoldLevel)
 	}
 }
-
-

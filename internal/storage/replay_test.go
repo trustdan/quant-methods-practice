@@ -682,4 +682,3 @@ func TestMultiQuestionSessionPersistenceAndReplay(t *testing.T) {
 		t.Fatalf("expected TemplateID='tmpl_q_9', got %q", restoredSess.TemplateID)
 	}
 }
-

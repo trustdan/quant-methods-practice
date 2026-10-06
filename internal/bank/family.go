@@ -380,4 +380,3 @@ func DefaultRegistry() *Registry {
 	})
 	return defaultRegistry
 }
-
