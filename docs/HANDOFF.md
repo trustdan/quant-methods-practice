@@ -235,7 +235,7 @@ Stage 00, Stage 01, Stage 02, Stage 03, Stage 04, Stage 05, Stage 06, Stage 07, 
 - `powershell -ExecutionPolicy Bypass -File scripts/test.ps1`: Passed (all verification checks passed end-to-end).
 - `powershell -ExecutionPolicy Bypass -File scripts/build.ps1`: Passed (frontend assets bundled with local MathJax and standalone Go binary compiled to `bin\quant-practice.exe`).
 - `.\bin\quant-practice.exe -notes`: Passed (prints formatted notes library).
-- `.\bin\quant-practice.exe -export-notes <dir>`: Passed (exports markdown files with LaTeX math).
+- CI verification fix: Reordered [.github/workflows/ci.yml](file:///.github/workflows/ci.yml), [scripts/test.sh](file:///scripts/test.sh), and [scripts/test.ps1](file:///scripts/test.ps1) so that frontend dependencies and assets are installed and built before `go vet`, `go test`, and binary compilation. This resolves the `internal/assets/assets.go#L9: pattern dist/*: no matching files found` failure caused by Go embed requiring the build bundle on clean runner checkouts. Added [internal/assets/assets_test.go](file:///internal/assets/assets_test.go) to verify embed filesystem integrity.
 
 ## Next action
 

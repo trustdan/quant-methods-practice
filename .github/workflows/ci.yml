@@ -34,13 +34,8 @@ jobs:
       - name: Validate documentation scaffold
         run: python scripts/validate_scaffold.py
 
-      - name: Go formatting and vet
-        run: |
-          diff -u <(echo -n) <(gofmt -d cmd internal)
-          go vet ./internal/... ./cmd/...
-
-      - name: Go unit tests
-        run: go test -v ./internal/... ./cmd/...
+      - name: Go formatting
+        run: diff -u <(echo -n) <(gofmt -d cmd internal)
 
       - name: Install frontend dependencies
         working-directory: web
@@ -57,6 +52,12 @@ jobs:
       - name: Build frontend production assets
         working-directory: web
         run: npm run build
+
+      - name: Go vet
+        run: go vet ./internal/... ./cmd/...
+
+      - name: Go unit tests
+        run: go test -v ./internal/... ./cmd/...
 
       - name: Compile Go binary
         run: go build -o bin/quant-practice ./cmd/quant-practice
