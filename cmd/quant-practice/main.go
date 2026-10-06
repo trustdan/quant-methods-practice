@@ -17,9 +17,11 @@ import (
 	"time"
 
 	"github.com/trustdan/quant-methods-practice/internal/assets"
+	"github.com/trustdan/quant-methods-practice/internal/auth"
 	"github.com/trustdan/quant-methods-practice/internal/bank"
 	"github.com/trustdan/quant-methods-practice/internal/httpapi"
 	"github.com/trustdan/quant-methods-practice/internal/mathengine"
+	"github.com/trustdan/quant-methods-practice/internal/siwc"
 	"github.com/trustdan/quant-methods-practice/internal/storage"
 	"github.com/trustdan/quant-methods-practice/internal/tutor"
 )
@@ -46,6 +48,7 @@ func main() {
 		masteryFlag      = flag.Bool("mastery", false, "Display curriculum concept mastery and transfer projections and exit")
 		notesFlag        = flag.Bool("notes", false, "List saved explanations and notes in personal library and exit")
 		exportNotesFlag  = flag.String("export-notes", "", "Export all saved notes as UTF-8 Markdown files to specified directory and exit")
+		providersFlag    = flag.Bool("providers", false, "Display configured AI providers and models and exit")
 	)
 
 	flag.Parse()
@@ -124,6 +127,20 @@ func main() {
 		return
 	}
 
+	dataDir := *dataDirFlag
+	if dataDir == "" {
+		dataDir, _ = storage.DefaultDataDir()
+	}
+	vault, err := auth.NewStandardVault(dataDir)
+	if err != nil {
+		log.Fatalf("failed to initialize credential vault: %v", err)
+	}
+
+	if *providersFlag {
+		runProviders(vault)
+		return
+	}
+
 	// Persist initial user preferences if configured via CLI flags
 	if *questionsFlag != 10 || *moduleFlag != "" || *intensityFlag != "standard" || *seedFlag != 0 {
 		var modIDs []string
@@ -175,6 +192,7 @@ func main() {
 		AllowedDevOrigins: []string{"http://localhost:5173", "http://127.0.0.1:5173"},
 		Bank:              activeBank,
 		Store:             store,
+		Vault:             vault,
 	})
 	if err != nil {
 		log.Fatalf("failed to initialize server: %v", err)
@@ -473,4 +491,53 @@ func runExportNotes(store *storage.Store, outDir string) {
 		fmt.Printf("  -> Exported: %s\n", filePath)
 	}
 	fmt.Println("Export complete.")
+}
+
+func runProviders(v auth.Vault) {
+	fmt.Println("=== AI Provider Credentials & Vault Status ===")
+	statuses := v.AllStatuses()
+
+	fmt.Printf("%-14s %-14s %-16s %s\n", "ROUTE", "CONFIGURED?", "SOURCE", "MASKED KEY")
+	fmt.Println(strings.Repeat("-", 65))
+	for _, st := range statuses {
+		confStr := "No"
+		if st.Configured {
+			confStr = "Yes"
+		}
+		masked := st.MaskedKey
+		if masked == "" {
+			masked = "(none)"
+		}
+		fmt.Printf("%-14s %-14s %-16s %s\n",
+			st.Route,
+			confStr,
+			string(st.Source),
+			masked,
+		)
+	}
+
+	fmt.Println()
+	fmt.Println("=== ChatGPT Plan Accounts (Sign in with ChatGPT; billed to the ChatGPT plan) ===")
+	accts, err := siwc.NewClient(v).Accounts()
+	switch {
+	case err != nil:
+		fmt.Printf("  unavailable: %v\n", err)
+	case len(accts) == 0:
+		fmt.Println("  (no accounts signed in)")
+	}
+	for _, a := range accts {
+		state := "ready"
+		if a.NeedsReauth {
+			state = "sign-in expired"
+		} else if !a.PlanGranted {
+			state = "plan usage not granted"
+		}
+		sel := " "
+		if a.Selected {
+			sel = "*"
+		}
+		fmt.Printf("  %s %-32s %s\n", sel, a.Label, state)
+	}
+	fmt.Println()
+	fmt.Println("Note: Keys and tokens are stored exclusively in the backend vault and are never exposed in UI or logs.")
 }

@@ -115,7 +115,7 @@ export interface PublicSessionView {
   revision: number;
   title: string;
   scenario_markdown: string;
-  parameters: Record<string, any>;
+  parameters: Record<string, unknown>;
   assumptions: string[];
   current_stage_index: number;
   completed: boolean;

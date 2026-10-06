@@ -45,6 +45,10 @@ jobs:
         working-directory: web
         run: npm run typecheck
 
+      - name: Frontend lint
+        working-directory: web
+        run: npm run lint
+
       - name: Frontend unit tests
         working-directory: web
         run: npm run test

@@ -6,6 +6,7 @@ import {
   TutorEventDTO,
   SavedExplanationDTO,
 } from '../../types/tutor';
+import { BillingRoute, BILLING_LABELS } from '../../types/providers';
 
 export interface AITutorPanelProps {
   isOpen: boolean;
@@ -41,9 +42,41 @@ export const AITutorPanel: React.FC<AITutorPanelProps> = ({
   const [showSaveOnLeave, setShowSaveOnLeave] = useState<boolean>(false);
   const [pendingLeaveAction, setPendingLeaveAction] = useState<(() => void) | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [activeProvider, setActiveProvider] = useState<{
+    route: string;
+    name: string;
+    model: string;
+    billing?: BillingRoute;
+  }>({
+    route: 'offline',
+    name: 'Offline Reviewed',
+    model: 'offline-curriculum',
+  });
 
   const abortControllerRef = useRef<AbortController | null>(null);
   const panelRef = useRef<HTMLDivElement>(null);
+
+  // Load active provider details on open
+  useEffect(() => {
+    if (isOpen) {
+      fetch('/api/providers')
+        .then((res) => (res.ok ? res.json() : null))
+        .then((data) => {
+          if (data && data.active_route) {
+            const current = data.providers?.find(
+              (p: { route: string; billing?: BillingRoute }) => p.route === data.active_route,
+            );
+            setActiveProvider({
+              route: data.active_route,
+              name: current?.name || data.active_route,
+              model: data.active_model || '',
+              billing: current?.billing,
+            });
+          }
+        })
+        .catch(() => {});
+    }
+  }, [isOpen]);
 
   // Load recovery draft on open if one exists
   useEffect(() => {
@@ -133,7 +166,7 @@ export const AITutorPanel: React.FC<AITutorPanelProps> = ({
           action,
           follow_up_kind: followUpKind,
           custom_prompt: customQuery,
-          provider: 'offline',
+          provider: activeProvider.route,
         }),
         signal: controller.signal,
       });
@@ -219,9 +252,9 @@ export const AITutorPanel: React.FC<AITutorPanelProps> = ({
       provider_info: {
         title: instanceTitle ? `Notes: ${instanceTitle}` : `${topic} Explanation`,
         concepts: concepts || [],
-        provider: 'offline',
-        model: 'offline-curriculum',
-        route: 'offline',
+        provider: activeProvider.route,
+        model: activeProvider.model || 'curriculum',
+        route: activeProvider.route,
         fallback_label: fallbackNotice || undefined,
         advisory_status: 'Advisory AI explanation: for self-study only, does not affect score or official grades',
       },
@@ -354,8 +387,33 @@ export const AITutorPanel: React.FC<AITutorPanelProps> = ({
             <h2 className="modal-title" id="tutor-title">
               💡 AI Tutor
             </h2>
-            <span className="badge" style={{ background: 'rgba(56, 189, 248, 0.15)', color: 'var(--accent-cyan)' }}>
-              Offline Reviewed
+            <span
+              id="tutor-provider-badge"
+              className="badge"
+              style={{
+                background:
+                  activeProvider.route === 'offline'
+                    ? 'rgba(56, 189, 248, 0.15)'
+                    : activeProvider.route === 'gemini'
+                    ? 'rgba(168, 85, 247, 0.15)'
+                    : activeProvider.route === 'anthropic'
+                    ? 'rgba(245, 158, 11, 0.15)'
+                    : 'rgba(16, 185, 129, 0.15)',
+                color:
+                  activeProvider.route === 'offline'
+                    ? 'var(--accent-cyan)'
+                    : activeProvider.route === 'gemini'
+                    ? '#c084fc'
+                    : activeProvider.route === 'anthropic'
+                    ? 'var(--accent-amber)'
+                    : 'var(--accent-emerald)',
+              }}
+            >
+              {activeProvider.route === 'offline'
+                ? 'Offline Reviewed'
+                : `${activeProvider.name} (${activeProvider.model})${
+                    activeProvider.billing ? ` · ${BILLING_LABELS[activeProvider.billing]}` : ''
+                  }`}
             </span>
           </div>
           <button

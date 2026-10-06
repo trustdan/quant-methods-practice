@@ -24,7 +24,7 @@ test.beforeAll(async () => {
   tempDbPath = path.join(tempDir, 'e2e-test.db');
 
   // Start Go loopback server with isolated temp database
-  serverProcess = spawn(BIN_PATH, ['--port', String(PORT), '--no-browser', '--db', tempDbPath], {
+  serverProcess = spawn(BIN_PATH, ['--port', String(PORT), '--no-browser', '--data-dir', path.dirname(tempDbPath), '--db', tempDbPath], {
     cwd: path.resolve(__dirname, '../..'),
     stdio: ['ignore', 'pipe', 'pipe'],
   });
@@ -139,7 +139,7 @@ test.describe('Foundation Verification (Offline Math & Keyboard Shell)', () => {
 
     // 2. Restart server process pointing to the SAME tempDbPath
     const RESTART_PORT = 8996;
-    serverProcess = spawn(BIN_PATH, ['--port', String(RESTART_PORT), '--no-browser', '--db', tempDbPath], {
+    serverProcess = spawn(BIN_PATH, ['--port', String(RESTART_PORT), '--no-browser', '--data-dir', path.dirname(tempDbPath), '--db', tempDbPath], {
       cwd: path.resolve(__dirname, '../..'),
       stdio: ['ignore', 'pipe', 'pipe'],
     });
@@ -348,7 +348,7 @@ test.describe('Foundation Verification (Offline Math & Keyboard Shell)', () => {
     }
 
     const STAGE07_PORT = 8997;
-    serverProcess = spawn(BIN_PATH, ['--port', String(STAGE07_PORT), '--no-browser', '--db', tempDbPath], {
+    serverProcess = spawn(BIN_PATH, ['--port', String(STAGE07_PORT), '--no-browser', '--data-dir', path.dirname(tempDbPath), '--db', tempDbPath], {
       cwd: path.resolve(__dirname, '../..'),
       stdio: ['ignore', 'pipe', 'pipe'],
     });
@@ -563,5 +563,212 @@ test.describe('Foundation Verification (Offline Math & Keyboard Shell)', () => {
     const screenshotDir = path.resolve(__dirname, 'screenshots');
     fs.mkdirSync(screenshotDir, { recursive: true });
     await page.screenshot({ path: path.join(screenshotDir, 'stage09_verified.png'), fullPage: true });
+  });
+
+  test('verifies Stage 10 provider settings, vault credential masking, and AI tutor provider badge', async ({ context, page }) => {
+    // Strictly disable all external networking: abort any request not targeting the loopback server
+    await context.route('**/*', (route) => {
+      const url = route.request().url();
+      if (!url.startsWith('http://127.0.0.1:')) {
+        console.warn(`Blocked unexpected external request to: ${url}`);
+        route.abort();
+      } else {
+        route.continue();
+      }
+    });
+
+    await page.goto(stage07Url || restartedUrl || bootstrapUrl);
+    await expect(page).toHaveTitle('Quant Methods Practice');
+
+    // 1. Open Settings modal via 't' key shortcut
+    await page.keyboard.press('t');
+    const settingsModal = page.locator('.modal-backdrop');
+    await expect(settingsModal).toBeVisible();
+
+    // 2. Verify Tab Navigation: Session Settings vs AI Providers
+    const sessionTab = page.locator('#tab-session-settings');
+    const providerTab = page.locator('#tab-provider-settings');
+    await expect(sessionTab).toBeVisible();
+    await expect(providerTab).toBeVisible();
+
+    // 3. Switch to AI Providers & Credentials Tab
+    await providerTab.click();
+    await expect(page.locator('.provider-settings-container')).toBeVisible({ timeout: 5000 });
+
+    // Verify provider route selector tabs
+    await expect(page.getByRole('button', { name: /Offline Reviewed/ })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Google Gemini/ })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Anthropic Claude/ })).toBeVisible();
+    await expect(page.getByRole('button', { name: /OpenAI/ })).toBeVisible();
+
+    // Verify Offline Reviewed is active by default
+    await expect(page.getByText('ACTIVE').first()).toBeVisible();
+
+    // 4. Select Google Gemini tab
+    await page.getByRole('button', { name: 'Google Gemini' }).click();
+    await expect(page.getByText('Google Gemini API Key (GEMINI_API_KEY)')).toBeVisible();
+
+    // 5. Store an API key into backend vault
+    const keyInput = page.locator('input[type="password"]');
+    await keyInput.fill('AIzaSyE2ETestSecretKey9988');
+
+    const saveKeyBtn = page.getByRole('button', { name: 'Save Key' });
+    await saveKeyBtn.click();
+
+    // Verify success confirmation and masked key display
+    await expect(page.getByText('API key stored securely in backend vault.')).toBeVisible({ timeout: 5000 });
+    await expect(page.getByText(/AIzaSy\.\.\.9988/)).toBeVisible();
+
+    // 6. Set Google Gemini as Active Provider
+    const setActiveBtn = page.getByRole('button', { name: 'Set as Active' });
+    await setActiveBtn.click();
+    await expect(page.getByText('Currently Active')).toBeVisible({ timeout: 5000 });
+
+    // 7. Close Settings modal via Escape
+    await page.keyboard.press('Escape');
+    await expect(settingsModal).not.toBeVisible();
+
+    // 8. Open AI Tutor panel (press 'n')
+    await page.keyboard.press('n');
+    const tutorModal = page.locator('#tutor-panel');
+    await expect(tutorModal).toBeVisible({ timeout: 5000 });
+
+    // 9. Verify header badge reflects active Google Gemini provider
+    const providerBadge = page.locator('#tutor-provider-badge');
+    await expect(providerBadge).toBeVisible();
+    await expect(providerBadge).toContainText('Google Gemini');
+
+    // 10. Close AI Tutor panel
+    const closeTutorBtn = page.locator('#btn-tutor-close');
+    await closeTutorBtn.click();
+    await expect(tutorModal).not.toBeVisible();
+
+    // 11. Reopen Settings and revert to Offline Reviewed (ensuring offline default)
+    await page.keyboard.press('t');
+    await expect(settingsModal).toBeVisible();
+    await providerTab.click();
+    await page.getByRole('button', { name: /Offline Reviewed/ }).click();
+    const setOfflineActive = page.getByRole('button', { name: 'Set as Active' });
+    if (await setOfflineActive.isVisible()) {
+      await setOfflineActive.click();
+    }
+    await page.keyboard.press('Escape');
+    await expect(settingsModal).not.toBeVisible();
+
+    // 12. Capture screenshot of verified Stage 10 release
+    const screenshotDir = path.resolve(__dirname, 'screenshots');
+    fs.mkdirSync(screenshotDir, { recursive: true });
+    await page.screenshot({ path: path.join(screenshotDir, 'stage10_verified.png'), fullPage: true });
+  });
+
+  test('Stage 11: ChatGPT plan route shows plan billing, starts PKCE sign-in on loopback, and cancels cleanly', async ({ context, page }) => {
+    const externalRequests: string[] = [];
+    await context.route('**/*', (route) => {
+      const url = route.request().url();
+      if (!url.startsWith('http://127.0.0.1:')) {
+        externalRequests.push(url);
+        route.abort();
+      } else {
+        route.continue();
+      }
+    });
+    // Record the sign-in URL instead of navigating a real popup to OpenAI.
+    await context.addInitScript(() => {
+      (window as unknown as { __openedUrls: string[] }).__openedUrls = [];
+      window.open = (url?: string | URL) => {
+        (window as unknown as { __openedUrls: string[] }).__openedUrls.push(String(url));
+        return null;
+      };
+    });
+
+    await page.goto(stage07Url || restartedUrl || bootstrapUrl);
+    await expect(page).toHaveTitle('Quant Methods Practice');
+
+    await page.keyboard.press('t');
+    const settingsModal = page.locator('.modal-backdrop');
+    await expect(settingsModal).toBeVisible();
+    await page.locator('#tab-provider-settings').click();
+
+    // Plan and API-key routes are separate tabs with distinct billing labels.
+    await page.getByRole('button', { name: 'OpenAI API' }).click();
+    await expect(page.locator('#provider-billing-label')).toHaveText('Billing: API usage billing');
+    await page.getByRole('button', { name: 'ChatGPT Plan' }).click();
+    await expect(page.locator('#provider-billing-label')).toHaveText('Billing: ChatGPT plan usage');
+    await expect(page.getByText('Not signed in.')).toBeVisible();
+    await expect(page.locator('#chatgpt-plan-panel input[type="password"]')).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Set as Active' })).toBeDisabled();
+
+    await page.getByRole('button', { name: 'Sign in with ChatGPT' }).click();
+    await expect(page.getByText(/Waiting for you to finish signing in/)).toBeVisible({ timeout: 5000 });
+
+    const opened = await page.evaluate(() => (window as unknown as { __openedUrls: string[] }).__openedUrls);
+    expect(opened).toHaveLength(1);
+    const authorize = new URL(opened[0]);
+    expect(authorize.origin + authorize.pathname).toBe('https://auth.openai.com/api/accounts/authorize');
+    expect(authorize.searchParams.get('client_id')).toBe('dynamic_agent_client');
+    expect(authorize.searchParams.get('code_challenge_method')).toBe('S256');
+    expect(authorize.searchParams.get('redirect_uri')).toMatch(/^http:\/\/127\.0\.0\.1:\d+\/auth\/callback$/);
+
+    await page.getByRole('button', { name: 'Cancel' }).click();
+    await expect(page.getByRole('button', { name: 'Sign in with ChatGPT' })).toBeVisible();
+
+    // The route never became active and nothing left the machine.
+    await expect(page.getByText('ACTIVE').first()).toBeVisible();
+    expect(externalRequests).toEqual([]);
+
+    const screenshotDir = path.resolve(__dirname, 'screenshots');
+    fs.mkdirSync(screenshotDir, { recursive: true });
+    await page.screenshot({ path: path.join(screenshotDir, 'stage11_verified.png'), fullPage: true });
+
+    await page.keyboard.press('Escape');
+    await expect(settingsModal).not.toBeVisible();
+  });
+
+  test('renders provider markdown: multi-line display math and headings are typeset', async ({ context, page }) => {
+    await context.route('**/*', (route) => {
+      const url = route.request().url();
+      if (!url.startsWith('http://127.0.0.1:')) {
+        route.abort();
+      } else {
+        route.continue();
+      }
+    });
+
+    // Replay a live provider answer shape (multi-line $$ block, ### heading) through the real panel.
+    const text = [
+      '### Heads counter',
+      'HHTT has two heads, so $X = 2$.',
+      'So we define:',
+      '',
+      '$$',
+      'X=\\text{the number of heads in the four tosses}.',
+      '$$',
+      '',
+      '#### Your turn',
+      '1. If the tosses are HTTT, what value would $X$ have?',
+    ].join('\n');
+    await page.route('**/api/tutor/requests/*/events', (route) =>
+      route.fulfill({
+        status: 200,
+        headers: { 'Content-Type': 'text/event-stream' },
+        body: `data: ${JSON.stringify({ type: 'text_delta', delta: text })}\n\n` +
+          `data: ${JSON.stringify({ type: 'complete', text })}\n\n`,
+      }),
+    );
+
+    await page.goto(stage07Url || restartedUrl || bootstrapUrl);
+    await expect(page.locator('.question-strip')).toBeVisible({ timeout: 10000 });
+    await page.keyboard.press('n');
+    await expect(page.locator('#tutor-panel')).toBeVisible({ timeout: 10000 });
+    await page.locator('#btn-tutor-hint').click();
+
+    const responseArea = page.locator('#tutor-response-area');
+    await expect(responseArea.getByRole('heading', { name: 'Heads counter' })).toBeVisible({ timeout: 10000 });
+    await expect(responseArea.getByRole('heading', { name: 'Your turn' })).toBeVisible();
+    await expect(responseArea.locator('.display-math mjx-container[jax="SVG"][display="true"]')).toHaveCount(1, { timeout: 10000 });
+    await expect(responseArea.locator('ol > li')).toHaveCount(1);
+    await expect(responseArea).not.toContainText('$$');
+    await expect(responseArea).not.toContainText('###');
+    await expect(responseArea).not.toContainText('\\text{');
   });
 });

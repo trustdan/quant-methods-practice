@@ -18,10 +18,12 @@ import (
 	"sync"
 	"time"
 
+	"github.com/trustdan/quant-methods-practice/internal/auth"
 	"github.com/trustdan/quant-methods-practice/internal/bank"
 	"github.com/trustdan/quant-methods-practice/internal/domain"
 	"github.com/trustdan/quant-methods-practice/internal/drill"
 	"github.com/trustdan/quant-methods-practice/internal/mastery"
+	"github.com/trustdan/quant-methods-practice/internal/providers"
 	"github.com/trustdan/quant-methods-practice/internal/tutor"
 )
 
@@ -35,6 +37,8 @@ type Config struct {
 	Store             drill.SessionStore
 	NoteStore         NoteStore
 	TutorManager      *tutor.TutorManager
+	Vault             auth.Vault
+	ProviderManager   *providers.ProviderManager
 }
 
 type Server struct {
@@ -48,6 +52,8 @@ type Server struct {
 	sessionManager    *drill.SessionManager
 	noteStore         NoteStore
 	tutorManager      *tutor.TutorManager
+	vault             auth.Vault
+	providerManager   *providers.ProviderManager
 	lastSessionID     string
 	mu                sync.RWMutex
 }
@@ -100,13 +106,34 @@ func NewServer(cfg Config) (*Server, error) {
 		tutorManager = tutor.NewTutorManager(nil)
 	}
 
+	vault := cfg.Vault
+	if vault == nil {
+		vault = auth.NewMemoryVault()
+	}
+
+	providerManager := cfg.ProviderManager
+	if providerManager == nil {
+		budget := providers.NewBudgetTracker(providers.DefaultMaxRequestsPerSession)
+		catalog := providers.NewCatalogCache()
+		providerManager = providers.NewProviderManager(vault, budget, catalog)
+	}
+
+	// Register external providers in tutorManager
+	for _, route := range []string{auth.RouteAnthropic, auth.RouteGemini, auth.RouteOpenAI, auth.RouteChatGPT} {
+		if svc, err := providerManager.GetProvider(route); err == nil && svc != nil {
+			tutorManager.RegisterProvider(svc)
+		}
+	}
+
 	s := &Server{
-		config:         cfg,
-		bootstrapToken: bootstrapToken,
-		bank:           cfg.Bank,
-		sessionManager: cfg.SessionManager,
-		noteStore:      noteStore,
-		tutorManager:   tutorManager,
+		config:          cfg,
+		bootstrapToken:  bootstrapToken,
+		bank:            cfg.Bank,
+		sessionManager:  cfg.SessionManager,
+		noteStore:       noteStore,
+		tutorManager:    tutorManager,
+		vault:           vault,
+		providerManager: providerManager,
 	}
 
 	if s.sessionManager != nil && s.bank != nil {
@@ -137,6 +164,8 @@ func NewServer(cfg Config) (*Server, error) {
 	mux.HandleFunc("/api/notes/", s.handleNoteByID)
 	mux.HandleFunc("/api/exports", s.handleExports)
 	mux.HandleFunc("/api/tutor/drafts/", s.handleTutorDrafts)
+	mux.HandleFunc("/api/providers", s.handleProviders)
+	mux.HandleFunc("/api/providers/", s.handleProviders)
 	mux.HandleFunc("/", s.handleStaticOrSPA)
 
 	wrapped := s.securityMiddleware(mux)

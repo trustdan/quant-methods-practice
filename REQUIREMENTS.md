@@ -34,6 +34,8 @@ Status: planned. IDs are stable traceability anchors; completion requires the li
 | R16 | Save AI explanation when leaving it, using y/n/Esc or buttons; scrolling does not prompt. Failed saving preserves the note and intended navigation. Local library supports search/topic filters, reopen, Markdown export, explicit deletion and follow-up context. |
 | R17 | Save raw Markdown/LaTeX, originating immutable question/stage, provider/model/route, time and assistance context. Exports open in Typora/Obsidian, include no secrets, and label AI notes as advisory. Chat-only learning does not write mastery. |
 | R18 | Generate AI question candidate, local variation, preview, validate, approve/reject/retire and export bank. Content approval is separate from attempts. Unsupported families require code/rule review before activation; generated solutions are not answer keys. |
+| R30 | Multi-turn AI tutor chat: Conversational threads with SQLite thread persistence, streaming SSE, sliding context budgets, strict answer-withholding on unresolved stages, and selective note exports. |
+| R31 | Local offline LLM adapter: OpenAI-compatible loopback adapter for LM Studio/Ollama on local port with model discovery, no API key required, and zero network calls beyond loopback. |
 
 ## Assessment, visuals and tools
 
@@ -45,6 +47,7 @@ Status: planned. IDs are stable traceability anchors; completion requires the li
 | R22 | Reference library/glossary, reviewed offline explanations, course notation/parameterization and module objectives. Reference opening marks assistance on the active unresolved problem. Exam aids follow an explicit policy. |
 | R23 | CLI equivalents for bank validation/reconciliation, session defaults, data-dir, seed, mastery/history/export, exams, candidates, provider/model diagnostics, high scores and skip-intro. Mutating content commands require explicit IDs/actions; diagnostics redact credentials. |
 | R24 | Backup/export/import plan, migration backup, failure recovery, per-profile data path, question bank versioning and native packaging for Windows/macOS/Linux. No automatic cloud sync or telemetry. |
+| R29 | Excel formula equivalents: Mathematical engine derivations, drill recaps, stage explanations, reference library and tutor prompts provide standard Excel function formulas (e.g. BINOM.DIST, POISSON.DIST, COMBIN, NORM.DIST) matching canonical results. |
 
 ## Arcade, accessibility and reliability
 

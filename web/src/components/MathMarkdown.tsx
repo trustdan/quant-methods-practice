@@ -6,85 +6,117 @@ interface MathMarkdownProps {
   className?: string;
 }
 
-// Convert common markdown elements while keeping math delimiters intact
+function escapeHtml(text: string): string {
+  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+// Convert common markdown elements while keeping math delimiters intact.
+// Display math ($$ ... $$ or \[ ... \]) may span several lines and is kept in
+// one element so MathJax can match its delimiters.
 function markdownToHtml(raw: string): string {
   if (!raw) return '';
 
   const lines = raw.split(/\r?\n/);
   const output: string[] = [];
-  let inList = false;
+  let list: 'ul' | 'ol' | null = null;
+
+  const closeList = () => {
+    if (list) {
+      output.push(`</${list}>`);
+      list = null;
+    }
+  };
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
+    const trimmed = line.trim();
 
-    // Headers
-    if (line.startsWith('### ')) {
-      if (inList) { output.push('</ul>'); inList = false; }
-      output.push(`<h3>${formatInline(line.slice(4))}</h3>`);
+    // Fenced code blocks
+    if (trimmed.startsWith('```')) {
+      closeList();
+      const code: string[] = [];
+      while (i + 1 < lines.length && !lines[i + 1].trim().startsWith('```')) {
+        code.push(lines[++i]);
+      }
+      i++; // skip the closing fence (or run past the end of an unterminated stream)
+      output.push(`<pre><code>${escapeHtml(code.join('\n'))}</code></pre>`);
       continue;
     }
-    if (line.startsWith('## ')) {
-      if (inList) { output.push('</ul>'); inList = false; }
-      output.push(`<h2>${formatInline(line.slice(3))}</h2>`);
+
+    // Display math, single- or multi-line
+    const opener = trimmed.startsWith('$$') ? '$$' : trimmed.startsWith('\\[') ? '\\[' : null;
+    if (opener) {
+      const closer = opener === '$$' ? '$$' : '\\]';
+      const block: string[] = [trimmed];
+      let closed = trimmed.length >= opener.length + closer.length && trimmed.endsWith(closer);
+      while (!closed && i + 1 < lines.length) {
+        const next = lines[++i];
+        block.push(next);
+        closed = next.trim().endsWith(closer);
+      }
+      closeList();
+      const tex = escapeHtml(block.join('\n'));
+      // An unterminated block (e.g. still streaming) shows as raw text until it closes.
+      output.push(closed ? `<div class="display-math">${tex}</div>` : `<p>${tex}</p>`);
       continue;
     }
-    if (line.startsWith('# ')) {
-      if (inList) { output.push('</ul>'); inList = false; }
-      output.push(`<h1>${formatInline(line.slice(2))}</h1>`);
+
+    // Headings (# through ######, up to three leading spaces)
+    const heading = /^ {0,3}(#{1,6})\s+(.*?)\s*#*\s*$/.exec(line);
+    if (heading) {
+      closeList();
+      const level = Math.min(heading[1].length + 1, 4); // h1 is reserved for the page
+      output.push(`<h${level}>${formatInline(heading[2])}</h${level}>`);
+      continue;
+    }
+
+    // Horizontal rules
+    if (/^ {0,3}([-*_])(\s*\1){2,}\s*$/.test(line)) {
+      closeList();
+      output.push('<hr>');
       continue;
     }
 
     // List items
-    if (/^[-*]\s+/.test(line)) {
-      if (!inList) {
-        output.push('<ul>');
-        inList = true;
+    const item = /^\s*(?:([-*+])|\d+[.)])\s+(.*)$/.exec(line);
+    if (item) {
+      const kind = item[1] ? 'ul' : 'ol';
+      if (list !== kind) {
+        closeList();
+        output.push(`<${kind}>`);
+        list = kind;
       }
-      const itemText = line.replace(/^[-*]\s+/, '');
-      output.push(`<li>${formatInline(itemText)}</li>`);
-      continue;
-    } else if (inList) {
-      output.push('</ul>');
-      inList = false;
-    }
-
-    // Empty lines
-    if (line.trim() === '') {
+      output.push(`<li>${formatInline(item[2])}</li>`);
       continue;
     }
 
-    // Display math lines ($$...$$)
-    if (line.trim().startsWith('$$') && line.trim().endsWith('$$') && line.trim().length > 4) {
-      output.push(`<div class="display-math">${line.trim()}</div>`);
+    // Empty lines end a list
+    if (trimmed === '') {
+      closeList();
       continue;
     }
 
-    // Standard paragraph
+    closeList();
     output.push(`<p>${formatInline(line)}</p>`);
   }
 
-  if (inList) {
-    output.push('</ul>');
-  }
-
+  closeList();
   return output.join('\n');
 }
 
 // Format inline markdown (bold, italic, code), while protecting $...$ math spans
 function formatInline(text: string): string {
   // Split on math segments so inline markdown formatting does not touch formulas
-  const parts = text.split(/(\$\$[\s\S]*?\$\$|\$[^$\n]+?\$)/g);
+  const parts = text.split(/(\$\$[\s\S]*?\$\$|\$[^$\n]+?\$|\\\([\s\S]*?\\\))/g);
   return parts
     .map((part, index) => {
-      // Odd indices are math segments ($...$ or $$...$$)
+      // Odd indices are math segments ($...$, $$...$$ or \(...\)). Escape HTML only;
+      // MathJax reads the original TeX back from the text content.
       if (index % 2 === 1) {
-        return part;
+        return escapeHtml(part);
       }
       // Even indices are markdown text
-      let escaped = part
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
+      let escaped = escapeHtml(part);
 
       // Inline code
       escaped = escaped.replace(/`([^`]+)`/g, '<code>$1</code>');
@@ -106,7 +138,7 @@ export const MathMarkdown: React.FC<MathMarkdownProps> = ({ content, className =
   const sanitizedHtml = DOMPurify.sanitize(rawHtml, {
     ALLOWED_TAGS: [
       'p', 'strong', 'em', 'code', 'pre', 'ul', 'ol', 'li',
-      'h1', 'h2', 'h3', 'h4', 'br', 'span', 'div',
+      'h1', 'h2', 'h3', 'h4', 'br', 'hr', 'span', 'div',
       'mjx-container', 'svg', 'g', 'path', 'defs', 'use', 'rect', 'text'
     ],
     ALLOWED_ATTR: ['class', 'style', 'id', 'jax', 'display', 'role', 'aria-hidden', 'viewBox', 'width', 'height', 'fill', 'd', 'transform', 'href', 'x', 'y'],

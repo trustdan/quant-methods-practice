@@ -18,6 +18,11 @@ Recorded October 4, 2026; revisit with explicit reasons rather than quietly chan
 | Full parity staged after offline drill | All desired workflows tracked without implementing everything simultaneously |
 | Module path `github.com/trustdan/quant-methods-practice` | Established at Stage 00; remote `https://github.com/trustdan/quant-methods-practice.git` on branch `main` |
 | Toolchain baseline | Go `go1.27.1` (windows/amd64), Node `v22.21.1`, npm `10.9.4`, Python `3.13.15` |
+| Excel formula equivalents | Connect analytical derivations with standard business stats spreadsheet functions (=BINOM.DIST, =POISSON.DIST, =NORM.DIST, =COMBIN) |
+| Multi-turn AI tutor chat | Stateful conversational threads with SQLite persistence and strict answer-withholding guardrails on active stages |
+| ChatGPT plan callback on its own one-shot loopback listener | Keeps OAuth callback acceptance separate from the authenticated app API (SECURITY); the listener exists only during an attempt |
+| ChatGPT plan tokens in the existing encrypted vault | Reuses the DPAPI/AES vault rather than adding a second token file; the UI only sees redacted account summaries |
+| Local LLM (LM Studio / Ollama) | OpenAI-compatible loopback adapter for zero-network, cost-free, private offline generative tutoring |
 
 ## Open facts
 

@@ -4,6 +4,7 @@ import {
   SessionCommandDTO,
   CommandResultDTO,
   PublicStageView,
+  SubmittedAnswerDTO,
 } from '../../types/practice';
 import { MathMarkdown } from '../../components/MathMarkdown';
 import { StageStrip, StageInfo } from '../../components/StageStrip';
@@ -47,7 +48,7 @@ export const PracticeDrill: React.FC<PracticeDrillProps> = ({
   const draftsRef = useRef<Record<string, DraftRecord>>({});
   const numericInputRef = useRef<HTMLInputElement>(null);
   const prevStageIndexRef = useRef<number>(session.current_stage_index);
-  const saveTimeoutRef = useRef<any>(null);
+  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Determine reachable stages: learner cannot jump ahead of current highest uncompleted stage
   let maxReachableIndex = 0;
@@ -154,7 +155,7 @@ export const PracticeDrill: React.FC<PracticeDrillProps> = ({
   }, [session.current_stage_index, session.completed, currentStage, onDraftChange, checkHasDraft]);
 
   // Debounced server draft sync
-  const syncDraftToServer = (stageId: string, answerPayload: any) => {
+  const syncDraftToServer = (stageId: string, answerPayload: SubmittedAnswerDTO) => {
     if (saveTimeoutRef.current) {
       clearTimeout(saveTimeoutRef.current);
     }
@@ -198,7 +199,7 @@ export const PracticeDrill: React.FC<PracticeDrillProps> = ({
   const handleSubmit = async () => {
     if (!currentStage || isSubmitting) return;
 
-    let answerPayload: any = null;
+    let answerPayload: SubmittedAnswerDTO | null = null;
     if (currentStage.kind === 'choice') {
       if (!selectedOptionId) return;
       answerPayload = {

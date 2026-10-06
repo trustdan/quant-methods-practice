@@ -2,7 +2,7 @@
 
 ## Current state - October 5, 2026
 
-Stage 00, Stage 01, Stage 02, Stage 03, Stage 04, Stage 05, Stage 06, Stage 07, Stage 08, and Stage 09 are complete and verified. The standalone repository is active on branch `main` at `https://github.com/trustdan/quant-methods-practice.git`.
+Stage 00 through Stage 10 are complete and verified. Stage 11 (ChatGPT plan sign-in) is **implemented and mock-verified; live verification is pending** an eligible ChatGPT account sign-in, inference and sign-out (the stage's exit gate). Stage 10 and Stage 11 work is uncommitted in the working tree. The standalone repository is active on branch `main` at `https://github.com/trustdan/quant-methods-practice.git`.
 
 ### Stage 00 Record
 - Toolchain versions: Go `go1.27.1` (windows/amd64), Node `v22.21.1`, npm `10.9.4`, Python `3.13.15`, Windows 11 amd64 (Microsoft Edge available).
@@ -218,34 +218,108 @@ Stage 00, Stage 01, Stage 02, Stage 03, Stage 04, Stage 05, Stage 06, Stage 07, 
 - End-to-end Automated Verification:
   - [tests/e2e/foundation.spec.ts](file:///tests/e2e/foundation.spec.ts): Added dedicated Stage 09 Playwright E2E browser test verifying AI tutor streaming with offline math rendering, leave-intent protection modal (`y` Save, `n` Discard, `Esc` Stay), streaming cancellation, note library viewing, searching, LaTeX math rendering in detail pane, and note markdown export. Captured verified screenshot [tests/e2e/screenshots/stage09_verified.png](file:///tests/e2e/screenshots/stage09_verified.png).
 
+### Stage 10 Implementation
+- Backend Credential Vault ([internal/auth](file:///internal/auth)):
+  - [internal/auth/types.go](file:///internal/auth/types.go): `Route` constants (`offline`, `anthropic`, `gemini`, `openai`), `CredentialStatus`, `Vault` interface (`SaveKey`, `GetKey`, `DeleteKey`, `Status`), and `MaskKey` (e.g. `AIzaSy...9988`).
+  - [internal/auth/memory_vault.go](file:///internal/auth/memory_vault.go): Concurrent thread-safe in-memory vault for session-only/test storage.
+  - [internal/auth/file_vault.go](file:///internal/auth/file_vault.go): AES-256-GCM encrypted persistent file store with 0600 file permissions.
+  - [internal/auth/dpapi_vault_windows.go](file:///internal/auth/dpapi_vault_windows.go): Windows DPAPI user-credential encryption leveraging native `CryptProtectData` and `CryptUnprotectData`.
+  - [internal/auth/dpapi_vault_other.go](file:///internal/auth/dpapi_vault_other.go): Cross-platform fallback stub.
+  - [internal/auth/vault.go](file:///internal/auth/vault.go): `StandardVault` coordinating persistent encrypted storage with backend environment variables (`ANTHROPIC_API_KEY`, `GEMINI_API_KEY`/`GOOGLE_API_KEY`, `OPENAI_API_KEY`).
+  - [internal/auth/vault_test.go](file:///internal/auth/vault_test.go): 4 unit tests verifying memory vault, key masking, AES file encryption, and DPAPI persistence.
+- Provider Adapters & Discovery ([internal/providers](file:///internal/providers)):
+  - [internal/providers/types.go](file:///internal/providers/types.go): `ModelInfo`, `ProviderSummary`, `BudgetStatus`, and `ModelDiscoverer` interface.
+  - [internal/providers/budget.go](file:///internal/providers/budget.go): `BudgetTracker` enforcing 20 external requests/session, input/output token tracking, and thread-safe resets.
+  - [internal/providers/catalog.go](file:///internal/providers/catalog.go): `CatalogCache` with curated defaults for offline, Anthropic (`claude-3-5-sonnet-latest`, `claude-3-5-haiku-latest`), Gemini (`gemini-1.5-pro-latest`, `gemini-1.5-flash-latest`), and OpenAI (`gpt-4o`, `gpt-4o-mini`), 24-hour TTL caching, and custom model ID support.
+  - [internal/providers/prompt.go](file:///internal/providers/prompt.go): Strict pedagogical system prompt preventing answer reveals on unresolved stages, causal hint instructions, and structured context assembly.
+  - [internal/providers/anthropic.go](file:///internal/providers/anthropic.go): Anthropic Claude Messages API adapter with SSE streaming and `/v1/models` discovery.
+  - [internal/providers/gemini.go](file:///internal/providers/gemini.go): Google Gemini API adapter with SSE streaming and `/v1beta/models` discovery.
+  - [internal/providers/openai.go](file:///internal/providers/openai.go): OpenAI Chat Completions API adapter with SSE streaming and `/v1/models` discovery.
+  - [internal/providers/manager.go](file:///internal/providers/manager.go): `ProviderManager` coordinating active routes, models, catalog caches, and automatic fallback to `OfflineTutor`.
+  - [internal/providers/providers_test.go](file:///internal/providers/providers_test.go): 8 unit tests covering budget enforcement, catalog cache, Anthropic/Gemini/OpenAI mock streaming and discovery, manager coordination, offline zero-network invariant, and rate limit exponential backoff.
+- HTTP API & CLI Integration:
+  - [internal/httpapi/providers.go](file:///internal/httpapi/providers.go): Endpoints for `/api/providers`, `/api/providers/active`, `/api/providers/{route}/credentials`, `/api/providers/{route}/disconnect`, `/api/providers/{route}/models`, `/api/providers/{route}/models/refresh`, `/api/providers/{route}/models/custom`, `/api/providers/budget`, and `/api/providers/budget/reset`.
+  - [internal/httpapi/providers_test.go](file:///internal/httpapi/providers_test.go): 15 unit tests verifying provider listing, credential save/disconnect without secret leakage in responses or logs, model switching, custom model additions, budget consumption, and zero network calls when offline.
+  - [internal/httpapi/server.go](file:///internal/httpapi/server.go) & [internal/httpapi/tutor_notes.go](file:///internal/httpapi/tutor_notes.go): Integrated `Vault` and `ProviderManager` into server runtime and connected tutor request handler to route to active provider.
+  - [cmd/quant-practice/main.go](file:///cmd/quant-practice/main.go): Added `-providers` CLI flag to inspect active provider and vault credential status.
+- Web Frontend ([web/src](file:///web/src)):
+  - [web/src/types/providers.ts](file:///web/src/types/providers.ts): TypeScript DTO interfaces.
+  - [web/src/features/providers/ProviderSettings.tsx](file:///web/src/features/providers/ProviderSettings.tsx): UI component with provider cards, masked password input, model selection dropdown, dynamic model refresh, custom model input, and session budget meter.
+  - [web/src/features/settings/SettingsModal.tsx](file:///web/src/features/settings/SettingsModal.tsx): Dual-tab navigation for Session Settings vs AI Providers & Credentials.
+  - [web/src/features/tutor/AITutorPanel.tsx](file:///web/src/features/tutor/AITutorPanel.tsx): Header badge reflecting active provider and model, linking directly to settings.
+  - [web/src/features/providers/ProviderSettings.test.tsx](file:///web/src/features/providers/ProviderSettings.test.tsx): 4 Vitest unit tests verifying provider listing, API key save, model select, and budget meter rendering.
+- End-to-end Automated Verification:
+  - [tests/e2e/foundation.spec.ts](file:///tests/e2e/foundation.spec.ts): Added dedicated Stage 10 Playwright E2E browser test verifying provider settings tab navigation, key saving, masked display, active provider toggling, and AI tutor provider badge rendering with zero network requests. Captured verified screenshot [tests/e2e/screenshots/stage10_verified.png](file:///tests/e2e/screenshots/stage10_verified.png).
+
+### Stage 11 Implementation (live verification pending)
+- Protocol reverified on October 5, 2026 against the official docs ([sign-in](https://developers.openai.com/siwc/token-sharing-open-source/sign-in), [accounts and sessions](https://developers.openai.com/siwc/token-sharing-open-source/profiles-and-sessions), [models and inference](https://developers.openai.com/siwc/token-sharing-open-source/models-and-inference), [token reference](https://developers.openai.com/siwc/token-sharing-open-source/token-reference), [errors and recovery](https://developers.openai.com/siwc/token-sharing-open-source/errors-and-recovery), [preview limitations](https://developers.openai.com/siwc/token-sharing-open-source/preview-limitations)) and the live `https://auth.openai.com/.well-known/openid-configuration` (issuer `https://auth.openai.com`, RS256 JWKS, revocation endpoint `/api/accounts/oauth/revoke`, public client auth `none`). Details recorded in [docs/PROVIDERS.md](PROVIDERS.md).
+- [internal/siwc/oidc.go](../internal/siwc/oidc.go): endpoints, PKCE S256, stdlib RS256 ID-token verification (signature via JWKS, issuer, audience = issued client ID, expiry, nonce, subject). No new dependencies.
+- [internal/siwc/client.go](../internal/siwc/client.go): `Client` with dynamic registration via `dynamic_agent_client` (issued `client_id` read from the callback and saved per account), persistent `urn:uuid:` host identifier (`ext_agent_host_id`), `agent_name_hint` only on new registration, `id_token_hint` on reauthorization, fresh state/nonce/PKCE per attempt, one-shot callback listener on `127.0.0.1:<ephemeral>/auth/callback` separate from the app server (Host-checked; forged state rejected without consuming the attempt; 10-minute timeout; graceful shutdown), `chatgpt.tokens.use.direct` grant check, refresh with rotation and the documented reauth error codes, revoke-then-delete sign-out, multiple accounts with selection, identity check on reauth (a different account replaces nothing). Accounts and tokens are stored as one record in the existing encrypted vault (DPAPI on Windows) under `chatgpt_plan_accounts`; the UI only receives redacted `AccountSummary` values.
+- [internal/providers/chatgpt.go](../internal/providers/chatgpt.go): `ChatGPTPlanAdapter` (route `chatgpt`) calling `POST /v1/responses` with only `model`, `instructions`, `input` (array), `store:false`, `stream:true`; parses `response.output_text.delta`, treats only `response.completed` as success, surfaces `response.failed`/`response.incomplete`; maps documented `subscription_sharing_*` codes; a 429 usage limit is never retried, 503 is retried with bounded backoff; `subscription_sharing_invalid_user` marks the account for reauth. Model discovery via `GET /v1/models` filtered to `visibility: "list"`. No default model is assumed and it never reads an API key.
+- [internal/providers/manager.go](../internal/providers/manager.go) / [types.go](../internal/providers/types.go): route registered; summaries now carry `auth_kind`, `billing` (`none` / `api_usage` / `chatgpt_plan`) and `account_label`; the plan route cannot be activated without a signed-in account that granted plan usage and a selected model. Startup still always begins offline.
+- [internal/httpapi/chatgpt.go](../internal/httpapi/chatgpt.go): `POST/GET /api/providers/chatgpt/signin`, `POST .../signin/cancel`, `GET .../accounts`, `POST .../accounts/{key}/select`, `POST .../accounts/{key}/signout` (falls back visibly to offline if the active plan account goes away). Pasting tokens into `.../credentials` is rejected.
+- [cmd/quant-practice/main.go](../cmd/quant-practice/main.go): `-providers` lists ChatGPT plan accounts and their state.
+- Web: [ChatGPTPlanPanel.tsx](../web/src/features/providers/ChatGPTPlanPanel.tsx) (sign-in opens OpenAI's page with `noopener`, status polling, cancel, account select/renew/sign-out, billing explanation); [ProviderSettings.tsx](../web/src/features/providers/ProviderSettings.tsx) adds the `ChatGPT Plan` tab, renames `OpenAI` to `OpenAI API`, shows a billing label on every route, no longer carries one route's model into another, explains an empty catalog, and disables Set as Active without a model; [AITutorPanel.tsx](../web/src/features/tutor/AITutorPanel.tsx) badge shows the billing route.
+- Verification tooling: [scripts/test.ps1](../scripts/test.ps1) now builds before browser tests and fails on any non-zero native exit code and on gofmt drift. **Previously it ignored npm/go exit codes and ran E2E against the old binary before rebuilding, so earlier HANDOFF entries saying "test.ps1 passed" did not prove every step passed.**
+
 ## Checks
 
-- `go test -v ./internal/tutor/...`: Passed (10 comprehensive unit tests covering hints, math derivations, follow-ups, streaming chunks, cancellations, provider fallback, markdown export, and grade mutation protection).
-- `go test -v ./internal/storage/...`: Passed (25 unit tests covering storage, migrations, multi-question replay, mastery projection persistence, and note/draft persistence).
+Stage 11 session (October 5, 2026), commands actually run:
+- `go test -count=1 ./internal/siwc/` and `go test -race -count=1 ./internal/siwc/`: Passed (8 tests, one with 5 subtests, against a fake auth server signing real RS256 tokens: RFC 7636 PKCE vector; new-registration flow and authorize parameters; forged-state rejection; nonce/audience/expiry/signature/missing-plan-scope rejection; authorization error callback; refresh rotation then `refresh_token_reused` reauth; reauth-as-different-account rejection; revoke-then-delete sign-out; cancelled listener closes).
+- `go test -count=1 ./internal/...`: Passed (12 packages). Includes 8 new plan-adapter tests (permitted payload keys only, missing completion is an error, 429 not retried, 503 bounded retry, invalid user marks reauth, no API-key fallback and no network/budget use without a plan token, model visibility filtering, plan/API routes distinct) and 3 new HTTP tests (pasted tokens rejected, activation requires sign-in, sign-in start/cancel with the main server not serving the callback).
+- `go vet ./internal/... ./cmd/...` and `gofmt -s -l cmd internal`: clean.
+- `npm run typecheck`: Passed. `npm run test`: Passed (62 tests in 13 files; 4 new plan-panel tests).
+- `npm run lint`: was not working (pre-existing; ESLint 9.39.5 found no `eslint.config.js`). Restored in the follow-up below.
+- `scripts/build.ps1`: Passed. `npm run test:e2e` after the build: Passed (8 tests, including the new Stage 11 test: network blocked, `window.open` stubbed, asserts authorize URL/PKCE/loopback redirect, billing labels, no key field, cancel, zero external requests). Passed 5 more consecutive runs. One earlier run inside `test.ps1` had 3 failures (`toBeVisible`, 17.5 s vs. the usual ~6 s) that did not reproduce; cause not identified.
+- Fixed `scripts/test.ps1`: final full run exited 0 with every step passing; a deliberately failing command was confirmed to stop it with a non-zero exit.
+- `bin/quant-practice.exe -providers` (fresh data dir): prints the API-key table plus "ChatGPT Plan Accounts: (no accounts signed in)".
+- **Not run:** any live sign-in, token exchange, inference, model listing or revocation against OpenAI. No eligible account was used, and Stage 11 live support is not claimed.
+
+Lint restoration (October 5, 2026, follow-up session):
+- Added [web/eslint.config.js](../web/eslint.config.js) (flat config: `@eslint/js` recommended + `@typescript-eslint` `flat/recommended`, browser globals, `_`-prefixed unused names allowed). Declared `@eslint/js` (^9.39.5, already installed transitively) as a direct dev dependency. Dropped the `--ext` flag, which flat config rejects.
+- The first real lint run found 10 errors, all fixed without disabling rules: lexical declarations in a `switch` case in `App.tsx` (wrapped in a block); `any` replaced with `SubmittedAnswerDTO` in `PracticeDrill.tsx` draft/submit payloads, `ReturnType<typeof setTimeout>` for the debounce ref, `unknown` for `PublicSessionView.parameters`, an `instanceof Error` check in `MasteryView.tsx`, and `RequestInit` / `typeof fetch` in two test files.
+- Lint added to [scripts/test.ps1](../scripts/test.ps1) and the CI workflow.
+- `npm run lint` and `npm run typecheck`: clean. Full `scripts/test.ps1`: passed (scaffold, typecheck, lint, 62 unit tests, build, 8 browser tests, gofmt, go test, go vet).
+
+Stage 11 live check and tutor rendering fix (October 5, 2026, same follow-up session):
+- **Live (user-run, partial):** the user signed in with an eligible ChatGPT account and received a streamed tutor answer over the `chatgpt` plan route in the real app. `bin\quant-practice.exe -providers` afterwards lists the account as `ready`. Not yet confirmed live: sign-out/revocation. The model used was not recorded.
+- The live answer exposed a rendering bug in [MathMarkdown.tsx](../web/src/components/MathMarkdown.tsx): a `$$` block spread over several lines was split into separate paragraphs, so MathJax could not match its delimiters, and only `#`/`##`/`### ` at column 0 became headings. The block parser now keeps multi-line `$$ … $$` and `\[ … \]` blocks in one element (an unterminated block stays plain text while streaming), handles `#`–`######` with up to three leading spaces, numbered lists, horizontal rules and fenced code blocks, protects `\( … \)` inline math, and HTML-escapes math text, which MathJax still reads as TeX. Styles for headings, lists, rules and code blocks were added to `index.css`.
+- **Test isolation bug fixed:** the browser tests started the server with only `--db`, so the credential vault resolved to the user's real data directory. The Stage 11 test failed once the user had really signed in, and the Stage 10 test's fake Gemini key (`AIzaSy...9988`) is still in the user's real vault. All three server launches in `tests/e2e/foundation.spec.ts` now pass `--data-dir` to the temporary directory. The leftover fake key was not removed; it is the user's to remove in Settings.
+- Added 4 MathMarkdown unit tests and 1 browser test that replays a live-shaped answer through the real panel and asserts real MathJax typesets the display block and headings.
+- Full `scripts/test.ps1`: passed (lint clean, 66 unit tests, build, 9 browser tests, gofmt, go test, go vet).
+
+Earlier Stage 10 record:
+- `go test -v ./internal/auth/...`: Passed (4 comprehensive unit tests covering memory vault, key masking, AES file encryption, and DPAPI persistence).
+- `go test -v ./internal/providers/...`: Passed (8 comprehensive unit tests covering budgets, catalog cache, Anthropic/Gemini/OpenAI mock streaming/discovery, provider manager, offline zero-network verification, and rate-limit backoff).
+- `go test -v ./internal/httpapi/...`: Passed (15 unit tests covering provider and tutor endpoints with zero secret leakage).
+- `go test -v ./internal/tutor/...`: Passed (10 unit tests).
+- `go test -v ./internal/storage/...`: Passed (25 unit tests).
 - `go test -v ./internal/mastery/...`: Passed (8 unit tests).
 - `go test -v ./internal/drill/...`: Passed (11 unit tests).
-- `go test -v ./internal/httpapi/...`: Passed (14 unit tests covering all endpoints).
-- `go test -count=1 ./...`: Passed (10/10 packages passed across bank, domain, drill, httpapi, mastery, mathengine, storage, and tutor).
+- `go test -count=1 ./internal/...`: Passed (11/11 packages passed across assets, auth, bank, domain, drill, httpapi, mastery, mathengine, providers, storage, and tutor).
 - `go vet ./internal/... ./cmd/...`: Passed (0 warnings).
 - `gofmt -s -l cmd internal`: Passed (clean formatting).
-- `python scripts/validate_scaffold.py`: Passed (31 Markdown files, 51 local links, 41 JSON files, 35 source directories; draft basics checked).
+- `python scripts/validate_scaffold.py`: Passed (34 Markdown files, 51 local links, 41 JSON files, 35 source directories; draft basics checked).
 - `npm run typecheck` (in `web/`): Passed (strict TypeScript, 0 errors).
-- `npm run test` (in `web/`): Passed (54 unit tests passed in Vitest across 11 files).
-- `npm run test:e2e` (in `web/`): Passed (6 Playwright end-to-end browser tests passed with network disabled, verifying offline math/keyboard navigation, persistent drill recovery, Stage 06 navigation/draft preservation, Stage 07 multi-question navigation/reference library/settings/375px responsive math, Stage 08 concept mastery/scaffolds, and Stage 09 read-only AI tutor streaming/leave protection/notes library/export).
+- `npm run test` (in `web/`): Passed (58 unit tests passed in Vitest across 12 files).
+- `npm run test:e2e` (in `web/`): Passed (7 Playwright end-to-end browser tests passed with network disabled, verifying offline math/keyboard navigation, persistent drill recovery, Stage 06 navigation/draft preservation, Stage 07 multi-question navigation/reference library/settings/375px responsive math, Stage 08 concept mastery/scaffolds, Stage 09 read-only AI tutor streaming/leave protection/notes library/export, and Stage 10 provider settings/vault credential masking/AI tutor badge).
 - `powershell -ExecutionPolicy Bypass -File scripts/test.ps1`: Passed (all verification checks passed end-to-end).
 - `powershell -ExecutionPolicy Bypass -File scripts/build.ps1`: Passed (frontend assets bundled with local MathJax and standalone Go binary compiled to `bin\quant-practice.exe`).
-- `.\bin\quant-practice.exe -notes`: Passed (prints formatted notes library).
-- CI verification fix: Reordered [.github/workflows/ci.yml](file:///.github/workflows/ci.yml), [scripts/test.sh](file:///scripts/test.sh), and [scripts/test.ps1](file:///scripts/test.ps1) so that frontend dependencies and assets are installed and built before `go vet`, `go test`, and binary compilation. This resolves the `internal/assets/assets.go#L9: pattern dist/*: no matching files found` failure caused by Go embed requiring the build bundle on clean runner checkouts. Added [internal/assets/assets_test.go](file:///internal/assets/assets_test.go) to verify embed filesystem integrity.
+- `.\bin\quant-practice.exe -providers`: Passed (prints formatted provider and vault credential table).
+
+### Backlog Additions Recorded
+- Formally scheduled four key features in `PLAN.md`, `REQUIREMENTS.md`, `docs/PROVIDERS.md`, `docs/AI-TUTOR.md`, and `docs/DECISIONS.md`:
+  1. **Excel formula equivalents** (R29): Engine derivations, stage explanations, recaps, and reference library supply standard Excel functions (`=BINOM.DIST`, `=POISSON.DIST`, `=COMBIN`, `=NORM.DIST`).
+  2. **Interactive multi-turn AI tutor chat** (R30): Conversational threads in SQLite, sliding-window budgets, strict answer-withholding guardrails, and flexible note saving.
+  3. **ChatGPT plan sign-in** (R14, Stage 11 [IMPLEMENTED, live verification pending]): Verified local/open-source OAuth integration with PKCE `S256`, loopback redirect callback, dynamic registration, and plan Responses adapter.
+  4. **Local offline LLM provider** (R31): OpenAI-compatible loopback adapter for LM Studio (`localhost:1234`) and Ollama (`localhost:11434`), zero external network calls, true offline generative AI.
 
 ## Next action
 
-Proceed to Stage 10: API-key providers and discovery:
-- Anthropic/Gemini/OpenAI adapters with rate limiting, timeouts, and error handling.
-- Key UI and encrypted storage / OS vault integration.
-- Dynamic model lists, capability discovery, and local cache.
-- Request token and cost budgets.
-- Strict invariant: no external network calls permitted unless explicitly configured and enabled.
+1. **Finish the live Stage 11 gate (needs the user):** sign-in and a live tutor answer are confirmed. Still needed: sign out from Settings > AI Providers > ChatGPT Plan and confirm the account disappears, and note the model used. Record the date, route, model and redacted outcome here, separately from mock checks. If OpenAI rejects the registration or any parameter, record the exact error and fix it against the docs; never borrow another app's client ID.
+2. Commit the Stage 10 and Stage 11 work in reviewable commits once the user approves.
+3. Then Stage 12 (creative candidate workflow) per [PLAN.md](../PLAN.md), or a backlog item if the user reprioritizes (the local LLM provider, R31, can reuse the existing SSE parsing). The curated API-key model defaults in `internal/providers/catalog.go` (Claude 3.5, Gemini 1.5, GPT-4o) are dated and should be refreshed against current catalogs.
 
 ## Unresolved external gates
 
-Actual course syllabus/slides/notation; ChatGPT-plan sign-in account access; native vault integration tests; optional Google project OAuth; continuous distribution/test/regression course details.
+Actual course syllabus/slides/notation; ChatGPT-plan sign-in eligible live account access; live provider API keys for optional non-mock testing; continuous distribution/test/regression course details.

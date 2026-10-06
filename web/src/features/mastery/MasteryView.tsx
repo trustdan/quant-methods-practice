@@ -26,9 +26,9 @@ export const MasteryView: React.FC<MasteryViewProps> = ({ onClose }) => {
           setSummary(data);
           setError(null);
         }
-      } catch (err: any) {
+      } catch (err) {
         if (isMounted) {
-          setError(err.message || 'Failed to load concept mastery');
+          setError((err instanceof Error && err.message) || 'Failed to load concept mastery');
         }
       } finally {
         if (isMounted) {

@@ -52,7 +52,7 @@ describe('AITutorPanel Component', () => {
       },
     });
 
-    global.fetch = vi.fn().mockImplementation((url: string, _opts?: any) => {
+    global.fetch = vi.fn().mockImplementation((url: string, _opts?: RequestInit) => {
       if (url === '/api/tutor/requests') {
         return Promise.resolve({
           ok: true,
@@ -94,7 +94,7 @@ describe('AITutorPanel Component', () => {
   });
 
   it('triggers save note and clears draft', async () => {
-    global.fetch = vi.fn().mockImplementation((url: string, opts?: any) => {
+    global.fetch = vi.fn().mockImplementation((url: string, opts?: RequestInit) => {
       if (url.startsWith('/api/tutor/drafts/')) {
         return Promise.resolve({
           ok: true,

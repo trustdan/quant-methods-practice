@@ -2,7 +2,7 @@
 
 A planned local, keyboard-driven probability and statistics tutor with readable mathematics, progressive problems, persistent practice history, optional AI help, saved explanations, and a skippable space arcade.
 
-**Status: Stages 00 through 08 complete; Stage 09 next, October 5, 2026.** Standalone repository established at `https://github.com/trustdan/quant-methods-practice.git`. Standalone Go executable and React web interface are fully working offline with local MathJax math rendering, 10-question reviewed curriculum bank, deliberate practice scheduling & transfer engine, concept mastery dashboard, offline formula reference library, responsive layout, and complete keyboard navigation.
+**Status: Stages 00 through 10 complete; Stage 11 (ChatGPT plan sign-in) implemented with mock protocol tests, live account verification pending, October 5, 2026.** Standalone repository established at `https://github.com/trustdan/quant-methods-practice.git`. Standalone Go executable and React web interface are fully working offline with local MathJax math rendering, 10-question reviewed curriculum bank, deliberate practice scheduling & transfer engine, concept mastery dashboard, offline formula reference library, personal AI notes library with Markdown export, protected credential vault & AI provider adapters (Anthropic/Gemini/OpenAI), responsive layout, and complete keyboard navigation.
 
 ## Launching the application
 
@@ -16,6 +16,8 @@ To start the local application and open it in your browser immediately:
 CLI inspection tools:
 - `.\bin\quant-practice.exe -list-bank` — View all approved active curriculum questions.
 - `.\bin\quant-practice.exe -mastery` — View current concept retention and transfer status.
+- `.\bin\quant-practice.exe -notes` — View personal saved notes library.
+- `.\bin\quant-practice.exe -providers` — View configured AI provider and vault credential status.
 
 ## Start building
 
@@ -23,7 +25,7 @@ CLI inspection tools:
 2. Resume from [docs/HANDOFF.md](docs/HANDOFF.md), then perform the first unfinished stage in [PLAN.md](PLAN.md).
 3. Inventory actual course materials using [docs/COURSE-MAP.md](docs/COURSE-MAP.md).
 4. Run tests with `.\scripts\test.ps1` or `./scripts/test.sh`.
-5. Proceed to Stage 09 (Read-only tutor and note library) in [PLAN.md](PLAN.md).
+5. Complete the Stage 11 live sign-in check described in [docs/HANDOFF.md](docs/HANDOFF.md), then continue with [PLAN.md](PLAN.md).
 
 ## Selected design
 

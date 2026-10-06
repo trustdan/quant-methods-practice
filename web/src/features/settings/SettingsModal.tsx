@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { ProviderSettings } from '../providers/ProviderSettings';
 
 export interface SessionConfig {
   question_count: number;
@@ -20,6 +21,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   onStartSession,
   currentSettings,
 }) => {
+  const [activeTab, setActiveTab] = useState<'session' | 'providers'>('session');
   const [questionCount, setQuestionCount] = useState<number>(currentSettings?.question_count || 10);
   const [selectedModules, setSelectedModules] = useState<string[]>(currentSettings?.module_ids || []);
   const [intensity, setIntensity] = useState<string>(currentSettings?.intensity || 'standard');
@@ -118,7 +120,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         aria-labelledby="settings-title"
         style={{
           width: '100%',
-          maxWidth: '540px',
+          maxWidth: '620px',
+          maxHeight: '90vh',
+          overflowY: 'auto',
           background: 'var(--bg-surface)',
           border: '1px solid var(--border-subtle)',
           borderRadius: 'var(--radius-lg)',
@@ -137,6 +141,33 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             ✕
           </button>
         </div>
+
+        {/* Tab Navigation */}
+        <div style={{ display: 'flex', gap: '0.5rem', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.5rem' }}>
+          <button
+            type="button"
+            id="tab-session-settings"
+            className={`btn ${activeTab === 'session' ? 'btn-primary' : 'btn-ghost'}`}
+            onClick={() => setActiveTab('session')}
+            style={{ fontSize: '0.85rem', padding: '0.4rem 0.75rem' }}
+          >
+            📚 Session & Curriculum
+          </button>
+          <button
+            type="button"
+            id="tab-provider-settings"
+            className={`btn ${activeTab === 'providers' ? 'btn-primary' : 'btn-ghost'}`}
+            onClick={() => setActiveTab('providers')}
+            style={{ fontSize: '0.85rem', padding: '0.4rem 0.75rem' }}
+          >
+            🔑 AI Providers & Credentials
+          </button>
+        </div>
+
+        {activeTab === 'providers' ? (
+          <ProviderSettings />
+        ) : (
+          <>
 
         {/* Question Count Selector */}
         <div>
@@ -281,6 +312,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             </button>
           </div>
         </div>
+        </>
+        )}
       </div>
     </div>
   );

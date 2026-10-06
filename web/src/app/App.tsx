@@ -571,7 +571,7 @@ export const App: React.FC = () => {
           }
           break;
 
-        case 'NAV_NEXT_PROBLEM':
+        case 'NAV_NEXT_PROBLEM': {
           e.preventDefault();
           const totalQ = session.total_questions || (session.questions ? session.questions.length : 1);
           const curQ = session.current_question_index || 0;
@@ -579,6 +579,7 @@ export const App: React.FC = () => {
             handleNavigateQuestion(curQ + 1);
           }
           break;
+        }
 
         // View tabs
         case 'VIEW_REFERENCE':

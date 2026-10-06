@@ -59,6 +59,16 @@ func (s *Server) handleTutorRequests(w http.ResponseWriter, r *http.Request) {
 		dto.Action = tutor.ActionExplain
 	}
 
+	targetProvider := dto.Provider
+	if targetProvider == "" || targetProvider == "active" {
+		if s.providerManager != nil {
+			targetProvider = s.providerManager.GetActiveRoute()
+		}
+	}
+	if targetProvider == "" {
+		targetProvider = "offline"
+	}
+
 	tutorReq := tutor.TutorRequest{
 		RequestID:       tutor.GenerateRequestID(),
 		SessionID:       dto.SessionID,
@@ -67,7 +77,7 @@ func (s *Server) handleTutorRequests(w http.ResponseWriter, r *http.Request) {
 		Action:          dto.Action,
 		FollowUpKind:    dto.FollowUpKind,
 		CustomPrompt:    dto.CustomPrompt,
-		Provider:        dto.Provider,
+		Provider:        targetProvider,
 		SubmittedAnswer: dto.SubmittedAnswer,
 	}
 
