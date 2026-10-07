@@ -1,4 +1,4 @@
-# Quant Methods Practice
+# Quant Methods Practice [in progress]
 
 A planned local, keyboard-driven probability and statistics tutor with readable mathematics, progressive problems, persistent practice history, optional AI help, saved explanations, and a skippable space arcade.
 
