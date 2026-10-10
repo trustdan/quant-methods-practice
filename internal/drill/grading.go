@@ -144,14 +144,17 @@ func GradeSubmission(
 			if strings.Contains(gradeRes.Reason, "bare percentage") {
 				hint = fmt.Sprintf("Entered %.6g. Did you mean %.6g%%? Bare numbers are interpreted as absolute probabilities; probabilities must be between 0 and 1.", parsed.Value, parsed.Value)
 			} else {
-				hint = "Recall the formula $P(X = k) = \\binom{n}{k} p^k (1-p)^{n-k}$. Compute $\\binom{4}{2} (0.5)^2 (0.5)^2 = 6 \\times 0.0625$."
+				hint = "Check which outcomes belong to the event, the model conditions, and the arithmetic. Use the quantities in this problem."
+				if stage.Instance.ID == "observed_value" {
+					hint = "Count experiments with exactly two heads, then divide by the number of recorded experiments. The denominator is experiments, not individual tosses."
+				}
 			}
 
 			if attemptNum == 1 {
 				att.FeedbackMarkdown = fmt.Sprintf("Not quite. %s", hint)
 				stage.ActiveHint = hint
 			} else {
-				att.FeedbackMarkdown = fmt.Sprintf("Incorrect. The exact probability is **$0.375$** ($3/8$ or $37.5\\%%$).\n\n%s", stage.Instance.ExplanationMarkdown)
+				att.FeedbackMarkdown = fmt.Sprintf("Incorrect. The expected value is **%.10g %s**.\n\n%s", *stage.Instance.ExpectedAnswer.Value, stage.Instance.ExpectedAnswer.Units, stage.Instance.ExplanationMarkdown)
 			}
 		}
 

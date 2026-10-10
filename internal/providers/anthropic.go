@@ -117,7 +117,7 @@ func (a *AnthropicAdapter) Stream(ctx context.Context, req tutor.TutorRequest) (
 			Model:     model,
 			MaxTokens: DefaultMaxTokensPerRequest,
 			Stream:    true,
-			System:    BuildSystemPrompt(),
+			System:    RequestSystemPrompt(req),
 			Messages: []anthropicMessageContent{
 				{Role: "user", Content: BuildUserPrompt(req)},
 			},

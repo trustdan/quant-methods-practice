@@ -15,6 +15,7 @@ const (
 	AssistanceGuidedContrast AssistanceType = "guided_contrast"
 	AssistanceSolutionReveal AssistanceType = "solution_reveal"
 	AssistanceTutor          AssistanceType = "tutor"
+	AssistanceFullSolution   AssistanceType = "full_solution_form"
 )
 
 // SubmittedAnswer captures learner input across choice and numeric forms.

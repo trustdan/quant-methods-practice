@@ -153,7 +153,7 @@ func (c *ChatGPTPlanAdapter) Stream(ctx context.Context, req tutor.TutorRequest)
 
 	payload, err := json.Marshal(planResponsesRequest{
 		Model:        c.DefaultModel,
-		Instructions: BuildSystemPrompt(),
+		Instructions: RequestSystemPrompt(req),
 		Input:        []planInputMessage{{Role: "user", Content: BuildUserPrompt(req)}},
 		Store:        false,
 		Stream:       true,

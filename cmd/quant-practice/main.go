@@ -51,6 +51,19 @@ func main() {
 		providersFlag    = flag.Bool("providers", false, "Display configured AI providers and models and exit")
 	)
 
+	var candidateOpts candidateFlags
+	flag.BoolVar(&candidateOpts.generate, "generate-candidate", false, "Generate and save a local binomial candidate (never auto-approve)")
+	flag.BoolVar(&candidateOpts.list, "candidates", false, "List saved candidates and review history")
+	flag.StringVar(&candidateOpts.preview, "preview-candidate", "", "Print full candidate preview by ID")
+	flag.StringVar(&candidateOpts.importFile, "import-candidate", "", "Import a proposal JSON file as a new draft")
+	flag.StringVar(&candidateOpts.approve, "approve-candidate", "", "Approve a reviewed candidate ID")
+	flag.StringVar(&candidateOpts.reject, "reject-candidate", "", "Reject a candidate ID")
+	flag.StringVar(&candidateOpts.retire, "retire-question", "", "Retire a locally approved candidate ID")
+	flag.StringVar(&candidateOpts.export, "export-bank", "", "Export active approved bank to a new JSON file")
+	flag.IntVar(&candidateOpts.revision, "candidate-revision", 0, "Preview revision required for a review command")
+	flag.StringVar(&candidateOpts.reviewer, "candidate-reviewer", "", "Human reviewer's name")
+	flag.StringVar(&candidateOpts.notes, "candidate-notes", "", "Semantic review findings or rejection/retirement reason")
+	flag.BoolVar(&candidateOpts.semantic, "confirm-semantic-review", false, "Confirm personal review of scenario, assumptions, stages, answers and hints")
 	flag.Parse()
 
 	if *versionFlag {
@@ -111,6 +124,12 @@ func main() {
 	}
 
 	store := storage.NewStore(db, nil)
+	if candidateOpts.requested() {
+		if err := runCandidateCLI(ctx, store, candidateOpts, *seedFlag); err != nil {
+			log.Fatalf("candidate command: %v", err)
+		}
+		return
+	}
 
 	if *masteryFlag {
 		runMastery(store)

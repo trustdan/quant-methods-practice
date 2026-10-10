@@ -126,7 +126,7 @@ func (g *GeminiAdapter) Stream(ctx context.Context, req tutor.TutorRequest) (<-c
 			SystemInstruction: &struct {
 				Parts []geminiPart `json:"parts"`
 			}{
-				Parts: []geminiPart{{Text: BuildSystemPrompt()}},
+				Parts: []geminiPart{{Text: RequestSystemPrompt(req)}},
 			},
 			Contents: []geminiContent{
 				{

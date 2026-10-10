@@ -2,7 +2,7 @@
 
 A planned local, keyboard-driven probability and statistics tutor with readable mathematics, progressive problems, persistent practice history, optional AI help, saved explanations, and a skippable space arcade.
 
-**Status: Stages 00 through 10 complete; Stage 11 (ChatGPT plan sign-in) implemented with mock protocol tests, live account verification pending, October 5, 2026.** Standalone repository established at `https://github.com/trustdan/quant-methods-practice.git`. Standalone Go executable and React web interface are fully working offline with local MathJax math rendering, 10-question reviewed curriculum bank, deliberate practice scheduling & transfer engine, concept mastery dashboard, offline formula reference library, personal AI notes library with Markdown export, protected credential vault & AI provider adapters (Anthropic/Gemini/OpenAI), responsive layout, and complete keyboard navigation.
+**Status: Stages 00 through 13 complete within their documented scope, October 9, 2026. ChatGPT plan sign-in/inference/sign-out verified through user-run checks; see HANDOFF for platform coverage and limitations.** Standalone repository established at `https://github.com/trustdan/quant-methods-practice.git`. Standalone Go executable and React web interface work offline with bundled MathJax, a 10-question reviewed curriculum bank, scheduling and transfer, mastery dashboard, formula references, notes with Markdown export, protected provider credentials, binomial candidate review, and [full-solution worksheets and four-toss CSV cases](docs/WORKSHEETS.md).
 
 ## Launching the application
 
@@ -25,7 +25,7 @@ CLI inspection tools:
 2. Resume from [docs/HANDOFF.md](docs/HANDOFF.md), then perform the first unfinished stage in [PLAN.md](PLAN.md).
 3. Inventory actual course materials using [docs/COURSE-MAP.md](docs/COURSE-MAP.md).
 4. Run tests with `.\scripts\test.ps1` or `./scripts/test.sh`.
-5. Complete the Stage 11 live sign-in check described in [docs/HANDOFF.md](docs/HANDOFF.md), then continue with [PLAN.md](PLAN.md).
+5. Try **Worksheets** (`Shift+J` for full solutions, `Shift+F` for CSV cases), or **Question candidates** (`p`) for reviewed binomial proposals. Continue with Stage 14 (exam mode) in [PLAN.md](PLAN.md).
 
 ## Selected design
 
@@ -36,7 +36,7 @@ CLI inspection tools:
 - A local Go process serves the compiled UI on loopback and opens the browser. No remote hosting, login, Node runtime, or internet is required for packaged offline drills.
 - Provider tokens stay in the backend. ChatGPT sign-in and paid API-key connections are separate routes. Unsupported subscription connections are not offered as working features.
 
-These are chosen architectural defaults, not installed or tested dependencies. A desktop wrapper can be evaluated after the browser release works.
+These architectural choices are implemented and tested locally. Native release packaging remains Stage 19 work; a desktop wrapper can be evaluated separately.
 
 ## Documentation map
 
@@ -71,4 +71,4 @@ The [example question](curriculum/examples/binomial-seven-stage.draft.json) illu
 
 With Python 3.9 or newer installed, run `python scripts/validate_scaffold.py` from this folder. This checks local Markdown links, JSON syntax, required documents/directories, and draft fixture basics. It does not replace JSON Schema validation, math tests, or application tests. Python is only a documentation-check convenience, not a planned application runtime dependency.
 
-No build or launch command is presented as working until Stage 01 creates the application. See [CONTRIBUTING.md](CONTRIBUTING.md) for the development workflow.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the development workflow and HANDOFF for actual platform verification.

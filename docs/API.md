@@ -43,3 +43,27 @@ Navigation command records relevant exposure before returning new content. Grade
 Stream typed events: started, text_delta, complete, fallback, cancelled and error. Include request/session/instance/stage IDs to reject stale UI completions. Client streaming uses an authenticated fetch-compatible design; never put bearer credentials in stream URLs. An explicit cancel aborts upstream work; closing the panel also cancels unless a documented save/recovery transition is pending.
 
 Errors use stable codes, concise messages and recoverable actions. Rate/usage limits cannot trigger another billing route. Cap request/body/response sizes and rate-limit local commands that initiate external calls. Security, save-on-leave and snapshot rules apply to every route, including CLI equivalents.
+
+## Candidate endpoints (Stage 12 implemented)
+
+These endpoints require the launcher's `quant_session` cookie; mutations additionally require the exact app Origin (or an explicitly configured development origin). Bodies are capped at 16 KB and reject unknown fields and trailing JSON documents.
+
+- `GET /api/candidates`: persisted proposals, complete previews and review history (administrative answer material).
+- `POST /api/candidates`: `{mode:"local"|"manual"|"ai", seed:integer, proposal?:object}`. Only manual mode accepts a proposal; AI uses the selected provider and rewrites fixed parameters' wording. Returns a pending candidate, never active content.
+- `POST /api/candidates/{id}/review`: `{expected_revision, action:"approve"|"reject"|"retire", reviewer, notes, semantic_confirmed}`. Approval requires semantic confirmation. Stale/duplicate transitions return 409. Save failures preserve client review input.
+- `GET /api/candidates/export`: active approved bank JSON download including bundled and local approved templates. No drafts, secrets or learner history.
+
+Candidate review changes only the local content bank and append-only review audit. Practice DTOs continue withholding unresolved keys. Candidate content revisions are separate immutable drafts with new IDs; no edit/delete endpoint is exposed.
+
+## Worksheet endpoints (Stage 13)
+
+Require the launcher's `quant_session` cookie; POST also requires the exact app Origin (or configured development Origin). JSON bodies are capped at 128 KiB and reject unknown fields and trailing documents. CSV has its separate 64 KiB/500-row bound. No endpoint accepts paths or trusted canonical keys.
+
+- `GET /api/worksheets`: saved public views, newest update first.
+- `POST /api/worksheets`: `{mode:"full_solution", template_id, seed}` copies approved content. The CSV case takes `{mode:"dataset", csv, seed, reviewer, source_note, reviewed:true}` with full-case semantic confirmation; the theoretical reference is fixed by the server. Returns 201 and a key-withholding public worksheet.
+- `POST /api/worksheets/dataset-preview`: `{csv}` returns validated rows and proposed case snapshots with keys/hints for explicit author review. No persistence or activation. Later practice records reference exposure.
+- `GET /api/worksheets/{id}`: saved public view. A field's key/explanation appears only when that field completes.
+- `POST /api/worksheets/{id}/commands`: `{command_id, expected_revision, type:"save_draft"|"submit", answers:{"instance_id:stage_id":{kind:"choice",option_id}|{kind:"numeric",numeric_raw}}}`. Submit requires all unfinished fields; invalid input rejects the whole form without attempts. Client normalization is discarded. Identical command replay returns its saved result; changed payload/stale revision returns 409. Completed fields/worksheets cannot be edited.
+- `GET /api/worksheets/{id}/export`: safe Markdown attachment from saved public state, without unresolved keys.
+
+See [worksheet scope and review policy](WORKSHEETS.md). Worksheet evidence is separate from independent mastery and bank activation.

@@ -25,6 +25,8 @@ Question snapshots include private canonical answers but unresolved browser DTOs
 
 ## Exams and restart
 
+Stage 13 adds `worksheets` (revision and complete immutable source/problem/data snapshots, drafts, attempts and review state) and `worksheet_commands` (request hash and original result per worksheet/command ID). Worksheet commands commit all state and idempotency in one transaction. A failure cannot persist half a full-form submission. These supported-practice records are separate from drill attempts and mastery projections. Migration 002 preserves migration 001 unchanged and uses the launcher's existing consistent backup callback. See [worksheets](WORKSHEETS.md).
+
 Create exam order and full snapshots before beginning. Persist started_at/deadline_at in UTC; a restart does not reset the clock. Pause behavior must be explicit and course-compatible. Resume from original stored instances and responses. Missing/corrupt snapshots produce a recoverable failure, never regenerated substitute questions. Time changes are handled conservatively and documented.
 
 ## Notes and exports

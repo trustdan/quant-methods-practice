@@ -747,3 +747,34 @@ html, body {
 }
 
 
+
+/* Candidate review keeps complete answer material separate from learner drills. */
+.candidate-review { display: grid; gap: 1rem; }
+.candidate-review[hidden] { display: none; }
+.candidate-layout { display: grid; grid-template-columns: minmax(180px, 260px) minmax(0, 1fr); gap: 1rem; align-items: start; }
+.candidate-layout aside { display: grid; gap: .6rem; }
+.candidate-layout aside button { white-space: normal; text-align: left; }
+.candidate-actions { display: flex; flex-wrap: wrap; gap: .7rem; align-items: end; }
+.candidate-review label { display: grid; gap: .4rem; margin: .7rem 0; }
+.candidate-review input:not([type="checkbox"]), .candidate-review textarea { box-sizing: border-box; width: 100%; padding: .6rem; background: var(--bg-surface-elevated); color: var(--text-primary); border: 1px solid var(--border-color, #475569); border-radius: var(--radius-sm); font: inherit; }
+.candidate-muted { color: var(--text-muted); font-size: .85rem; overflow-wrap: anywhere; }
+.candidate-stage { border-top: 1px solid var(--border-color, #475569); margin-top: 1.3rem; padding-top: .7rem; }
+.candidate-option { padding: .65rem; margin: .5rem 0; background: var(--bg-surface-elevated); border-radius: var(--radius-sm); }
+.candidate-review .candidate-confirm { display: flex; gap: .65rem; align-items: start; }
+.candidate-review-form { border-top: 1px solid var(--border-color, #475569); margin-top: 1.4rem; padding-top: .6rem; }
+@media (max-width: 700px) { .candidate-layout { grid-template-columns: minmax(0,1fr); } }
+/* Full-form practice remains usable at narrow widths and with long math. */
+.worksheet-workspace { display: flex; flex-direction: column; gap: 1rem; min-width: 0; }
+.worksheet-workspace[hidden] { display: none; }
+.worksheet-workspace .card { min-width: 0; }
+.worksheet-workspace input:not([type=radio]):not([type=checkbox]),
+.worksheet-workspace select, .worksheet-workspace textarea { max-width: 100%; box-sizing: border-box; }
+.worksheet-workspace textarea { display: block; width: 100%; margin: .5rem 0; }
+.worksheet-workspace label { overflow-wrap: anywhere; }
+.worksheet-workspace fieldset { min-width: 0; margin: 1rem 0; border: 1px solid var(--border-color, #334155); border-radius: .5rem; padding: 1rem; }
+.worksheet-workspace legend { max-width: 100%; overflow-wrap: anywhere; }
+.worksheet-actions { display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; margin: 1rem 0; }
+.worksheet-actions label { min-width: 0; }
+.worksheet-option { display: flex; align-items: baseline; gap: .5rem; margin: .4rem 0; }
+.worksheet-option .math-markdown { min-width: 0; }
+.worksheet-workspace table { width: 100%; table-layout: fixed; text-align: left; overflow-wrap: anywhere; }

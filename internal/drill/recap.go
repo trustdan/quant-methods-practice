@@ -138,7 +138,7 @@ func formatExpectedAnswer(inst domain.StageInstance) string {
 		return getOptionText(inst.Options, inst.ExpectedAnswer.OptionID)
 	}
 	if inst.Kind == domain.StageKindNumeric && inst.ExpectedAnswer.Value != nil {
-		return fmt.Sprintf("%.4g (3/8 or 37.5%%)", *inst.ExpectedAnswer.Value)
+		return fmt.Sprintf("%.10g %s", *inst.ExpectedAnswer.Value, inst.ExpectedAnswer.Units)
 	}
 	return ""
 }

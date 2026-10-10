@@ -2,8 +2,6 @@
 
 package auth
 
-import "errors"
-
 // DPAPIVault fallback stub on non-Windows platforms.
 type DPAPIVault struct {
 	*FileVault

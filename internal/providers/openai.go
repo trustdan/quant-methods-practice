@@ -122,7 +122,7 @@ func (o *OpenAIAdapter) Stream(ctx context.Context, req tutor.TutorRequest) (<-c
 			Model:  model,
 			Stream: true,
 			Messages: []openAIMessageContent{
-				{Role: "system", Content: BuildSystemPrompt()},
+				{Role: "system", Content: RequestSystemPrompt(req)},
 				{Role: "user", Content: BuildUserPrompt(req)},
 			},
 		}

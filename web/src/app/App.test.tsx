@@ -32,7 +32,6 @@ describe('App Shell', () => {
     render(<App />);
 
     expect(screen.getByText('Quant Methods Practice')).toBeInTheDocument();
-    expect(screen.getByText(/Stage 04 Drill/)).toBeInTheDocument();
     expect(screen.getByText(/Exactly two heads in four tosses/)).toBeInTheDocument();
     expect(screen.getByText(/What should \$X\$ represent\?/)).toBeInTheDocument();
 

@@ -1,6 +1,6 @@
 # Requirements
 
-Status: planned. IDs are stable traceability anchors; completion requires the linked stage's recorded evidence, not a checkbox in this file. See [feature parity](docs/FEATURE-PARITY.md) for the accounting reference.
+Status: implemented through Stage 13 within the scope recorded in PLAN/HANDOFF; later stages remain planned. IDs are stable traceability anchors; completion requires the linked stage's recorded evidence, not a checkbox in this file. See [feature parity](docs/FEATURE-PARITY.md) for the accounting reference.
 
 ## Local runtime and mathematics
 
@@ -42,7 +42,7 @@ Status: planned. IDs are stable traceability anchors; completion requires the li
 | ID | Requirement and acceptance |
 |---|---|
 | R19 | Timed/untimed exams, allowed-aid policy, withheld hints/results, interruption/resume, abandonment, history/report and post-completion question review. Original snapshots and wall-clock deadline survive restart. |
-| R20 | Statistics equivalents of full journal/case practice: structured full solutions and multi-part datasets/cases, checking method, parameters, calculation and interpretation. Progressive and full-solution grading share engine rules. |
+| R20 | Statistics equivalents of full journal/case practice: structured full solutions and multi-part datasets/cases, checking method, parameters, calculation and interpretation. Progressive and full-solution grading share engine rules. Initial Stage 13 scope: approved-bank structured choices/numbers and reviewed four-toss empirical/model CSV cases, with durable drafts/submission/review and Markdown worksheets; see [scope and limits](docs/WORKSHEETS.md). |
 | R21 | Venn regions, discrete PMF/CDF, continuous PDF/CDF/areas, sampling simulations, CI coverage, test-tail diagrams and regression/residual plots. Figures have units, assumptions, textual summaries and keyboard-accessible controls. |
 | R22 | Reference library/glossary, reviewed offline explanations, course notation/parameterization and module objectives. Reference opening marks assistance on the active unresolved problem. Exam aids follow an explicit policy. |
 | R23 | CLI equivalents for bank validation/reconciliation, session defaults, data-dir, seed, mastery/history/export, exams, candidates, provider/model diagnostics, high scores and skip-intro. Mutating content commands require explicit IDs/actions; diagnostics redact credentials. |

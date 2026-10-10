@@ -33,3 +33,15 @@ Start a timed exam, leave/restart, alter bank and resume; original questions/ord
 Build all target binaries and verify archive checksums/contents. Native Windows/macOS/Linux extracted-package checks are separate from cross-compilation. Smoke with Go/Node absent and network disabled, local math/fonts, browser launch fallback, data path and clean shutdown. Check readability at 200% zoom, narrow screen, keyboard-only and reduced-motion modes. Keep learning-effectiveness evaluation separate from correctness and usability.
 
 Once established, normal checks include gofmt, go test ./..., go vet ./..., frontend typecheck/lint/unit/build, focused browser tests and scaffold validation. Repeat broader checks only when changes or failures justify it.
+
+## Native macOS checks
+
+`./scripts/test.sh` uses Python 3, runs frontend typecheck/lint/units, builds the production UI and native executable **before** browser tests, then checks gofmt/tests/vet. Browser tests use `bin/quant-practice` on macOS/Linux and `.exe` on Windows. Playwright uses Chromium on macOS/Linux and Edge on Windows; install the test browser with `cd web && npx playwright install chromium` on a fresh Mac checkout. No browser package is needed by end users. Target a browser test with `npm run test:e2e -- candidates.spec.ts` from `web`.
+
+Stage 12 coverage includes canonical answers for the four supported variations, unknown/forged key rejection, wrong-story semantic attestation, stale/duplicate reviews, atomic review audit and restart, unchanged saved snapshots after revision/retirement, no learning-table changes, authenticated/exact-origin candidate requests, bounded/incomplete/changed-parameter AI output, cancellation/stale UI completion, and an offline browser generation/approval/retirement/export/restart sequence. Test approvals are fixture actions in isolated temporary databases.
+
+## Stage 13 worksheet checks
+
+`go test ./internal/worksheets ./internal/mathengine ./internal/storage ./internal/httpapi` covers shared progressive/full grading over every approved template, hand-derived empirical frequencies, unsafe CSV inputs/limits, invalid-form atomicity, key withholding, snapshot isolation, own-problem numeric reveals, one retry, durable replay, injected transaction failure, migration 001→002 backup and session/Origin/JSON boundaries. Race-check the worksheet/storage/HTTP packages.
+
+`npm run test -- src/features/worksheets/Worksheets.test.tsx` (inside `web`) checks unsaved input navigation, exact command retry after a lost response, editable invalid input and stale-response cancellation. `npm run test:e2e -- worksheets.spec.ts` checks full-form drafts, invalid input, retry, Markdown export and completed review across native restart; offline CSV upload/review/observed-vs-model grading; editable shortcuts and narrow math. Browser servers use temporary databases and block remote requests. Author approvals are synthetic test fixtures, never the user's content.

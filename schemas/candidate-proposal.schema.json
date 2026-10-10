@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Untrusted binomial candidate proposal",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["family_id", "n", "p", "k", "title", "scenario_markdown", "success_label"],
+  "properties": {
+    "family_id": {"const": "binomial_pmf"},
+    "n": {"type": "integer"},
+    "p": {"type": "number"},
+    "k": {"type": "integer"},
+    "title": {"type": "string", "minLength": 1, "maxLength": 200},
+    "scenario_markdown": {"type": "string", "minLength": 1, "maxLength": 6000},
+    "success_label": {"type": "string", "minLength": 1, "maxLength": 120}
+  },
+  "oneOf": [
+    {"properties": {"n": {"const": 4}, "p": {"const": 0.5}, "k": {"const": 2}}},
+    {"properties": {"n": {"const": 8}, "p": {"const": 0.25}, "k": {"const": 2}}},
+    {"properties": {"n": {"const": 6}, "p": {"const": 0.5}, "k": {"const": 3}}},
+    {"properties": {"n": {"const": 10}, "p": {"const": 0.2}, "k": {"const": 2}}}
+  ],
+  "$comment": "Runtime Go validation additionally rejects blank text and limits UTF-8 byte lengths. JSON Schema character length limits are documentation only. Semantic human review is required."
+}

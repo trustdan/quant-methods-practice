@@ -1,6 +1,6 @@
 # Provider connections
 
-Verified from official documentation on **October 4, 2026**; ChatGPT plan protocol reverified **October 5, 2026** (see below). Reverify before implementing each adapter: availability, authentication, model catalogs, limits and request fields change. This scaffold contains no credentials and makes no live-inference claim. See [SOURCES.md](SOURCES.md).
+Verified from official documentation on **October 4, 2026**; ChatGPT plan protocol reverified **October 5, 2026** (see below). Reverify before implementing each adapter: availability, authentication, model catalogs, limits and request fields change. No credentials are committed. User-run ChatGPT plan inference succeeded October 5; macOS sign-in/sign-out succeeded October 9, 2026. The inference model was not recorded; see HANDOFF for evidence limits. See [SOURCES.md](SOURCES.md).
 
 ## Connection matrix
 
@@ -32,7 +32,7 @@ Key properties:
 
 Use the local/open-source integration, not the separate limited-partner website identity flow. Persist this installation's host identifier. Initial authorization uses the documented dynamic-registration entry point; save the account/workspace's issued client ID, not the entry-point identifier. Use the app's own name and registration. Generate fresh PKCE/state/nonce, receive the callback on loopback, validate identity and granted plan permission, and store backend credentials. Keep account registrations separate, refresh/revoke per official metadata, and show the selected account/route. Recheck current eligible-account availability at implementation.
 
-Implemented values (reverified October 5, 2026; live account check still pending):
+Implemented values (protocol reverified October 5, 2026; user-run live gate completed October 9):
 
 - Discovery: `https://auth.openai.com/.well-known/openid-configuration`; issuer `https://auth.openai.com`; authorize `/api/accounts/authorize`; token `/api/accounts/oauth/token`; revoke `/api/accounts/oauth/revoke`; JWKS `/.well-known/jwks.json` (RS256); public client (token endpoint auth method `none`).
 - Authorize: `client_id` (`dynamic_agent_client` for new registration, otherwise the saved issued `oaiapp_...` ID), `agent_name_hint` (new registration only), `ext_agent_host_id` (persisted `urn:uuid:`), optional `id_token_hint`, `response_type=code`, `redirect_uri=http://127.0.0.1:<port>/auth/callback` (fixed path, port may vary, not `localhost`), `scope=openid profile email offline_access resource.invoke chatgpt.tokens.use.direct`, `resource=https://api.openai.com/v1`, `state`, `nonce`, `code_challenge_method=S256`.

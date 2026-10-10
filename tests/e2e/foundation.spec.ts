@@ -4,7 +4,7 @@ import path from 'path';
 import fs from 'fs';
 import os from 'os';
 
-const BIN_PATH = path.resolve(__dirname, '../../bin/quant-practice.exe');
+const BIN_PATH = path.resolve(__dirname, process.platform === 'win32' ? '../../bin/quant-practice.exe' : '../../bin/quant-practice');
 const PORT = 8995;
 
 let serverProcess: ChildProcess | null = null;
@@ -83,7 +83,6 @@ test.describe('Foundation Verification (Offline Math & Keyboard Shell)', () => {
     await expect(page).toHaveTitle('Quant Methods Practice');
     await expect(page.locator('.app-logo')).toContainText('Quant Methods Practice');
     await expect(page.locator('.app-header')).toContainText('Loopback Server Active');
-    await expect(page.locator('.app-header')).toContainText('Stage 04 Drill');
 
     // 2. Verify approved drill scenario and prompt are presented
     await expect(page.getByText('Exactly two heads in four tosses')).toBeVisible();

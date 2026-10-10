@@ -33,6 +33,7 @@ func (b *Bank) Add(tmpl *domain.QuestionTemplate) {
 	b.mu.Lock()
 	defer b.mu.Unlock()
 
+	b.removeLocked(tmpl.ID)
 	b.templates[tmpl.ID] = tmpl
 	b.byModule[tmpl.ModuleID] = append(b.byModule[tmpl.ModuleID], tmpl)
 	b.byFamily[tmpl.FamilyID] = append(b.byFamily[tmpl.FamilyID], tmpl)
@@ -192,4 +193,29 @@ func ValidateBankDir(dir string, reg *Registry) ([]ValidationResult, error) {
 	}
 
 	return results, nil
+}
+
+// Remove excludes content from future selection. Existing session snapshots are separate.
+func (b *Bank) Remove(id string) {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	b.removeLocked(id)
+}
+func (b *Bank) removeLocked(id string) {
+	old, ok := b.templates[id]
+	if !ok {
+		return
+	}
+	delete(b.templates, id)
+	filter := func(src []*domain.QuestionTemplate) []*domain.QuestionTemplate {
+		dst := make([]*domain.QuestionTemplate, 0, len(src))
+		for _, t := range src {
+			if t.ID != id {
+				dst = append(dst, t)
+			}
+		}
+		return dst
+	}
+	b.byModule[old.ModuleID] = filter(b.byModule[old.ModuleID])
+	b.byFamily[old.FamilyID] = filter(b.byFamily[old.FamilyID])
 }

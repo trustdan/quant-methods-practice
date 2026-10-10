@@ -11,9 +11,10 @@ import (
 type TutorAction string
 
 const (
-	ActionHint     TutorAction = "hint"
-	ActionExplain  TutorAction = "explain"
-	ActionFollowUp TutorAction = "follow_up"
+	ActionCandidate TutorAction = "candidate"
+	ActionHint      TutorAction = "hint"
+	ActionExplain   TutorAction = "explain"
+	ActionFollowUp  TutorAction = "follow_up"
 )
 
 // FollowUpKind categorizes specific drill-down follow-up inquiries.

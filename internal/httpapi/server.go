@@ -39,6 +39,8 @@ type Config struct {
 	TutorManager      *tutor.TutorManager
 	Vault             auth.Vault
 	ProviderManager   *providers.ProviderManager
+	CandidateStore    CandidateStore
+	WorksheetStore    WorksheetStore
 }
 
 type Server struct {
@@ -54,6 +56,9 @@ type Server struct {
 	tutorManager      *tutor.TutorManager
 	vault             auth.Vault
 	providerManager   *providers.ProviderManager
+	candidateStore    CandidateStore
+	candidateState    candidateState
+	worksheetStore    WorksheetStore
 	lastSessionID     string
 	mu                sync.RWMutex
 }
@@ -136,6 +141,33 @@ func NewServer(cfg Config) (*Server, error) {
 		providerManager: providerManager,
 	}
 
+	s.candidateStore = cfg.CandidateStore
+	s.worksheetStore = cfg.WorksheetStore
+	if s.worksheetStore == nil && cfg.Store != nil {
+		s.worksheetStore, _ = cfg.Store.(WorksheetStore)
+	}
+	if s.candidateStore == nil && cfg.Store != nil {
+		s.candidateStore, _ = cfg.Store.(CandidateStore)
+	}
+	if s.candidateStore != nil {
+		records, err := s.candidateStore.ListCandidates(context.Background())
+		if err != nil {
+			return nil, fmt.Errorf("loading candidate bank: %w", err)
+		}
+		for _, rec := range records {
+			if rec.Status != "approved" {
+				continue
+			}
+			if _, exists := s.bank.Get(rec.ID); exists {
+				return nil, fmt.Errorf("duplicate approved candidate id %q", rec.ID)
+			}
+			if err := bank.ValidateTemplate(rec.Template, nil); err != nil {
+				return nil, fmt.Errorf("invalid approved candidate: %w", err)
+			}
+			s.bank.Add(rec.Template)
+		}
+	}
+
 	if s.sessionManager != nil && s.bank != nil {
 		s.sessionManager.SetContrastFinder(func(originID, misID string) (*domain.QuestionTemplate, bool) {
 			partnerID, found := mastery.FindContrastPartner(originID, misID)
@@ -160,6 +192,10 @@ func NewServer(cfg Config) (*Server, error) {
 	mux.HandleFunc("/api/practice/sessions/", s.handlePracticeSessionByID)
 	mux.HandleFunc("/api/tutor/requests", s.handleTutorRequests)
 	mux.HandleFunc("/api/tutor/requests/", s.handleTutorRequestByID)
+	mux.HandleFunc("/api/candidates", s.handleCandidates)
+	mux.HandleFunc("/api/candidates/", s.handleCandidates)
+	mux.HandleFunc("/api/worksheets", s.handleWorksheets)
+	mux.HandleFunc("/api/worksheets/", s.handleWorksheets)
 	mux.HandleFunc("/api/notes", s.handleNotes)
 	mux.HandleFunc("/api/notes/", s.handleNoteByID)
 	mux.HandleFunc("/api/exports", s.handleExports)

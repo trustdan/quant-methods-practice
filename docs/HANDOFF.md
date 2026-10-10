@@ -1,6 +1,69 @@
 # Handoff
 
-## Current state - October 5, 2026
+## Stage 13 — October 9, 2026 (macOS)
+
+Stage 00 through Stage 13 are complete within their documented scope. Stage 14 (exam mode) is next. All Mac-session changes, including Stage 12, remain local and uncommitted.
+
+### Implemented
+
+- `internal/worksheets`: approved-bank full-form snapshots using the progressive instantiator and `drill.GradeSubmission`; complete-form validation without partial attempts, one causal hint/retry per incorrect field, read-only completed review, public key withholding and Markdown worksheets. Approved source template/rule/approval, seed, parameters, option order and numeric policies are preserved independently of current bank state.
+- `internal/mathengine/frequency.go` and worksheet CSV/case builder: generic relative frequency for recorded four-toss experiments, compared with the existing fair-independent-coin reference. Strict UTF-8/two-column/64 KiB/500-row import, unique safe IDs and counts 0–4; no expressions, file paths or inferred schemas. Hand-derived fixtures and mathematical references are recorded in `docs/WORKSHEETS.md`. Actual course sources remain absent (`course-materials/private` contains only `.gitkeep`).
+- Case creation requires human review of the complete author preview (wording, options, hints, assumptions, keys and numeric policies), reviewer/source note and explicit confirmation. The dataset and semantic approval record are immutable. Full-form attempts are `full_solution_form`; cases also record `reference`, retries `hint`/`retry`, and reveals are on stage state. No worksheet evidence enters independent mastery/transfer, and no case enters the approved bank automatically.
+- `internal/storage/{worksheets.go,migrations/002_worksheets.sql}`: separate worksheet state and command results, atomic revision checks, request hashes, exact idempotent replay after restart. Existing migration 001 is unchanged. Launch upgrade uses the existing consistent pre-migration backup. No drill/mastery table is written by worksheet commands.
+- `internal/httpapi/worksheets.go`: authenticated/exact-Origin, strictly decoded bounded create/list/get/preview/command/Markdown-export endpoints. Shared app-session guard replaces duplicate candidate guard. Storage failures return a redacted 500 so the browser retains the exact pending request; validation errors consume no attempts.
+- `web/src/features/worksheets`, App and CSS: Worksheets tab, Shift+J/Shift+F, all fields together, saved/history selection, bounded CSV upload/paste and semantic preview, durable draft, full submission/retry, solution review/download, navigation/stale-response handling, explicit uncertain-command retry, editable-field protection and narrow-screen math. Updated shortcut help. Removed obsolete “Stage 04 Drill” badge assertions; actual shell/drill/navigation checks remain.
+- `internal/drill/grading.go`: incorrect numeric feedback now reveals the saved problem's own key instead of hardcoded `0.375`, with no hardcoded original-coin arithmetic in the first hint. Empirical numeric errors explain the experiment denominator.
+- Docs: WORKSHEETS, API, STORAGE, TESTING, README, REQUIREMENTS and PLAN describe scope and evidence. Free-prose grading, arbitrary CSV schemas, other dataset families, course-specific cases, worksheet CLI and mastery contribution remain outside this initial scope.
+
+### Actual checks
+
+- Final `./scripts/test.sh` passed natively on macOS: scaffold, frontend typecheck/lint, 70 unit tests in 15 files, production frontend/native Go build, all 12 offline Playwright tests, gofmt, uncached Go tests across 14 internal packages and command package, and go vet. Older unrelated React `act(...)` warnings remain; new worksheet tests pass without them.
+- Final `go test -race ./internal/worksheets ./internal/storage ./internal/httpapi` passed. Coverage includes every approved template's progressive/full agreement, safe CSV boundaries, snapshot isolation, own-key numeric reveal, hint/assistance, no mastery writes, restart and duplicate/stale/changed commands, injected transaction failure, 001→002 backup preservation, authenticated/exact-Origin endpoints, hidden keys and redacted save failure/retry.
+- Focused worksheet browser run passed both flows: full-form draft and completed review across native restart, invalid input consumes no attempts, hinted numeric retry, Markdown export, editable shortcuts and 375px math; offline CSV file upload, explicit semantic approval, `2/5` observed versus `3/8` theoretical, preserved dataset/review after restart.
+- Initial sandboxed browser launch could not start its loopback child; the permitted native run resolved that environment boundary. Early shortcut tests sent keys before app initialization; they now wait for authenticated readiness. Full-suite obsolete badge assertions blocked the first drill test and caused dependent restart/note failures; removing the obsolete assertions produced a clean full run. No unrelated note behavior was changed.
+- No live provider calls or real-user content approvals were made. Synthetic case approvals use temporary test databases. No native Windows/Linux run is claimed.
+- Final scaffold validation and `git diff --check` passed; the seven older browser verification screenshots were restored to committed versions. Stopped the older Stage 12 server and launched the verified app with `./scripts/start.sh`. The existing real database was backed up automatically (`quant-methods.db.backup-1791603925`) before migration 002. The app is left running at `http://127.0.0.1:64203/` (homepage HTTP 200), opened for user review. No real worksheet was submitted or case approved by the agent.
+
+## Stage 12 — October 9, 2026 (macOS)
+
+Stage 00 through Stage 12 are complete within the documented binomial candidate scope. Stage 13 (full solutions and cases) is next. All changes from this Mac session remain local and uncommitted.
+
+### Implemented
+
+- `internal/candidates`: strict, key-free proposal contract; four deterministic finite `(n,p,k)` sets; seven-stage binomial exactly-k builder deriving numeric truth from Go; semantic-review attestation and immutable approval/rejection/retirement transitions. Wording variants retain the existing setting group. Other families/parameters fail closed.
+- `internal/storage/candidates.go`: durable candidate records and atomic revision-checked approval audit using existing Stage 05 tables; no migration needed. Existing snapshots/attempts/mastery are untouched.
+- `internal/httpapi/candidates.go` and `candidate_generation.go`: session-authenticated, exact-Origin, bounded create/list/review/export endpoints; provider output capped at 12 KB with a 60-second timeout, completion requirement, fixed-parameter enforcement and cancellation. No automatic AI call or activation.
+- `internal/httpapi/server.go`, `internal/bank/bank.go`: approved local content reloads at startup and joins future selection; retirement removes all selection indices. Duplicate replacement no longer duplicates module/family index entries.
+- `internal/providers/{prompt,anthropic,gemini,openai,chatgpt}.go`, `internal/tutor/types.go`: separate candidate wording prompt over existing adapters/budgets. Provider protocols/billing routes are unchanged; no live AI-generation request was made.
+- `cmd/quant-practice/{main,candidates}.go`: generation/import/list/preview/approve/reject/retire/export CLI equivalents, with review revision/name/notes/semantic attestation. CLI changes require an already running app to restart its in-memory bank.
+- `web/src/features/candidates`: complete sanitized math preview, source/seed, review findings, approval/rejection/retirement, separate immutable wording drafts, approved-bank download, cancellation/stale response protection and preserved review input on failure. App tab/`p` shortcut; settings close refreshes the selected AI route. No generated content was approved in the user's real database.
+- `internal/drill/recap.go`: removed a hardcoded “3/8 or 37.5%” suffix that incorrectly appeared for every numeric answer.
+- `web/src/features/practice/PracticeDrill.tsx`: wrap action buttons on narrow screens; the Mac browser check found 381 px content at a 375 px viewport.
+- `scripts/test.sh`, `web/playwright.config.ts`, `web/scripts/test-e2e.js`, `tests/e2e/{foundation,candidates}.spec.ts`: native Mac binary/Chromium support; Python 3, lint and gofmt checks; fresh build before browser tests; focused test arguments; isolated data for candidate approval/restart checks.
+- Docs: README, REQUIREMENTS, PLAN, QUESTION-BANK, API, TESTING and `schemas/candidate-proposal.schema.json` describe implementation and limits. Approved candidates are immutable; changing wording creates a separate draft/content ID at version 1 with fresh approval. In-place version editing, new-family generation and retirement of source-controlled bundled curriculum are outside this initial workflow.
+
+### Actual checks
+
+- `./scripts/test.sh`: passed natively on macOS (frontend typecheck/lint, 68 unit tests in 14 files, production frontend + native Go build, all 10 Playwright browser tests, gofmt, uncached Go tests across 13 internal packages, go vet). Existing unrelated React `act(...)` warnings remain in older tests; assertions passed.
+- `go test -race ./internal/candidates ./internal/storage ./internal/httpapi`: passed. Coverage includes structural/forged key rejection, wrong-story approval attestation, canonical numeric fixtures, stale/duplicate review, persisted audit/restart, immutable old snapshots, no learning writes, session/Origin checks, bounded/incomplete/changed-parameter provider output and cancellation.
+- CLI smoke in an automatically cleaned temporary directory: generate, preview, approve synthetic fixture, reject stale approval, export 11 active templates, retire and read persisted audit all passed. No real learner or provider data used.
+- Browser failures found during implementation were fixed: textarea's wrapping label accumulated its value and stopped exact label matching; labels now use explicit `for`/`id`. Narrow practice-button overflow fixed. The notes search failure caused by the aborted earlier restart test disappeared on the successful full suite.
+- Final `python3 scripts/validate_scaffold.py` and `git diff --check` passed. Browser-generated replacements of older verification screenshots were restored to their committed versions.
+- Stopped the earlier local server and reopened the fresh build via `./scripts/start.sh`; homepage returned HTTP 200 at `http://127.0.0.1:63632/`. The app is left running for user review.
+- No native Windows/Linux run or live AI-generation test was performed in this Mac session. Existing sign-in/inference evidence remains recorded separately below.
+
+## macOS continuation — October 9, 2026
+
+- Working tree was clean on arrival; Stage 10/11 changes are already committed (including `99114fa`, titled `stage 11 complete`). The older uncommitted-work statement below is stale.
+- Installed Go 1.27.2 with Homebrew; existing Node v26.7.0/npm 11.19.0. Installed frontend dependencies with `npm ci`.
+- Made `scripts/start.sh`, `scripts/build.sh`, and `scripts/test.sh` executable. Removed an unused `errors` import from `internal/auth/dpapi_vault_other.go` that prevented non-Windows compilation.
+- Frontend production build and native `go build -o bin/quant-practice ./cmd/quant-practice` passed. `npm run lint` passed; targeted MathMarkdown/ChatGPTPlanPanel tests passed (11 tests). `go test ./internal/auth ./internal/siwc` passed natively on macOS.
+- Launched via `./scripts/start.sh`, which opened the browser and loaded 10 approved templates. Mac runtime data lives in `~/Library/Application Support/quant-methods-practice`.
+- **Live (user-run, October 9):** user reports successful ChatGPT sign-in and sign-out on macOS. Together with the October 5 user-run streamed tutor answer over the `chatgpt` plan route, this closes Stage 11's sign-in/inference/sign-out gate. Model used was not recorded; no additional Mac inference or independent server-side revocation audit is claimed. Full verification suite was not rerun in this session.
+- At this launch checkpoint Stage 00 through Stage 11 were complete; Stage 12 was next and is now implemented in the record above.
+- Updated README, PLAN, PROVIDERS and this handoff to reflect the user-run gate. `python3 scripts/validate_scaffold.py` and `git diff --check` passed after these documentation changes.
+
+## Historical state - October 5, 2026
 
 Stage 00 through Stage 10 are complete and verified. Stage 11 (ChatGPT plan sign-in) is **implemented and mock-verified; live verification is pending** an eligible ChatGPT account sign-in, inference and sign-out (the stage's exit gate). Stage 10 and Stage 11 work is uncommitted in the working tree. The standalone repository is active on branch `main` at `https://github.com/trustdan/quant-methods-practice.git`.
 
@@ -316,10 +379,10 @@ Earlier Stage 10 record:
 
 ## Next action
 
-1. **Finish the live Stage 11 gate (needs the user):** sign-in and a live tutor answer are confirmed. Still needed: sign out from Settings > AI Providers > ChatGPT Plan and confirm the account disappears, and note the model used. Record the date, route, model and redacted outcome here, separately from mock checks. If OpenAI rejects the registration or any parameter, record the exact error and fix it against the docs; never borrow another app's client ID.
-2. Commit the Stage 10 and Stage 11 work in reviewable commits once the user approves.
-3. Then Stage 12 (creative candidate workflow) per [PLAN.md](../PLAN.md), or a backlog item if the user reprioritizes (the local LLM provider, R31, can reuse the existing SSE parsing). The curated API-key model defaults in `internal/providers/catalog.go` (Claude 3.5, Gemini 1.5, GPT-4o) are dated and should be refreshed against current catalogs.
+1. Continue with Stage 14 (exam mode) per [PLAN.md](../PLAN.md): inspect immutable snapshots, deadlines, aid/feedback withholding, restart and report policy before implementation. Stage 13 workflow and limits are in [WORKSHEETS.md](WORKSHEETS.md).
+2. Mac launch fixes, Stage 12/13 implementation and October 9 documentation remain local changes; Stage 10/11 implementation is already committed.
+3. The curated API-key model defaults in `internal/providers/catalog.go` (Claude 3.5, Gemini 1.5, GPT-4o) are dated and should be refreshed against current catalogs when that work is taken up.
 
 ## Unresolved external gates
 
-Actual course syllabus/slides/notation; ChatGPT-plan sign-in eligible live account access; live provider API keys for optional non-mock testing; continuous distribution/test/regression course details.
+Actual course syllabus/slides/notation; live provider API keys for optional non-mock testing; continuous distribution/test/regression course details.

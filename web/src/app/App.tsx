@@ -12,11 +12,16 @@ import { ReferenceLibrary } from '../features/reference/ReferenceLibrary';
 import { SettingsModal, SessionConfig } from '../features/settings/SettingsModal';
 import { MasteryView } from '../features/mastery/MasteryView';
 import { NoteLibraryView } from '../features/notes/NoteLibraryView';
+import { CandidateReview } from '../features/candidates/CandidateReview';
+import { Worksheets, WorksheetMode } from '../features/worksheets/Worksheets';
 import { AITutorPanel } from '../features/tutor/AITutorPanel';
 
 export const App: React.FC = () => {
   const [session, setSession] = useState<PublicSessionView>(DEFAULT_BINOMIAL_SESSION);
-  const [activeTab, setActiveTab] = useState<'drill' | 'reference' | 'gallery' | 'mastery' | 'notes'>('drill');
+  const [activeTab, setActiveTab] = useState<'drill' | 'reference' | 'gallery' | 'mastery' | 'notes' | 'candidates' | 'worksheets'>('drill');
+  const [candidatesVisited, setCandidatesVisited] = useState(false);
+  const [worksheetsVisited, setWorksheetsVisited] = useState(false);
+  const [worksheetMode, setWorksheetMode] = useState<WorksheetMode>('full_solution');
   const [showTutorModal, setShowTutorModal] = useState<boolean>(false);
   const [showSettingsModal, setShowSettingsModal] = useState<boolean>(false);
   const [settingsConfig, setSettingsConfig] = useState<SessionConfig>({
@@ -490,7 +495,7 @@ export const App: React.FC = () => {
         ? 'leave_intent'
         : showHelpModal || showSettingsModal
         ? 'modal'
-        : activeTab === 'gallery'
+        : (activeTab === 'gallery' || activeTab === 'candidates' || activeTab === 'worksheets')
         ? 'reading'
         : session.stages[session.current_stage_index]?.kind === 'choice'
         ? 'practice_choice'
@@ -523,7 +528,7 @@ export const App: React.FC = () => {
             handleCloseHelp();
           } else if (showLeaveModal) {
             handleLeaveCancel();
-          } else if (activeTab === 'mastery' || activeTab === 'reference' || activeTab === 'notes') {
+          } else if (activeTab === 'mastery' || activeTab === 'reference' || activeTab === 'notes' || activeTab === 'candidates' || activeTab === 'worksheets') {
             setActiveTab('drill');
           }
           break;
@@ -557,7 +562,7 @@ export const App: React.FC = () => {
         case 'SCROLL_HALF_UP':
         case 'SCROLL_TOP':
         case 'SCROLL_BOTTOM':
-          if (activeTab === 'gallery') {
+          if (activeTab === 'gallery' || activeTab === 'candidates' || activeTab === 'worksheets') {
             e.preventDefault();
             handleReadingScroll(cmd);
           }
@@ -565,6 +570,7 @@ export const App: React.FC = () => {
 
         // Big problem navigation
         case 'NAV_PREV_PROBLEM':
+          if (activeTab === 'candidates' || activeTab === 'worksheets') break;
           e.preventDefault();
           if (session.current_question_index !== undefined && session.current_question_index > 0) {
             handleNavigateQuestion(session.current_question_index - 1);
@@ -572,6 +578,7 @@ export const App: React.FC = () => {
           break;
 
         case 'NAV_NEXT_PROBLEM': {
+          if (activeTab === 'candidates' || activeTab === 'worksheets') break;
           e.preventDefault();
           const totalQ = session.total_questions || (session.questions ? session.questions.length : 1);
           const curQ = session.current_question_index || 0;
@@ -582,6 +589,15 @@ export const App: React.FC = () => {
         }
 
         // View tabs
+        case 'VIEW_FULL_SOLUTION':
+        case 'VIEW_DATASET_CASE':
+          if (!isFieldActive) {
+            e.preventDefault();
+            setWorksheetsVisited(true);
+            setWorksheetMode(cmd === 'VIEW_DATASET_CASE' ? 'dataset' : 'full_solution');
+            setActiveTab('worksheets');
+          }
+          break;
         case 'VIEW_REFERENCE':
           if (!isFieldActive) {
             e.preventDefault();
@@ -610,6 +626,14 @@ export const App: React.FC = () => {
           }
           break;
 
+        case 'VIEW_CANDIDATE_REVIEW':
+          if (!isFieldActive) {
+            e.preventDefault();
+            setCandidatesVisited(true);
+            setActiveTab(prev => prev === 'candidates' ? 'drill' : 'candidates');
+          }
+          break;
+
         case 'VIEW_AI_REQUEST':
           if (!isFieldActive) {
             e.preventDefault();
@@ -635,7 +659,7 @@ export const App: React.FC = () => {
             <div className="app-logo-badge">Q</div>
             <span>Quant Methods Practice</span>
           </div>
-          <span className="badge badge-emerald">Stage 04 Drill (Offline)</span>
+          <span className="badge badge-emerald">Offline practice</span>
         </div>
 
         {/* Tab Navigation */}
@@ -682,6 +706,14 @@ export const App: React.FC = () => {
             title="AI Tutor Panel (n)"
           >
             <span className="kbd">n</span> 💡 AI Tutor
+          </button>
+          <button className={`btn ${activeTab === 'candidates' ? 'btn-primary' : 'btn-outline'}`}
+            onClick={() => { setCandidatesVisited(true); setActiveTab('candidates'); }} id="tab-candidates" title="Question candidates (p)">
+            Question candidates
+          </button>
+          <button className={`btn ${activeTab === 'worksheets' ? 'btn-primary' : 'btn-outline'}`}
+            onClick={() => { setWorksheetsVisited(true); setActiveTab('worksheets'); }} title="Full solution (Shift+J) or dataset case (Shift+F)">
+            Worksheets
           </button>
           <button
             className={`btn ${activeTab === 'gallery' ? 'btn-primary' : 'btn-outline'}`}
@@ -762,6 +794,8 @@ export const App: React.FC = () => {
 
       {/* Main Workspace */}
       <main className="app-main" ref={readingContainerRef}>
+        {candidatesVisited && <CandidateReview active={activeTab === 'candidates' && !showSettingsModal && !showTutorModal} />}
+        {worksheetsVisited && <Worksheets active={activeTab === 'worksheets' && !showSettingsModal && !showTutorModal && !showHelpModal && !showLeaveModal} launchMode={worksheetMode} />}
         {activeTab === 'mastery' && (
           <MasteryView onClose={() => setActiveTab('drill')} />
         )}
@@ -955,9 +989,10 @@ export const App: React.FC = () => {
 
               <div>
                 <h4 style={{ color: 'var(--accent-cyan)', margin: '0 0 0.4rem 0', fontSize: '0.95rem' }}>
-                  3. Reading Views (Recap &amp; Gallery)
+                  3. Reading Views &amp; Worksheets
                 </h4>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                  <div>Full solution: <span className="kbd">Shift+J</span>. CSV dataset case: <span className="kbd">Shift+F</span>. Use Tab to move between form fields; save the worksheet draft before closing.</div>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <span style={{ color: 'var(--text-muted)' }}>Line Scroll:</span>
                     <span><span className="kbd">j</span> / <span className="kbd">k</span></span>

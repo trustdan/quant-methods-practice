@@ -100,8 +100,12 @@ func TestMigrationsIdempotency(t *testing.T) {
 	if err != nil {
 		t.Fatalf("GetAppliedMigrations failed: %v", err)
 	}
-	if len(applied) != 1 {
-		t.Errorf("expected 1 applied migration, got %d", len(applied))
+	all, err := LoadMigrations()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(applied) != len(all) {
+		t.Errorf("expected %d applied migrations, got %d", len(all), len(applied))
 	}
 }
 

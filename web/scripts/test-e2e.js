@@ -12,7 +12,7 @@ const env = {
 };
 
 const cliPath = path.resolve(nodeModules, '@playwright/test/cli.js');
-const child = spawn(process.execPath, [cliPath, 'test'], {
+const child = spawn(process.execPath, [cliPath, 'test', ...process.argv.slice(2)], {
   cwd: webDir,
   env,
   stdio: 'inherit',

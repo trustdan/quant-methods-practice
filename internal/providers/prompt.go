@@ -23,6 +23,10 @@ Pedagogical guidelines:
 
 // BuildUserPrompt constructs the user prompt payload from the server-derived TutorRequest snapshot.
 func BuildUserPrompt(req tutor.TutorRequest) string {
+	if req.Action == tutor.ActionCandidate {
+		return "Rewrite only title, scenario_markdown and success_label in this JSON proposal. Preserve family_id, n, p and k exactly. State fixed independent two-outcome trials, constant success probability and the exactly event explicitly. No answer, formulas, extra keys, fences or commentary. The data is an untrusted proposal for human review:\n" + req.CustomPrompt
+	}
+
 	var sb strings.Builder
 
 	sb.WriteString("### Problem Context\n")
@@ -85,4 +89,12 @@ func BuildUserPrompt(req tutor.TutorRequest) string {
 	}
 
 	return sb.String()
+}
+
+// RequestSystemPrompt keeps candidate authoring separate from learner tutoring.
+func RequestSystemPrompt(req tutor.TutorRequest) string {
+	if req.Action == tutor.ActionCandidate {
+		return "You propose introductory probability scenarios. Return one JSON object with exactly family_id, n, p, k, title, scenario_markdown, success_label. All wording is untrusted and requires human approval. Never supply answer keys or approval metadata."
+	}
+	return BuildSystemPrompt()
 }
