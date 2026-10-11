@@ -4,8 +4,21 @@ import { UniformVisual } from './UniformVisual';
 import { ExponentialVisual } from './ExponentialVisual';
 import { DiscreteVisual } from './DiscreteVisual';
 import { VennVisual } from './VennVisual';
+import { SamplingVisual } from './SamplingVisual';
+import { ConfidenceIntervalVisual } from './ConfidenceIntervalVisual';
+import { HypothesisTestVisual } from './HypothesisTestVisual';
+import { RegressionVisual } from './RegressionVisual';
 
-export type VisualTab = 'normal' | 'uniform' | 'exponential' | 'discrete' | 'venn';
+export type VisualTab =
+  | 'normal'
+  | 'uniform'
+  | 'exponential'
+  | 'discrete'
+  | 'venn'
+  | 'sampling'
+  | 'ci'
+  | 'hypothesis'
+  | 'regression';
 
 interface VisualsExplorerProps {
   initialTab?: VisualTab;
@@ -24,6 +37,10 @@ export const VisualsExplorer: React.FC<VisualsExplorerProps> = ({
     { id: 'exponential', label: 'Exponential Distribution', badge: 'Continuous Exp(λ)' },
     { id: 'discrete', label: 'Discrete PMF / CDF', badge: 'Binomial & Poisson' },
     { id: 'venn', label: 'Venn Diagram', badge: 'Set Probability' },
+    { id: 'sampling', label: 'Sampling & CLT', badge: 'Module 4 Simulation' },
+    { id: 'ci', label: 'Confidence Intervals', badge: 'Module 4 Coverage' },
+    { id: 'hypothesis', label: 'Hypothesis Testing', badge: 'Module 5 Rejection' },
+    { id: 'regression', label: 'Linear Regression', badge: 'Module 6 OLS & Residuals' },
   ];
 
   return (
@@ -32,7 +49,7 @@ export const VisualsExplorer: React.FC<VisualsExplorerProps> = ({
         <div>
           <h2 className="card-title" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
             Mathematical Visuals &amp; Distribution Lab
-            <span className="badge badge-purple">Module 1 - 3 Figures</span>
+            <span className="badge badge-purple">Module 1 - 6 Interactive Figures</span>
           </h2>
           <p style={{ margin: '0.2rem 0 0', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
             Interactive, keyboard-operable SVG statistical visualizations reconciling exact Go math engine results with spreadsheet formulas.
@@ -79,6 +96,10 @@ export const VisualsExplorer: React.FC<VisualsExplorerProps> = ({
         {activeTab === 'exponential' && <ExponentialVisual />}
         {activeTab === 'discrete' && <DiscreteVisual />}
         {activeTab === 'venn' && <VennVisual />}
+        {activeTab === 'sampling' && <SamplingVisual />}
+        {activeTab === 'ci' && <ConfidenceIntervalVisual />}
+        {activeTab === 'hypothesis' && <HypothesisTestVisual />}
+        {activeTab === 'regression' && <RegressionVisual />}
       </div>
     </div>
   );

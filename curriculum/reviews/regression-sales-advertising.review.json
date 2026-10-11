@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "template_id": "regression_sales_advertising",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-10T22:30:00Z",
+  "delegation_basis": "Stage 16 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "linear_regression",
+    "parameters": {
+      "n": 5,
+      "slope": 1.8,
+      "intercept": 12.8,
+      "r": 0.9,
+      "r_squared": 0.81,
+      "x_pred": 6.0
+    },
+    "canonical_probability": 0.81,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 20.0,
+      "variance": 10.0,
+      "standard_deviation": 3.162277
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.01,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 4,
+    "concept_count": 4,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "calculate_slope", "kind": "choice", "evidence": "regression_slope_calculation"},
+      {"id": "calculate_intercept", "kind": "choice", "evidence": "regression_intercept_calculation"},
+      {"id": "predict_response", "kind": "choice", "evidence": "regression_fitted_prediction"},
+      {"id": "association_vs_causation", "kind": "choice", "evidence": "regression_association_not_causation"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Verified mathematically: b1 = 18/10 = 1.8. b0 = 20 - 1.8*4 = 12.8. At x=6: yHat = 23.6. r = 0.90, R^2 = 0.81. Association != causation emphasized."
+}

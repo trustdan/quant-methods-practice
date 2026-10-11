@@ -6,6 +6,10 @@ import { UniformVisual } from './UniformVisual';
 import { ExponentialVisual } from './ExponentialVisual';
 import { DiscreteVisual } from './DiscreteVisual';
 import { VennVisual } from './VennVisual';
+import { SamplingVisual } from './SamplingVisual';
+import { ConfidenceIntervalVisual } from './ConfidenceIntervalVisual';
+import { HypothesisTestVisual } from './HypothesisTestVisual';
+import { RegressionVisual } from './RegressionVisual';
 
 describe('VisualsExplorer & Distribution Visuals', () => {
   beforeEach(() => {
@@ -20,6 +24,10 @@ describe('VisualsExplorer & Distribution Visuals', () => {
     expect(screen.getByText('Exponential Distribution')).toBeDefined();
     expect(screen.getByText('Discrete PMF / CDF')).toBeDefined();
     expect(screen.getByText('Venn Diagram')).toBeDefined();
+    expect(screen.getByText('Sampling & CLT')).toBeDefined();
+    expect(screen.getByText('Confidence Intervals')).toBeDefined();
+    expect(screen.getByText('Hypothesis Testing')).toBeDefined();
+    expect(screen.getByText('Linear Regression')).toBeDefined();
   });
 
   it('switches active distribution view when tabs are clicked', () => {
@@ -32,17 +40,21 @@ describe('VisualsExplorer & Distribution Visuals', () => {
     fireEvent.click(screen.getByText('Uniform Distribution'));
     expect(screen.getByText(/Uniform Distribution Explorer/i)).toBeDefined();
 
-    // Switch to Exponential Distribution
-    fireEvent.click(screen.getByText('Exponential Distribution'));
-    expect(screen.getByText(/Exponential Distribution Explorer/i)).toBeDefined();
+    // Switch to Sampling & CLT
+    fireEvent.click(screen.getByText('Sampling & CLT'));
+    expect(screen.getByText(/Central Limit Theorem & Sampling Distribution Lab/i)).toBeDefined();
 
-    // Switch to Discrete PMF / CDF
-    fireEvent.click(screen.getByText('Discrete PMF / CDF'));
-    expect(screen.getByText(/Discrete Distribution Explorer/i)).toBeDefined();
+    // Switch to Confidence Intervals
+    fireEvent.click(screen.getByText('Confidence Intervals'));
+    expect(screen.getByText(/Confidence Interval Coverage Explorer/i)).toBeDefined();
 
-    // Switch to Venn Diagram
-    fireEvent.click(screen.getByText('Venn Diagram'));
-    expect(screen.getByText(/Venn Diagram Explorer/i)).toBeDefined();
+    // Switch to Hypothesis Testing
+    fireEvent.click(screen.getByText('Hypothesis Testing'));
+    expect(screen.getByText(/Hypothesis Testing & Rejection Region Lab/i)).toBeDefined();
+
+    // Switch to Linear Regression
+    fireEvent.click(screen.getByText('Linear Regression'));
+    expect(screen.getByText(/Simple Linear Regression & Residuals Lab/i)).toBeDefined();
   });
 
   it('NormalVisual toggles between PDF and CDF modes and updates cutoff', async () => {
@@ -197,7 +209,6 @@ describe('VisualsExplorer & Distribution Visuals', () => {
 
     render(<VennVisual />);
 
-    // Click union button
     const unionBtn = screen.getByRole('button', { name: /A ∪ B \(Union\)/i });
     fireEvent.click(unionBtn);
 
@@ -207,5 +218,151 @@ describe('VisualsExplorer & Distribution Visuals', () => {
 
     expect(screen.getByText('P(A ∪ B) = P(A) + P(B) - P(A ∩ B)')).toBeDefined();
     expect(screen.getByText('Independent')).toBeDefined();
+  });
+
+  it('SamplingVisual displays CLT histogram and standard error metrics', async () => {
+    const mockSampling = {
+      family: 'sampling',
+      pop_distribution: 'skewed',
+      pop_mean: 3.0,
+      pop_std_dev: 2.45,
+      sample_size: 25,
+      trials: 400,
+      standard_error: 0.49,
+      empirical_mean: 3.02,
+      empirical_std_err: 0.485,
+      bars: [{ bin_mid: 3.0, count: 50, density: 0.65, theoretical_density: 0.68 }],
+      normal_curve: [{ x: 3.0, pdf: 0.68, cdf: 0.5 }],
+      clt_note: 'Central Limit Theorem holds.',
+      excel_formula: '=NORM.DIST(x_bar, 3, 2.45 / SQRT(25), TRUE)',
+      summary: 'Sampling Distribution: n = 25, 400 trials.',
+    };
+
+    globalThis.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => mockSampling,
+    }) as unknown as typeof fetch;
+
+    render(<SamplingVisual />);
+
+    await waitFor(() => {
+      expect(screen.getByText(/Central Limit Theorem Holds/i)).toBeDefined();
+    });
+
+    expect(screen.getByText(/0.485/)).toBeDefined();
+    expect(screen.getByText(/=NORM.DIST\(x_bar, 3, 2.45 \/ SQRT\(25\), TRUE\)/)).toBeDefined();
+  });
+
+  it('ConfidenceIntervalVisual displays interval coverage and nominal level', async () => {
+    const mockCI = {
+      family: 'confidence_interval',
+      confidence_level: 0.95,
+      alpha: 0.05,
+      true_mean: 50.0,
+      sigma: 10.0,
+      sample_size: 16,
+      num_intervals: 25,
+      intervals: [
+        { index: 1, sample_mean: 51.2, lower_bound: 46.1, upper_bound: 56.3, captures_truth: true },
+        { index: 2, sample_mean: 43.1, lower_bound: 38.0, upper_bound: 48.2, captures_truth: false },
+      ],
+      captured_count: 24,
+      empirical_coverage: 0.96,
+      excel_formula: '=CONFIDENCE.T(0.05, s, 16)',
+      summary: '95.0% Confidence Interval Simulation: 24 of 25 captured.',
+    };
+
+    globalThis.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => mockCI,
+    }) as unknown as typeof fetch;
+
+    render(<ConfidenceIntervalVisual />);
+
+    await waitFor(() => {
+      expect(screen.getByText('96.0%')).toBeDefined();
+    });
+
+    expect(screen.getAllByText(/24 of 25 captured/i).length).toBeGreaterThan(0);
+    expect(screen.getByText('=CONFIDENCE.T(0.05, s, 16)')).toBeDefined();
+  });
+
+  it('HypothesisTestVisual displays decision and rejection rule', async () => {
+    const mockHyp = {
+      family: 'hypothesis_test',
+      test_type: 'mean_t',
+      tail: 'two_tailed',
+      null_hypothesis: 'mu = 50',
+      alt_hypothesis: 'mu != 50',
+      null_value: 50.0,
+      sample_stat: 53.5,
+      sample_size: 25,
+      standard_error: 1.6,
+      test_statistic: 2.188,
+      degrees_of_freedom: 24,
+      p_value: 0.0386,
+      alpha: 0.05,
+      critical_value: 2.064,
+      critical_value_2: -2.064,
+      reject_null: true,
+      decision: 'Reject H0',
+      rejection_region: '|t| >= 2.064',
+      excel_formula: '=T.DIST.2T(2.188, 24)',
+      summary: 'Test statistic t = 2.188. Reject H0.',
+      points: [{ x: 0, pdf: 0.39, cdf: 0.5 }],
+    };
+
+    globalThis.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => mockHyp,
+    }) as unknown as typeof fetch;
+
+    render(<HypothesisTestVisual />);
+
+    await waitFor(() => {
+      expect(screen.getByText('REJECT H0')).toBeDefined();
+    });
+
+    expect(screen.getByText(/Reject \$H_0\$ if \|t\| >= 2.064/i)).toBeDefined();
+    expect(screen.getByText('=T.DIST.2T(2.188, 24)')).toBeDefined();
+  });
+
+  it('RegressionVisual displays OLS equation, R^2, and association warning', async () => {
+    const mockReg = {
+      family: 'regression',
+      dataset_name: 'advertising_sales',
+      n: 8,
+      points: [{ x: 2, y: 15 }],
+      slope: 1.8,
+      intercept: 12.8,
+      correlation: 0.90,
+      r_squared: 0.81,
+      std_err_est: 1.45,
+      equation: 'y_hat = 1.8*x + 12.8',
+      association_note: 'Association is not causation.',
+      excel_formula: '=SLOPE(...)',
+      residuals: [{ x: 2, y: 15, y_hat: 16.4, residual: -1.4 }],
+      line_start_x: 1,
+      line_start_y: 14.6,
+      line_end_x: 9,
+      line_end_y: 29.0,
+      predicted_x: 5.0,
+      predicted_y: 21.8,
+      summary: 'Linear Regression: y_hat = 1.8*x + 12.8.',
+    };
+
+    globalThis.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => mockReg,
+    }) as unknown as typeof fetch;
+
+    render(<RegressionVisual />);
+
+    await waitFor(() => {
+      expect(screen.getByText(/Association is not causation/i)).toBeDefined();
+    });
+
+    expect(screen.getByText(/Residual standard deviation/i)).toBeDefined();
+    expect(screen.getByText(/81.0% of variance in \$Y\$ explained/i)).toBeDefined();
   });
 });

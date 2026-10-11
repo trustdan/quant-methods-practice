@@ -467,4 +467,98 @@ func TestRejectInvalidContinuousDistributionParameters(t *testing.T) {
 			}
 		})
 	}
+
+	// Sampling distribution
+	sampFam, ok := reg.Get("sampling_distribution")
+	if !ok {
+		t.Fatal("sampling_distribution not registered")
+	}
+	sampCases := []struct {
+		name    string
+		params  map[string]interface{}
+		wantErr bool
+	}{
+		{"valid mean", map[string]interface{}{"stat": "mean", "mu": 50.0, "sigma": 10.0, "n": 25}, false},
+		{"valid proportion", map[string]interface{}{"stat": "proportion", "p": 0.4, "n": 100}, false},
+		{"missing n", map[string]interface{}{"mu": 50.0, "sigma": 10.0}, true},
+		{"negative n", map[string]interface{}{"mu": 50.0, "sigma": 10.0, "n": -5}, true},
+		{"missing sigma for mean", map[string]interface{}{"stat": "mean", "mu": 50.0, "n": 25}, true},
+	}
+	for _, tc := range sampCases {
+		t.Run("sampling_"+tc.name, func(t *testing.T) {
+			err := sampFam.ValidateParameters(1, tc.params)
+			if (err != nil) != tc.wantErr {
+				t.Errorf("sampling ValidateParameters() error = %v, wantErr %v", err, tc.wantErr)
+			}
+		})
+	}
+
+	// Confidence interval
+	ciFam, ok := reg.Get("confidence_interval")
+	if !ok {
+		t.Fatal("confidence_interval not registered")
+	}
+	ciCases := []struct {
+		name    string
+		params  map[string]interface{}
+		wantErr bool
+	}{
+		{"valid mean z", map[string]interface{}{"parameter": "mean_z", "n": 36, "confidence_level": 0.95, "sigma": 12.0}, false},
+		{"missing confidence_level", map[string]interface{}{"parameter": "mean_z", "n": 36}, true},
+		{"invalid confidence_level", map[string]interface{}{"n": 36, "confidence_level": 1.5}, true},
+	}
+	for _, tc := range ciCases {
+		t.Run("ci_"+tc.name, func(t *testing.T) {
+			err := ciFam.ValidateParameters(1, tc.params)
+			if (err != nil) != tc.wantErr {
+				t.Errorf("ci ValidateParameters() error = %v, wantErr %v", err, tc.wantErr)
+			}
+		})
+	}
+
+	// Hypothesis test
+	hypFam, ok := reg.Get("hypothesis_test")
+	if !ok {
+		t.Fatal("hypothesis_test not registered")
+	}
+	hypCases := []struct {
+		name    string
+		params  map[string]interface{}
+		wantErr bool
+	}{
+		{"valid test", map[string]interface{}{"null_value": 50.0, "n": 25, "alpha": 0.05, "tail": "two_tailed"}, false},
+		{"missing alpha", map[string]interface{}{"null_value": 50.0, "n": 25}, true},
+		{"missing null_value", map[string]interface{}{"n": 25, "alpha": 0.05}, true},
+	}
+	for _, tc := range hypCases {
+		t.Run("hyp_"+tc.name, func(t *testing.T) {
+			err := hypFam.ValidateParameters(1, tc.params)
+			if (err != nil) != tc.wantErr {
+				t.Errorf("hyp ValidateParameters() error = %v, wantErr %v", err, tc.wantErr)
+			}
+		})
+	}
+
+	// Linear regression
+	regFam, ok := reg.Get("linear_regression")
+	if !ok {
+		t.Fatal("linear_regression not registered")
+	}
+	regCases := []struct {
+		name    string
+		params  map[string]interface{}
+		wantErr bool
+	}{
+		{"valid regression", map[string]interface{}{"slope": 1.5, "intercept": 2.0, "n": 10}, false},
+		{"missing slope", map[string]interface{}{"intercept": 2.0, "n": 10}, true},
+		{"missing intercept", map[string]interface{}{"slope": 1.5, "n": 10}, true},
+	}
+	for _, tc := range regCases {
+		t.Run("regression_"+tc.name, func(t *testing.T) {
+			err := regFam.ValidateParameters(1, tc.params)
+			if (err != nil) != tc.wantErr {
+				t.Errorf("regression ValidateParameters() error = %v, wantErr %v", err, tc.wantErr)
+			}
+		})
+	}
 }

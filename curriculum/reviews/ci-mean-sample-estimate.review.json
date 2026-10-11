@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "template_id": "ci_mean_sample_estimate",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-10T22:30:00Z",
+  "delegation_basis": "Stage 16 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "confidence_interval",
+    "parameters": {
+      "parameter": "mean_t",
+      "point_estimate": 25.0,
+      "s": 2.0,
+      "n": 16,
+      "confidence_level": 0.95
+    },
+    "canonical_probability": 0.95,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 25.0,
+      "variance": 4.0,
+      "standard_deviation": 2.0
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "critical_value_selection", "kind": "choice", "evidence": "ci_t_distribution_degrees_of_freedom"},
+      {"id": "margin_of_error", "kind": "choice", "evidence": "ci_margin_of_error_calculation"},
+      {"id": "interval_interpretation", "kind": "choice", "evidence": "ci_population_parameter_interpretation"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Verified mathematically: n = 16, df = 15, s = 2.0. SE = 2.0 / 4 = 0.50. t_{0.025, 15} = 2.1314495. MOE = 1.0657. [23.934, 26.066]."
+}

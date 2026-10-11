@@ -143,7 +143,41 @@ test('distribution visuals lab, continuous PDF/CDF evaluation, interactive Venn 
   await expect(unionBtn).toHaveAttribute('aria-pressed', 'true');
   await expect(page.locator('#venn-formula')).toContainText('cup');
 
-  // 7. Responsive check on narrow viewport (375px mobile)
+  // 7. Switch to Sampling Distribution (CLT) tab
+  const samplingTab = page.locator('#tab-visual-sampling');
+  await samplingTab.click();
+  const samplingTitle = page.getByRole('heading', { name: /Central Limit Theorem & Sampling Distribution/i });
+  await expect(samplingTitle).toBeVisible();
+  await expect(page.locator('#sampling-stats-theoretical-se')).toBeVisible();
+  await expect(page.locator('#sampling-excel-formula')).toContainText('SQRT');
+
+  // 8. Switch to Confidence Intervals tab
+  const ciTab = page.locator('#tab-visual-ci');
+  await ciTab.click();
+  const ciTitle = page.getByRole('heading', { name: /Confidence Interval Coverage Explorer/i });
+  await expect(ciTitle).toBeVisible();
+  await expect(page.locator('#ci-coverage-rate')).toBeVisible();
+  await expect(page.locator('#ci-excel-formula')).toContainText('CONFIDENCE');
+
+  // 9. Switch to Hypothesis Testing tab
+  const htTab = page.locator('#tab-visual-hypothesis');
+  await htTab.click();
+  const htTitle = page.getByRole('heading', { name: /Hypothesis Testing & Rejection Region/i });
+  await expect(htTitle).toBeVisible();
+  await expect(page.locator('#ht-decision-badge')).toBeVisible();
+  await expect(page.locator('#ht-excel-formula')).toContainText('DIST');
+
+  // 10. Switch to Simple Linear Regression tab
+  const regTab = page.locator('#tab-visual-regression');
+  await regTab.click();
+  const regTitle = page.getByRole('heading', { name: /Simple Linear Regression & Residuals/i });
+  await expect(regTitle).toBeVisible();
+  await expect(page.locator('#reg-slope-value')).toBeVisible();
+  await expect(page.locator('#reg-r2-value')).toBeVisible();
+  await expect(page.locator('#reg-association-warning')).toBeVisible();
+  await expect(page.locator('#reg-excel-formula')).toContainText('SLOPE');
+
+  // 11. Responsive check on narrow viewport (375px mobile)
   await page.setViewportSize({ width: 375, height: 667 });
   await page.waitForTimeout(300);
   const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);
@@ -152,12 +186,12 @@ test('distribution visuals lab, continuous PDF/CDF evaluation, interactive Venn 
   // Restore desktop viewport
   await page.setViewportSize({ width: 1280, height: 800 });
 
-  // 8. Capture verified screenshot for audit
+  // 12. Capture verified screenshot for audit
   const screenshotDir = path.join(__dirname, 'screenshots');
   if (!fs.existsSync(screenshotDir)) {
     fs.mkdirSync(screenshotDir, { recursive: true });
   }
-  const screenshotPath = path.join(screenshotDir, 'stage15_verified.png');
+  const screenshotPath = path.join(screenshotDir, 'stage16_verified.png');
   await page.screenshot({ path: screenshotPath, fullPage: true });
   expect(fs.existsSync(screenshotPath)).toBe(true);
 

@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "regression_sales_advertising",
+  "version": 1,
+  "status": "active",
+  "family_id": "linear_regression",
+  "rule_version": 1,
+  "module_id": "module_6",
+  "title": "Linear regression of sales revenue on advertising expenditure",
+  "scenario_markdown": "A retail firm analyzes advertising spending ($X$, in thousands of dollars) and monthly sales revenue ($Y$, in thousands of dollars) across 5 regional stores ($n = 5$). Summary calculations yield: $\\bar{x} = 4.0$, $\\bar{y} = 20.0$, $SS_{xx} = 10.0$, $SS_{yy} = 40.0$, and $SS_{xy} = 18.0$. Fit an Ordinary Least Squares (OLS) line $\\hat{y} = b_0 + b_1 x$.",
+  "parameters": {
+    "n": 5,
+    "slope": 1.8,
+    "intercept": 12.8,
+    "r": 0.9,
+    "r_squared": 0.81,
+    "x_pred": 6.0
+  },
+  "assumptions": [
+    "Linear relationship between advertising expenditure and sales revenue",
+    "Independent observations across the 5 stores",
+    "Constant error variance (homoscedasticity) and approximately normal errors"
+  ],
+  "concept_ids": ["regression_slope_calculation", "regression_intercept_calculation", "regression_fitted_prediction", "regression_association_not_causation"],
+  "setting_group": "retail_store_sales_regression",
+  "source_refs": ["Course Module 6: Regression Analysis", "docs/COURSE-MAP.md"],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-10T22:30:00Z",
+    "notes": "Reviewed derivation: b1 = 18.0 / 10.0 = 1.8. b0 = 20.0 - 1.8 * 4.0 = 12.8. Equation: y_hat = 12.8 + 1.8*x. At x = 6.0: y_hat = 23.6. r = 18 / sqrt(400) = 0.90, R^2 = 0.81.",
+    "delegation_basis": "Stage 16 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "calculate_slope",
+      "kind": "choice",
+      "prompt_markdown": "Compute the slope of the regression line: $b_1 = \\frac{SS_{xy}}{SS_{xx}}$.",
+      "options": [
+        {"id": "slope_correct", "text_markdown": "$b_1 = 1.80$ ($18.0 / 10.0$)", "misconception_id": null, "hint_markdown": null},
+        {"id": "slope_inverted", "text_markdown": "$b_1 = 0.556$ ($10.0 / 18.0$)", "misconception_id": "inverted_slope_ratio", "hint_markdown": "Slope is $b_1 = SS_{xy} / SS_{xx}$, with $SS_{xx}$ in the denominator."},
+        {"id": "slope_used_ssyy", "text_markdown": "$b_1 = 0.450$ ($18.0 / 40.0$)", "misconception_id": "used_ssyy_in_denominator", "hint_markdown": "The denominator of the OLS slope is $SS_{xx}$, not $SS_{yy}$."}
+      ],
+      "expected_answer": {"kind": "choice", "option_id": "slope_correct"},
+      "evidence_concept_ids": ["regression_slope_calculation"],
+      "explanation_markdown": "$b_1 = \\frac{SS_{xy}}{SS_{xx}} = \\frac{18.0}{10.0} = 1.800$. For every additional thousand dollars spent on advertising, predicted sales increase by $1.8$ thousand dollars ($1,800). Excel formula: `=SLOPE(y_range, x_range)`.",
+      "numeric_policy": null
+    },
+    {
+      "id": "calculate_intercept",
+      "kind": "choice",
+      "prompt_markdown": "Compute the $y$-intercept of the regression line: $b_0 = \\bar{y} - b_1 \\bar{x}$.",
+      "options": [
+        {"id": "intercept_correct", "text_markdown": "$b_0 = 12.80$ ($20.0 - 1.8 \\times 4.0$)", "misconception_id": null, "hint_markdown": null},
+        {"id": "intercept_added", "text_markdown": "$b_0 = 27.20$ ($20.0 + 1.8 \\times 4.0$)", "misconception_id": "added_instead_of_subtracted_slope_term", "hint_markdown": "The intercept is $b_0 = \\bar{y} - b_1\\bar{x}$, subtracting the slope component."},
+        {"id": "intercept_swapped_means", "text_markdown": "$b_0 = -32.0$ ($4.0 - 1.8 \\times 20.0$)", "misconception_id": "swapped_x_and_y_means", "hint_markdown": "Start with $\\bar{y} = 20.0$, not $\\bar{x} = 4.0$."}
+      ],
+      "expected_answer": {"kind": "choice", "option_id": "intercept_correct"},
+      "evidence_concept_ids": ["regression_intercept_calculation"],
+      "explanation_markdown": "$b_0 = \\bar{y} - b_1 \\bar{x} = 20.0 - (1.800)(4.0) = 20.0 - 7.2 = 12.800$. When advertising expenditure is zero ($X = 0$), predicted baseline sales revenue is $12.8$ thousand dollars ($12,800). Excel formula: `=INTERCEPT(y_range, x_range)`.",
+      "numeric_policy": null
+    },
+    {
+      "id": "predict_response",
+      "kind": "choice",
+      "prompt_markdown": "Using the fitted model $\\hat{y} = 12.8 + 1.8x$, predict the sales revenue (in thousands of dollars) for a store with $x = 6.0$ thousand dollars in advertising expenditure.",
+      "options": [
+        {"id": "pred_correct", "text_markdown": "$\\hat{y} = 23.60$ thousand dollars ($12.8 + 1.8 \\times 6.0$)", "misconception_id": null, "hint_markdown": null},
+        {"id": "pred_forgot_intercept", "text_markdown": "$\\hat{y} = 10.80$ thousand dollars ($1.8 \\times 6.0$)", "misconception_id": "omitted_intercept_in_prediction", "hint_markdown": "Do not forget to add the base intercept $b_0 = 12.8$."},
+        {"id": "pred_swapped_coefficients", "text_markdown": "$\\hat{y} = 78.60$ thousand dollars ($1.8 + 12.8 \\times 6.0$)", "misconception_id": "swapped_slope_and_intercept", "hint_markdown": "The slope is $1.8$ multiplying $x$; $12.8$ is the constant intercept."}
+      ],
+      "expected_answer": {"kind": "choice", "option_id": "pred_correct"},
+      "evidence_concept_ids": ["regression_fitted_prediction"],
+      "explanation_markdown": "Substituting $x = 6.0$ into the estimated regression equation yields $\\hat{y} = 12.8 + 1.8(6.0) = 12.8 + 10.8 = 23.600$ thousand dollars ($23,600).",
+      "numeric_policy": null
+    },
+    {
+      "id": "association_vs_causation",
+      "kind": "choice",
+      "prompt_markdown": "The correlation is $r = 0.90$, giving a coefficient of determination $R^2 = 0.81$. Which statement correctly interprets this result?",
+      "options": [
+        {"id": "variation_explained_no_causation", "text_markdown": "$81\\%$ of the variation in store sales is explained by advertising spending in this linear model; however, this association does not prove advertising caused the sales increase.", "misconception_id": null, "hint_markdown": null},
+        {"id": "advertising_causes_sales", "text_markdown": "Because $R^2 = 0.81$ is high, this regression proves that increasing advertising directly causes $81\\%$ higher sales revenue.", "misconception_id": "infer_causation_from_correlation", "hint_markdown": "Observational regression models establish association, not causal proof. Omitted variables like store size or location could explain the relationship."},
+        {"id": "eighty_one_percent_points_fit", "text_markdown": "$81\\%$ of the data points lie exactly on the regression line.", "misconception_id": "confuse_r2_with_point_proportion", "hint_markdown": "$R^2$ is the proportion of total sum of squares explained by the model ($SSR / SST$), not the percentage of points lying on the line."}
+      ],
+      "expected_answer": {"kind": "choice", "option_id": "variation_explained_no_causation"},
+      "evidence_concept_ids": ["regression_association_not_causation"],
+      "explanation_markdown": "$R^2 = r^2 = (0.90)^2 = 0.81$ means that $81\\%$ of the total variation in sales ($SST$) is accounted for by the linear relationship with advertising ($SSR$). However, correlation does not imply causation: third factors (such as city demographics or store size) might drive both advertising budgets and sales volume.",
+      "numeric_policy": null
+    }
+  ]
+}

@@ -4,7 +4,7 @@ import { MathMarkdown } from '../../components/MathMarkdown';
 export interface ReferenceEntry {
   id: string;
   title: string;
-  category: 'foundations' | 'distributions' | 'properties';
+  category: 'foundations' | 'distributions' | 'properties' | 'inference';
   module: string;
   summary: string;
   formulaTex?: string;
@@ -250,6 +250,81 @@ A random variable $X \\sim \\text{Exp}(\\lambda)$ with rate $\\lambda > 0$:
       'Assuming mechanical wear-out: the exponential distribution models pure random failure without aging.',
     ],
   },
+  {
+    id: 'sampling_clt',
+    title: 'Central Limit Theorem & Confidence Intervals',
+    category: 'inference',
+    module: 'Module 4: Sampling & Estimation',
+    summary: 'Sampling distributions of the mean, standard error, and confidence interval estimation.',
+    formulaTex: '\\bar{X} \\sim N\\left(\\mu, \\frac{\\sigma^2}{n}\\right), \\quad E = t^* \\cdot \\frac{s}{\\sqrt{n}}',
+    contentMarkdown: `
+- **Central Limit Theorem (CLT)**: For any population with mean $\\mu$ and finite standard deviation $\\sigma$, the sampling distribution of the sample mean $\\bar{X}$ approaches a normal distribution as sample size $n$ increases ($n \\ge 30$ heuristic):
+  $$\\bar{X} \\sim N\\left(\\mu, \\frac{\\sigma^2}{n}\\right), \\quad SE = \\frac{\\sigma}{\\sqrt{n}}$$
+- **Confidence Intervals**:
+  - Known $\\sigma$: $\\bar{x} \\pm z^* \\frac{\\sigma}{\\sqrt{n}}$
+  - Unknown $\\sigma$ ($s$): $\\bar{x} \\pm t^* \\frac{s}{\\sqrt{n}}$ with $df = n - 1$
+- **Excel Formulas**:
+  - \`=CONFIDENCE.NORM(alpha, sigma, n)\`
+  - \`=CONFIDENCE.T(alpha, s, n)\`
+  - \`=T.INV.2T(alpha, df)\`
+    `,
+    pitfalls: [
+      'Using the normal Z distribution when population sigma is unknown (must use Student t with df = n - 1).',
+      'Interpreting a 95% confidence interval as containing 95% of individual data observations.',
+    ],
+  },
+  {
+    id: 'hypothesis_testing_framework',
+    title: 'Hypothesis Testing & p-Value Decision Rules',
+    category: 'inference',
+    module: 'Module 5: Hypothesis Testing',
+    summary: 'Null and alternative hypotheses, test statistics, critical rejection regions, and error types.',
+    formulaTex: 't = \\frac{\\bar{x} - \\mu_0}{s / \\sqrt{n}}, \\quad \\text{Reject } H_0 \\iff p < \\alpha',
+    contentMarkdown: `
+- **Formulating Hypotheses**:
+  - Null hypothesis: $H_0: \\mu = \\mu_0$ (baseline assumption)
+  - Directional Alternative: $H_a: \\mu > \\mu_0$ or $\\mu < \\mu_0$
+  - Two-Sided Alternative: $H_a: \\mu \\ne \\mu_0$
+- **Test Statistic**:
+  $$t = \\frac{\\bar{x} - \\mu_0}{s / \\sqrt{n}} \\quad (df = n - 1)$$
+- **Decision Rule**:
+  - If $p\\text{-value} < \\alpha$: Reject $H_0$ in favor of $H_a$.
+  - If $p\\text{-value} \\ge \\alpha$: Fail to reject $H_0$ (insufficient evidence).
+- **Decision Errors**:
+  - Type I error ($\\alpha$): False positive (rejecting a true $H_0$).
+  - Type II error ($\\beta$): False negative (failing to reject a false $H_0$).
+    `,
+    pitfalls: [
+      'Concluding that failing to reject H0 proves H0 is true.',
+      'Putting sample statistics into hypotheses (e.g. H0: x_bar = 50 instead of H0: mu = 50).',
+    ],
+  },
+  {
+    id: 'simple_linear_regression',
+    title: 'Simple Linear Regression & Correlation',
+    category: 'inference',
+    module: 'Module 6: Regression Analysis',
+    summary: 'Ordinary Least Squares (OLS) line, correlation r, R-squared, residuals, and association vs causation.',
+    formulaTex: '\\hat{y} = b_0 + b_1 x, \\quad b_1 = \\frac{SS_{xy}}{SS_{xx}}, \\quad R^2 = \\frac{SSR}{SST}',
+    contentMarkdown: `
+- **Fitted Model**: $\\hat{y} = b_0 + b_1 x$
+  - Slope: $b_1 = \\frac{SS_{xy}}{SS_{xx}} = r \\frac{s_y}{s_x}$
+  - Intercept: $b_0 = \\bar{y} - b_1 \\bar{x}$
+- **Residuals**: $e_i = y_i - \\hat{y}_i$ (sum to zero in OLS with intercept).
+- **Coefficient of Determination**:
+  $$R^2 = r^2 = \\frac{SSR}{SST} = 1 - \\frac{SSE}{SST}$$
+  Represents the proportion of total variation in $Y$ explained by the linear relationship with $X$.
+- **Excel Formulas**:
+  - \`=SLOPE(y_range, x_range)\`
+  - \`=INTERCEPT(y_range, x_range)\`
+  - \`=CORREL(x_range, y_range)\`
+  - \`=RSQ(y_range, x_range)\`
+    `,
+    pitfalls: [
+      'Assuming correlation implies causation (omitted confounding variables or reverse causality).',
+      'Extrapolating predictions far outside the range of observed X data.',
+    ],
+  },
 ];
 
 interface ReferenceLibraryProps {
@@ -317,6 +392,7 @@ export const ReferenceLibrary: React.FC<ReferenceLibraryProps> = ({ onClose }) =
             { id: 'foundations', label: 'Probability & Sets' },
             { id: 'distributions', label: 'Distributions' },
             { id: 'properties', label: 'Moments & Variance' },
+            { id: 'inference', label: 'Inference & Regression' },
           ].map((cat) => (
             <button
               key={cat.id}

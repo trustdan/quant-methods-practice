@@ -502,6 +502,242 @@ func (e *ExponentialFamily) ValidateParameters(ruleVersion int, params map[strin
 	return nil
 }
 
+// SamplingDistributionFamily implements the sampling distribution family.
+type SamplingDistributionFamily struct{}
+
+func NewSamplingDistributionFamily() *SamplingDistributionFamily {
+	return &SamplingDistributionFamily{}
+}
+
+func (s *SamplingDistributionFamily) ID() string {
+	return "sampling_distribution"
+}
+
+func (s *SamplingDistributionFamily) SupportedRuleVersions() []int {
+	return []int{1}
+}
+
+func (s *SamplingDistributionFamily) ValidateParameters(ruleVersion int, params map[string]interface{}) error {
+	if ruleVersion != 1 {
+		return fmt.Errorf("sampling_distribution unsupported rule_version %d (supported: 1)", ruleVersion)
+	}
+
+	allowed := map[string]bool{
+		"stat": true, "mu": true, "sigma": true, "p": true, "n": true, "pop_size": true, "pop_is_normal": true,
+	}
+	for k := range params {
+		if !allowed[k] {
+			return fmt.Errorf("sampling_distribution unknown parameter %q", k)
+		}
+	}
+
+	rawN, ok := params["n"]
+	if !ok {
+		return fmt.Errorf("sampling_distribution missing required parameter \"n\"")
+	}
+	n, ok := toFloat(rawN)
+	if !ok || n <= 0 || math.Floor(n) != n {
+		return fmt.Errorf("sampling_distribution parameter \"n\" must be a positive integer, got %v", rawN)
+	}
+
+	rawStat, hasStat := params["stat"]
+	stat := "mean"
+	if hasStat {
+		if sStr, ok := rawStat.(string); ok {
+			stat = sStr
+		}
+	}
+
+	if stat == "proportion" {
+		rawP, ok := params["p"]
+		if !ok {
+			return fmt.Errorf("sampling_distribution proportion requires parameter \"p\"")
+		}
+		p, ok := toFloat(rawP)
+		if !ok || p <= 0 || p >= 1 {
+			return fmt.Errorf("sampling_distribution parameter \"p\" must be in (0, 1), got %v", rawP)
+		}
+	} else {
+		// mean
+		rawMu, ok := params["mu"]
+		if !ok {
+			return fmt.Errorf("sampling_distribution missing parameter \"mu\"")
+		}
+		if _, ok := toFloat(rawMu); !ok {
+			return fmt.Errorf("sampling_distribution parameter \"mu\" must be a number, got %v", rawMu)
+		}
+
+		rawSigma, ok := params["sigma"]
+		if !ok {
+			return fmt.Errorf("sampling_distribution missing parameter \"sigma\"")
+		}
+		sigma, ok := toFloat(rawSigma)
+		if !ok || sigma <= 0 {
+			return fmt.Errorf("sampling_distribution parameter \"sigma\" must be strictly positive, got %v", rawSigma)
+		}
+	}
+
+	return nil
+}
+
+// ConfidenceIntervalFamily implements the confidence interval family.
+type ConfidenceIntervalFamily struct{}
+
+func NewConfidenceIntervalFamily() *ConfidenceIntervalFamily {
+	return &ConfidenceIntervalFamily{}
+}
+
+func (c *ConfidenceIntervalFamily) ID() string {
+	return "confidence_interval"
+}
+
+func (c *ConfidenceIntervalFamily) SupportedRuleVersions() []int {
+	return []int{1}
+}
+
+func (c *ConfidenceIntervalFamily) ValidateParameters(ruleVersion int, params map[string]interface{}) error {
+	if ruleVersion != 1 {
+		return fmt.Errorf("confidence_interval unsupported rule_version %d (supported: 1)", ruleVersion)
+	}
+
+	allowed := map[string]bool{
+		"parameter": true, "point_estimate": true, "n": true, "confidence_level": true,
+		"sigma": true, "s": true, "successes": true,
+	}
+	for k := range params {
+		if !allowed[k] {
+			return fmt.Errorf("confidence_interval unknown parameter %q", k)
+		}
+	}
+
+	rawN, ok := params["n"]
+	if !ok {
+		return fmt.Errorf("confidence_interval missing required parameter \"n\"")
+	}
+	n, ok := toFloat(rawN)
+	if !ok || n <= 0 || math.Floor(n) != n {
+		return fmt.Errorf("confidence_interval parameter \"n\" must be a positive integer, got %v", rawN)
+	}
+
+	rawCL, ok := params["confidence_level"]
+	if !ok {
+		return fmt.Errorf("confidence_interval missing required parameter \"confidence_level\"")
+	}
+	cl, ok := toFloat(rawCL)
+	if !ok || cl <= 0 || cl >= 1 {
+		return fmt.Errorf("confidence_interval parameter \"confidence_level\" must be in (0, 1), got %v", rawCL)
+	}
+
+	return nil
+}
+
+// HypothesisTestFamily implements the hypothesis testing family.
+type HypothesisTestFamily struct{}
+
+func NewHypothesisTestFamily() *HypothesisTestFamily {
+	return &HypothesisTestFamily{}
+}
+
+func (h *HypothesisTestFamily) ID() string {
+	return "hypothesis_test"
+}
+
+func (h *HypothesisTestFamily) SupportedRuleVersions() []int {
+	return []int{1}
+}
+
+func (h *HypothesisTestFamily) ValidateParameters(ruleVersion int, params map[string]interface{}) error {
+	if ruleVersion != 1 {
+		return fmt.Errorf("hypothesis_test unsupported rule_version %d (supported: 1)", ruleVersion)
+	}
+
+	allowed := map[string]bool{
+		"test_type": true, "null_value": true, "sample_stat": true, "n": true,
+		"sigma": true, "s": true, "tail": true, "alpha": true,
+	}
+	for k := range params {
+		if !allowed[k] {
+			return fmt.Errorf("hypothesis_test unknown parameter %q", k)
+		}
+	}
+
+	rawNull, ok := params["null_value"]
+	if !ok {
+		return fmt.Errorf("hypothesis_test missing required parameter \"null_value\"")
+	}
+	if _, ok := toFloat(rawNull); !ok {
+		return fmt.Errorf("hypothesis_test parameter \"null_value\" must be a number, got %v", rawNull)
+	}
+
+	rawN, ok := params["n"]
+	if !ok {
+		return fmt.Errorf("hypothesis_test missing required parameter \"n\"")
+	}
+	n, ok := toFloat(rawN)
+	if !ok || n <= 0 || math.Floor(n) != n {
+		return fmt.Errorf("hypothesis_test parameter \"n\" must be a positive integer, got %v", rawN)
+	}
+
+	rawAlpha, ok := params["alpha"]
+	if !ok {
+		return fmt.Errorf("hypothesis_test missing required parameter \"alpha\"")
+	}
+	alpha, ok := toFloat(rawAlpha)
+	if !ok || alpha <= 0 || alpha >= 1 {
+		return fmt.Errorf("hypothesis_test parameter \"alpha\" must be in (0, 1), got %v", rawAlpha)
+	}
+
+	return nil
+}
+
+// LinearRegressionFamily implements the simple linear regression family.
+type LinearRegressionFamily struct{}
+
+func NewLinearRegressionFamily() *LinearRegressionFamily {
+	return &LinearRegressionFamily{}
+}
+
+func (l *LinearRegressionFamily) ID() string {
+	return "linear_regression"
+}
+
+func (l *LinearRegressionFamily) SupportedRuleVersions() []int {
+	return []int{1}
+}
+
+func (l *LinearRegressionFamily) ValidateParameters(ruleVersion int, params map[string]interface{}) error {
+	if ruleVersion != 1 {
+		return fmt.Errorf("linear_regression unsupported rule_version %d (supported: 1)", ruleVersion)
+	}
+
+	allowed := map[string]bool{
+		"n": true, "slope": true, "intercept": true, "r": true, "r_squared": true, "x_pred": true,
+	}
+	for k := range params {
+		if !allowed[k] {
+			return fmt.Errorf("linear_regression unknown parameter %q", k)
+		}
+	}
+
+	rawSlope, ok := params["slope"]
+	if !ok {
+		return fmt.Errorf("linear_regression missing required parameter \"slope\"")
+	}
+	if _, ok := toFloat(rawSlope); !ok {
+		return fmt.Errorf("linear_regression parameter \"slope\" must be a number, got %v", rawSlope)
+	}
+
+	rawIntercept, ok := params["intercept"]
+	if !ok {
+		return fmt.Errorf("linear_regression missing required parameter \"intercept\"")
+	}
+	if _, ok := toFloat(rawIntercept); !ok {
+		return fmt.Errorf("linear_regression parameter \"intercept\" must be a number, got %v", rawIntercept)
+	}
+
+	return nil
+}
+
 func toFloat(val interface{}) (float64, bool) {
 	switch v := val.(type) {
 	case float64:
@@ -535,6 +771,10 @@ func DefaultRegistry() *Registry {
 		defaultRegistry.Register(NewNormalFamily())
 		defaultRegistry.Register(NewUniformFamily())
 		defaultRegistry.Register(NewExponentialFamily())
+		defaultRegistry.Register(NewSamplingDistributionFamily())
+		defaultRegistry.Register(NewConfidenceIntervalFamily())
+		defaultRegistry.Register(NewHypothesisTestFamily())
+		defaultRegistry.Register(NewLinearRegressionFamily())
 	})
 	return defaultRegistry
 }

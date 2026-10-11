@@ -88,3 +88,109 @@ export interface VennVisualResponse {
   formula: string;
   summary: string;
 }
+
+export interface SamplingBar {
+  bin_mid: number;
+  count: number;
+  density: number;
+  theoretical_density: number;
+}
+
+export interface SamplingVisualResponse {
+  family: string;
+  pop_distribution: string;
+  pop_mean: number;
+  pop_std_dev: number;
+  sample_size: number;
+  trials: number;
+  standard_error: number;
+  empirical_mean: number;
+  empirical_std_err: number;
+  bars: SamplingBar[];
+  normal_curve: CurvePoint[];
+  clt_note: string;
+  excel_formula: string;
+  summary: string;
+}
+
+export interface SimulatedInterval {
+  index: number;
+  sample_mean: number;
+  lower_bound: number;
+  upper_bound: number;
+  captures_truth: boolean;
+}
+
+export interface ConfidenceIntervalVisualResponse {
+  family: string;
+  confidence_level: number;
+  alpha: number;
+  true_mean: number;
+  sigma: number;
+  sample_size: number;
+  num_intervals: number;
+  intervals: SimulatedInterval[];
+  captured_count: number;
+  empirical_coverage: number;
+  excel_formula: string;
+  summary: string;
+}
+
+export interface HypothesisVisualResponse {
+  family: string;
+  test_type: string;
+  tail: string;
+  null_hypothesis: string;
+  alt_hypothesis: string;
+  null_value: number;
+  sample_stat: number;
+  sample_size: number;
+  standard_error: number;
+  test_statistic: number;
+  degrees_of_freedom?: number;
+  p_value: number;
+  alpha: number;
+  critical_value: number;
+  critical_value_2?: number;
+  reject_null: boolean;
+  decision: string;
+  rejection_region: string;
+  excel_formula: string;
+  summary: string;
+  points: CurvePoint[];
+}
+
+export interface DataPoint {
+  x: number;
+  y: number;
+}
+
+export interface ResidualPoint {
+  x: number;
+  y: number;
+  y_hat: number;
+  residual: number;
+}
+
+export interface RegressionVisualResponse {
+  family: string;
+  dataset_name: string;
+  n: number;
+  points: DataPoint[];
+  slope: number;
+  intercept: number;
+  correlation: number;
+  r_squared: number;
+  std_err_est: number;
+  equation: string;
+  association_note: string;
+  excel_formula: string;
+  residuals: ResidualPoint[];
+  line_start_x: number;
+  line_start_y: number;
+  line_end_x: number;
+  line_end_y: number;
+  predicted_x?: number;
+  predicted_y?: number;
+  summary: string;
+}

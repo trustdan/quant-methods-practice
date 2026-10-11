@@ -282,6 +282,8 @@ export function resolveKeyCommand(event: KeyboardEvent, context: KeyContext): Na
       return 'INCREASE_SESSION_SIZE';
     case 'L':
       return 'VIEW_LEADERBOARD';
+    case 'A':
+      return 'VIEW_ARCADE';
 
     default:
       return null;

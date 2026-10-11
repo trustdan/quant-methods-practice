@@ -1,6 +1,6 @@
 # Requirements
 
-Status: implemented through Stage 13 within the scope recorded in PLAN/HANDOFF; later stages remain planned. IDs are stable traceability anchors; completion requires the linked stage's recorded evidence, not a checkbox in this file. See [feature parity](docs/FEATURE-PARITY.md) for the accounting reference.
+Status: implemented through Stage 17 within the scope recorded in PLAN/HANDOFF; later stages remain planned. IDs are stable traceability anchors; completion requires the linked stage's recorded evidence, not a checkbox in this file. See [feature parity](docs/FEATURE-PARITY.md) for the accounting reference.
 
 ## Local runtime and mathematics
 

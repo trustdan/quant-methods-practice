@@ -1,5 +1,108 @@
 # Handoff
 
+## Stage 17 — October 10, 2026 (macOS)
+
+Stage 00 through Stage 17 are complete within their documented scope. Stage 18 (Arcade complete parity) is next. All changes from this Mac session remain local and uncommitted.
+
+### Implemented
+
+- `web/src/features/arcade/types.ts`: Domain models, geometry constants, and configuration for Quant Flight space arcade:
+  - Logical coordinate bounds (800x480), 60Hz fixed simulation step (`FIXED_DT = 1/60`), bounded entity pools (max 40 projectiles, 15 hazards, 70 particles).
+  - Atmospheric statistical hazard labels (`Selection Bias`, `Confounding`, `Bad Denominator`, `Spurious Correlation`, `Missing Covariance`).
+  - Full typing for ship physics, projectiles, hazards, particle sparks, stars, held input state, and game state.
+- `web/src/features/arcade/simulation.ts`: Pure `step(state, input, dt, rng)` and `createInitialState(seed, mode)` fixed-step simulation engine:
+  - Deterministic pseudo-random number generator using Mulberry32 for seedable runs.
+  - Attract autopilot mode with sinusoidal cruising and line-of-sight targeting.
+  - Immediate manual takeover upon any player movement or fire input (`takeoverManual`), resetting score, timer, and targets to 0 so demo play never contaminates human records (enforcing Invariant 12).
+  - Velocity normalization on diagonal steering, smooth acceleration, banking roll tilt, weapon cooldown, circle-to-circle collision detection for projectiles and ship shields against hazards, particle bursts, and pause/reduced-motion handling.
+- `web/src/features/arcade/renderer.ts`: Pure Canvas 2D renderer with original assets and geometry:
+  - Deep space gradient and 3-layer parallax starfield (slow, mid, fast stars).
+  - Original vector interceptor ship geometry with cockpit canopy, wing cannons, and dynamic dual engine exhaust glow.
+  - Faceted hexagonal hazard bodies with glowing danger cores and statistical labels.
+  - Projectile capsule energy bolts and particle spark explosion systems.
+  - Heads-Up Display (HUD) showing pilot mode badge, score, hazards cleared count, shields meter, and shortcut hints.
+  - Attract banner call-to-action and paused simulation overlay.
+- `web/src/features/arcade/ArcadeGame.tsx`: React component managing fixed-step accumulator game loop via `requestAnimationFrame`:
+  - High-DPI crisp canvas scaling with `devicePixelRatio`.
+  - Simultaneous held-key input tracking for Arrows, WASD, j/k, Space, and F.
+  - Immediate keydown takeover latching and canvas click takeover.
+  - Window blur and document visibility key clearance and auto-pausing when unfocused.
+  - Pause toggle button and shortcut (`p`).
+  - Skip-to-practice button (`#btn-skip-arcade`) and shortcuts (`Escape`, `Enter`) providing immediate return to drills from any state.
+  - Reduced motion toggle and system media-query detection.
+  - Screen-reader accessible live announcement region (`#arcade-status-announcement`) with `aria-live="polite"`.
+- `web/src/app/App.tsx` and `web/src/navigation/keymap.ts`:
+  - Header tab navigation button (`#tab-arcade`, `Shift+A` / `A`).
+  - Routed `VIEW_ARCADE` command.
+  - Yields keyboard ownership to the arcade when active, and restores drill ownership immediately upon exit.
+  - Complete isolation: zero arcade actions alter practice sessions, mastery records, or exams.
+- `web/src/features/arcade/simulation.test.ts` & `ArcadeGame.test.tsx`:
+  - 15 unit and component tests covering seed determinism, fixed-step simulation, attract score isolation, manual takeover, canvas boundary clamping, continuous fire cooldown, collisions, pause freezing, reduced-motion suppression, skip triggers, and pause toggles.
+- `tests/e2e/arcade.spec.ts`:
+  - End-to-end Playwright browser suite verifying arcade opening, attract mode presentation, manual takeover on keypress, pause/resume, reduced motion toggle, 375px mobile viewport responsiveness, immediate return to practice via button and Escape, and verified screenshot capture (`tests/e2e/screenshots/stage17_verified.png`).
+
+### Actual checks
+
+- Native `./scripts/test.sh` passed on macOS:
+  - Documentation and scaffold check: 32 Markdown files, 74 local links, 54 JSON files, 35 source directories (0 errors).
+  - Frontend typecheck (`tsc --noEmit`): 0 errors.
+  - Frontend lint (`eslint src`): 0 errors.
+  - Frontend unit tests (Vitest): 99 passed across 19 test files.
+  - Frontend production build (`tsc && vite build`): bundle compiled cleanly.
+  - Native Go binary compilation: `bin/quant-practice` compiled with embedded UI and bank.
+  - Playwright E2E browser tests: 15/15 passed across all suites (`arcade.spec.ts`, `visuals.spec.ts`, `candidates.spec.ts`, `worksheets.spec.ts`, `exams.spec.ts`, and `foundation.spec.ts`).
+  - Go formatting check (`gofmt -s -l cmd internal`): 100% formatted.
+  - Go unit tests (`go test -count=1 ./internal/... ./cmd/...`): all 16 packages passed.
+  - Go vet (`go vet ./internal/... ./cmd/...`): 0 issues.
+- Verified screenshot generated at `tests/e2e/screenshots/stage17_verified.png`.
+
+## Stage 16 — October 10, 2026 (macOS)
+
+Stage 00 through Stage 16 are complete within their documented scope. Stage 17 (Arcade first playable) is next. All changes from this Mac session remain local and uncommitted.
+
+### Implemented
+
+- `internal/mathengine/`: Advanced course-grounded statistical inference and regression engines:
+  - `student_t.go`: Student's $t$-distribution $T \sim t(\nu)$ with exact PDF via log-gamma, CDF and survival via Lentz's continued fraction for regularized incomplete beta $I_x(a, b)$, and quantile (inverse CDF) via Halley-Cornish-Fisher iteration verified against textbook statistical tables ($\nu = 9, 19, 29, 20$).
+  - `inference.go`: Sampling distribution of the mean $\bar{X} \sim N(\mu, \sigma^2/n)$ (with Finite Population Correction $\sqrt{(N-n)/(N-1)}$ when $n/N > 0.05$), proportion standard error $\sqrt{p(1-p)/n}$, confidence intervals for mean ($Z$ and $t$) and proportion, and Monte Carlo confidence interval coverage simulation.
+  - `hypothesis.go`: One-sample $z$ and $t$ tests for mean, $z$-test for proportion; two-tailed, left-tailed, and right-tailed tests; critical value cutoffs, exact $p$-values, decision logic, and enforcement of the frequentist invariant that failing to reject $H_0$ never proves $H_0$ is true.
+  - `regression.go`: Ordinary Least Squares (OLS) regression for paired bivariate data $(x_i, y_i)$, slope $b_1 = SS_{xy}/SS_{xx}$, intercept $b_0 = \bar{y} - b_1 \bar{x}$, residuals $e_i = y_i - \hat{y}_i$, sample correlation $r$, coefficient of determination $R^2 = r^2$, standard error of estimate $s_e = \sqrt{SSE/(n-2)}$, prediction at $x^*$, and core invariant that association is not causation.
+- `internal/bank/family.go`: Registered 4 new problem families: `sampling_distribution`, `confidence_interval`, `hypothesis_test`, and `linear_regression` with parameter validation, default instances, and stage derivation.
+- `curriculum/approved/` & `curriculum/reviews/`: Added 3 new approved questions with human/delegated reviews:
+  - `ci-mean-sample-estimate.json` (Module 4): 95% confidence interval for sample mean thickness with unknown $\sigma$ ($df = 15, t^* \approx 2.131$).
+  - `hypothesis-mean-one-sample.json` (Module 5): Left-tailed one-sample $t$-test for product packaging underfill ($df = 24, t = -3.00, p = 0.0031$).
+  - `regression-sales-advertising.json` (Module 6): OLS regression of retail sales on advertising ($b_1 = 1.80, b_0 = 12.80, R^2 = 0.81$, prediction at $x = 6.0$, association vs causation invariant).
+  Active bank count expanded to 16 approved templates.
+- `internal/httpapi/visuals.go`: Implemented 4 new statistical visualization endpoints:
+  - `GET /api/visuals/sampling`: Central Limit Theorem simulation, empirical vs theoretical standard error, normal density curve overlay, and Excel formula `=NORM.DIST(x_bar, mu, sigma/SQRT(n), TRUE)`.
+  - `GET /api/visuals/confidence_interval`: Confidence interval simulation, stacked whiskers marking capture vs miss of true $\mu$, empirical coverage scorecard, and Excel formulas `=CONFIDENCE.T`, `=CONFIDENCE.NORM`.
+  - `GET /api/visuals/hypothesis_test`: Shaded critical rejection regions, test statistic position marker, critical value cutoff, $p$-value decision card, and Excel formulas `=T.DIST.2T`, `=T.DIST.RT`, `=NORM.S.DIST`.
+  - `GET /api/visuals/regression`: Paired data scatter points, OLS fitted line, vertical residuals $e_i$, prediction at $x^*$, correlation & $R^2$, and Excel formulas `=SLOPE`, `=INTERCEPT`, `=RSQ`.
+- `web/src/visuals/`: Interactive accessible SVG Visuals Lab:
+  - `SamplingVisual.tsx`: Central Limit Theorem interactive simulator with population shape selector (skewed chi-square, uniform, exponential, normal), sample size slider, trial count selector, theoretical vs empirical standard error cards, and accessible SVG chart.
+  - `ConfidenceIntervalVisual.tsx`: Confidence interval coverage simulator with confidence level toggle (90%, 95%, 99%), known vs unknown $\sigma$ toggle, sample size slider, stacked interval whiskers, empirical coverage rate card, and frequentist invariant explanation.
+  - `HypothesisTestVisual.tsx`: Hypothesis test explorer with test type selector (mean $t$, mean $z$, proportion $z$), tail selector, significance level $\alpha$ selector, sample mean slider, rejection region shading, statistical decision card, and failure-to-reject caution.
+  - `RegressionVisual.tsx`: Simple linear regression and residuals explorer with dataset selector, evaluated $x^*$ input, scatter plot with OLS line and vertical residual bars, $R^2$ decomposition, and prominent "Association is not Causation" warning card.
+  - `VisualsExplorer.tsx`: Unified tabbed container updated with all 9 visual explorers and keyboard navigation.
+  - `ReferenceLibrary.tsx`: Reference library cards updated with Modules 4–6 inference and regression reference cards and filter.
+- `tests/e2e/visuals.spec.ts`: Expanded Playwright E2E browser tests covering all 9 visual tabs, CLT simulation, CI coverage, hypothesis testing decision badge, linear regression residuals and association warning, 375px mobile responsiveness, and verified screenshot capture (`tests/e2e/screenshots/stage16_verified.png`).
+
+### Actual checks
+
+- Native `./scripts/test.sh` passed on macOS:
+  - Documentation and scaffold check: 43 Markdown files, 74 local links, 54 JSON files, 35 source directories (0 errors).
+  - Frontend typecheck (`tsc --noEmit`): 0 errors.
+  - Frontend lint (`eslint src`): 0 errors.
+  - Frontend unit tests (Vitest): 84 passed across 17 test files.
+  - Frontend production build (`tsc && vite build`): bundle compiled cleanly.
+  - Native Go binary compilation: `bin/quant-practice` built with embedded UI and bank.
+  - Playwright E2E browser tests: 14/14 passed across all suites (`visuals.spec.ts`, `candidates.spec.ts`, `worksheets.spec.ts`, `exams.spec.ts`, and `foundation.spec.ts`).
+  - Go formatting check (`gofmt -s -l cmd internal`): 100% formatted.
+  - Go unit tests (`go test -count=1 ./internal/... ./cmd/...`): all 16 packages passed.
+  - Go race detector (`go test -race ./internal/...`): all packages passed with 0 data races.
+  - Go vet (`go vet ./internal/... ./cmd/...`): 0 issues.
+- Verified screenshot generated at `tests/e2e/screenshots/stage16_verified.png`.
+
 ## Stage 15 — October 10, 2026 (macOS)
 
 Stage 00 through Stage 15 are complete within their documented scope. Stage 16 (sampling, confidence intervals, hypothesis testing and regression) is next. All changes from this Mac session remain local and uncommitted.

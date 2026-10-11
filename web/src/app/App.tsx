@@ -17,10 +17,11 @@ import { Worksheets, WorksheetMode } from '../features/worksheets/Worksheets';
 import { AITutorPanel } from '../features/tutor/AITutorPanel';
 import { Exams } from '../features/exams/Exams';
 import { VisualsExplorer } from '../visuals/VisualsExplorer';
+import { ArcadeGame } from '../features/arcade/ArcadeGame';
 
 export const App: React.FC = () => {
   const [session, setSession] = useState<PublicSessionView>(DEFAULT_BINOMIAL_SESSION);
-  const [activeTab, setActiveTab] = useState<'drill' | 'reference' | 'gallery' | 'visuals' | 'mastery' | 'notes' | 'candidates' | 'worksheets' | 'exams'>('drill');
+  const [activeTab, setActiveTab] = useState<'drill' | 'reference' | 'gallery' | 'visuals' | 'mastery' | 'notes' | 'candidates' | 'worksheets' | 'exams' | 'arcade'>('drill');
   const [candidatesVisited, setCandidatesVisited] = useState(false);
   const [worksheetsVisited, setWorksheetsVisited] = useState(false);
   const [examsVisited, setExamsVisited] = useState(false);
@@ -492,6 +493,9 @@ export const App: React.FC = () => {
   // Keyboard navigation complying with docs/NAVIGATION.md
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
+      if (activeTab === 'arcade') {
+        return;
+      }
       const isFieldActive = isEditableElement(document.activeElement);
 
       const activeMode: KeyMode = showLeaveModal
@@ -652,6 +656,13 @@ export const App: React.FC = () => {
           }
           break;
 
+        case 'VIEW_ARCADE':
+          if (!isFieldActive) {
+            e.preventDefault();
+            setActiveTab(prev => prev === 'arcade' ? 'drill' : 'arcade');
+          }
+          break;
+
         case 'VIEW_AI_REQUEST':
           if (!isFieldActive) {
             e.preventDefault();
@@ -750,6 +761,15 @@ export const App: React.FC = () => {
             title="Distribution Visuals & Math Lab (v)"
           >
             <span className="kbd">v</span> 📊 Visuals
+          </button>
+          <button
+            className={`btn ${activeTab === 'arcade' ? 'btn-primary' : 'btn-outline'}`}
+            onClick={() => setActiveTab(prev => prev === 'arcade' ? 'drill' : 'arcade')}
+            id="tab-arcade"
+            style={{ fontSize: '0.85rem', padding: '0.35rem 0.75rem' }}
+            title="Quant Flight Arcade (Shift+A)"
+          >
+            <span className="kbd">Shift+A</span> 🚀 Arcade
           </button>
           <button
             className={`btn ${activeTab === 'gallery' ? 'btn-primary' : 'btn-outline'}`}
@@ -867,6 +887,10 @@ export const App: React.FC = () => {
 
         {activeTab === 'visuals' && (
           <VisualsExplorer onClose={() => setActiveTab('drill')} />
+        )}
+
+        {activeTab === 'arcade' && (
+          <ArcadeGame onExit={() => setActiveTab('drill')} />
         )}
 
         {activeTab === 'gallery' && (

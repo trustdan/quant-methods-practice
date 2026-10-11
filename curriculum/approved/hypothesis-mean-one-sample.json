@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "hypothesis_mean_one_sample",
+  "version": 1,
+  "status": "active",
+  "family_id": "hypothesis_test",
+  "rule_version": 1,
+  "module_id": "module_5",
+  "title": "One-sample t-test for product packaging weight",
+  "scenario_markdown": "A cereal manufacturer states that its packaging contains an average of $\\mu = 500$ grams. A consumer rights organization samples $n = 25$ boxes and finds a sample mean of $\\bar{x} = 494$ grams with sample standard deviation $s = 10$ grams. Conduct a hypothesis test at significance level $\\alpha = 0.05$ to determine if the boxes are significantly underfilled.",
+  "parameters": {
+    "test_type": "mean_t",
+    "null_value": 500.0,
+    "sample_stat": 494.0,
+    "s": 10.0,
+    "n": 25,
+    "tail": "left_tailed",
+    "alpha": 0.05
+  },
+  "assumptions": [
+    "Box weights are approximately normally distributed",
+    "Independent random sample of 25 boxes",
+    "Unknown population standard deviation sigma requires Student's t test with df = 24"
+  ],
+  "concept_ids": ["hypothesis_null_and_alternative_setup", "hypothesis_t_statistic_calculation", "hypothesis_rejection_decision_interpretation"],
+  "setting_group": "cereal_packaging_compliance",
+  "source_refs": ["Course Module 5: Hypothesis Testing", "docs/COURSE-MAP.md"],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-10T22:30:00Z",
+    "notes": "Reviewed derivation: H0: mu = 500 vs Ha: mu < 500. SE = 10 / sqrt(25) = 2.0. t = (494 - 500) / 2.0 = -3.00. df = 24. Critical t = -1.7109. p = 0.0031 < 0.05. Decision: Reject H0.",
+    "delegation_basis": "Stage 16 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "state_hypotheses",
+      "kind": "choice",
+      "prompt_markdown": "What are the appropriate null and alternative hypotheses to test if the boxes are significantly underfilled?",
+      "options": [
+        {"id": "left_tailed", "text_markdown": "$H_0: \\mu = 500$ grams vs. $H_a: \\mu < 500$ grams", "misconception_id": null, "hint_markdown": null},
+        {"id": "two_tailed", "text_markdown": "$H_0: \\mu = 500$ grams vs. $H_a: \\mu \\neq 500$ grams", "misconception_id": "two_tailed_instead_of_directional", "hint_markdown": "The research claim specifically questions whether boxes are 'underfilled' ($<$ 500 grams), requiring a one-tailed test."},
+        {"id": "sample_in_hypotheses", "text_markdown": "$H_0: \\bar{x} = 494$ grams vs. $H_a: \\bar{x} < 494$ grams", "misconception_id": "hypothesize_sample_statistic", "hint_markdown": "Hypotheses always state claims about the population parameter $\\mu$, never the observed sample statistic $\\bar{x}$."}
+      ],
+      "expected_answer": {"kind": "choice", "option_id": "left_tailed"},
+      "evidence_concept_ids": ["hypothesis_null_and_alternative_setup"],
+      "explanation_markdown": "The null hypothesis assumes the company's stated baseline: $H_0: \\mu = 500$. The research question tests whether the cereal is systematically underfilled, which is directional: $H_a: \\mu < 500$. Hypotheses are always formulated in terms of population parameters ($\\mu$), not sample statistics ($\\bar{x}$).",
+      "numeric_policy": null
+    },
+    {
+      "id": "compute_test_statistic",
+      "kind": "choice",
+      "prompt_markdown": "Compute the sample test statistic $t = \\frac{\\bar{x} - \\mu_0}{s / \\sqrt{n}}$.",
+      "options": [
+        {"id": "t_stat_correct", "text_markdown": "$t = -3.00$ ($df = 24$)", "misconception_id": null, "hint_markdown": null},
+        {"id": "t_stat_positive", "text_markdown": "$t = +3.00$ ($df = 24$)", "misconception_id": "reversed_subtraction_order", "hint_markdown": "The numerator is $(\\bar{x} - \\mu_0) = 494 - 500 = -6$, which is negative because the sample mean is below the hypothesized mean."},
+        {"id": "t_stat_forgot_sqrt_n", "text_markdown": "$t = -0.60$ ($df = 24$)", "misconception_id": "forgot_sqrt_n_in_t_stat", "hint_markdown": "The denominator is standard error $SE = s / \\sqrt{n} = 10 / 5 = 2.0$, not $s = 10$."}
+      ],
+      "expected_answer": {"kind": "choice", "option_id": "t_stat_correct"},
+      "evidence_concept_ids": ["hypothesis_t_statistic_calculation"],
+      "explanation_markdown": "Standard error of the sample mean is $SE = \\frac{s}{\\sqrt{n}} = \\frac{10}{\\sqrt{25}} = \\frac{10}{5} = 2.0$ grams. The test statistic is $t = \\frac{494 - 500}{2.0} = \\frac{-6.0}{2.0} = -3.000$ with $df = n - 1 = 24$.",
+      "numeric_policy": null
+    },
+    {
+      "id": "decision_and_conclusion",
+      "kind": "choice",
+      "prompt_markdown": "Given that the critical value for a left-tailed test at $\\alpha = 0.05$ with $df = 24$ is $t_{0.05, 24} = -1.711$ (and $p$-value $\\approx 0.0031$), what is the statistical decision?",
+      "options": [
+        {"id": "reject_h0", "text_markdown": "Reject $H_0$. Because $t = -3.00 < -1.711$ ($p \\approx 0.0031 < 0.05$), there is statistically significant evidence that the cereal boxes are underfilled.", "misconception_id": null, "hint_markdown": null},
+        {"id": "fail_to_reject_h0", "text_markdown": "Fail to reject $H_0$. The discrepancy is small (only 6 grams), so the claim holds.", "misconception_id": "confuse_practical_with_statistical_rejection", "hint_markdown": "The test statistic falls far into the critical rejection region ($t = -3.00 < -1.711$), with $p$-value well below $\\alpha = 0.05$."},
+        {"id": "accept_ha_proven", "text_markdown": "Accept $H_a$ as absolute proof that every box produced is underfilled.", "misconception_id": "claim_absolute_proof_from_sample", "hint_markdown": "Statistical tests establish evidence about the population average, not a guarantee that every single box is underfilled."}
+      ],
+      "expected_answer": {"kind": "choice", "option_id": "reject_h0"},
+      "evidence_concept_ids": ["hypothesis_rejection_decision_interpretation"],
+      "explanation_markdown": "Because the observed test statistic $t = -3.00$ is more extreme than the critical cutoff $-1.711$ (and the $p$-value $0.0031$ is less than $\\alpha = 0.05$), we reject $H_0$. There is statistically significant evidence at the $5\\%$ level that the population mean weight is less than 500 grams.",
+      "numeric_policy": null
+    }
+  ]
+}

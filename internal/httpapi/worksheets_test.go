@@ -29,6 +29,7 @@ func TestWorksheetsHTTPBoundaryAndDatasetReview(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	initialCount := b.Count()
 	srv, err := NewServer(Config{Bank: b, Store: storage.NewStore(db, nil)})
 	if err != nil {
 		t.Fatal(err)
@@ -116,7 +117,7 @@ func TestWorksheetsHTTPBoundaryAndDatasetReview(t *testing.T) {
 	if w.Code != 201 || strings.Contains(w.Body.String(), "expected_answer") || !strings.Contains(w.Body.String(), "answer keys were shown") {
 		t.Fatalf("reviewed case not created safely: %d %s", w.Code, w.Body.String())
 	}
-	if b.Count() != 13 {
+	if b.Count() != initialCount {
 		t.Fatal("case generation modified active bank")
 	}
 }

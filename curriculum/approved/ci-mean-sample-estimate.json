@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "ci_mean_sample_estimate",
+  "version": 1,
+  "status": "active",
+  "family_id": "confidence_interval",
+  "rule_version": 1,
+  "module_id": "module_4",
+  "title": "Confidence interval for sample mean with unknown variance",
+  "scenario_markdown": "A quality assurance analyst measures the thickness of $n = 16$ machined parts. The sample mean is $\\bar{x} = 25.0$ mm with sample standard deviation $s = 2.0$ mm. Construct a $95\\%$ confidence interval for the true mean thickness $\\mu$.",
+  "parameters": {
+    "parameter": "mean_t",
+    "point_estimate": 25.0,
+    "s": 2.0,
+    "n": 16,
+    "confidence_level": 0.95
+  },
+  "assumptions": [
+    "Part thicknesses are approximately normally distributed",
+    "Independent random sample of machined parts",
+    "Population standard deviation sigma is unknown, requiring Student's t distribution with df = n - 1 = 15"
+  ],
+  "concept_ids": ["ci_t_distribution_degrees_of_freedom", "ci_margin_of_error_calculation", "ci_population_parameter_interpretation"],
+  "setting_group": "manufacturing_thickness_sampling",
+  "source_refs": ["Course Module 4: Sampling Distribution & Confidence Interval", "docs/COURSE-MAP.md"],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-10T22:30:00Z",
+    "notes": "Reviewed derivation: df = 15, t_{0.025, 15} = 2.13145. SE = 2.0 / sqrt(16) = 0.50. Margin of error = 2.13145 * 0.50 = 1.0657. Interval = [23.934, 26.066].",
+    "delegation_basis": "Stage 16 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "critical_value_selection",
+      "kind": "choice",
+      "prompt_markdown": "Which critical value distribution and degrees of freedom should be used for this $95\\%$ confidence interval?",
+      "options": [
+        {"id": "t_df_fifteen", "text_markdown": "Student's $t$-distribution with $df = n - 1 = 15$ ($t^* \\approx 2.131$)", "misconception_id": null, "hint_markdown": null},
+        {"id": "z_normal", "text_markdown": "Standard normal distribution $Z^* = 1.960$", "misconception_id": "use_z_when_sigma_unknown", "hint_markdown": "Because the population standard deviation $\\sigma$ is unknown and estimated by sample $s$, Student's $t$ must be used."},
+        {"id": "t_df_sixteen", "text_markdown": "Student's $t$-distribution with $df = n = 16$ ($t^* \\approx 2.120$)", "misconception_id": "omit_sample_size_df_subtraction", "hint_markdown": "Degrees of freedom for a single sample mean are $df = n - 1$, losing 1 degree of freedom from estimating the sample mean $\\bar{x}$."}
+      ],
+      "expected_answer": {"kind": "choice", "option_id": "t_df_fifteen"},
+      "evidence_concept_ids": ["ci_t_distribution_degrees_of_freedom"],
+      "explanation_markdown": "Because the true population standard deviation $\\sigma$ is unknown and estimated by the sample standard deviation $s = 2.0$, we must use Student's $t$-distribution with $df = n - 1 = 16 - 1 = 15$. For a two-tailed $\\alpha = 0.05$, $t_{0.025, 15} \\approx 2.131$.",
+      "numeric_policy": null
+    },
+    {
+      "id": "margin_of_error",
+      "kind": "choice",
+      "prompt_markdown": "Calculate the margin of error $E = t^* \\cdot \\frac{s}{\\sqrt{n}}$ for this $95\\%$ confidence interval (using $t^* \\approx 2.131$).",
+      "options": [
+        {"id": "moe_correct", "text_markdown": "$E = 1.066$ mm ($2.131 \\times 0.50$ mm)", "misconception_id": null, "hint_markdown": null},
+        {"id": "moe_used_z", "text_markdown": "$E = 0.980$ mm ($1.960 \\times 0.50$ mm)", "misconception_id": "used_z_instead_of_t", "hint_markdown": "Remember that because $\\sigma$ is unknown, we must use the Student's $t$ critical value $t^* \\approx 2.131$, not $Z^* = 1.960$."},
+        {"id": "moe_forgot_sqrt_n", "text_markdown": "$E = 4.262$ mm ($2.131 \\times 2.0$ mm)", "misconception_id": "forgot_sqrt_n_in_standard_error", "hint_markdown": "Standard error is $SE = s / \\sqrt{n} = 2.0 / 4 = 0.50$ mm; do not multiply $t^*$ directly by the sample standard deviation $s$."}
+      ],
+      "expected_answer": {"kind": "choice", "option_id": "moe_correct"},
+      "evidence_concept_ids": ["ci_margin_of_error_calculation"],
+      "explanation_markdown": "Standard error is $SE = \\frac{s}{\\sqrt{n}} = \\frac{2.0}{\\sqrt{16}} = \\frac{2.0}{4} = 0.50$ mm. Margin of error is $E = t^* \\cdot SE = 2.131 \\times 0.50 = 1.0655 \\approx 1.066$ mm. Excel formula: `=CONFIDENCE.T(0.05, 2.0, 16)`.",
+      "numeric_policy": null
+    },
+    {
+      "id": "interval_interpretation",
+      "kind": "choice",
+      "prompt_markdown": "Which statement correctly interprets the resulting $95\\%$ confidence interval $[23.93, 26.07]$ mm?",
+      "options": [
+        {"id": "interp_correct", "text_markdown": "We are $95\\%$ confident that the true population mean thickness $\\mu$ lies between $23.93$ mm and $26.07$ mm.", "misconception_id": null, "hint_markdown": null},
+        {"id": "interp_sample_parts", "text_markdown": "$95\\%$ of all individual machined parts have a thickness between $23.93$ mm and $26.07$ mm.", "misconception_id": "confuse_parameter_ci_with_individual_range", "hint_markdown": "A confidence interval estimates the unknown population parameter (the mean $\\mu$), not the dispersion of individual parts."},
+        {"id": "interp_prob_parameter", "text_markdown": "There is a $95\\%$ probability that the true parameter $\\mu$ falls into this specific fixed interval.", "misconception_id": "bayesian_posterior_interpretation", "hint_markdown": "In classical frequentist statistics, the true parameter $\\mu$ is a fixed constant, not a random variable. The $95\\%$ refers to the long-run coverage of intervals generated by repeated sampling."}
+      ],
+      "expected_answer": {"kind": "choice", "option_id": "interp_correct"},
+      "evidence_concept_ids": ["ci_population_parameter_interpretation"],
+      "explanation_markdown": "A confidence interval is a procedure for estimating the fixed, unknown population parameter $\\mu$. The $95\\%$ confidence level means that across repeated independent samples of size 16, $95\\%$ of the computed intervals will contain $\\mu$. It does not describe the range of $95\\%$ of individual parts.",
+      "numeric_policy": null
+    }
+  ]
+}

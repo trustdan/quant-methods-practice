@@ -202,3 +202,112 @@ func TestVisualsVennEndpoint(t *testing.T) {
 		t.Errorf("expected 405 for POST to visuals endpoint, got %d", wPost.Code)
 	}
 }
+
+func TestVisualsSamplingEndpoint(t *testing.T) {
+	srv := newTestServer(t)
+
+	req := httptest.NewRequest(http.MethodGet, "/api/visuals/sampling?pop_dist=skewed&n=25&trials=300&seed=123", nil)
+	req.Host = "127.0.0.1"
+	w := httptest.NewRecorder()
+	srv.httpServer.Handler.ServeHTTP(w, req)
+
+	if w.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d: %s", w.Code, w.Body.String())
+	}
+
+	var resp SamplingVisualResponse
+	if err := json.Unmarshal(w.Body.Bytes(), &resp); err != nil {
+		t.Fatalf("failed to decode: %v", err)
+	}
+
+	if resp.Family != "sampling" || resp.SampleSize != 25 || resp.Trials != 300 {
+		t.Errorf("unexpected metadata: %+v", resp)
+	}
+	if len(resp.Bars) == 0 || len(resp.NormalCurve) == 0 {
+		t.Errorf("expected bars and normal curve points")
+	}
+	if resp.CLTNote == "" {
+		t.Errorf("expected CLT note")
+	}
+}
+
+func TestVisualsCIEndpoint(t *testing.T) {
+	srv := newTestServer(t)
+
+	req := httptest.NewRequest(http.MethodGet, "/api/visuals/confidence_interval?conf_level=0.95&mu=50&sigma=10&n=16&num_intervals=20&seed=42", nil)
+	req.Host = "127.0.0.1"
+	w := httptest.NewRecorder()
+	srv.httpServer.Handler.ServeHTTP(w, req)
+
+	if w.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d: %s", w.Code, w.Body.String())
+	}
+
+	var resp ConfidenceIntervalVisualResponse
+	if err := json.Unmarshal(w.Body.Bytes(), &resp); err != nil {
+		t.Fatalf("failed to decode: %v", err)
+	}
+
+	if resp.Family != "confidence_interval" || resp.ConfidenceLevel != 0.95 || len(resp.Intervals) != 20 {
+		t.Errorf("unexpected CI response: %+v", resp)
+	}
+	if resp.CapturedCount == 0 {
+		t.Errorf("expected at least some intervals to capture truth")
+	}
+}
+
+func TestVisualsHypothesisEndpoint(t *testing.T) {
+	srv := newTestServer(t)
+
+	req := httptest.NewRequest(http.MethodGet, "/api/visuals/hypothesis_test?test_type=mean_t&tail=two_tailed&alpha=0.05&null_mu=50&x_bar=54&s=8&n=25", nil)
+	req.Host = "127.0.0.1"
+	w := httptest.NewRecorder()
+	srv.httpServer.Handler.ServeHTTP(w, req)
+
+	if w.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d: %s", w.Code, w.Body.String())
+	}
+
+	var resp HypothesisVisualResponse
+	if err := json.Unmarshal(w.Body.Bytes(), &resp); err != nil {
+		t.Fatalf("failed to decode: %v", err)
+	}
+
+	if resp.Family != "hypothesis_test" || resp.TestType != "mean_t" {
+		t.Errorf("unexpected hypothesis response: %+v", resp)
+	}
+	if len(resp.Points) == 0 {
+		t.Errorf("expected curve points")
+	}
+	if resp.Decision == "" || resp.RejectionRegion == "" {
+		t.Errorf("expected decision and rejection region")
+	}
+}
+
+func TestVisualsRegressionEndpoint(t *testing.T) {
+	srv := newTestServer(t)
+
+	req := httptest.NewRequest(http.MethodGet, "/api/visuals/regression?dataset=advertising_sales&x_pred=5.0", nil)
+	req.Host = "127.0.0.1"
+	w := httptest.NewRecorder()
+	srv.httpServer.Handler.ServeHTTP(w, req)
+
+	if w.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d: %s", w.Code, w.Body.String())
+	}
+
+	var resp RegressionVisualResponse
+	if err := json.Unmarshal(w.Body.Bytes(), &resp); err != nil {
+		t.Fatalf("failed to decode: %v", err)
+	}
+
+	if resp.Family != "regression" || resp.N != 8 {
+		t.Errorf("unexpected regression metadata: %+v", resp)
+	}
+	if resp.PredictedX == nil || *resp.PredictedX != 5.0 || resp.PredictedY == nil {
+		t.Errorf("expected prediction at x = 5.0, got: px=%v, py=%v", resp.PredictedX, resp.PredictedY)
+	}
+	if resp.AssociationNote == "" {
+		t.Errorf("expected association note")
+	}
+}

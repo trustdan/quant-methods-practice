@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "template_id": "hypothesis_mean_one_sample",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-10T22:30:00Z",
+  "delegation_basis": "Stage 16 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "hypothesis_test",
+    "parameters": {
+      "test_type": "mean_t",
+      "null_value": 500.0,
+      "sample_stat": 494.0,
+      "s": 10.0,
+      "n": 25,
+      "tail": "left_tailed",
+      "alpha": 0.05
+    },
+    "canonical_probability": 0.0031,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 494.0,
+      "variance": 100.0,
+      "standard_deviation": 10.0
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.01,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "state_hypotheses", "kind": "choice", "evidence": "hypothesis_null_and_alternative_setup"},
+      {"id": "compute_test_statistic", "kind": "choice", "evidence": "hypothesis_t_statistic_calculation"},
+      {"id": "decision_and_conclusion", "kind": "choice", "evidence": "hypothesis_rejection_decision_interpretation"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Verified mathematically: SE = 10 / 5 = 2.0. t = -6 / 2 = -3.00. df = 24. P(T <= -3) = 0.00313. Reject H0."
+}
