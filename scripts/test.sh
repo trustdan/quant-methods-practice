@@ -19,13 +19,16 @@ npm run test:e2e
 
 echo "==> Running Go formatting check, unit tests and vet..."
 cd "$ROOT_DIR"
-UNFORMATTED="$(gofmt -s -l cmd internal)"
+UNFORMATTED="$(gofmt -s -l cmd internal curriculum)"
 if [ -n "$UNFORMATTED" ]; then
     echo "Go formatting check failed:"
     echo "$UNFORMATTED"
     exit 1
 fi
-go test -count=1 ./internal/... ./cmd/...
-go vet ./internal/... ./cmd/...
+go test -count=1 ./internal/... ./cmd/... ./curriculum/...
+go vet ./internal/... ./cmd/... ./curriculum/...
+
+echo "==> Verifying multi-platform release packaging and isolated sandbox..."
+"$SCRIPT_DIR/verify_release.sh"
 
 echo "==> All verification checks PASSED!"

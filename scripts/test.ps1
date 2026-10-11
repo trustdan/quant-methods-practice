@@ -44,13 +44,13 @@ try {
 Write-Host "==> Running Go formatting check, unit tests and vet..." -ForegroundColor Cyan
 Push-Location "$rootDir"
 try {
-    $unformatted = gofmt -s -l cmd internal
+    $unformatted = gofmt -s -l cmd internal curriculum
     if ($unformatted) {
         Write-Host "==> FAILED: gofmt reports unformatted files:`n$unformatted" -ForegroundColor Red
         exit 1
     }
-    Invoke-Checked "go test" { go test -count=1 ./internal/... ./cmd/... }
-    Invoke-Checked "go vet" { go vet ./internal/... ./cmd/... }
+    Invoke-Checked "go test" { go test -count=1 ./internal/... ./cmd/... ./curriculum/... }
+    Invoke-Checked "go vet" { go vet ./internal/... ./cmd/... ./curriculum/... }
 } finally {
     Pop-Location
 }
