@@ -347,6 +347,161 @@ func (l *LinearCombinationFamily) ValidateParameters(ruleVersion int, params map
 	return nil
 }
 
+// NormalFamily implements the continuous normal distribution family.
+type NormalFamily struct{}
+
+func NewNormalFamily() *NormalFamily {
+	return &NormalFamily{}
+}
+
+func (n *NormalFamily) ID() string {
+	return "normal_dist"
+}
+
+func (n *NormalFamily) SupportedRuleVersions() []int {
+	return []int{1}
+}
+
+func (n *NormalFamily) ValidateParameters(ruleVersion int, params map[string]interface{}) error {
+	if ruleVersion != 1 {
+		return fmt.Errorf("normal_dist unsupported rule_version %d (supported: 1)", ruleVersion)
+	}
+
+	allowed := map[string]bool{
+		"mu": true, "sigma": true, "x": true, "x1": true, "x2": true, "tail": true,
+	}
+	for k := range params {
+		if !allowed[k] {
+			return fmt.Errorf("normal_dist unknown parameter %q", k)
+		}
+	}
+
+	rawMu, ok := params["mu"]
+	if !ok {
+		return fmt.Errorf("normal_dist missing required parameter \"mu\"")
+	}
+	_, ok = toFloat(rawMu)
+	if !ok {
+		return fmt.Errorf("normal_dist parameter \"mu\" must be a number, got %v", rawMu)
+	}
+
+	rawSigma, ok := params["sigma"]
+	if !ok {
+		return fmt.Errorf("normal_dist missing required parameter \"sigma\"")
+	}
+	sigma, ok := toFloat(rawSigma)
+	if !ok || sigma <= 0 {
+		return fmt.Errorf("normal_dist parameter \"sigma\" must be strictly positive, got %v", rawSigma)
+	}
+
+	if rawX1, hasX1 := params["x1"]; hasX1 {
+		x1, ok1 := toFloat(rawX1)
+		if rawX2, hasX2 := params["x2"]; hasX2 {
+			x2, ok2 := toFloat(rawX2)
+			if ok1 && ok2 && x1 > x2 {
+				return fmt.Errorf("normal_dist parameter \"x1\" (%v) cannot exceed \"x2\" (%v)", x1, x2)
+			}
+		}
+	}
+
+	return nil
+}
+
+// UniformFamily implements the continuous uniform distribution family.
+type UniformFamily struct{}
+
+func NewUniformFamily() *UniformFamily {
+	return &UniformFamily{}
+}
+
+func (u *UniformFamily) ID() string {
+	return "uniform_dist"
+}
+
+func (u *UniformFamily) SupportedRuleVersions() []int {
+	return []int{1}
+}
+
+func (u *UniformFamily) ValidateParameters(ruleVersion int, params map[string]interface{}) error {
+	if ruleVersion != 1 {
+		return fmt.Errorf("uniform_dist unsupported rule_version %d (supported: 1)", ruleVersion)
+	}
+
+	allowed := map[string]bool{
+		"a": true, "b": true, "x": true, "x1": true, "x2": true, "tail": true,
+	}
+	for k := range params {
+		if !allowed[k] {
+			return fmt.Errorf("uniform_dist unknown parameter %q", k)
+		}
+	}
+
+	rawA, ok := params["a"]
+	if !ok {
+		return fmt.Errorf("uniform_dist missing required parameter \"a\"")
+	}
+	a, ok := toFloat(rawA)
+	if !ok {
+		return fmt.Errorf("uniform_dist parameter \"a\" must be a number, got %v", rawA)
+	}
+
+	rawB, ok := params["b"]
+	if !ok {
+		return fmt.Errorf("uniform_dist missing required parameter \"b\"")
+	}
+	b, ok := toFloat(rawB)
+	if !ok {
+		return fmt.Errorf("uniform_dist parameter \"b\" must be a number, got %v", rawB)
+	}
+
+	if a >= b {
+		return fmt.Errorf("uniform_dist lower bound \"a\" (%v) must be strictly less than upper bound \"b\" (%v)", a, b)
+	}
+
+	return nil
+}
+
+// ExponentialFamily implements the continuous exponential distribution family.
+type ExponentialFamily struct{}
+
+func NewExponentialFamily() *ExponentialFamily {
+	return &ExponentialFamily{}
+}
+
+func (e *ExponentialFamily) ID() string {
+	return "exponential_dist"
+}
+
+func (e *ExponentialFamily) SupportedRuleVersions() []int {
+	return []int{1}
+}
+
+func (e *ExponentialFamily) ValidateParameters(ruleVersion int, params map[string]interface{}) error {
+	if ruleVersion != 1 {
+		return fmt.Errorf("exponential_dist unsupported rule_version %d (supported: 1)", ruleVersion)
+	}
+
+	allowed := map[string]bool{
+		"lambda": true, "x": true, "x1": true, "x2": true, "tail": true,
+	}
+	for k := range params {
+		if !allowed[k] {
+			return fmt.Errorf("exponential_dist unknown parameter %q", k)
+		}
+	}
+
+	rawLambda, ok := params["lambda"]
+	if !ok {
+		return fmt.Errorf("exponential_dist missing required parameter \"lambda\"")
+	}
+	lambda, ok := toFloat(rawLambda)
+	if !ok || lambda <= 0 {
+		return fmt.Errorf("exponential_dist parameter \"lambda\" must be strictly positive, got %v", rawLambda)
+	}
+
+	return nil
+}
+
 func toFloat(val interface{}) (float64, bool) {
 	switch v := val.(type) {
 	case float64:
@@ -377,6 +532,9 @@ func DefaultRegistry() *Registry {
 		defaultRegistry.Register(NewPoissonFamily())
 		defaultRegistry.Register(NewSetProbabilityFamily())
 		defaultRegistry.Register(NewLinearCombinationFamily())
+		defaultRegistry.Register(NewNormalFamily())
+		defaultRegistry.Register(NewUniformFamily())
+		defaultRegistry.Register(NewExponentialFamily())
 	})
 	return defaultRegistry
 }

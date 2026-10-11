@@ -497,8 +497,8 @@ func TestBankEndpoint(t *testing.T) {
 		t.Fatalf("failed to decode template summaries: %v", err)
 	}
 
-	if len(list) != 10 {
-		t.Errorf("expected 10 approved templates in bank, got %d", len(list))
+	if len(list) != approvedBank.Count() {
+		t.Errorf("expected %d approved templates in bank, got %d", approvedBank.Count(), len(list))
 	}
 }
 

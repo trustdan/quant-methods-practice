@@ -49,6 +49,11 @@ func main() {
 		notesFlag        = flag.Bool("notes", false, "List saved explanations and notes in personal library and exit")
 		exportNotesFlag  = flag.String("export-notes", "", "Export all saved notes as UTF-8 Markdown files to specified directory and exit")
 		providersFlag    = flag.Bool("providers", false, "Display configured AI providers and models and exit")
+		examFlag         = flag.Bool("exam", false, "Initialize and start a new assessment session")
+		examTimeFlag     = flag.Int("exam-time", 0, "Time limit in minutes for exam (0 for untimed)")
+		resumeExamFlag   = flag.String("resume-exam", "", "Resume active assessment by ID")
+		examHistoryFlag  = flag.Bool("exam-history", false, "Display past assessment history and scores")
+		examReportFlag   = flag.String("exam-report", "", "Display assessment score report by ID")
 	)
 
 	var candidateOpts candidateFlags
@@ -128,6 +133,37 @@ func main() {
 		if err := runCandidateCLI(ctx, store, candidateOpts, *seedFlag); err != nil {
 			log.Fatalf("candidate command: %v", err)
 		}
+		return
+	}
+
+	if *examHistoryFlag {
+		runExamHistory(store)
+		return
+	}
+
+	if *examReportFlag != "" {
+		runExamReport(store, *examReportFlag)
+		return
+	}
+
+	if *resumeExamFlag != "" {
+		runResumeExam(store, *resumeExamFlag)
+		return
+	}
+
+	if *examFlag {
+		bankDirs := []string{"curriculum/approved", "../curriculum/approved", "../../curriculum/approved"}
+		var activeBank *bank.Bank
+		for _, dir := range bankDirs {
+			if fi, statErr := os.Stat(dir); statErr == nil && fi.IsDir() {
+				b, loadErr := bank.LoadActiveBank(dir, nil)
+				if loadErr == nil && b.Count() > 0 {
+					activeBank = b
+					break
+				}
+			}
+		}
+		runStartExam(store, activeBank, *questionsFlag, *examTimeFlag, *seedFlag, *moduleFlag)
 		return
 	}
 

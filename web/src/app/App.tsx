@@ -15,12 +15,15 @@ import { NoteLibraryView } from '../features/notes/NoteLibraryView';
 import { CandidateReview } from '../features/candidates/CandidateReview';
 import { Worksheets, WorksheetMode } from '../features/worksheets/Worksheets';
 import { AITutorPanel } from '../features/tutor/AITutorPanel';
+import { Exams } from '../features/exams/Exams';
+import { VisualsExplorer } from '../visuals/VisualsExplorer';
 
 export const App: React.FC = () => {
   const [session, setSession] = useState<PublicSessionView>(DEFAULT_BINOMIAL_SESSION);
-  const [activeTab, setActiveTab] = useState<'drill' | 'reference' | 'gallery' | 'mastery' | 'notes' | 'candidates' | 'worksheets'>('drill');
+  const [activeTab, setActiveTab] = useState<'drill' | 'reference' | 'gallery' | 'visuals' | 'mastery' | 'notes' | 'candidates' | 'worksheets' | 'exams'>('drill');
   const [candidatesVisited, setCandidatesVisited] = useState(false);
   const [worksheetsVisited, setWorksheetsVisited] = useState(false);
+  const [examsVisited, setExamsVisited] = useState(false);
   const [worksheetMode, setWorksheetMode] = useState<WorksheetMode>('full_solution');
   const [showTutorModal, setShowTutorModal] = useState<boolean>(false);
   const [showSettingsModal, setShowSettingsModal] = useState<boolean>(false);
@@ -495,7 +498,7 @@ export const App: React.FC = () => {
         ? 'leave_intent'
         : showHelpModal || showSettingsModal
         ? 'modal'
-        : (activeTab === 'gallery' || activeTab === 'candidates' || activeTab === 'worksheets')
+        : (activeTab === 'gallery' || activeTab === 'visuals' || activeTab === 'candidates' || activeTab === 'worksheets' || activeTab === 'exams')
         ? 'reading'
         : session.stages[session.current_stage_index]?.kind === 'choice'
         ? 'practice_choice'
@@ -528,7 +531,7 @@ export const App: React.FC = () => {
             handleCloseHelp();
           } else if (showLeaveModal) {
             handleLeaveCancel();
-          } else if (activeTab === 'mastery' || activeTab === 'reference' || activeTab === 'notes' || activeTab === 'candidates' || activeTab === 'worksheets') {
+          } else if (activeTab === 'mastery' || activeTab === 'reference' || activeTab === 'visuals' || activeTab === 'notes' || activeTab === 'candidates' || activeTab === 'worksheets' || activeTab === 'exams') {
             setActiveTab('drill');
           }
           break;
@@ -570,7 +573,7 @@ export const App: React.FC = () => {
 
         // Big problem navigation
         case 'NAV_PREV_PROBLEM':
-          if (activeTab === 'candidates' || activeTab === 'worksheets') break;
+          if (activeTab === 'candidates' || activeTab === 'worksheets' || activeTab === 'exams') break;
           e.preventDefault();
           if (session.current_question_index !== undefined && session.current_question_index > 0) {
             handleNavigateQuestion(session.current_question_index - 1);
@@ -578,7 +581,7 @@ export const App: React.FC = () => {
           break;
 
         case 'NAV_NEXT_PROBLEM': {
-          if (activeTab === 'candidates' || activeTab === 'worksheets') break;
+          if (activeTab === 'candidates' || activeTab === 'worksheets' || activeTab === 'exams') break;
           e.preventDefault();
           const totalQ = session.total_questions || (session.questions ? session.questions.length : 1);
           const curQ = session.current_question_index || 0;
@@ -631,6 +634,21 @@ export const App: React.FC = () => {
             e.preventDefault();
             setCandidatesVisited(true);
             setActiveTab(prev => prev === 'candidates' ? 'drill' : 'candidates');
+          }
+          break;
+
+        case 'VIEW_EXAM':
+          if (!isFieldActive) {
+            e.preventDefault();
+            setExamsVisited(true);
+            setActiveTab('exams');
+          }
+          break;
+
+        case 'VIEW_VISUALS':
+          if (!isFieldActive) {
+            e.preventDefault();
+            setActiveTab(prev => prev === 'visuals' ? 'drill' : 'visuals');
           }
           break;
 
@@ -716,6 +734,24 @@ export const App: React.FC = () => {
             Worksheets
           </button>
           <button
+            className={`btn ${activeTab === 'exams' ? 'btn-primary' : 'btn-outline'}`}
+            onClick={() => { setExamsVisited(true); setActiveTab('exams'); }}
+            id="tab-exams"
+            style={{ fontSize: '0.85rem', padding: '0.35rem 0.75rem' }}
+            title="Exam Mode Assessment (Shift+E)"
+          >
+            <span className="kbd">Shift+E</span> ⏱️ Exams
+          </button>
+          <button
+            className={`btn ${activeTab === 'visuals' ? 'btn-primary' : 'btn-outline'}`}
+            onClick={() => setActiveTab('visuals')}
+            id="tab-visuals"
+            style={{ fontSize: '0.85rem', padding: '0.35rem 0.75rem' }}
+            title="Distribution Visuals & Math Lab (v)"
+          >
+            <span className="kbd">v</span> 📊 Visuals
+          </button>
+          <button
             className={`btn ${activeTab === 'gallery' ? 'btn-primary' : 'btn-outline'}`}
             onClick={() => setActiveTab('gallery')}
             style={{ fontSize: '0.85rem', padding: '0.35rem 0.75rem' }}
@@ -796,6 +832,12 @@ export const App: React.FC = () => {
       <main className="app-main" ref={readingContainerRef}>
         {candidatesVisited && <CandidateReview active={activeTab === 'candidates' && !showSettingsModal && !showTutorModal} />}
         {worksheetsVisited && <Worksheets active={activeTab === 'worksheets' && !showSettingsModal && !showTutorModal && !showHelpModal && !showLeaveModal} launchMode={worksheetMode} />}
+        {(examsVisited || activeTab === 'exams') && (
+          <Exams
+            active={activeTab === 'exams' && !showSettingsModal && !showTutorModal && !showHelpModal && !showLeaveModal}
+            onReturnToPractice={() => setActiveTab('drill')}
+          />
+        )}
         {activeTab === 'mastery' && (
           <MasteryView onClose={() => setActiveTab('drill')} />
         )}
@@ -821,6 +863,10 @@ export const App: React.FC = () => {
 
         {activeTab === 'reference' && (
           <ReferenceLibrary onClose={() => setActiveTab('drill')} />
+        )}
+
+        {activeTab === 'visuals' && (
+          <VisualsExplorer onClose={() => setActiveTab('drill')} />
         )}
 
         {activeTab === 'gallery' && (
@@ -898,9 +944,15 @@ export const App: React.FC = () => {
             <span>Submit</span>
           </div>
           <div className="key-hint">
-            <span className="kbd">?</span>
-            <span>Hint</span>
+            <span className="kbd">v</span>
+            <span>Visuals</span>
           </div>
+          {activeTab === 'drill' && (
+            <div className="key-hint">
+              <span className="kbd">?</span>
+              <span>Hint</span>
+            </div>
+          )}
           <div className="key-hint">
             <span className="kbd">F1</span>
             <span>Help</span>

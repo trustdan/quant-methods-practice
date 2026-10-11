@@ -67,3 +67,14 @@ Require the launcher's `quant_session` cookie; POST also requires the exact app 
 - `GET /api/worksheets/{id}/export`: safe Markdown attachment from saved public state, without unresolved keys.
 
 See [worksheet scope and review policy](WORKSHEETS.md). Worksheet evidence is separate from independent mastery and bank activation.
+
+## Exam Mode endpoints (Stage 14)
+
+Require the launcher's `quant_session` cookie; mutations also require the exact app Origin (or configured development Origin). JSON bodies are capped at 128 KiB and reject unknown fields and trailing documents. While active, all exams strictly withhold expected keys, hints, explanations, and correctness feedback via `PublicExamView` and `PublicOptionView`.
+
+- `GET /api/exams`: list summary records (`[]ExamSummary`) of assessments sorted newest first. Returns `[]` if none exist.
+- `POST /api/exams`: `{title, question_count, module_ids, duration_minutes, seed}`. Generates immutable question snapshots from approved content with deterministic option shuffles, calculates UTC wall-clock `deadline_at` for timed exams, persists to `sessions`, and returns `PublicExamView` (HTTP 201).
+- `GET /api/exams/{id}`: retrieves `PublicExamView`. If the assessment is active and its UTC wall-clock deadline has expired, dynamically marks the assessment expired and auto-evaluates the score report.
+- `POST /api/exams/{id}/commands`: `{command_id, expected_revision, type:"save_answer"|"navigate"|"submit_exam"|"abandon_exam", question_index?, stage_id?, answer?}`. Executes atomically under optimistic revision check. Idempotent replay of identical command returns previous result; changed payload or mismatched revision returns HTTP 409 conflict. Grading uses mathematical engine rules.
+- `GET /api/exams/{id}/report`: unlocked full evaluation report (`ExamReport`), including total/correct stages, percentage score, time spent, question-by-question breakdown, and step-by-step mathematical derivations. Only available after exam is completed, expired, or abandoned (HTTP 403 while active). Supports `?format=markdown` for standalone Markdown report download.
+- `GET /api/history`: unified chronological ledger of completed drills and assessments (`[]HistoryItem`) with pagination (`?offset=&limit=`). Exam attempts are tagged as mode `assessment` and never alter concept mastery or transfer projections.

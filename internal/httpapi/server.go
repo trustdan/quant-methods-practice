@@ -41,6 +41,7 @@ type Config struct {
 	ProviderManager   *providers.ProviderManager
 	CandidateStore    CandidateStore
 	WorksheetStore    WorksheetStore
+	ExamStore         ExamStore
 }
 
 type Server struct {
@@ -59,6 +60,7 @@ type Server struct {
 	candidateStore    CandidateStore
 	candidateState    candidateState
 	worksheetStore    WorksheetStore
+	examStore         ExamStore
 	lastSessionID     string
 	mu                sync.RWMutex
 }
@@ -143,6 +145,10 @@ func NewServer(cfg Config) (*Server, error) {
 
 	s.candidateStore = cfg.CandidateStore
 	s.worksheetStore = cfg.WorksheetStore
+	s.examStore = cfg.ExamStore
+	if s.examStore == nil && cfg.Store != nil {
+		s.examStore, _ = cfg.Store.(ExamStore)
+	}
 	if s.worksheetStore == nil && cfg.Store != nil {
 		s.worksheetStore, _ = cfg.Store.(WorksheetStore)
 	}
@@ -196,12 +202,16 @@ func NewServer(cfg Config) (*Server, error) {
 	mux.HandleFunc("/api/candidates/", s.handleCandidates)
 	mux.HandleFunc("/api/worksheets", s.handleWorksheets)
 	mux.HandleFunc("/api/worksheets/", s.handleWorksheets)
+	mux.HandleFunc("/api/exams", s.handleExams)
+	mux.HandleFunc("/api/exams/", s.handleExams)
+	mux.HandleFunc("/api/history", s.handleHistory)
 	mux.HandleFunc("/api/notes", s.handleNotes)
 	mux.HandleFunc("/api/notes/", s.handleNoteByID)
 	mux.HandleFunc("/api/exports", s.handleExports)
 	mux.HandleFunc("/api/tutor/drafts/", s.handleTutorDrafts)
 	mux.HandleFunc("/api/providers", s.handleProviders)
 	mux.HandleFunc("/api/providers/", s.handleProviders)
+	mux.HandleFunc("/api/visuals/", s.handleVisuals)
 	mux.HandleFunc("/", s.handleStaticOrSPA)
 
 	wrapped := s.securityMiddleware(mux)

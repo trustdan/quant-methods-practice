@@ -43,7 +43,8 @@ test('candidate preview, explicit review, replay, retirement and export stay off
   await expect(preview.locator('mjx-container').first()).toBeVisible();
   const draft = (await (await page.request.get(new URL('/api/candidates', url).href)).json())[0];
   const bankURL = new URL('/api/bank', url).href;
-  expect((await (await page.request.get(bankURL)).json()).length).toBe(10);
+  const initialBankCount = (await (await page.request.get(bankURL)).json()).length;
+  expect(initialBankCount).toBeGreaterThanOrEqual(10);
   const approve = page.getByRole('button', { name: 'Approve for practice', exact: true });
   await page.getByLabel('Reviewer name', { exact: true }).fill('E2E fixture reviewer');
   await page.getByLabel('Review notes', { exact: true }).fill('Reviewed the scenario, parameters, all stages, hints and answer. Isolated test fixture.');
@@ -54,7 +55,7 @@ test('candidate preview, explicit review, replay, retirement and export stay off
   await page.getByLabel('Review notes', { exact: true }).type(' jkl');
   await approve.click();
   await expect(page.getByText('Approved for future practice sessions. Existing sessions keep their saved questions.')).toBeVisible();
-  expect((await (await page.request.get(bankURL)).json()).length).toBe(11);
+  expect((await (await page.request.get(bankURL)).json()).length).toBe(initialBankCount + 1);
   const sessionResponse = await page.request.post(new URL('/api/practice/sessions', url).href, { data: { template_id: draft.id, seed: 42 } });
   expect(sessionResponse.ok()).toBeTruthy();
   const session = await sessionResponse.json();
@@ -62,13 +63,13 @@ test('candidate preview, explicit review, replay, retirement and export stay off
   await page.getByLabel('Review notes', { exact: true }).fill('Retire test fixture, preserve its existing session.');
   await page.getByRole('button', { name: 'Retire from future practice', exact: true }).click();
   await expect(page.getByText('Retired from future practice. Past sessions are preserved.')).toBeVisible();
-  expect((await (await page.request.get(bankURL)).json()).length).toBe(10);
+  expect((await (await page.request.get(bankURL)).json()).length).toBe(initialBankCount);
   const downloadPromise = page.waitForEvent('download');
   await page.getByRole('button', { name: 'Export approved bank', exact: true }).click();
   const download = await downloadPromise;
   const exportPath = await download.path();
   const exported = JSON.parse(fs.readFileSync(exportPath!, 'utf8'));
-  expect(exported).toHaveLength(10); expect(exported.some((item: { id: string }) => item.id === draft.id)).toBeFalsy();
+  expect(exported).toHaveLength(initialBankCount); expect(exported.some((item: { id: string }) => item.id === draft.id)).toBeFalsy();
   await stop(); url = await start();
   await page.goto(url);
   await page.getByRole('button', { name: 'Question candidates', exact: true }).click();

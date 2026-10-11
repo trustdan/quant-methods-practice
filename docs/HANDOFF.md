@@ -1,5 +1,73 @@
 # Handoff
 
+## Stage 15 — October 10, 2026 (macOS)
+
+Stage 00 through Stage 15 are complete within their documented scope. Stage 16 (sampling, confidence intervals, hypothesis testing and regression) is next. All changes from this Mac session remain local and uncommitted.
+
+### Implemented
+
+- `internal/mathengine/continuous.go`: Continuous distribution families and evaluations:
+  - `NormalDistribution`: PDF $\phi(x; \mu, \sigma)$, CDF $\Phi(x; \mu, \sigma)$ via `math.Erf`/`math.Erfc` with stable extreme-tail bounds, survival function $1 - \Phi(x)$, and high-precision quantile (inverse CDF) via Peter John Acklam's rational probit approximation with Halley refinement.
+  - `UniformDistribution`: Constant density $1/(b-a)$, linear CDF $(x-a)/(b-a)$, exact moments ($\mu = (a+b)/2, \sigma^2 = (b-a)^2/12$), and support validation $b > a$.
+  - `ExponentialDistribution`: Decaying density $\lambda e^{-\lambda x}$, cumulative distribution $1 - e^{-\lambda x}$, survival $e^{-\lambda x}$, memoryless property preservation, and support $x \ge 0$.
+  - Continuous event evaluator `EvaluateContinuousEvent`: exact point mass probability $P(X = c) = 0$, intervals $P(x_1 \le X \le x_2)$, lower tails $P(X \le x)$, upper survival tails $P(X \ge x)$, and symmetric two-tailed bounds.
+- `internal/bank/family.go`: Registered `normal_dist`, `uniform_dist`, and `exponential_dist` in `DefaultRegistry()`, binding continuous parameter validation, default instances, and stage derivation.
+- `internal/httpapi/visuals.go`: Reconciled visual math endpoints:
+  - `GET /api/visuals/normal`: Returns curve points (PDF and CDF modes), $z$-score, shaded probability, 68-95-99.7 empirical rule values, and exact Excel formulas (`=NORM.DIST(x, mu, sigma, TRUE)`).
+  - `GET /api/visuals/uniform`: Returns constant density height, interval bounds, shaded probability, moments, and Excel formulas.
+  - `GET /api/visuals/exponential`: Returns decaying density points, cutoff height, survival probability, memoryless property notes, and Excel formulas (`=1 - EXPON.DIST(x, lambda, TRUE)`).
+  - `GET /api/visuals/discrete`: Bar heights for Binomial and Poisson, event highlighting, and Excel formulas (`=BINOM.DIST`, `=POISSON.DIST`).
+  - `GET /api/visuals/venn`: Set operations with Fréchet inequality validation ($P(A \cap B) \in [\max(0, P(A)+P(B)-1), \min(P(A), P(B))]$), analytical formulas, and independence checking.
+- `curriculum/approved/`: Added 3 Module 3 approved questions:
+  - `normal-standard-upper-tail.json`: Standard normal tail probability $P(Z \ge 1.645) \approx 0.05$.
+  - `exponential-service-lifetime.json`: Service equipment survival with rate $\lambda = 0.5$.
+  - `uniform-commute-wait-time.json`: Wait time between 0 and 15 minutes.
+  Audit reviews added in `curriculum/reviews/`. Scaffold validator passes with 0 errors.
+- `web/src/visuals/`: Interactive accessible SVG Visuals Lab:
+  - `NormalVisual.tsx`: Interactive sliders for $\mu, \sigma$, tail region selector, PDF/CDF toggle, empirical rule standard deviation guidelines ($\pm 1\sigma, \pm 2\sigma, \pm 3\sigma$), accessible SVG diagonal hatching pattern, live Excel formula, and ARIA polite text summary.
+  - `UniformVisual.tsx`: Sliders for bounds $[a, b]$, interval selector, rectangle shaded area, density height indicator.
+  - `ExponentialVisual.tsx`: Rate parameter $\lambda$ slider, survival/lower/interval events, decaying curve with diagonal shading, memoryless property explanation.
+  - `DiscreteVisual.tsx`: Binomial ($n, p$) and Poisson ($\lambda$) distribution bar charts, event highlighting, cumulative vs point mass views.
+  - `VennVisual.tsx`: Interactive 2-set Euler/Venn diagram with Fréchet inequality slider enforcement, boolean region buttons (intersection, union, set differences, complement, neither), SVG clip paths and diagonal patterns, independence tester.
+  - `VisualsExplorer.tsx`: Unified tabbed container with keyboard accessibility and back-to-practice button.
+- `web/src/features/reference/ReferenceLibrary.tsx`: Reference library cards updated with Module 3 continuous distributions: formulas, properties, Excel functions, and exam pitfalls.
+- `web/src/app/App.tsx` and `keymap.ts`: Wired `v` shortcut (`VIEW_VISUALS`) to toggle Visuals Lab, `Esc` to return to practice drill, tab button in header (`#tab-visuals`), and responsive mobile width constraints ($\le 376$px on 375px viewport).
+- `tests/e2e/visuals.spec.ts`: End-to-end browser tests verifying all 5 visual explorers, dynamic curve updates, spreadsheet formula displays, Venn set operations, mobile responsiveness at 375px viewport, verified screenshot capture (`tests/e2e/screenshots/stage15_verified.png`), and `Escape` return to practice.
+
+### Actual checks
+
+- Native `./scripts/test.sh` passed on macOS:
+  - Documentation and scaffold check: 32 Markdown files, 74 local links, 51 JSON files, 35 source directories (0 errors).
+  - Frontend typecheck (`tsc --noEmit`): 0 errors.
+  - Frontend lint (`eslint src`): 0 errors, 0 warnings.
+  - Frontend unit tests (Vitest): 80 passed across 17 test files.
+  - Frontend production build (`tsc && vite build`): successful bundle.
+  - Native Go binary compilation: `bin/quant-practice` compiled cleanly.
+  - Playwright E2E browser tests: 14/14 passed across all suites (including `visuals.spec.ts`, `candidates.spec.ts`, `worksheets.spec.ts`, `exams.spec.ts`, and `foundation.spec.ts`).
+  - Go formatting check (`gofmt -l .`): 100% formatted.
+  - Go unit tests with race detector (`go test -race ./...`): all 16 packages passed.
+  - Go vet (`go vet ./...`): 0 issues.
+- Verified screenshot generated at `tests/e2e/screenshots/stage15_verified.png` (182 KiB).
+
+## Stage 14 — October 10, 2026 (macOS)
+
+Stage 00 through Stage 14 are complete within their documented scope. Stage 15 (continuous distributions and math visuals) is next. All changes from this Mac session remain local and uncommitted.
+
+### Implemented
+
+- `internal/exam`: Domain engine for timed and untimed assessments with strict aid withholding. `New` constructs frozen question snapshots from approved content with deterministic per-question option shuffles. `Public` strips all hints, solutions, explanations, and expected keys via `PublicExamView` and `PublicOptionView`. Strict deadline enforcement uses UTC wall-clock time (`deadline_at`). Automated evaluation via mathematical engine (`EvaluateExam`), returning points, percentage score, stage breakdown, full mathematical derivations, and standalone Markdown export (`FormatMarkdownReport`).
+- `internal/storage/exams.go`: Persistent exam storage implementing `CreateExam`, `GetExam`, `ListExams`, `CommandExam`, `GetExamReport`, and `GetHistory` over existing migration 001 SQLite tables (`sessions`, `question_instances`, `exam_responses`, `command_idempotency`). Replay idempotency via request hash, optimistic revision lock, and dynamic deadline expiration on read. Zero mastery writes (assessments remain strictly separate from independent learning ledger).
+- `internal/httpapi/exams.go`: Session-authenticated and loopback/exact-Origin protected endpoints (`POST /api/exams`, `GET /api/exams`, `GET /api/exams/{id}`, `POST /api/exams/{id}/commands`, `GET /api/exams/{id}/report` with JSON and `?format=markdown`, `GET /api/history`). Unknown JSON fields and bodies > 128 KiB are rejected. Active exams return HTTP 403 on report retrieval.
+- `cmd/quant-practice`: Added CLI assessment commands (`-exam [count]`, `-exam-time [minutes]`, `-resume-exam [id]`, `-exam-history`, `-exam-report [id]`) in `cmd/quant-practice/exams.go`.
+- `web/src/features/exams`, `App.tsx`, and `keymap.ts`: Full React frontend in `web/src/features/exams/Exams.tsx` featuring setup dashboard, question count and time limit selectors, active countdown timer (`aria-label="Time Remaining"`), question strip, radio choice and numeric inputs, submission and abandonment confirmation modals, score hero card, detailed question review with revealed derivations, and Markdown report download link. Integrated into `App.tsx` header tabs and keymap (`Shift+E` / `E` for `VIEW_EXAM`), with automatic active exam recovery across server/browser restarts.
+- Docs: Updated `API.md`, `PLAN.md`, `README.md`, and `HANDOFF.md` with Stage 14 details.
+
+### Actual checks
+
+- Native `./scripts/test.sh` passed on macOS: scaffold validation (`scripts/validate_scaffold.py`), frontend typecheck (`tsc --noEmit`), lint (`eslint src`), 73 frontend unit tests across 16 files, production build (`vite build` + `go build`), all 13 Playwright E2E browser tests (including `tests/e2e/exams.spec.ts`), gofmt check, unit tests across all 15 Go packages, and `go vet`.
+- `tests/e2e/exams.spec.ts` verified complete lifecycle: starting a 30-minute exam, strict aid withholding during active exam, answering choice and numeric stages, native server stop and restart with wall-clock deadline preservation and answer recovery, submission confirmation modal, post-completion score report with unlocked keys/derivations, Markdown export link, history table update, and 375px mobile viewport responsiveness.
+- `git diff --check` and `python3 scripts/validate_scaffold.py` passed with 0 errors.
+
 ## Stage 13 — October 9, 2026 (macOS)
 
 Stage 00 through Stage 13 are complete within their documented scope. Stage 14 (exam mode) is next. All Mac-session changes, including Stage 12, remain local and uncommitted.

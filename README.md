@@ -2,7 +2,7 @@
 
 A planned local, keyboard-driven probability and statistics tutor with readable mathematics, progressive problems, persistent practice history, optional AI help, saved explanations, and a skippable space arcade.
 
-**Status: Stages 00 through 13 complete within their documented scope, October 9, 2026. ChatGPT plan sign-in/inference/sign-out verified through user-run checks; see HANDOFF for platform coverage and limitations.** Standalone repository established at `https://github.com/trustdan/quant-methods-practice.git`. Standalone Go executable and React web interface work offline with bundled MathJax, a 10-question reviewed curriculum bank, scheduling and transfer, mastery dashboard, formula references, notes with Markdown export, protected provider credentials, binomial candidate review, and [full-solution worksheets and four-toss CSV cases](docs/WORKSHEETS.md).
+**Status: Stages 00 through 14 complete within their documented scope, October 10, 2026. ChatGPT plan sign-in/inference/sign-out verified through user-run checks; see HANDOFF for platform coverage and limitations.** Standalone repository established at `https://github.com/trustdan/quant-methods-practice.git`. Standalone Go executable and React web interface work offline with bundled MathJax, a 10-question reviewed curriculum bank, scheduling and transfer, mastery dashboard, formula references, notes with Markdown export, protected provider credentials, binomial candidate review, [full-solution worksheets and four-toss CSV cases](docs/WORKSHEETS.md), and timed/untimed Exam Mode assessments with strict aid withholding and post-submission score reports.
 
 ## Launching the application
 
@@ -18,6 +18,11 @@ CLI inspection tools:
 - `.\bin\quant-practice.exe -mastery` — View current concept retention and transfer status.
 - `.\bin\quant-practice.exe -notes` — View personal saved notes library.
 - `.\bin\quant-practice.exe -providers` — View configured AI provider and vault credential status.
+- `.\bin\quant-practice.exe -exam [count]` — Start a CLI assessment session (default 5 questions).
+- `.\bin\quant-practice.exe -exam-time [minutes]` — Set exam time limit (0 = untimed).
+- `.\bin\quant-practice.exe -resume-exam [id]` — Resume active assessment by ID.
+- `.\bin\quant-practice.exe -exam-history` — View past completed and active assessments.
+- `.\bin\quant-practice.exe -exam-report [id]` — Display completed exam score report and derivations.
 
 ## Start building
 
@@ -25,7 +30,7 @@ CLI inspection tools:
 2. Resume from [docs/HANDOFF.md](docs/HANDOFF.md), then perform the first unfinished stage in [PLAN.md](PLAN.md).
 3. Inventory actual course materials using [docs/COURSE-MAP.md](docs/COURSE-MAP.md).
 4. Run tests with `.\scripts\test.ps1` or `./scripts/test.sh`.
-5. Try **Worksheets** (`Shift+J` for full solutions, `Shift+F` for CSV cases), or **Question candidates** (`p`) for reviewed binomial proposals. Continue with Stage 14 (exam mode) in [PLAN.md](PLAN.md).
+5. Try **Visuals Lab** (`v`), **Exams** (`Shift+E`), **Worksheets** (`Shift+J` for full solutions, `Shift+F` for CSV cases), or **Question candidates** (`p`). Continue with Stage 16 (sampling, confidence intervals, hypothesis testing and regression) in [PLAN.md](PLAN.md).
 
 ## Selected design
 

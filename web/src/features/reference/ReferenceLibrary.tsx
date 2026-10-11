@@ -170,6 +170,86 @@ Let $X$ and $Y$ be random variables, and $a, b, c \\in \\mathbb{R}$:
       'Forgetting that variance scales quadratically: $\\operatorname{Var}(2X) = 4\\operatorname{Var}(X)$, whereas $\\operatorname{Var}(X_1 + X_2) = 2\\operatorname{Var}(X)$ for independent copies.',
     ],
   },
+  {
+    id: 'normal_distribution',
+    title: 'Normal (Gaussian) Distribution & Z-Scores',
+    category: 'distributions',
+    module: 'Module 3: Continuous Probability Distributions',
+    summary: 'The bell-shaped continuous distribution defined by mean mu and standard deviation sigma.',
+    formulaTex: 'f(x) = \\frac{1}{\\sigma \\sqrt{2\\pi}} e^{-\\frac{(x-\\mu)^2}{2\\sigma^2}}, \\quad Z = \\frac{X - \\mu}{\\sigma}',
+    contentMarkdown: `
+A continuous random variable $X \\sim N(\\mu, \\sigma^2)$ with mean $\\mu$ and standard deviation $\\sigma > 0$.
+- **Standardization ($Z$-Score)**:
+  $$Z = \\frac{X - \\mu}{\\sigma} \\sim N(0, 1)$$
+- **Cumulative Probability**:
+  $$P(X \\le x) = \\Phi\\left(\\frac{x - \\mu}{\\sigma}\\right) = \\frac{1}{2}\\left[1 + \\operatorname{erf}\\left(\\frac{x - \\mu}{\\sigma \\sqrt{2}}\\right)\\right]$$
+- **Upper Tail & Intervals**:
+  $$P(X \\ge x) = 1 - \\Phi(z) = \\frac{1}{2}\\operatorname{erfc}\\left(\\frac{z}{\\sqrt{2}}\\right), \\quad P(a \\le X \\le b) = \\Phi(z_b) - \\Phi(z_a)$$
+- **Empirical Rule (68-95-99.7)**:
+  - $\\mu \\pm 1\\sigma$: $\\approx 68.27\\%$
+  - $\\mu \\pm 2\\sigma$: $\\approx 95.45\\%$
+  - $\\mu \\pm 3\\sigma$: $\\approx 99.73\\%$
+- **Excel Formulas**:
+  - CDF: \`=NORM.DIST(x, mu, sigma, TRUE)\` or \`=NORM.S.DIST(z, TRUE)\`
+  - PDF: \`=NORM.DIST(x, mu, sigma, FALSE)\`
+  - Inverse/Quantile: \`=NORM.INV(p, mu, sigma)\` or \`=NORM.S.INV(p)\`
+    `,
+    pitfalls: [
+      'Confusing probability density f(x) with probability: for any continuous variable, P(X = c) = 0. Probability is the AREA under the curve, not height!',
+      'Using unstandardized raw distances without dividing by sigma.',
+    ],
+  },
+  {
+    id: 'uniform_distribution',
+    title: 'Continuous Uniform Distribution',
+    category: 'distributions',
+    module: 'Module 3: Continuous Probability Distributions',
+    summary: 'Constant probability density over a finite continuous support interval [a, b].',
+    formulaTex: 'f(x) = \\frac{1}{b - a}, \\quad a \\le x \\le b',
+    contentMarkdown: `
+A random variable $X \\sim U(a, b)$ with $a < b$:
+- **PDF**:
+  $$f(x) = \\frac{1}{b - a} \\quad \\text{for } a \\le x \\le b, \\quad 0 \\text{ otherwise}$$
+- **CDF**:
+  $$F(x) = \\frac{x - a}{b - a} \\quad \\text{for } a \\le x \\le b$$
+- **Moments**:
+  $$E[X] = \\frac{a + b}{2}, \\quad \\operatorname{Var}(X) = \\frac{(b - a)^2}{12}, \\quad \\sigma_X = \\frac{b - a}{\\sqrt{12}}$$
+- **Interval Probability**:
+  $$P(x_1 \\le X \\le x_2) = \\frac{x_2 - x_1}{b - a}$$
+- **Endpoint Invariance**: $P(x_1 \\le X \\le x_2) = P(x_1 < X < x_2)$ because individual boundary points carry 0 probability.
+    `,
+    pitfalls: [
+      'Setting density height to (b - a) instead of the reciprocal 1/(b - a). Area must equal 1.',
+      'Treating continuous uniform endpoints like discrete integers.',
+    ],
+  },
+  {
+    id: 'exponential_distribution',
+    title: 'Exponential Distribution & Memoryless Property',
+    category: 'distributions',
+    module: 'Module 3: Continuous Probability Distributions',
+    summary: 'Continuous waiting times between Poisson events with constant hazard rate lambda.',
+    formulaTex: 'f(x) = \\lambda e^{-\\lambda x}, \\quad P(X \\ge x) = e^{-\\lambda x}, \\quad x \\ge 0',
+    contentMarkdown: `
+A random variable $X \\sim \\text{Exp}(\\lambda)$ with rate $\\lambda > 0$:
+- **PDF & CDF**:
+  $$f(x) = \\lambda e^{-\\lambda x}, \\quad F(x) = 1 - e^{-\\lambda x}$$
+- **Survival Function**:
+  $$P(X \\ge x) = e^{-\\lambda x}$$
+- **Moments**:
+  $$E[X] = \\frac{1}{\\lambda}, \\quad \\operatorname{Var}(X) = \\frac{1}{\\lambda^2}, \\quad \\sigma_X = \\frac{1}{\\lambda}$$
+- **Memoryless Property**:
+  $$P(X > s + t \\mid X > s) = P(X > t) = e^{-\\lambda t}$$
+  Given that an item has operated for $s$ hours, the probability of lasting an additional $t$ hours is identical to fresh survival.
+- **Excel Formula**:
+  - Cumulative: \`=EXPON.DIST(x, lambda, TRUE)\`
+  - Density: \`=EXPON.DIST(x, lambda, FALSE)\`
+    `,
+    pitfalls: [
+      'Confusing rate parameter lambda with mean duration: E[X] = 1/lambda, NOT lambda.',
+      'Assuming mechanical wear-out: the exponential distribution models pure random failure without aging.',
+    ],
+  },
 ];
 
 interface ReferenceLibraryProps {

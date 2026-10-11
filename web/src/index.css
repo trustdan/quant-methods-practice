@@ -303,6 +303,9 @@ html, body {
   border-radius: var(--radius-md);
   padding: 1.5rem;
   box-shadow: var(--shadow-md);
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 .card-header {
   display: flex;
@@ -778,3 +781,24 @@ html, body {
 .worksheet-option { display: flex; align-items: baseline; gap: .5rem; margin: .4rem 0; }
 .worksheet-option .math-markdown { min-width: 0; }
 .worksheet-workspace table { width: 100%; table-layout: fixed; text-align: left; overflow-wrap: anywhere; }
+
+/* Visuals Lab Responsive Styles */
+.visuals-card,
+.visual-card {
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.visual-card svg,
+.visuals-card svg {
+  max-width: 100%;
+  height: auto;
+}
+
+@media (max-width: 768px) {
+  .app-main {
+    padding: 0.75rem;
+    min-width: 0;
+  }
+}

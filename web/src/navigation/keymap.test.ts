@@ -119,6 +119,7 @@ describe('keymap navigation', () => {
     // Escape and Enter are permitted in fields
     expect(resolveKeyCommand(new KeyboardEvent('keydown', { key: 'Escape' }), context)).toBe('ESCAPE');
     expect(resolveKeyCommand(new KeyboardEvent('keydown', { key: 'Enter' }), context)).toBe('SUBMIT');
+    expect(resolveKeyCommand(new KeyboardEvent('keydown', { key: 'v' }), { isEditableActive: false, activeMode: 'practice' })).toBe('VIEW_VISUALS');
   });
 
   it('ignores IME composition events', () => {

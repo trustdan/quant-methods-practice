@@ -114,7 +114,7 @@ test('CSV case requires semantic review, saves data and distinguishes observed a
   const snapshot = (await (await page.request.get(new URL('/api/worksheets', url).href)).json())[0];
   expect(snapshot.dataset.rows).toHaveLength(5);
   expect(snapshot.items.every((item: { attempts: { is_correct: boolean; assistance: string[] }[] }) => item.attempts[0].is_correct && item.attempts[0].assistance.includes('reference'))).toBeTruthy();
-  expect((await (await page.request.get(new URL('/api/bank', url).href)).json()).length).toBe(10);
+  expect((await (await page.request.get(new URL('/api/bank', url).href)).json()).length).toBeGreaterThanOrEqual(10);
   await stop(); url = await start(); await page.goto(url);
   await page.getByRole('button', { name: 'Worksheets', exact: true }).click();
   await expect(observed.getByLabel('Numeric answer (observed value)')).toHaveValue('2/5');

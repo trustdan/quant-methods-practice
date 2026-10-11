@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "template_id": "uniform_commute_wait_time",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-10T21:45:00Z",
+  "delegation_basis": "Stage 15 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "uniform_dist",
+    "parameters": {"a": 0.0, "b": 20.0, "x1": 5.0, "x2": 12.0, "tail": "interval"},
+    "canonical_probability": 0.35,
+    "canonical_rational": "7/20",
+    "moments": {
+      "mean": 10.0,
+      "variance": 33.3333,
+      "standard_deviation": 5.7735
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.001,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "uniform_density_height", "kind": "choice", "evidence": "uniform_pdf_height"},
+      {"id": "calculate_interval_prob", "kind": "numeric", "evidence": "uniform_interval_calculation"},
+      {"id": "endpoints_inclusion_check", "kind": "choice", "evidence": "continuous_endpoints_invariant"}
+    ],
+    "numeric_policy": {
+      "version": 1,
+      "allowed_forms": ["decimal", "percent", "fraction"],
+      "absolute_tolerance": 0.001,
+      "relative_tolerance": 0.01
+    }
+  },
+  "notes": "Verified mathematically: f(x) = 1/20 = 0.05. P(5 <= X <= 12) = 7/20 = 0.35. Continuous endpoint invariant verified."
+}

@@ -385,3 +385,86 @@ func TestRejectInvalidLinearCombinationParameters(t *testing.T) {
 		})
 	}
 }
+
+func TestRejectInvalidContinuousDistributionParameters(t *testing.T) {
+	reg := bank.DefaultRegistry()
+
+	// Normal distribution
+	normFam, ok := reg.Get("normal_dist")
+	if !ok {
+		t.Fatal("normal_dist not registered")
+	}
+	normCases := []struct {
+		name    string
+		params  map[string]interface{}
+		wantErr bool
+	}{
+		{"valid standard normal", map[string]interface{}{"mu": 0.0, "sigma": 1.0}, false},
+		{"valid with cutoff x", map[string]interface{}{"mu": 100.0, "sigma": 15.0, "x": 115.0, "tail": "upper"}, false},
+		{"valid interval bounds", map[string]interface{}{"mu": 0.0, "sigma": 1.0, "x1": -1.96, "x2": 1.96}, false},
+		{"inverted interval bounds", map[string]interface{}{"mu": 0.0, "sigma": 1.0, "x1": 2.0, "x2": -1.0}, true},
+		{"missing mu", map[string]interface{}{"sigma": 1.0}, true},
+		{"missing sigma", map[string]interface{}{"mu": 0.0}, true},
+		{"negative sigma", map[string]interface{}{"mu": 0.0, "sigma": -1.0}, true},
+		{"zero sigma", map[string]interface{}{"mu": 0.0, "sigma": 0.0}, true},
+		{"unknown param", map[string]interface{}{"mu": 0.0, "sigma": 1.0, "extra": 123}, true},
+	}
+	for _, tc := range normCases {
+		t.Run("normal_"+tc.name, func(t *testing.T) {
+			err := normFam.ValidateParameters(1, tc.params)
+			if (err != nil) != tc.wantErr {
+				t.Errorf("normal ValidateParameters() error = %v, wantErr %v", err, tc.wantErr)
+			}
+		})
+	}
+
+	// Uniform distribution
+	uniFam, ok := reg.Get("uniform_dist")
+	if !ok {
+		t.Fatal("uniform_dist not registered")
+	}
+	uniCases := []struct {
+		name    string
+		params  map[string]interface{}
+		wantErr bool
+	}{
+		{"valid bounds", map[string]interface{}{"a": 0.0, "b": 10.0}, false},
+		{"a equals b", map[string]interface{}{"a": 5.0, "b": 5.0}, true},
+		{"a greater than b", map[string]interface{}{"a": 10.0, "b": 2.0}, true},
+		{"missing b", map[string]interface{}{"a": 0.0}, true},
+		{"unknown param", map[string]interface{}{"a": 0.0, "b": 1.0, "c": 2.0}, true},
+	}
+	for _, tc := range uniCases {
+		t.Run("uniform_"+tc.name, func(t *testing.T) {
+			err := uniFam.ValidateParameters(1, tc.params)
+			if (err != nil) != tc.wantErr {
+				t.Errorf("uniform ValidateParameters() error = %v, wantErr %v", err, tc.wantErr)
+			}
+		})
+	}
+
+	// Exponential distribution
+	expFam, ok := reg.Get("exponential_dist")
+	if !ok {
+		t.Fatal("exponential_dist not registered")
+	}
+	expCases := []struct {
+		name    string
+		params  map[string]interface{}
+		wantErr bool
+	}{
+		{"valid rate", map[string]interface{}{"lambda": 0.5}, false},
+		{"missing lambda", map[string]interface{}{}, true},
+		{"negative lambda", map[string]interface{}{"lambda": -2.0}, true},
+		{"zero lambda", map[string]interface{}{"lambda": 0.0}, true},
+		{"unknown param", map[string]interface{}{"lambda": 1.0, "rate": 1.0}, true},
+	}
+	for _, tc := range expCases {
+		t.Run("exponential_"+tc.name, func(t *testing.T) {
+			err := expFam.ValidateParameters(1, tc.params)
+			if (err != nil) != tc.wantErr {
+				t.Errorf("exponential ValidateParameters() error = %v, wantErr %v", err, tc.wantErr)
+			}
+		})
+	}
+}

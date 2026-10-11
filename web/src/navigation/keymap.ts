@@ -36,6 +36,7 @@ export type NavigationCommand =
   | 'VIEW_FULL_SOLUTION'
   | 'VIEW_DATASET_CASE'
   | 'VIEW_EXAM'
+  | 'VIEW_VISUALS'
   | 'VIEW_ARCADE'
   | 'VIEW_LEADERBOARD'
   | 'CYCLE_INTENSITY'
@@ -265,6 +266,8 @@ export function resolveKeyCommand(event: KeyboardEvent, context: KeyContext): Na
       return 'VIEW_MASTERY';
     case 'r':
       return 'VIEW_REFERENCE';
+    case 'v':
+      return 'VIEW_VISUALS';
     case 't':
       return 'VIEW_SETTINGS';
     case 'p':

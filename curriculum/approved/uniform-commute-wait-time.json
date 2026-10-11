@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "uniform_commute_wait_time",
+  "version": 1,
+  "status": "active",
+  "family_id": "uniform_dist",
+  "rule_version": 1,
+  "module_id": "module_3",
+  "title": "Commute transit wait time uniform interval",
+  "scenario_markdown": "A passenger arrives at a transit stop where the wait time $X$ until the next express shuttle is uniformly distributed between 0 and 20 minutes ($X \\sim U(0, 20)$). Find the probability that the passenger waits between 5 and 12 minutes.",
+  "parameters": {
+    "a": 0.0,
+    "b": 20.0,
+    "x1": 5.0,
+    "x2": 12.0,
+    "tail": "interval"
+  },
+  "assumptions": [
+    "Continuous uniform distribution X ~ U(0, 20)",
+    "Constant probability density across interval [0, 20]",
+    "Zero probability outside support bounds"
+  ],
+  "concept_ids": ["uniform_pdf_height", "uniform_interval_calculation", "continuous_endpoints_invariant"],
+  "setting_group": "uniform_transit_wait",
+  "source_refs": ["Course Module 3: Continuous Probability Distributions", "docs/COURSE-MAP.md"],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-10T21:45:00Z",
+    "notes": "Reviewed derivation: f(x) = 1/(20 - 0) = 0.05. P(5 <= X <= 12) = (12 - 5)/20 = 7/20 = 0.35. Invariant P(5 <= X <= 12) = P(5 < X < 12).",
+    "delegation_basis": "Stage 15 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "uniform_density_height",
+      "kind": "choice",
+      "prompt_markdown": "What is the constant probability density height $f(x)$ for wait times within the support interval $[0, 20]$ minutes?",
+      "options": [
+        {"id": "height_point_zero_five", "text_markdown": "$f(x) = \\frac{1}{b - a} = \\frac{1}{20 - 0} = 0.05$ per minute", "misconception_id": null, "hint_markdown": null},
+        {"id": "height_twenty", "text_markdown": "$f(x) = b - a = 20.0$", "misconception_id": "interval_length_as_density", "hint_markdown": "Total area under the PDF must equal 1, so the height is the reciprocal of the width: $1/(b-a)$."},
+        {"id": "height_point_five", "text_markdown": "$f(x) = 0.50$", "misconception_id": "arbitrary_density", "hint_markdown": "Divide 1 by the width of the interval $(20 - 0)$."}
+      ],
+      "expected_answer": {"kind": "choice", "option_id": "height_point_zero_five"},
+      "evidence_concept_ids": ["uniform_pdf_height"],
+      "explanation_markdown": "For $U(a, b)$, the density is constant: $f(x) = \\frac{1}{b - a} = \\frac{1}{20} = 0.05$ per minute for $0 \\le x \\le 20$.",
+      "numeric_policy": null
+    },
+    {
+      "id": "calculate_interval_prob",
+      "kind": "numeric",
+      "prompt_markdown": "Calculate $P(5 \\le X \\le 12) = \\frac{12 - 5}{20 - 0}$. Enter as a decimal or percentage.",
+      "options": [],
+      "expected_answer": {"kind": "numeric", "value": 0.35, "units": "probability"},
+      "evidence_concept_ids": ["uniform_interval_calculation"],
+      "explanation_markdown": "$P(5 \\le X \\le 12) = \\frac{12 - 5}{20} = \\frac{7}{20} = 0.35$ (or $35\\%$).",
+      "numeric_policy": {
+        "version": 1,
+        "allowed_forms": ["decimal", "percent", "fraction"],
+        "absolute_tolerance": 0.001,
+        "relative_tolerance": 0.01
+      }
+    },
+    {
+      "id": "endpoints_inclusion_check",
+      "kind": "choice",
+      "prompt_markdown": "How does the probability $P(5 \\le X \\le 12)$ compare to the strict inequality $P(5 < X < 12)$?",
+      "options": [
+        {"id": "identical_probability", "text_markdown": "They are exactly identical ($0.35$) because individual endpoints carry zero probability in any continuous distribution.", "misconception_id": null, "hint_markdown": null},
+        {"id": "inclusive_strictly_larger", "text_markdown": "$P(5 \\le X \\le 12)$ is strictly larger because it includes the points 5 and 12", "misconception_id": "discrete_endpoint_confusion", "hint_markdown": "In continuous distributions, $P(X = 5) = 0$ and $P(X = 12) = 0$, so including endpoints changes nothing."},
+        {"id": "cannot_determine", "text_markdown": "They cannot be compared without knowing whether the shuttle schedule is exact", "misconception_id": "practical_ambiguity", "hint_markdown": "Mathematically, for any continuous random variable, $P(X \\in [c, d]) = P(X \\in (c, d))$."}
+      ],
+      "expected_answer": {"kind": "choice", "option_id": "identical_probability"},
+      "evidence_concept_ids": ["continuous_endpoints_invariant"],
+      "explanation_markdown": "In continuous probability, single points have zero measure: $P(X = 5) = 0$ and $P(X = 12) = 0$. Therefore, $P(5 \\le X \\le 12) = P(5 < X < 12) = 0.35$.",
+      "numeric_policy": null
+    }
+  ]
+}

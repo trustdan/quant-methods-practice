@@ -116,7 +116,7 @@ func TestWorksheetsHTTPBoundaryAndDatasetReview(t *testing.T) {
 	if w.Code != 201 || strings.Contains(w.Body.String(), "expected_answer") || !strings.Contains(w.Body.String(), "answer keys were shown") {
 		t.Fatalf("reviewed case not created safely: %d %s", w.Code, w.Body.String())
 	}
-	if b.Count() != 10 {
+	if b.Count() != 13 {
 		t.Fatal("case generation modified active bank")
 	}
 }
