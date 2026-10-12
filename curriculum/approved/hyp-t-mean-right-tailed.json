@@ -1,0 +1,146 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "hyp_t_mean_right_tailed",
+  "version": 1,
+  "status": "active",
+  "family_id": "hypothesis_test",
+  "rule_version": 1,
+  "module_id": "module_5",
+  "title": "Right-tailed one-sample t-test for call handling time",
+  "scenario_markdown": "A telecommunications customer support center deployed a new CRM ticketing interface. Operations management set a benchmark target mean resolution time of $\\mu = 50.0\\text{ seconds}$. Supervisors suspect that the new interface has increased handling times ($H_1: \\mu > 50.0\\text{ seconds}$). A random sample of $n = 20$ customer calls yields a sample mean of $\\bar{x} = 53.1\\text{ seconds}$ with sample standard deviation $s = 6.2\\text{ seconds}$. Test the hypothesis at significance level $\\alpha = 0.05$.",
+  "parameters": {
+    "test_type": "mean_t",
+    "null_value": 50.0,
+    "sample_stat": 53.1,
+    "s": 6.2,
+    "n": 20,
+    "alpha": 0.05,
+    "tail": "right_tailed"
+  },
+  "assumptions": [
+    "Call handling times follow an approximately normal distribution",
+    "Independent random sample of support calls",
+    "Population standard deviation sigma is unknown and estimated by sample standard deviation s = 6.2 seconds, requiring Student's t distribution with df = n - 1 = 19"
+  ],
+  "concept_ids": [
+    "hyp_t_test_degrees_freedom_statistic",
+    "hyp_right_tailed_pvalue_excel",
+    "hyp_t_test_decision_and_action"
+  ],
+  "setting_group": "telecom_call_center_handling_duration",
+  "source_refs": [
+    "Course Module 5: Hypothesis Testing",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T22:00:00Z",
+    "notes": "Reviewed derivation: null_mu = 50.0, x_bar = 53.1, s = 6.2, n = 20. df = 19. SE = 6.2 / sqrt(20) = 1.38636. t = 3.1 / 1.38636 = 2.23607. One-tailed right tail p-value = 0.01878. Critical t_{0.05, 19} = 1.7291. Since p = 0.0188 < 0.05 and t = 2.236 > 1.729, reject H0. Excel: =T.DIST.RT(2.236, 19).",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "degrees_freedom_and_statistic",
+      "kind": "choice",
+      "prompt_markdown": "Determine the appropriate degrees of freedom and compute the $t$ test statistic $t = \\frac{\\bar{x} - \\mu_0}{s / \\sqrt{n}}$.",
+      "options": [
+        {
+          "id": "t_stat_correct",
+          "text_markdown": "$df = 19$, $SE = 1.386\\text{ s}$, $t = +2.236$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "t_stat_df_twenty",
+          "text_markdown": "$df = 20$, $SE = 1.386\\text{ s}$, $t = +2.236$",
+          "misconception_id": "omitted_df_subtraction",
+          "hint_markdown": "For a single sample t-test, degrees of freedom are $df = n - 1 = 20 - 1 = 19$."
+        },
+        {
+          "id": "t_stat_forgot_sqrt",
+          "text_markdown": "$df = 19$, $SE = 6.200\\text{ s}$, $t = +0.500$",
+          "misconception_id": "forgot_sqrt_n_in_t_standard_error",
+          "hint_markdown": "Standard error divides $s$ by $\\sqrt{n} = \\sqrt{20} \\approx 4.472$, giving $1.386\\text{ s}$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "t_stat_correct"
+      },
+      "evidence_concept_ids": [
+        "hyp_t_test_degrees_freedom_statistic"
+      ],
+      "explanation_markdown": "Because $\\sigma$ is unknown, we use Student's $t$-distribution with $df = n - 1 = 20 - 1 = 19$. The standard error is $SE = \\frac{s}{\\sqrt{n}} = \\frac{6.2}{\\sqrt{20}} = \\frac{6.2}{4.472136} \\approx 1.38636\\text{ seconds}$. The test statistic is $t = \\frac{53.1 - 50.0}{1.38636} = \\frac{3.1}{1.38636} \\approx +2.236$.",
+      "numeric_policy": null
+    },
+    {
+      "id": "right_tailed_pvalue",
+      "kind": "choice",
+      "prompt_markdown": "Calculate the right-tailed $p$-value and identify the corresponding Excel formula.",
+      "options": [
+        {
+          "id": "pval_correct",
+          "text_markdown": "$p\\text{-value} \\approx 0.0188$ ($1.88\\%$), calculated using `=T.DIST.RT(2.236, 19)`",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "pval_doubled",
+          "text_markdown": "$p\\text{-value} \\approx 0.0376$ ($3.76\\%$), calculated using `=T.DIST.2T(2.236, 19)`",
+          "misconception_id": "used_two_tailed_pvalue_for_directional_test",
+          "hint_markdown": "The research hypothesis is strictly right-tailed ($H_1: \\mu > 50$), so the p-value is the single upper tail area, not doubled."
+        },
+        {
+          "id": "pval_left_tail",
+          "text_markdown": "$p\\text{-value} \\approx 0.9812$, calculated using `=T.DIST(2.236, 19, TRUE)`",
+          "misconception_id": "reported_cumulative_left_tail_for_upper_test",
+          "hint_markdown": "In an upper-tailed test, the p-value is the area to the right of the test statistic ($1 - \\text{CDF}$). Excel's `=T.DIST.RT` directly returns this right-tail probability."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "pval_correct"
+      },
+      "evidence_concept_ids": [
+        "hyp_right_tailed_pvalue_excel"
+      ],
+      "explanation_markdown": "For an upper-tailed test ($H_1: \\mu > 50.0$), the $p$-value is the area in the upper tail beyond $t = 2.236$ under a $t$-distribution with $19$ degrees of freedom: $P(T_{19} \\ge 2.236) \\approx 0.01878$ (or $1.88\\%$). In Excel, `=T.DIST.RT(2.236, 19)` yields $0.0188$.",
+      "numeric_policy": null
+    },
+    {
+      "id": "decision_and_action",
+      "kind": "choice",
+      "prompt_markdown": "Comparing the test statistic and $p$-value to $\\alpha = 0.05$ (critical value $t_{0.05, 19} = 1.729$), what is the operational conclusion?",
+      "options": [
+        {
+          "id": "reject_h0_correct",
+          "text_markdown": "Reject $H_0$ because $p\\text{-value} = 0.0188 < 0.05$ (and $t = 2.236 > 1.729$). There is statistically significant evidence that the new interface has increased mean handling time.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "fail_to_reject_due_to_small_n",
+          "text_markdown": "Fail to reject $H_0$ because a sample of $n = 20$ is too small to make any valid statistical conclusion.",
+          "misconception_id": "belief_small_samples_cannot_reject_null",
+          "hint_markdown": "Student's t distribution explicitly accounts for smaller sample sizes through degrees of freedom; with p < 0.05, rejection is fully justified."
+        },
+        {
+          "id": "fail_to_reject_wrong_comparison",
+          "text_markdown": "Fail to reject $H_0$ because $t = 2.236$ does not exceed $Z^* = 2.576$.",
+          "misconception_id": "compared_against_wrong_critical_value",
+          "hint_markdown": "The test uses alpha = 0.05 with df = 19, where critical cutoff is t = 1.729, not 2.576."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "reject_h0_correct"
+      },
+      "evidence_concept_ids": [
+        "hyp_t_test_decision_and_action"
+      ],
+      "explanation_markdown": "Because the $p$-value ($0.0188$) is less than $\\alpha = 0.05$ (and the test statistic $t = 2.236$ exceeds the critical threshold $t_{0.05, 19} = 1.729$), we reject $H_0$. Operations management has statistically significant evidence that the new CRM interface has prolonged call handling times beyond the $50\\text{ second}$ target.",
+      "numeric_policy": null
+    }
+  ]
+}

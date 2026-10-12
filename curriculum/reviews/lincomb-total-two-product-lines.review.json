@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "template_id": "lincomb_total_two_product_lines",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T23:25:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "linear_combination",
+    "parameters": {
+      "operation": "sum_independent",
+      "mean_x": 12000.0,
+      "sd_x": 1500.0,
+      "var_x": 2250000.0,
+      "mean_y": 8000.0,
+      "sd_y": 2000.0,
+      "var_y": 4000000.0,
+      "mean": 20000.0,
+      "var": 6250000.0,
+      "sd": 2500.0
+    },
+    "canonical_probability": 0.5,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 20000.0,
+      "variance": 6250000.0,
+      "standard_deviation": 2500.0
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "compute_total_expected_revenue", "kind": "choice", "evidence": "compute_sum_of_expected_values"},
+      {"id": "compute_total_variance", "kind": "choice", "evidence": "compute_sum_of_independent_variances"},
+      {"id": "apply_rss_standard_deviation", "kind": "choice", "evidence": "apply_root_sum_of_squares_for_sd"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Reviewed sum of independent variables: E[T] = $20,000. Var(T) = 2.25M + 4.0M = 6.25M. SD(T) = sqrt(6.25M) = $2,500. Exposes the common fallacy of adding standard deviations directly ($3,500)."
+}

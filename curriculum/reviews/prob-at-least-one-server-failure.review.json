@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "template_id": "prob_at_least_one_server_failure",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T22:00:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "set_probability",
+    "parameters": {
+      "operation": "complement",
+      "p_a": 0.857375
+    },
+    "canonical_probability": 0.142625,
+    "canonical_rational": "1141/8000",
+    "moments": {
+      "mean": 0.142625,
+      "variance": 0.0,
+      "standard_deviation": 0.0
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "complement_strategy", "kind": "choice", "evidence": "prob_at_least_one_complement_strategy"},
+      {"id": "all_operating_calc", "kind": "choice", "evidence": "prob_all_operating_calculation"},
+      {"id": "at_least_one_calc", "kind": "choice", "evidence": "prob_at_least_one_subtraction"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Verified mathematically: p = 0.05 per server, n = 3 independent servers. P(zero failures) = 0.95^3 = 0.857375. Complement rule: P(at least one failure) = 1 - 0.857375 = 0.142625 (14.26%). Tests against naive addition trap (0.15) and simultaneous failure trap (0.000125). Excel: =1 - (0.95^3)."
+}

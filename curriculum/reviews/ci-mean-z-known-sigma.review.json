@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "template_id": "ci_mean_z_known_sigma",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T22:00:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "confidence_interval",
+    "parameters": {
+      "parameter": "mean_z",
+      "point_estimate": 150.0,
+      "sigma": 12.0,
+      "n": 49,
+      "confidence_level": 0.95
+    },
+    "canonical_probability": 0.95,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 150.0,
+      "variance": 144.0,
+      "standard_deviation": 12.0
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "critical_value_distribution", "kind": "choice", "evidence": "ci_z_known_sigma_selection"},
+      {"id": "margin_of_error_calc", "kind": "choice", "evidence": "ci_z_margin_of_error_calculation"},
+      {"id": "confidence_interval_bounds", "kind": "choice", "evidence": "ci_mean_bounds_and_interpretation"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Verified mathematically: sigma = 12.0, n = 49, x_bar = 150.0. SE = 12/7 = 1.7142857. Z_crit = 1.959964. Margin of error = 3.35994. Lower bound = 146.640, upper bound = 153.360. Excel: =CONFIDENCE.NORM(0.05, 12, 49)."
+}

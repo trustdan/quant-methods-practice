@@ -1,0 +1,154 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "twosample_two_proportion_ads",
+  "version": 1,
+  "status": "active",
+  "family_id": "two_sample_test",
+  "rule_version": 2,
+  "module_id": "module_5",
+  "title": "A pooled two-proportion test for ad conversions",
+  "scenario_markdown": "A randomized ad experiment independently assigns 600 visitors to A and another 600 to B. A converts 48 visitors; B converts 72. Test H0:pA=pB versus H1:pA differs from pB at alpha=0.05 using the pooled two-proportion z test. Each visitor contributes one binary outcome.",
+  "parameters": {
+    "alpha": 0.05,
+    "n1": 600,
+    "n2": 600,
+    "operation": "proportions",
+    "x1": 48,
+    "x2": 72
+  },
+  "assumptions": [
+    "The two groups are independent; each visitor is assigned once and contributes one outcome.",
+    "Under H0 use the common pooled proportion; each group's expected successes and failures exceed 10.",
+    "The statistic uses A minus B and the alternative is two-sided."
+  ],
+  "concept_ids": [
+    "ad_test_pooled_proportion",
+    "ad_test_two_tail_pvalue",
+    "ad_test_conversion_conclusion"
+  ],
+  "setting_group": "randomized_visitor_ad_conversion",
+  "source_refs": [
+    "docs/COURSE-MAP.md: learner-supplied module objectives, October 11, 2026",
+    "docs/CONTENT-BACKLOG.md: twosample-two-proportion-ads",
+    "https://support.microsoft.com/en-us/excel/functions/t-test-function"
+  ],
+  "approval": {
+    "reviewer": "codex_delegated_final_waves",
+    "reviewed_at": "2026-10-12T04:32:26.275462Z",
+    "delegation_basis": "User explicitly replied on October 11, 2026 (America/Chicago): Yes—delegate review and activate after checks pass. Approval follows successful Go mathematical, bank admission, every-option grading and snapshot checks; assistant semantic review does not claim personal user reading.",
+    "notes": "Assistant reviewed the complete scenario, stage wording, all options, causal hints and worked explanations. Numerical choices are independently bound to Go engine quantities under rule v2; conceptual choices are semantically reviewed. Fixed parameters only; no cosmetic variation claimed as transfer. Stated course conventions remain unconfirmed where applicable. Validated one-to-one concept evidence, rejected ambiguous numeric distractors, and tested every option after snapshot serialization."
+  },
+  "stages": [
+    {
+      "calculation": "pooled_p",
+      "id": "ad_test_pooled_proportion",
+      "kind": "choice",
+      "prompt_markdown": "What is the pooled proportion under the equal-proportions null? Select the value rounded to four decimal places.",
+      "options": [
+        {
+          "numeric_value": 0.1,
+          "id": "supported",
+          "text_markdown": "$0.1000$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "numeric_value": 0.2,
+          "id": "misconception_a",
+          "text_markdown": "$0.2000$",
+          "misconception_id": "ad_test_pooled_proportion_a",
+          "hint_markdown": "Divide combined successes by combined trials, not by one group's sample size."
+        },
+        {
+          "numeric_value": 0.08,
+          "id": "misconception_b",
+          "text_markdown": "$0.0800$",
+          "misconception_id": "ad_test_pooled_proportion_b",
+          "hint_markdown": "Use both groups under the common-proportion null."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "supported"
+      },
+      "evidence_concept_ids": [
+        "ad_test_pooled_proportion"
+      ],
+      "explanation_markdown": "$\\hat p=(48+72)/(600+600)=0.10$. Expected counts in each group are 60 conversions and 540 nonconversions, satisfying the stated normal-approximation threshold.",
+      "numeric_policy": null
+    },
+    {
+      "calculation": "p_two",
+      "id": "ad_test_two_tail_pvalue",
+      "kind": "choice",
+      "prompt_markdown": "What is the two-sided p-value? Select the value rounded to four decimal places.",
+      "options": [
+        {
+          "numeric_value": 0.020921335337794063,
+          "id": "supported",
+          "text_markdown": "$0.0209$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "numeric_value": 0.0105,
+          "id": "misconception_a",
+          "text_markdown": "$0.0105$",
+          "misconception_id": "ad_test_two_tail_pvalue_a",
+          "hint_markdown": "The alternative includes differences in either direction; use both tails."
+        },
+        {
+          "numeric_value": 0.05,
+          "id": "misconception_b",
+          "text_markdown": "$0.0500$",
+          "misconception_id": "ad_test_two_tail_pvalue_b",
+          "hint_markdown": "Alpha is specified separately from the observed evidence."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "supported"
+      },
+      "evidence_concept_ids": [
+        "ad_test_two_tail_pvalue"
+      ],
+      "explanation_markdown": "$SE=\\sqrt{0.1(0.9)(1/600+1/600)}=\\sqrt{0.0003}$; $z=(0.08-0.12)/SE=-2.3094$. Excel: `=2*NORM.S.DIST(-ABS((48/600-72/600)/SQRT(0.1*0.9*(1/600+1/600))),TRUE)`.",
+      "numeric_policy": null
+    },
+    {
+      "id": "ad_test_conversion_conclusion",
+      "kind": "choice",
+      "prompt_markdown": "What should the analyst report at alpha=0.05?",
+      "options": [
+        {
+          "id": "supported",
+          "text_markdown": "Reject equal population conversion proportions; B's observed conversion rate is 12% versus A's 8%.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "misconception_a",
+          "text_markdown": "B's population conversion rate is certainly exactly 4 percentage points higher.",
+          "misconception_id": "ad_test_conversion_conclusion_a",
+          "hint_markdown": "The sample difference estimates an uncertain population difference."
+        },
+        {
+          "id": "misconception_b",
+          "text_markdown": "Fail to reject because the z statistic is negative.",
+          "misconception_id": "ad_test_conversion_conclusion_b",
+          "hint_markdown": "A two-sided test uses the magnitude of either sign."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "supported"
+      },
+      "evidence_concept_ids": [
+        "ad_test_conversion_conclusion"
+      ],
+      "explanation_markdown": "The two-sided p-value is about 0.0209. This supports a difference under the randomized study conditions. Distinguish the 4-percentage-point observed difference from relative increase (50%) and from an exact population effect.",
+      "numeric_policy": null
+    }
+  ]
+}

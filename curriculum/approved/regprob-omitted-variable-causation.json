@@ -1,0 +1,139 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "regprob_omitted_variable_causation",
+  "version": 1,
+  "status": "active",
+  "family_id": "concept_check",
+  "rule_version": 1,
+  "module_id": "module_6",
+  "title": "An omitted common cause in ice-cream and sunscreen sales",
+  "scenario_markdown": "Across summer days, a beach retailer observes a positive regression slope between ice-cream sales and sunscreen sales. Temperature was not recorded. Hotter days plausibly increase demand for both products. The retailer did not randomly change ice-cream sales or assign treatments.",
+  "parameters": {
+    "topic": "regression_diagnostics"
+  },
+  "assumptions": [
+    "The data are observational and temperature is a plausible common cause.",
+    "A plausible omitted variable is a hypothesis to investigate, not proof of the entire causal mechanism."
+  ],
+  "concept_ids": [
+    "omitted_common_cause",
+    "omitted_variable_analysis_step",
+    "association_causal_report"
+  ],
+  "setting_group": "beach_retail_omitted_temperature",
+  "source_refs": [
+    "docs/COURSE-MAP.md: learner-supplied module objectives, October 11, 2026",
+    "docs/CONTENT-BACKLOG.md: regprob-omitted-variable-causation"
+  ],
+  "approval": {
+    "reviewer": "codex_delegated_final_waves",
+    "reviewed_at": "2026-10-12T04:32:26.275462Z",
+    "delegation_basis": "User explicitly replied on October 11, 2026 (America/Chicago): Yes—delegate review and activate after checks pass. Approval follows successful Go mathematical, bank admission, every-option grading and snapshot checks; assistant semantic review does not claim personal user reading.",
+    "notes": "Assistant reviewed the complete scenario, stage wording, all options, causal hints and worked explanations. Numerical choices are independently bound to Go engine quantities under rule v2; conceptual choices are semantically reviewed. Fixed parameters only; no cosmetic variation claimed as transfer. Stated course conventions remain unconfirmed where applicable. Validated one-to-one concept evidence, rejected ambiguous numeric distractors, and tested every option after snapshot serialization."
+  },
+  "stages": [
+    {
+      "id": "omitted_common_cause",
+      "kind": "choice",
+      "prompt_markdown": "Which explanation most directly challenges a causal interpretation of the slope?",
+      "options": [
+        {
+          "id": "supported",
+          "text_markdown": "Temperature may influence both sales series, creating association without an ice-cream-to-sunscreen causal effect.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "misconception_a",
+          "text_markdown": "A positive slope proves buying ice cream makes customers buy sunscreen.",
+          "misconception_id": "omitted_common_cause_a",
+          "hint_markdown": "The observational relationship can arise through a common cause."
+        },
+        {
+          "id": "misconception_b",
+          "text_markdown": "A significant p-value eliminates all omitted-variable explanations.",
+          "misconception_id": "omitted_common_cause_b",
+          "hint_markdown": "Statistical significance is conditional on a model and does not establish causal identification."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "supported"
+      },
+      "evidence_concept_ids": [
+        "omitted_common_cause"
+      ],
+      "explanation_markdown": "Temperature is a plausible confounder: it relates to the predictor and may independently affect the response. The slope can capture this omitted common influence.",
+      "numeric_policy": null
+    },
+    {
+      "id": "omitted_variable_analysis_step",
+      "kind": "choice",
+      "prompt_markdown": "Which next step would help assess this concern?",
+      "options": [
+        {
+          "id": "supported",
+          "text_markdown": "Collect temperature and other justified variables, examine the adjusted association, and state the limits of observational control.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "misconception_a",
+          "text_markdown": "Change sales units from dollars to cents to remove confounding.",
+          "misconception_id": "omitted_variable_analysis_step_a",
+          "hint_markdown": "Rescaling changes coefficients' units, not the causal structure."
+        },
+        {
+          "id": "misconception_b",
+          "text_markdown": "Add random unrelated predictors until R-squared is large.",
+          "misconception_id": "omitted_variable_analysis_step_b",
+          "hint_markdown": "Variables need a defensible causal or predictive role."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "supported"
+      },
+      "evidence_concept_ids": [
+        "omitted_variable_analysis_step"
+      ],
+      "explanation_markdown": "Including temperature can test sensitivity to a plausible common cause, but measurement error and unmeasured factors can remain. Adjustment alone is not automatic proof of causation.",
+      "numeric_policy": null
+    },
+    {
+      "id": "association_causal_report",
+      "kind": "choice",
+      "prompt_markdown": "Which business statement is defensible from the original regression?",
+      "options": [
+        {
+          "id": "supported",
+          "text_markdown": "Ice-cream and sunscreen sales are associated in these observations; the data alone do not establish that increasing ice-cream sales would raise sunscreen sales.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "misconception_a",
+          "text_markdown": "Doubling ice-cream sales will necessarily double sunscreen sales.",
+          "misconception_id": "association_causal_report_a",
+          "hint_markdown": "The observational slope is not a guaranteed intervention effect or a fixed proportional law."
+        },
+        {
+          "id": "misconception_b",
+          "text_markdown": "The association is impossible unless the relationship is causal.",
+          "misconception_id": "association_causal_report_b",
+          "hint_markdown": "Common causes can generate association between two outcomes."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "supported"
+      },
+      "evidence_concept_ids": [
+        "association_causal_report"
+      ],
+      "explanation_markdown": "A regression can support prediction under suitable validation while leaving causal attribution unresolved. A causal claim requires a design and assumptions that address confounding and the proposed intervention.",
+      "numeric_policy": null
+    }
+  ]
+}

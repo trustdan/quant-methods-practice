@@ -1,0 +1,142 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "concept_data_types_business",
+  "version": 1,
+  "status": "active",
+  "family_id": "concept_check",
+  "rule_version": 1,
+  "module_id": "module_1",
+  "title": "Classifying business data types and measurement scales",
+  "scenario_markdown": "An enterprise retail data analyst prepares a data dictionary for an operational analytics dashboard tracking vendor performance. The database contains four primary attributes for each supplier:\n\n1. `Store_Region`: Geographic sales territory (*North, South, East, West, International*)\n2. `Satisfaction_Rating`: Customer feedback survey score recorded on an integer scale from $1$ (*Very Dissatisfied*) to $5$ (*Very Satisfied*)\n3. `Monthly_Revenue`: Total monthly sales revenue in dollars and cents (e.g., $\\$48{,}250.75$)\n4. `Units_Returned`: Total count of defective product units returned during the month (e.g., $0, 1, 2, 3, \\dots$)\n\nClassify each variable into its correct statistical data type and level of measurement.",
+  "parameters": {
+    "topic": "business_data_classification",
+    "concept": "categorical_numerical_discrete_continuous_scales",
+    "objective": "Classify operational business variables into categorical/numerical, discrete/continuous, and nominal/ordinal/interval/ratio scales"
+  },
+  "assumptions": [
+    "Standard statistical taxonomy: variables are either categorical (qualitative) or numerical (quantitative)",
+    "Numerical variables are discrete if countable integers, and continuous if measurable along an interval continuum",
+    "Stevens' four levels of measurement: nominal, ordinal, interval, and ratio"
+  ],
+  "concept_ids": [
+    "classify_categorical_versus_numerical",
+    "classify_discrete_versus_continuous_numerical",
+    "identify_levels_of_measurement"
+  ],
+  "setting_group": "enterprise_retail_data_dictionary",
+  "source_refs": [
+    "Course Module 1: Descriptive Measures & Basic Probability",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T22:30:00Z",
+    "notes": "Reviewed taxonomy: Store_Region = Categorical (Nominal); Satisfaction_Rating = Categorical/Ordinal (ranked qualitative scale); Monthly_Revenue = Numerical Continuous (Ratio); Units_Returned = Numerical Discrete (Ratio count). Addresses common traps where numeric codes (1-5) are confused with continuous measurements.",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "categorical_vs_numerical",
+      "kind": "choice",
+      "prompt_markdown": "Which option correctly splits the four attributes into **categorical** and **numerical** variables?",
+      "options": [
+        {
+          "id": "split_correct",
+          "text_markdown": "**Categorical**: `Store_Region` and `Satisfaction_Rating`\n**Numerical**: `Monthly_Revenue` and `Units_Returned`",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "split_numbers_all_numerical",
+          "text_markdown": "**Categorical**: `Store_Region` only\n**Numerical**: `Satisfaction_Rating`, `Monthly_Revenue`, and `Units_Returned`",
+          "misconception_id": "treated_numeric_ordinal_rating_as_numerical_variable",
+          "hint_markdown": "A 1-to-5 satisfaction rating uses numbers as labels for qualitative ranks; the distance between 'Dissatisfied' and 'Neutral' is not an objective numeric quantity."
+        },
+        {
+          "id": "split_inverted",
+          "text_markdown": "**Categorical**: `Monthly_Revenue` and `Units_Returned`\n**Numerical**: `Store_Region` and `Satisfaction_Rating`",
+          "misconception_id": "inverted_categorical_and_numerical_definitions",
+          "hint_markdown": "Numerical variables represent meaningful quantities where arithmetic operations (like sums and differences) make physical sense."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "split_correct"
+      },
+      "evidence_concept_ids": [
+        "classify_categorical_versus_numerical"
+      ],
+      "explanation_markdown": "`Store_Region` places suppliers into qualitative groupings (categorical nominal). `Satisfaction_Rating` represents subjective rank order on a Likert scale (categorical ordinal); assigning integers $1$ through $5$ does not make differences between ratings equal mathematical units. In contrast, `Monthly_Revenue` (dollars) and `Units_Returned` (counts) are quantitative measurements where differences and arithmetic have direct numerical meaning.",
+      "numeric_policy": null
+    },
+    {
+      "id": "discrete_vs_continuous",
+      "kind": "choice",
+      "prompt_markdown": "How are the two numerical variables—`Monthly_Revenue` and `Units_Returned`—correctly classified into **discrete** and **continuous**?",
+      "options": [
+        {
+          "id": "disc_cont_correct",
+          "text_markdown": "`Units_Returned` is **discrete** (countable integer values with gaps); `Monthly_Revenue` is **continuous** (measurable along a continuum of monetary values).",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "disc_cont_revenue_discrete",
+          "text_markdown": "`Monthly_Revenue` is **discrete** because dollar transactions only exist in two decimal places ($0.01$ increments); `Units_Returned` is **continuous**.",
+          "misconception_id": "classified_financial_revenue_as_discrete_due_to_cents",
+          "hint_markdown": "Financial measurements represent continuous flows of economic value and are standardly modeled with continuous distributions; returned items are physical countable indivisible units."
+        },
+        {
+          "id": "disc_cont_both_discrete",
+          "text_markdown": "Both `Units_Returned` and `Monthly_Revenue` are **discrete** because every number stored in a computer database has finite precision.",
+          "misconception_id": "confused_computer_storage_precision_with_mathematical_continuity",
+          "hint_markdown": "Mathematical continuity refers to the nature of the underlying real-world variable, not digital storage rounding."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "disc_cont_correct"
+      },
+      "evidence_concept_ids": [
+        "classify_discrete_versus_continuous_numerical"
+      ],
+      "explanation_markdown": "A discrete variable has countable outcomes with distinct gaps between possible values (you can return $0, 1, 2$ items, but never $1.64$ items). A continuous variable can take on any value within an interval; financial variables like revenue represent continuous flows of economic value, modeled using continuous statistical distributions (such as the Normal distribution).",
+      "numeric_policy": null
+    },
+    {
+      "id": "measurement_scales",
+      "kind": "choice",
+      "prompt_markdown": "Match `Store_Region` and `Satisfaction_Rating` to their formal **level of measurement** (nominal, ordinal, interval, ratio).",
+      "options": [
+        {
+          "id": "scale_correct",
+          "text_markdown": "`Store_Region` is **nominal** (labels without natural ranking); `Satisfaction_Rating` is **ordinal** (ranked categories where distances between ranks are not measurable).",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "scale_both_nominal",
+          "text_markdown": "Both `Store_Region` and `Satisfaction_Rating` are **nominal** because neither is measured in physical metric units.",
+          "misconception_id": "failed_to_recognize_inherent_ordering_in_ordinal_scale",
+          "hint_markdown": "A satisfaction rating has a clear natural ranking ($5 > 4 > 3 > 2 > 1$), which distinguishes ordinal data from unordered nominal labels."
+        },
+        {
+          "id": "scale_rating_interval",
+          "text_markdown": "`Store_Region` is **ordinal**; `Satisfaction_Rating` is **interval** because the difference between score 1 and 2 equals the difference between 4 and 5.",
+          "misconception_id": "assumed_psychological_likert_scales_have_equal_intervals",
+          "hint_markdown": "Store regions have no natural order; psychological survey ratings do not have provably equal intervals between subjective sentiment states."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "scale_correct"
+      },
+      "evidence_concept_ids": [
+        "identify_levels_of_measurement"
+      ],
+      "explanation_markdown": "`Store_Region` is on a **nominal scale**: categories (North, South, East, West) have names but no meaningful mathematical ordering. `Satisfaction_Rating` is on an **ordinal scale**: responses have a clear order ($5 > 4 > 3 > 2 > 1$), but the subjective difference between 'Very Dissatisfied' and 'Dissatisfied' cannot be proven equal to the difference between 'Neutral' and 'Satisfied'.",
+      "numeric_policy": null
+    }
+  ]
+}

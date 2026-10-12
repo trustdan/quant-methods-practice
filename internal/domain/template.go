@@ -59,10 +59,11 @@ type ApprovalRecord struct {
 
 // Option represents a choice in a multiple-choice stage.
 type Option struct {
-	ID              string  `json:"id"`
-	TextMarkdown    string  `json:"text_markdown"`
-	MisconceptionID *string `json:"misconception_id"`
-	HintMarkdown    *string `json:"hint_markdown"`
+	NumericValue    *float64 `json:"numeric_value,omitempty"`
+	ID              string   `json:"id"`
+	TextMarkdown    string   `json:"text_markdown"`
+	MisconceptionID *string  `json:"misconception_id"`
+	HintMarkdown    *string  `json:"hint_markdown"`
 }
 
 // ExpectedAnswer represents the canonical answer specification for a stage.
@@ -144,6 +145,7 @@ type NumericPolicy struct {
 
 // StageTemplate describes one question stage in the question bank.
 type StageTemplate struct {
+	Calculation         string         `json:"calculation,omitempty"`
 	ID                  string         `json:"id"`
 	Kind                StageKind      `json:"kind"`
 	PromptMarkdown      string         `json:"prompt_markdown"`

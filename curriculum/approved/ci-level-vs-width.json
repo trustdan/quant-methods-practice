@@ -1,0 +1,142 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "ci_level_vs_width",
+  "version": 1,
+  "status": "active",
+  "family_id": "concept_check",
+  "rule_version": 1,
+  "module_id": "module_4",
+  "title": "Confidence level versus interval width and precision trade-off",
+  "scenario_markdown": "A semiconductor manufacturing facility monitors silicon wafer thickness. A quality engineer collects a random sample of $n = 36$ wafers, with standard error of the mean $SE = \\frac{\\sigma}{\\sqrt{n}} = \\frac{12.0}{\\sqrt{36}} = 2.0\\ \\mu\\text{m}$ and sample mean $\\bar{x} = 250.0\\ \\mu\\text{m}$. The engineer constructs confidence intervals for the true mean wafer thickness $\\mu$ at three different confidence levels: $90\\%$, $95\\%$, and $99\\%$.\n\n$$\\text{Critical values: } z_{0.05} = 1.645, \\quad z_{0.025} = 1.960, \\quad z_{0.005} = 2.576$$\n\nAnalyze the relationship between the chosen confidence level, the resulting margin of error $E$, and the overall width of the confidence interval.",
+  "parameters": {
+    "topic": "confidence_intervals",
+    "concept": "confidence_level_vs_width_tradeoff",
+    "objective": "Understand how confidence level determines margin of error and interval width, and evaluate the trade-off between certainty and precision"
+  },
+  "assumptions": [
+    "Known population standard deviation sigma = 12.0 um with sample size n = 36",
+    "Standard error SE = sigma / sqrt(n) = 12.0 / 6 = 2.0 um is held constant across all three calculations",
+    "Margin of error E = z* * SE and total interval width W = 2E = 2 * z* * SE"
+  ],
+  "concept_ids": [
+    "ci_width_ordering_by_confidence_level",
+    "ci_certainty_vs_precision_tradeoff",
+    "ci_narrowing_width_via_sample_size"
+  ],
+  "setting_group": "semiconductor_wafer_thickness_confidence_level",
+  "source_refs": [
+    "Course Module 4: Sampling Distributions & Confidence Intervals",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T22:30:00Z",
+    "notes": "Reviewed conceptual alignment: 90% CI width = 2*(1.645*2) = 6.58 um; 95% CI width = 2*(1.960*2) = 7.84 um; 99% CI width = 2*(2.576*2) = 10.30 um. Proves width strictly expands as confidence level increases. Explains the precision vs certainty trade-off and shows increasing n is the sole method to narrow width without reducing confidence.",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "width_ordering",
+      "kind": "choice",
+      "prompt_markdown": "Based on the critical values for the three confidence levels, how do the total widths of the $90\\%$, $95\\%$, and $99\\%$ confidence intervals compare?",
+      "options": [
+        {
+          "id": "width_strictly_increasing",
+          "text_markdown": "**$W_{90\\%} < W_{95\\%} < W_{99\\%}$**: The $90\\%$ interval is narrowest ($6.58\\ \\mu\\text{m}$), and the $99\\%$ interval is widest ($10.30\\ \\mu\\text{m}$).",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "width_strictly_decreasing",
+          "text_markdown": "**$W_{99\\%} < W_{95\\%} < W_{90\\%}$**: Higher confidence produces a narrower interval because higher confidence means greater precision.",
+          "misconception_id": "confused_higher_confidence_with_narrower_interval",
+          "hint_markdown": "To be more confident of capturing the true mean, you must cast a wider net (larger critical value $z^*$), which makes the interval wider."
+        },
+        {
+          "id": "width_identical",
+          "text_markdown": "**$W_{90\\%} = W_{95\\%} = W_{99\\%}$**: The interval width depends only on sample size $n$ and standard error $SE$, so all three intervals have identical width.",
+          "misconception_id": "believed_confidence_level_does_not_affect_width",
+          "hint_markdown": "Margin of error is $E = z^* \\times SE$; changing the confidence level changes $z^*$, directly altering interval width."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "width_strictly_increasing"
+      },
+      "evidence_concept_ids": [
+        "ci_width_ordering_by_confidence_level"
+      ],
+      "explanation_markdown": "The margin of error is $E = z^* \\times SE$, so total interval width is $W = 2E = 2z^* SE$. Because $z_{0.05} = 1.645 < z_{0.025} = 1.960 < z_{0.005} = 2.576$, the widths are $W_{90\\%} = 2(1.645)(2.0) = 6.58\\ \\mu\\text{m}$, $W_{95\\%} = 2(1.960)(2.0) = 7.84\\ \\mu\\text{m}$, and $W_{99\\%} = 2(2.576)(2.0) = 10.30\\ \\mu\\text{m}$. Width increases strictly with confidence level.",
+      "numeric_policy": null
+    },
+    {
+      "id": "precision_tradeoff",
+      "kind": "choice",
+      "prompt_markdown": "What fundamental statistical trade-off is illustrated by comparing confidence intervals across different confidence levels?",
+      "options": [
+        {
+          "id": "tradeoff_certainty_vs_precision",
+          "text_markdown": "**Certainty versus precision**: Demanding higher certainty (confidence) of capturing the true population parameter requires accepting a wider interval (less precision).",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "tradeoff_bias_vs_variance",
+          "text_markdown": "**Bias versus variance**: A $90\\%$ confidence interval has high bias, whereas a $99\\%$ confidence interval has zero bias.",
+          "misconception_id": "confused_confidence_level_with_estimator_bias",
+          "hint_markdown": "All three intervals use the unbiased sample mean $\\bar{x}$; the trade-off is between the capture rate (certainty) and the width of the interval (precision)."
+        },
+        {
+          "id": "tradeoff_type_i_vs_type_ii",
+          "text_markdown": "**Type I versus Type II error**: A $99\\%$ interval minimizes both Type I and Type II errors simultaneously without any cost.",
+          "misconception_id": "confused_ci_width_with_hypothesis_error_rates",
+          "hint_markdown": "Wider intervals provide less specific information about the true parameter location, representing a direct precision cost."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "tradeoff_certainty_vs_precision"
+      },
+      "evidence_concept_ids": [
+        "ci_certainty_vs_precision_tradeoff"
+      ],
+      "explanation_markdown": "There is an inherent trade-off between **certainty (confidence)** and **precision (interval width)**. If an analyst requires $99\\%$ confidence rather than $90\\%$, they gain greater assurance that the interval covers $\\mu$, but the interval is substantially wider ($10.30\\ \\mu\\text{m}$ vs $6.58\\ \\mu\\text{m}$), providing a less precise estimate of the true mean.",
+      "numeric_policy": null
+    },
+    {
+      "id": "narrowing_mechanism",
+      "kind": "choice",
+      "prompt_markdown": "If the engineering team desires both a high confidence level of $99\\%$ AND a narrow interval width of $6.58\\ \\mu\\text{m}$, how can they achieve this objective?",
+      "options": [
+        {
+          "id": "increase_sample_size",
+          "text_markdown": "**Increase the sample size $n$**: Expanding $n$ reduces standard error $SE = \\sigma / \\sqrt{n}$, shrinking the margin of error without reducing the confidence level.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "decrease_sample_size",
+          "text_markdown": "**Decrease the sample size $n$**: Smaller samples have fewer observations, which compresses the range of the data and narrows the interval.",
+          "misconception_id": "believed_smaller_sample_size_narrows_interval",
+          "hint_markdown": "Decreasing $n$ increases standard error $SE = \\sigma / \\sqrt{n}$, making the interval wider, not narrower."
+        },
+        {
+          "id": "change_critical_value_arbitrarily",
+          "text_markdown": "**Use $z^* = 1.645$ while reporting $99\\%$ confidence**: The critical value can be set independently of the stated confidence level.",
+          "misconception_id": "believed_critical_value_independent_of_confidence_level",
+          "hint_markdown": "The critical value $z^*$ is mathematically determined by the chosen confidence level; using $z = 1.645$ yields only $90\\%$ confidence."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "increase_sample_size"
+      },
+      "evidence_concept_ids": [
+        "ci_narrowing_width_via_sample_size"
+      ],
+      "explanation_markdown": "The only way to achieve both high confidence ($99\\%$, $z^* = 2.576$) and high precision ($E \\le 3.29\\ \\mu\\text{m}$) is to **increase sample size $n$**. Because $E = z^* \\frac{\\sigma}{\\sqrt{n}}$, solving for $n$ gives $n = \\left(\\frac{2.576 \\times 12.0}{3.29}\\right)^2 \\approx 88.36 \\implies n = 89$ wafers, compared to $n = 36$.",
+      "numeric_policy": null
+    }
+  ]
+}

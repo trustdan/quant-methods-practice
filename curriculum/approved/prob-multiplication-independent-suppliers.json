@@ -1,0 +1,143 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "prob_multiplication_independent_suppliers",
+  "version": 1,
+  "status": "active",
+  "family_id": "set_probability",
+  "rule_version": 1,
+  "module_id": "module_1",
+  "title": "Multiplication rule for independent supplier deliveries",
+  "scenario_markdown": "A manufacturing plant relies on two primary component vendors: Supplier A (microcontrollers) and Supplier B (sensors). Historical shipping records show that the probability Supplier A delivers on schedule is $P(A) = 0.90$, and the probability Supplier B delivers on schedule is $P(B) = 0.85$. Because the two suppliers operate in separate geographic regions with independent supply chains, their delivery schedules are statistically independent. Determine the probability that both suppliers deliver on time, $P(A \\cap B)$.",
+  "parameters": {
+    "operation": "multiplication",
+    "p_a": 0.9,
+    "p_b": 0.85,
+    "p_intersection": 0.765
+  },
+  "assumptions": [
+    "Delivery outcomes for Supplier A and Supplier B are statistically independent: P(A cap B) = P(A) * P(B)",
+    "Marginal on-time probabilities are stable: P(A) = 0.90 and P(B) = 0.85",
+    "Both events have non-zero probabilities"
+  ],
+  "concept_ids": [
+    "prob_multiplication_rule_formula",
+    "prob_independent_joint_calculation",
+    "prob_independence_definition_conditional"
+  ],
+  "setting_group": "manufacturing_dual_supplier_reliability",
+  "source_refs": [
+    "Course Module 1: Descriptive Measures & Basic Probability",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T22:00:00Z",
+    "notes": "Reviewed derivation: P(A) = 0.90, P(B) = 0.85. Independence implies P(A cap B) = P(A) * P(B) = 0.90 * 0.85 = 0.765. Fréchet bounds: max(0, 0.9+0.85-1) = 0.75 <= 0.765 <= min(0.9, 0.85) = 0.85. P(A|B) = P(A) = 0.90.",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "multiplication_formula",
+      "kind": "choice",
+      "prompt_markdown": "Which formula expresses the joint probability of two events $A$ and $B$ occurring simultaneously when they are statistically independent?",
+      "options": [
+        {
+          "id": "mult_rule_correct",
+          "text_markdown": "$P(A \\cap B) = P(A) \\times P(B)$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "mult_addition_rule",
+          "text_markdown": "$P(A \\cap B) = P(A) + P(B)$",
+          "misconception_id": "confused_multiplication_with_addition_rule",
+          "hint_markdown": "Summing probabilities is associated with the union of mutually exclusive events ($P(A \\cup B)$), not the intersection of independent events."
+        },
+        {
+          "id": "mult_conditional_general",
+          "text_markdown": "$P(A \\cap B) = \\frac{P(A)}{P(B)}$",
+          "misconception_id": "divided_probabilities_for_joint",
+          "hint_markdown": "The joint probability is a product, not a quotient."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "mult_rule_correct"
+      },
+      "evidence_concept_ids": [
+        "prob_multiplication_rule_formula"
+      ],
+      "explanation_markdown": "By the special multiplication rule of probability, if two events $A$ and $B$ are statistically independent, the probability of their intersection (both occurring simultaneously) is the direct product of their marginal probabilities: $P(A \\cap B) = P(A) \\cdot P(B)$.",
+      "numeric_policy": null
+    },
+    {
+      "id": "joint_calculation",
+      "kind": "choice",
+      "prompt_markdown": "Calculate the probability that both suppliers deliver on schedule: $P(A \\cap B)$.",
+      "options": [
+        {
+          "id": "joint_correct",
+          "text_markdown": "$P(A \\cap B) = 0.765$ ($76.5\\%$), calculated as $0.90 \\times 0.85$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "joint_average",
+          "text_markdown": "$P(A \\cap B) = 0.875$ ($87.5\\%$), the simple average of $0.90$ and $0.85$",
+          "misconception_id": "averaged_marginal_probabilities",
+          "hint_markdown": "The probability of both events happening must be lower than either individual probability; do not take an arithmetic average."
+        },
+        {
+          "id": "joint_union",
+          "text_markdown": "$P(A \\cap B) = 0.985$ ($98.5\\%$), calculated as $0.90 + 0.85 - 0.765$",
+          "misconception_id": "computed_union_instead_of_intersection",
+          "hint_markdown": "$0.985$ is the probability that *at least one* supplier delivers on time ($P(A \\cup B)$), not both."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "joint_correct"
+      },
+      "evidence_concept_ids": [
+        "prob_independent_joint_calculation"
+      ],
+      "explanation_markdown": "Applying the multiplication rule yields $P(A \\cap B) = P(A) \\times P(B) = 0.90 \\times 0.85 = 0.7650$ ($76.5\\%$). There is a $76.5\\%$ probability that the factory receives both shipments on time.",
+      "numeric_policy": null
+    },
+    {
+      "id": "conditional_invariance",
+      "kind": "choice",
+      "prompt_markdown": "If plant managers learn that Supplier B's shipment has arrived on time, what is the updated conditional probability that Supplier A also delivers on schedule, $P(A \\mid B)$?",
+      "options": [
+        {
+          "id": "cond_invariant_correct",
+          "text_markdown": "$P(A \\mid B) = 0.90$ ($90.0\\%$): Knowing that B arrived on time provides zero new information about A because they are statistically independent.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "cond_equals_joint",
+          "text_markdown": "$P(A \\mid B) = 0.765$ ($76.5\\%$): The joint probability $P(A \\cap B)$.",
+          "misconception_id": "confused_conditional_with_joint_probability",
+          "hint_markdown": "Conditional probability reduces the sample space to event B: $P(A \\mid B) = P(A \\cap B) / P(B) = 0.765 / 0.85 = 0.90$."
+        },
+        {
+          "id": "cond_increases",
+          "text_markdown": "$P(A \\mid B) = 1.00$ ($100\\%$): Because supplier reliability tends to be correlated in good quarters.",
+          "misconception_id": "assumed_external_correlation_violating_independence",
+          "hint_markdown": "The problem states the suppliers are statistically independent; knowledge of one cannot alter the probability of the other."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "cond_invariant_correct"
+      },
+      "evidence_concept_ids": [
+        "prob_independence_definition_conditional"
+      ],
+      "explanation_markdown": "The mathematical definition of independence is that the occurrence of one event does not affect the probability of the other: $P(A \\mid B) = \\frac{P(A \\cap B)}{P(B)} = \\frac{0.765}{0.85} = 0.90 = P(A)$. Receiving Supplier B's shipment provides no information regarding Supplier A's arrival.",
+      "numeric_policy": null
+    }
+  ]
+}

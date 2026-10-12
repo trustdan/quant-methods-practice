@@ -1,0 +1,144 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "n_proportion_conservative",
+  "version": 1,
+  "status": "active",
+  "family_id": "sample_size",
+  "rule_version": 1,
+  "module_id": "module_4",
+  "title": "Conservative sample size planning for population proportion",
+  "scenario_markdown": "A political polling organization is designing a statewide voter survey. With no prior survey data or historical benchmark available, the research director adopts a conservative planning assumption ($p^* = 0.50$) to guarantee that a $90\\%$ confidence interval has a margin of error no greater than $E = 0.04$ ($4.0$ percentage points). Determine the minimum sample size $n$ required.",
+  "parameters": {
+    "target": "proportion",
+    "p": 0.5,
+    "margin_of_error": 0.04,
+    "confidence_level": 0.9
+  },
+  "assumptions": [
+    "No reliable prior estimate of the true proportion exists, justifying the conservative baseline p* = 0.50",
+    "Independent random sampling of registered voters from a large electorate",
+    "Normal approximation is valid for large-sample proportion inference",
+    "Sample size must always be rounded up to the nearest integer (ceiling function) to prevent exceeding the maximum allowable margin of error"
+  ],
+  "concept_ids": [
+    "sample_size_conservative_p_justification",
+    "sample_size_proportion_calculation",
+    "sample_size_prior_information_savings"
+  ],
+  "setting_group": "political_statewide_voter_polling",
+  "source_refs": [
+    "Course Module 4: Sampling Distribution & Confidence Interval",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T22:00:00Z",
+    "notes": "Reviewed derivation: p* = 0.50, E = 0.04, CL = 0.90. Z* = 1.6448536. Exact continuous n = (1.6448536^2 * 0.25) / 0.0016 = 422.741. Ceiling n = 423. With prior p = 0.20, n = 271, saving 152 respondents. Excel: =ROUNDUP((NORM.S.INV(0.95)^2)*0.25/(0.04^2), 0).",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "conservative_p_justification",
+      "kind": "choice",
+      "prompt_markdown": "Why is $p^* = 0.50$ chosen as the planning value when no preliminary estimate of the proportion is available?",
+      "options": [
+        {
+          "id": "p_maximizes_variance",
+          "text_markdown": "The variance function $p(1-p)$ attains its maximum at $p = 0.50$, guaranteeing that the required sample size is large enough for any possible true parameter value.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "p_assumes_coin_flip",
+          "text_markdown": "Because researchers assume voters always split exactly $50/50$ in democratic elections.",
+          "misconception_id": "confuse_conservative_bound_with_empirical_belief",
+          "hint_markdown": "Using $p^* = 0.50$ is a mathematical worst-case variance safeguard, not an empirical prediction of an exact tie."
+        },
+        {
+          "id": "p_minimizes_sample_size",
+          "text_markdown": "Setting $p = 0.50$ minimizes the required sample size and reduces data collection expense.",
+          "misconception_id": "inverted_sample_size_variance_relationship",
+          "hint_markdown": "Setting $p = 0.50$ maximizes $p(1-p) = 0.25$, which yields the maximum possible sample size, not the minimum."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "p_maximizes_variance"
+      },
+      "evidence_concept_ids": [
+        "sample_size_conservative_p_justification"
+      ],
+      "explanation_markdown": "The parabola $f(p) = p(1-p)$ reaches its global maximum of $0.25$ at $p = 0.50$. Because sample size is directly proportional to $p(1-p)$, using $p^* = 0.50$ provides a conservative upper bound on the necessary sample size, ensuring that the actual margin of error will be $\\le 0.04$ regardless of what the true unknown proportion turns out to be.",
+      "numeric_policy": null
+    },
+    {
+      "id": "calculation_and_ceiling",
+      "kind": "choice",
+      "prompt_markdown": "Using $90\\%$ confidence critical value $Z^* = 1.645$, calculate the minimum integer sample size $n = \\left\\lceil \\frac{(Z^*)^2 p^*(1-p^*)}{E^2} \\right\\rceil$.",
+      "options": [
+        {
+          "id": "n_correct",
+          "text_markdown": "Continuous bound $422.74 \\implies$ minimum integer $n = 423$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "n_rounded_down",
+          "text_markdown": "Continuous bound $422.74 \\implies$ rounded down to $n = 422$",
+          "misconception_id": "conventional_round_down_violates_margin_bound",
+          "hint_markdown": "Rounding down to $n = 422$ yields a margin of error slightly greater than $0.0400$, violating the strict threshold. Sample sizes must always be rounded up."
+        },
+        {
+          "id": "n_used_95_pct_z",
+          "text_markdown": "Continuous bound $600.25 \\implies n = 601$ using $Z^* = 1.960$",
+          "misconception_id": "used_95_pct_z_instead_of_90_pct",
+          "hint_markdown": "The problem specifies a $90\\%$ confidence interval ($Z^* = 1.645$), not $95\\%$ ($Z^* = 1.960$)."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "n_correct"
+      },
+      "evidence_concept_ids": [
+        "sample_size_proportion_calculation"
+      ],
+      "explanation_markdown": "For a $90\\%$ confidence level, $\\alpha = 0.10$ and $Z_{0.05} = 1.64485$ (approx $1.645$). Continuous bound: $n = \\frac{(1.6448536)^2 \\times (0.50)(0.50)}{(0.04)^2} = \\frac{2.70554 \\times 0.25}{0.0016} = \\frac{0.676386}{0.0016} \\approx 422.741$. Taking the ceiling yields $n = 423$. Excel formula: `=ROUNDUP((NORM.S.INV(0.95)^2)*0.25/(0.04^2), 0)`.",
+      "numeric_policy": null
+    },
+    {
+      "id": "prior_information_savings",
+      "kind": "choice",
+      "prompt_markdown": "Suppose a reliable pilot study reveals that the proportion is approximately $p \\approx 0.20$. How many fewer respondents would need to be surveyed compared to the conservative baseline of $423$?",
+      "options": [
+        {
+          "id": "savings_correct",
+          "text_markdown": "Required $n = 271$, saving $152$ respondents ($423 - 271 = 152$, a $36\\%$ reduction)",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "savings_linear_proportion",
+          "text_markdown": "Required $n = 169$, saving $254$ respondents ($40\\%$ of $423$)",
+          "misconception_id": "linear_rescaling_by_proportion_misconception",
+          "hint_markdown": "Sample size scales with the variance $p(1-p) = 0.20 \\times 0.80 = 0.16$, not linearly with $p$."
+        },
+        {
+          "id": "savings_no_change",
+          "text_markdown": "No change: conservative $n = 423$ must always be used regardless of prior knowledge.",
+          "misconception_id": "belief_that_conservative_n_is_mandatory",
+          "hint_markdown": "When reliable prior information or pilot data exists, using the tighter estimate $p(1-p)$ legitimately reduces sample size requirements."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "savings_correct"
+      },
+      "evidence_concept_ids": [
+        "sample_size_prior_information_savings"
+      ],
+      "explanation_markdown": "With $p = 0.20$, the variance factor is $p(1-p) = 0.20(0.80) = 0.1600$. The required sample size becomes $n = \\left\\lceil \\frac{2.70554 \\times 0.16}{0.0016} \\right\\rceil = \\lceil 270.55 \\rceil = 271$. Compared to $423$, the organization saves $423 - 271 = 152$ survey interviews ($35.9\\%$ cost reduction) because extreme proportions have much less sampling variability than split ($0.50$) populations.",
+      "numeric_policy": null
+    }
+  ]
+}

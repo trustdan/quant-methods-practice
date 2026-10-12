@@ -1,0 +1,163 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "drv_compare_projects_risk",
+  "version": 1,
+  "status": "active",
+  "family_id": "discrete_rv",
+  "rule_version": 2,
+  "module_id": "module_2",
+  "title": "Comparing payoff variability at equal expected profit",
+  "scenario_markdown": "Two fictional projects have these net payoffs in thousands of dollars: A pays 0 or 200, each with probability 0.5; B pays 80 or 120, each with probability 0.5. A manager's stated criterion is to minimize payoff SD among alternatives with the same expected profit. This is a classroom risk comparison, with no claim that SD captures every investment concern.",
+  "parameters": {
+    "operation": "compare_risk",
+    "probabilities": [
+      0.5,
+      0.5
+    ],
+    "probabilities_b": [
+      0.5,
+      0.5
+    ],
+    "values": [
+      0,
+      200
+    ],
+    "values_b": [
+      80,
+      120
+    ]
+  },
+  "assumptions": [
+    "The listed distributions exhaust each project's outcomes.",
+    "The decision criterion is equal mean followed by lower payoff standard deviation."
+  ],
+  "concept_ids": [
+    "project_a_expected_payoff",
+    "project_b_payoff_sd",
+    "equal_mean_risk_comparison"
+  ],
+  "setting_group": "fictional_project_payoff_comparison",
+  "source_refs": [
+    "docs/COURSE-MAP.md: learner-supplied module objectives, October 11, 2026",
+    "docs/CONTENT-BACKLOG.md: drv-compare-projects-risk"
+  ],
+  "approval": {
+    "reviewer": "codex_delegated_final_waves",
+    "reviewed_at": "2026-10-12T04:32:26.275462Z",
+    "delegation_basis": "User explicitly replied on October 11, 2026 (America/Chicago): Yes—delegate review and activate after checks pass. Approval follows successful Go mathematical, bank admission, every-option grading and snapshot checks; assistant semantic review does not claim personal user reading.",
+    "notes": "Assistant reviewed the complete scenario, stage wording, all options, causal hints and worked explanations. Numerical choices are independently bound to Go engine quantities under rule v2; conceptual choices are semantically reviewed. Fixed parameters only; no cosmetic variation claimed as transfer. Stated course conventions remain unconfirmed where applicable. Validated one-to-one concept evidence, rejected ambiguous numeric distractors, and tested every option after snapshot serialization."
+  },
+  "stages": [
+    {
+      "calculation": "mean",
+      "id": "project_a_expected_payoff",
+      "kind": "choice",
+      "prompt_markdown": "What is Project A's expected payoff in thousands of dollars? Select the value rounded to four decimal places.",
+      "options": [
+        {
+          "numeric_value": 100,
+          "id": "supported",
+          "text_markdown": "$100.0000$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "numeric_value": 200,
+          "id": "misconception_a",
+          "text_markdown": "$200.0000$",
+          "misconception_id": "project_a_expected_payoff_a",
+          "hint_markdown": "Weight both possible payoffs by their probabilities."
+        },
+        {
+          "numeric_value": 50,
+          "id": "misconception_b",
+          "text_markdown": "$50.0000$",
+          "misconception_id": "project_a_expected_payoff_b",
+          "hint_markdown": "Use the full probability-weighted sum, not an extra averaging step."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "supported"
+      },
+      "evidence_concept_ids": [
+        "project_a_expected_payoff"
+      ],
+      "explanation_markdown": "$E[A]=0(0.5)+200(0.5)=100$. Also $E[B]=80(0.5)+120(0.5)=100$. Excel: `=SUMPRODUCT(payoffs,probabilities)`.",
+      "numeric_policy": null
+    },
+    {
+      "calculation": "sd_b",
+      "id": "project_b_payoff_sd",
+      "kind": "choice",
+      "prompt_markdown": "What is Project B's payoff SD in thousands of dollars? Select the value rounded to four decimal places.",
+      "options": [
+        {
+          "numeric_value": 20,
+          "id": "supported",
+          "text_markdown": "$20.0000$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "numeric_value": 400,
+          "id": "misconception_a",
+          "text_markdown": "$400.0000$",
+          "misconception_id": "project_b_payoff_sd_a",
+          "hint_markdown": "400 is its variance, in squared units; take the square root."
+        },
+        {
+          "numeric_value": 40,
+          "id": "misconception_b",
+          "text_markdown": "$40.0000$",
+          "misconception_id": "project_b_payoff_sd_b",
+          "hint_markdown": "The full range is not the standard deviation."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "supported"
+      },
+      "evidence_concept_ids": [
+        "project_b_payoff_sd"
+      ],
+      "explanation_markdown": "$\\operatorname{Var}(B)=0.5(80-100)^2+0.5(120-100)^2=400$, so SD is 20. A has variance 10000 and SD 100.",
+      "numeric_policy": null
+    },
+    {
+      "id": "equal_mean_risk_comparison",
+      "kind": "choice",
+      "prompt_markdown": "Which project meets this manager's stated criterion?",
+      "options": [
+        {
+          "id": "supported",
+          "text_markdown": "B: both means are 100, while B's SD is 20 versus A's 100.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "misconception_a",
+          "text_markdown": "A: its largest possible payoff is higher, so it must have lower risk.",
+          "misconception_id": "equal_mean_risk_comparison_a",
+          "hint_markdown": "Maximum payoff does not measure dispersion around the mean."
+        },
+        {
+          "id": "misconception_b",
+          "text_markdown": "The projects are identical because their means match.",
+          "misconception_id": "equal_mean_risk_comparison_b",
+          "hint_markdown": "Equal means do not imply equal variances or distributions."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "supported"
+      },
+      "evidence_concept_ids": [
+        "equal_mean_risk_comparison"
+      ],
+      "explanation_markdown": "The criterion selects B's lower variability at equal expectation. This conclusion is conditional on the stated objective; other preferences can value upside or downside differently.",
+      "numeric_policy": null
+    }
+  ]
+}

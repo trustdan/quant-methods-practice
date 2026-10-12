@@ -610,5 +610,125 @@ func TestRejectInvalidContinuousDistributionParameters(t *testing.T) {
 			}
 		})
 	}
-}
 
+	// Set probability
+	setFam, ok := reg.Get("set_probability")
+	if !ok {
+		t.Fatal("set_probability not registered")
+	}
+	setCases := []struct {
+		name    string
+		params  map[string]interface{}
+		wantErr bool
+	}{
+		{"valid union", map[string]interface{}{"operation": "union", "p_a": 0.4, "p_b": 0.5, "p_intersection": 0.2}, false},
+		{"valid complement", map[string]interface{}{"operation": "complement", "p_a": 0.3}, false},
+		{"valid conditional", map[string]interface{}{"operation": "conditional", "p_a": 0.4, "p_b": 0.6, "p_intersection": 0.24}, false},
+		{"valid multiplication", map[string]interface{}{"operation": "multiplication", "p_a": 0.90, "p_b": 0.85, "p_intersection": 0.765}, false},
+		{"valid independence_check", map[string]interface{}{"operation": "independence_check", "p_a": 0.40, "p_b": 0.50, "p_intersection": 0.20}, false},
+		{"independence_check missing p_intersection", map[string]interface{}{"operation": "independence_check", "p_a": 0.40, "p_b": 0.50}, true},
+		{"invalid operation", map[string]interface{}{"operation": "xor", "p_a": 0.5}, true},
+		{"missing p_b for union", map[string]interface{}{"operation": "union", "p_a": 0.4}, true},
+	}
+	for _, tc := range setCases {
+		t.Run("set_"+tc.name, func(t *testing.T) {
+			err := setFam.ValidateParameters(1, tc.params)
+			if (err != nil) != tc.wantErr {
+				t.Errorf("set_probability ValidateParameters() error = %v, wantErr %v", err, tc.wantErr)
+			}
+		})
+	}
+
+	// Binomial mean_sd operation
+	binomFam, ok := reg.Get("binomial_pmf")
+	if !ok {
+		t.Fatal("binomial_pmf not registered")
+	}
+	binomCases := []struct {
+		name    string
+		params  map[string]interface{}
+		wantErr bool
+	}{
+		{"valid mean_sd", map[string]interface{}{"operation": "mean_sd", "n": 200, "p": 0.02, "mean": 4.0, "sd": 1.979898987322333}, false},
+		{"mismatched mean", map[string]interface{}{"operation": "mean_sd", "n": 200, "p": 0.02, "mean": 5.0}, true},
+		{"mismatched sd", map[string]interface{}{"operation": "mean_sd", "n": 200, "p": 0.02, "sd": 3.0}, true},
+	}
+	for _, tc := range binomCases {
+		t.Run("binom_"+tc.name, func(t *testing.T) {
+			err := binomFam.ValidateParameters(1, tc.params)
+			if (err != nil) != tc.wantErr {
+				t.Errorf("binomial_pmf ValidateParameters() error = %v, wantErr %v", err, tc.wantErr)
+			}
+		})
+	}
+
+	// Descriptive stats
+
+	descFam, ok := reg.Get("descriptive_stats")
+	if !ok {
+		t.Fatal("descriptive_stats not registered")
+	}
+	descCases := []struct {
+		name    string
+		params  map[string]interface{}
+		wantErr bool
+	}{
+		{"valid summary", map[string]interface{}{"operation": "summary", "data": []interface{}{12.0, 16.0, 18.0, 20.0, 22.0, 32.0}}, false},
+		{"missing operation", map[string]interface{}{"data": []interface{}{10.0, 20.0}}, true},
+		{"unknown param", map[string]interface{}{"operation": "summary", "invalid_param": 123}, true},
+	}
+	for _, tc := range descCases {
+		t.Run("desc_"+tc.name, func(t *testing.T) {
+			err := descFam.ValidateParameters(1, tc.params)
+			if (err != nil) != tc.wantErr {
+				t.Errorf("descriptive_stats ValidateParameters() error = %v, wantErr %v", err, tc.wantErr)
+			}
+		})
+	}
+
+	// Discrete RV
+	drvFam, ok := reg.Get("discrete_rv")
+	if !ok {
+		t.Fatal("discrete_rv not registered")
+	}
+	drvCases := []struct {
+		name    string
+		params  map[string]interface{}
+		wantErr bool
+	}{
+		{"valid expected_value", map[string]interface{}{"operation": "expected_value", "values": []interface{}{0.0, 1.0, 2.0}, "probabilities": []interface{}{0.2, 0.5, 0.3}}, false},
+		{"missing operation", map[string]interface{}{"values": []interface{}{0.0, 1.0}}, true},
+		{"unknown param", map[string]interface{}{"operation": "variance", "invalid": 456}, true},
+	}
+	for _, tc := range drvCases {
+		t.Run("drv_"+tc.name, func(t *testing.T) {
+			err := drvFam.ValidateParameters(1, tc.params)
+			if (err != nil) != tc.wantErr {
+				t.Errorf("discrete_rv ValidateParameters() error = %v, wantErr %v", err, tc.wantErr)
+			}
+		})
+	}
+
+	// Two sample test
+	twoFam, ok := reg.Get("two_sample_test")
+	if !ok {
+		t.Fatal("two_sample_test not registered")
+	}
+	twoCases := []struct {
+		name    string
+		params  map[string]interface{}
+		wantErr bool
+	}{
+		{"valid paired_t", map[string]interface{}{"operation": "paired_t", "mean_diff": 4.0, "sd_diff": 3.0, "n": 10}, false},
+		{"missing operation", map[string]interface{}{"n": 10}, true},
+		{"unknown param", map[string]interface{}{"operation": "paired_t", "foo": 999}, true},
+	}
+	for _, tc := range twoCases {
+		t.Run("two_"+tc.name, func(t *testing.T) {
+			err := twoFam.ValidateParameters(1, tc.params)
+			if (err != nil) != tc.wantErr {
+				t.Errorf("two_sample_test ValidateParameters() error = %v, wantErr %v", err, tc.wantErr)
+			}
+		})
+	}
+}

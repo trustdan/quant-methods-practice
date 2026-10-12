@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "template_id": "mreg_write_equation_predict",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T22:30:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "regression_output",
+    "parameters": {
+      "n": 30,
+      "k": 3,
+      "ssr": 780.0,
+      "sse": 260.0,
+      "sst": 1040.0,
+      "confidence_level": 0.95,
+      "intercept_name": "Intercept",
+      "b0": 50.0,
+      "se_b0": 8.0,
+      "x1_name": "Ad_Spend",
+      "b1": 4.2,
+      "se_b1": 1.0,
+      "x2_name": "Price",
+      "b2": -2.5,
+      "se_b2": 0.5,
+      "x3_name": "Store_Size",
+      "b3": 0.8,
+      "se_b3": 0.2
+    },
+    "canonical_probability": 0.75,
+    "canonical_rational": "3/4",
+    "moments": {
+      "mean": 62.0,
+      "variance": 10.0,
+      "standard_deviation": 3.162277
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "write_regression_equation", "kind": "choice", "evidence": "mreg_equation_formulation"},
+      {"id": "point_prediction", "kind": "choice", "evidence": "mreg_point_prediction_evaluation"},
+      {"id": "partial_slope_interpretation", "kind": "choice", "evidence": "mreg_partial_slope_ceteris_paribus_interpretation"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Verified mathematically: k = 3, n = 30, df_res = 26. SSR = 780, SSE = 260, SST = 1040. MSR = 260, MSE = 10, F = 26.0 (p < 0.0001). R^2 = 0.75. Coefficients: b0 = 50.0 (t = 6.25), b1 = 4.2 (t = 4.20), b2 = -2.5 (t = -5.00), b3 = 0.8 (t = 4.00). Prediction at X1 = 10, X2 = 20, X3 = 25 yields 50 + 42 - 50 + 20 = 62.0. Interpretation of b2 enforces ceteris paribus condition."
+}

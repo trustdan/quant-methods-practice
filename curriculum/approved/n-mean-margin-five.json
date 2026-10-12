@@ -1,0 +1,144 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "n_mean_margin_five",
+  "version": 1,
+  "status": "active",
+  "family_id": "sample_size",
+  "rule_version": 1,
+  "module_id": "module_4",
+  "title": "Sample size planning for target mean margin of error",
+  "scenario_markdown": "A healthcare operations director plans a patient survey to estimate the average wait time in an urgent care network. Historical hospital data indicates the standard deviation of wait times is approximately $\\sigma = 25.0\\text{ minutes}$. The director specifies that the $95\\%$ confidence interval must have a margin of error no greater than $E = 5.0\\text{ minutes}$. Determine the minimum required sample size $n$.",
+  "parameters": {
+    "target": "mean",
+    "sigma": 25.0,
+    "margin_of_error": 5.0,
+    "confidence_level": 0.95
+  },
+  "assumptions": [
+    "Prior estimate of population standard deviation sigma = 25.0 minutes is reliable",
+    "Independent random sampling of patient wait times",
+    "Sampling distribution of the sample mean is normal by the Central Limit Theorem since n >= 30",
+    "Required sample size must always be rounded up to the next integer (ceiling function) to guarantee margin of error does not exceed 5.0 minutes"
+  ],
+  "concept_ids": [
+    "sample_size_formula_identification",
+    "sample_size_ceiling_rounding_rule",
+    "sample_size_precision_scaling"
+  ],
+  "setting_group": "healthcare_urgent_care_wait_times",
+  "source_refs": [
+    "Course Module 4: Sampling Distribution & Confidence Interval",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T22:00:00Z",
+    "notes": "Reviewed derivation: sigma = 25.0, E = 5.0, Z* = 1.959964. Continuous n = (1.959964 * 25.0 / 5.0)^2 = (9.79982)^2 = 96.0365. Ceiling n = 97. If n=96, E = 1.959964 * 25 / sqrt(96) = 5.0009 > 5.0. Excel: =ROUNDUP((NORM.S.INV(0.975)*25/5)^2, 0).",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "formula_identification",
+      "kind": "choice",
+      "prompt_markdown": "Which formula and critical value correctly express the required sample size for estimating a population mean?",
+      "options": [
+        {
+          "id": "formula_correct",
+          "text_markdown": "$n = \\left(\\frac{Z^* \\sigma}{E}\\right)^2$ with $Z^* = 1.960$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "formula_forgot_square",
+          "text_markdown": "$n = \\frac{Z^* \\sigma}{E}$ with $Z^* = 1.960$",
+          "misconception_id": "omitted_squaring_in_sample_size_formula",
+          "hint_markdown": "Because $E = Z^* \\frac{\\sigma}{\\sqrt{n}}$, solving for $n$ requires squaring both sides: $\\sqrt{n} = \\frac{Z^*\\sigma}{E} \\implies n = \\left(\\frac{Z^*\\sigma}{E}\\right)^2$."
+        },
+        {
+          "id": "formula_used_t",
+          "text_markdown": "$n = \\left(\\frac{t^* s}{E}\\right)^2$ requiring unknown Student's $t$ degrees of freedom",
+          "misconception_id": "attempted_t_in_sample_size_planning",
+          "hint_markdown": "In standard sample size planning before data collection, degrees of freedom are not yet known, so the standard normal Z critical value is used."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "formula_correct"
+      },
+      "evidence_concept_ids": [
+        "sample_size_formula_identification"
+      ],
+      "explanation_markdown": "Setting the margin of error equation $E = Z^* \\frac{\\sigma}{\\sqrt{n}}$ and isolating $n$ yields $\\sqrt{n} = \\frac{Z^* \\sigma}{E} \\implies n = \\left(\\frac{Z^* \\sigma}{E}\\right)^2$. For a $95\\%$ confidence interval, $Z^* = 1.960$ ($1.95996$).",
+      "numeric_policy": null
+    },
+    {
+      "id": "calculation_and_ceiling",
+      "kind": "choice",
+      "prompt_markdown": "Calculate the continuous sample size bound and determine the minimum integer sample size $n$ required.",
+      "options": [
+        {
+          "id": "n_correct",
+          "text_markdown": "Continuous bound $96.04 \\implies$ minimum integer $n = 97$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "n_rounded_down",
+          "text_markdown": "Continuous bound $96.04 \\implies$ rounded down to $n = 96$",
+          "misconception_id": "conventional_round_down_violates_margin_bound",
+          "hint_markdown": "If you round down to $n = 96$, the resulting margin of error is $1.960 \\times 25 / \\sqrt{96} \\approx 5.001\\text{ minutes}$, which exceeds the $5.0\\text{ minute}$ cap. You must always round up (ceiling)."
+        },
+        {
+          "id": "n_forgot_square_calc",
+          "text_markdown": "Continuous bound $9.80 \\implies n = 10$",
+          "misconception_id": "computed_sqrt_n_instead_of_n",
+          "hint_markdown": "$9.80$ is $\\sqrt{n}$; you must square this quantity: $(9.80)^2 \\approx 96.04$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "n_correct"
+      },
+      "evidence_concept_ids": [
+        "sample_size_ceiling_rounding_rule"
+      ],
+      "explanation_markdown": "Substitute the parameters into the formula: $n = \\left(\\frac{1.959964 \\times 25.0}{5.0}\\right)^2 = (9.79982)^2 \\approx 96.0365$. Because sample size must be a whole number and any fraction over $96$ causes $n = 96$ to violate the margin constraint ($E = 5.0009 > 5.0$), we take the ceiling $\\lceil 96.0365 \\rceil = 97$. Excel formula: `=ROUNDUP((NORM.S.INV(0.975)*25/5)^2, 0)`.",
+      "numeric_policy": null
+    },
+    {
+      "id": "precision_scaling",
+      "kind": "choice",
+      "prompt_markdown": "If the director decides to cut the maximum allowed margin of error in half, from $E = 5.0\\text{ minutes}$ to $E = 2.5\\text{ minutes}$, how does the required sample size change?",
+      "options": [
+        {
+          "id": "quadruples_correct",
+          "text_markdown": "It quadruples ($4\\times$) to $n = 385$ ($96.04 \\times 4 = 384.15 \\implies 385$)",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "doubles_wrong",
+          "text_markdown": "It doubles ($2\\times$) to $n = 194$ ($97 \\times 2 = 194$)",
+          "misconception_id": "linear_scaling_misconception",
+          "hint_markdown": "Margin of error $E$ is in the denominator and squared: cutting $E$ by $2\\times$ multiplies $n$ by $2^2 = 4\\times$."
+        },
+        {
+          "id": "halves_wrong",
+          "text_markdown": "It is reduced by half to $n = 49$",
+          "misconception_id": "inverted_scaling_relationship",
+          "hint_markdown": "Stricter precision (smaller margin of error) requires more data, not less."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "quadruples_correct"
+      },
+      "evidence_concept_ids": [
+        "sample_size_precision_scaling"
+      ],
+      "explanation_markdown": "Because $n \\propto 1/E^2$, halving the margin of error ($E \\to E/2$) scales sample size by $(2)^2 = 4\\times$. Specifically, $(1.959964 \\times 25 / 2.5)^2 = 384.15$, which rounds up to $n = 385$. Gaining a $2\\times$ improvement in precision requires $4\\times$ as much data.",
+      "numeric_policy": null
+    }
+  ]
+}

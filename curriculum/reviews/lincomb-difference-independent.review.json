@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "template_id": "lincomb_difference_independent",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T23:28:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "linear_combination",
+    "parameters": {
+      "operation": "diff_independent",
+      "mean_x": 150.0,
+      "var_x": 160.0,
+      "mean_y": 120.0,
+      "var_y": 90.0,
+      "mean": 30.0,
+      "var": 250.0,
+      "sd": 15.81139
+    },
+    "canonical_probability": 0.5,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 30.0,
+      "variance": 250.0,
+      "standard_deviation": 15.81139
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "compute_expected_differential", "kind": "choice", "evidence": "compute_difference_of_expectations"},
+      {"id": "compute_variance_differential", "kind": "choice", "evidence": "compute_variance_of_difference_independent"},
+      {"id": "explain_variances_always_add", "kind": "choice", "evidence": "explain_why_variances_always_add"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Reviewed variance of difference: E[D] = 150 - 120 = 30. Var(X1 - X2) = 160 + 90 = 250 (never 160 - 90 = 70). SD(D) = sqrt(250) = 15.81. Thoroughly disproves the common error of subtracting variances."
+}

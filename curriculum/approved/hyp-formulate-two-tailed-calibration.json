@@ -1,0 +1,142 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "hyp_formulate_two_tailed_calibration",
+  "version": 1,
+  "status": "active",
+  "family_id": "concept_check",
+  "rule_version": 1,
+  "module_id": "module_5",
+  "title": "Formulating two-tailed hypotheses for equipment calibration drift",
+  "scenario_markdown": "A high-precision CNC milling machine produces cylindrical aluminum bushings for aircraft hydraulic valves. The machine is engineered and calibrated to produce bushings with a target mean outer diameter of $\\mu = 2.000\\text{ cm}$. During routine quality audits, engineers sample $n = 30$ finished bushings to determine whether the machine has drifted out of calibration.\n\nBushings that are either too thick ($> 2.000\\text{ cm}$) or too thin ($< 2.000\\text{ cm}$) cause hydraulic pressure failures. Formulate the statistical null and alternative hypotheses, determine the appropriate tail direction, and establish the decision structure.",
+  "parameters": {
+    "topic": "hypothesis_formulation",
+    "concept": "two_tailed_hypothesis_testing",
+    "objective": "Formulate two-tailed null and alternative hypotheses for detecting parameter departure in either direction"
+  },
+  "assumptions": [
+    "Nominal calibrated benchmark mean diameter mu0 = 2.000 cm",
+    "Departure in either direction (positive or negative) represents an out-of-calibration state",
+    "Null hypothesis H0 represents the status quo of proper calibration; alternative hypothesis H1 carries the burden of proof"
+  ],
+  "concept_ids": [
+    "formulate_two_tailed_null_and_alt",
+    "identify_two_tailed_rejection_region",
+    "establish_burden_of_proof_direction"
+  ],
+  "setting_group": "cnc_machining_calibration_audit",
+  "source_refs": [
+    "Course Module 5: Hypothesis Testing",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T22:30:00Z",
+    "notes": "Reviewed conceptual alignment: Calibrated target mu0 = 2.000 cm. Formulates two-tailed test H0: mu = 2.000 vs H1: mu != 2.000 because both undersized and oversized parts are defective. Rejection region split into two tails of alpha/2. Burden of proof is on H1 to establish drift.",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "formulate_hypotheses",
+      "kind": "choice",
+      "prompt_markdown": "Which pair of hypotheses correctly formulates the quality engineer's calibration test?",
+      "options": [
+        {
+          "id": "hyp_two_tailed_correct",
+          "text_markdown": "$$H_0: \\mu = 2.000\\text{ cm} \\quad \\text{vs.} \\quad H_1: \\mu \\ne 2.000\\text{ cm}$$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "hyp_right_tailed",
+          "text_markdown": "$$H_0: \\mu \\le 2.000\\text{ cm} \\quad \\text{vs.} \\quad H_1: \\mu > 2.000\\text{ cm}$$",
+          "misconception_id": "formulated_one_tailed_test_for_two_sided_deviation",
+          "hint_markdown": "A right-tailed test only detects if bushings are too large; it fails to detect if bushings are undersized."
+        },
+        {
+          "id": "hyp_reversed_null_alt",
+          "text_markdown": "$$H_0: \\mu \\ne 2.000\\text{ cm} \\quad \\text{vs.} \\quad H_1: \\mu = 2.000\\text{ cm}$$",
+          "misconception_id": "placed_equality_in_alternative_hypothesis",
+          "hint_markdown": "The null hypothesis $H_0$ must always contain the equality sign ($=$, $\\le$, or $\\ge$), representing the baseline status quo."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "hyp_two_tailed_correct"
+      },
+      "evidence_concept_ids": [
+        "formulate_two_tailed_null_and_alt"
+      ],
+      "explanation_markdown": "Because deviations in **either direction** (undersized or oversized) constitute an out-of-calibration condition, this is a **two-tailed (two-sided)** test. The status-quo calibration baseline is $H_0: \\mu = 2.000\\text{ cm}$, and the research claim that calibration has failed is $H_1: \\mu \\ne 2.000\\text{ cm}$. The null hypothesis must contain the equality.",
+      "numeric_policy": null
+    },
+    {
+      "id": "rejection_region_split",
+      "kind": "choice",
+      "prompt_markdown": "For a two-tailed test at significance level $\\alpha = 0.05$, how is the rejection region structured?",
+      "options": [
+        {
+          "id": "region_split_two_tails",
+          "text_markdown": "**Two symmetric rejection regions**: The total risk $\\alpha = 0.05$ is divided equally, with $\\alpha/2 = 0.025$ in the extreme lower tail and $\\alpha/2 = 0.025$ in the extreme upper tail.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "region_entirely_in_upper_tail",
+          "text_markdown": "**Single upper rejection region**: The entire $\\alpha = 0.05$ is placed in the upper tail because engineers only shut down machines for excess diameter.",
+          "misconception_id": "confused_two_tailed_with_upper_tail_alpha_allocation",
+          "hint_markdown": "In a two-tailed test, extreme sample results in either direction lead to rejection, requiring $\\alpha$ to be split across both tails."
+        },
+        {
+          "id": "region_double_alpha",
+          "text_markdown": "**Double rejection region of $\\alpha = 0.05$ each**: Each tail gets a full $0.05$ area, resulting in an effective total significance level of $\\alpha = 0.10$.",
+          "misconception_id": "doubled_significance_level_for_two_tailed_test",
+          "hint_markdown": "The total probability of a Type I error remains fixed at $\\alpha = 0.05$; each tail contains $\\alpha/2 = 0.025$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "region_split_two_tails"
+      },
+      "evidence_concept_ids": [
+        "identify_two_tailed_rejection_region"
+      ],
+      "explanation_markdown": "In a two-tailed test with significance level $\\alpha = 0.05$, the critical region is split evenly between the two tails of the sampling distribution: the lower tail has probability $\\alpha/2 = 0.025$ (critical value $-t_{0.025}$ or $-z_{0.025} = -1.960$), and the upper tail has probability $\\alpha/2 = 0.025$ ($+1.960$). Extreme sample means in either direction reject $H_0$.",
+      "numeric_policy": null
+    },
+    {
+      "id": "burden_of_proof",
+      "kind": "choice",
+      "prompt_markdown": "Why is the calibration claim $\\mu = 2.000\\text{ cm}$ placed in $H_0$ rather than $H_1$?",
+      "options": [
+        {
+          "id": "burden_requires_compelling_evidence",
+          "text_markdown": "**The burden of proof rests on demonstrating an effect**: Halting production and recalibrating the machine is an intervention that requires convincing sample evidence, so maintaining calibration is assumed until proven otherwise.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "burden_hypotheses_arbitrary",
+          "text_markdown": "**Placement is completely arbitrary**: Whether $H_0$ or $H_1$ contains the target has zero mathematical or operational consequence.",
+          "misconception_id": "believed_null_and_alt_placement_is_arbitrary",
+          "hint_markdown": "Hypothesis testing is asymmetric: $H_0$ is protected from rejection unless the sample provides statistically compelling evidence."
+        },
+        {
+          "id": "burden_h1_always_equals_zero",
+          "text_markdown": "**$H_1$ can only ever test whether $\\mu = 0$**: The alternative hypothesis cannot reference any number other than zero.",
+          "misconception_id": "believed_alternative_must_equal_zero",
+          "hint_markdown": "The alternative hypothesis tests against the benchmark parameter $\\mu_0 = 2.000$, stating $\\mu \\ne 2.000$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "burden_requires_compelling_evidence"
+      },
+      "evidence_concept_ids": [
+        "establish_burden_of_proof_direction"
+      ],
+      "explanation_markdown": "In statistical hypothesis testing, the **null hypothesis $H_0$** represents the default status quo or baseline state. It is given the 'benefit of the doubt'. The **alternative hypothesis $H_1$** represents the research claim that requires compelling evidence. Because shutting down a CNC line incurs significant operational disruption, the plant assumes the machine is properly calibrated ($H_0$) unless the sample data strongly contradicts it ($H_1$).",
+      "numeric_policy": null
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "template_id": "regout_slope_ci_includes_zero",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T22:30:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "regression_output",
+    "parameters": {
+      "n": 20,
+      "k": 1,
+      "ssr": 80.0,
+      "sse": 1000.0,
+      "sst": 1080.0,
+      "confidence_level": 0.95,
+      "intercept_name": "Intercept",
+      "b0": 12.0,
+      "se_b0": 2.5,
+      "x1_name": "Cargo_Weight",
+      "b1": 0.6,
+      "se_b1": 0.5
+    },
+    "canonical_probability": 0.2457,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 0.6,
+      "variance": 0.25,
+      "standard_deviation": 0.5
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "slope_ci_verification", "kind": "choice", "evidence": "regout_slope_ci_calculation"},
+      {"id": "zero_inclusion_criterion", "kind": "choice", "evidence": "regout_slope_ci_zero_inclusion_criterion"},
+      {"id": "significance_decision", "kind": "choice", "evidence": "regout_slope_insignificance_conclusion"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Verified mathematically: b1 = 0.60, se_b1 = 0.50, n = 20, k = 1. df_res = 18. Critical t_{0.025, 18} = 2.10092. Margin of error = 2.10092 * 0.50 = 1.05046. 95% CI = [0.60 - 1.0505, 0.60 + 1.0505] = [-0.4505, +1.6505]. Interval includes 0.0. Test statistic t = 0.60 / 0.50 = 1.20, p-value = 0.2457 > 0.05. Fail to reject H0 at alpha = 0.05. Model consistency: F = 1.44 = (0.6/0.5)^2, SSR = 80, SSE = 1000, SST = 1080. Excel: =T.INV.2T(0.05, 18), =T.DIST.2T(1.2, 18)."
+}

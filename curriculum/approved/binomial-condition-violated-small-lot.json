@@ -1,0 +1,149 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "binomial_condition_violated_small_lot",
+  "version": 1,
+  "status": "active",
+  "family_id": "concept_check",
+  "rule_version": 1,
+  "module_id": "module_2",
+  "title": "Violation of binomial independence when sampling small lots without replacement",
+  "scenario_markdown": "A quality assurance auditor inspects a custom production lot of $N = 20$ precision aerospace fuel valves. Exactly $M = 4$ of the $20$ valves have micro-fracture defects ($20\\%$ defective rate in the lot). The auditor randomly selects a sample of $n = 5$ valves **without replacement** for metallurgical stress testing. A junior technician proposes using a Binomial distribution $\\text{Bin}(n = 5, p = 0.20)$ to calculate the probability of finding exactly one defective valve in the sample. Evaluate the validity of this modeling choice.",
+  "parameters": {
+    "topic": "binomial_assumptions_and_limits",
+    "concept": "sampling_without_replacement_hypergeometric",
+    "objective": "Identify violation of trial independence and constant success probability when sampling finite populations without replacement"
+  },
+  "assumptions": [
+    "Finite population size N = 20, defect count M = 4, sample size n = 5",
+    "Sampling is conducted strictly without replacement",
+    "Sampling fraction n/N = 5/20 = 0.25 (25%) substantially exceeds the 5% rule-of-thumb threshold (n/N <= 0.05) required for Binomial approximation to sampling without replacement",
+    "Exact probability model is the Hypergeometric distribution"
+  ],
+  "concept_ids": [
+    "binomial_independence_condition_violation",
+    "hypergeometric_exact_model_identification",
+    "finite_sampling_fraction_threshold_rule"
+  ],
+  "setting_group": "aerospace_component_lot_inspection",
+  "source_refs": [
+    "Course Module 2: Discrete Random Variables",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T22:30:00Z",
+    "notes": "Reviewed conceptual alignment: n = 5 from N = 20 without replacement violates independent trials and constant p = 0.20 (sampling fraction 25% > 5%). Identifies Hypergeometric distribution as the exact model. Demonstrates difference between Hypergeom P(X=1) = 0.4696 vs Binomial P(X=1) = 0.4096.",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "condition_violated_identification",
+      "kind": "choice",
+      "prompt_markdown": "Which fundamental condition required for a Binomial distribution is violated by this sampling scheme?",
+      "options": [
+        {
+          "id": "viol_independence_and_constant_p",
+          "text_markdown": "**Independent trials with constant success probability ($p$)**: Because sampling is without replacement from a small lot ($N = 20$), each draw changes the composition of the remaining valves, altering $p$ for subsequent trials.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "viol_binary_outcomes",
+          "text_markdown": "**Binary trial outcomes**: The valves cannot be classified as simply defective or non-defective because stress testing is metallurgical.",
+          "misconception_id": "confused_measurement_type_with_binary_outcome_classification",
+          "hint_markdown": "Each valve is either defective or conforming, which fully satisfies the binary outcome requirement."
+        },
+        {
+          "id": "viol_fixed_trials",
+          "text_markdown": "**Fixed number of trials**: Sampling without replacement means the number of trials $n$ is random rather than fixed.",
+          "misconception_id": "confused_sampling_without_replacement_with_variable_trial_count",
+          "hint_markdown": "The number of trials is fixed at exactly $n = 5$ valves selected."
+        },
+        {
+          "id": "viol_clt_minimum_30",
+          "text_markdown": "**Central Limit Theorem condition**: The sample size $n = 5$ is less than $30$, so the Binomial formula cannot be evaluated.",
+          "misconception_id": "confused_central_limit_theorem_with_binomial_definition",
+          "hint_markdown": "The Central Limit Theorem governs normal approximations for sample means, not the definition of discrete Binomial distributions."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "viol_independence_and_constant_p"
+      },
+      "evidence_concept_ids": [
+        "binomial_independence_condition_violation"
+      ],
+      "explanation_markdown": "The Binomial distribution requires four conditions: (1) fixed number of trials $n$, (2) binary outcomes (success/failure), (3) independent trials, and (4) constant success probability $p$ on every trial. Sampling **without replacement** from a small finite population ($N = 20$) violates independence: on the first draw, $P(\\text{defective}) = 4/20 = 0.20$. If a defective valve is drawn, the probability on the second draw drops to $3/19 \\approx 0.158$; if a conforming valve is drawn, it rises to $4/19 \\approx 0.211$.",
+      "numeric_policy": null
+    },
+    {
+      "id": "exact_distribution_model",
+      "kind": "choice",
+      "prompt_markdown": "What is the mathematically exact distribution that models the number of defective valves when sampling without replacement from a finite population?",
+      "options": [
+        {
+          "id": "dist_hypergeometric_correct",
+          "text_markdown": "The **Hypergeometric distribution** with parameters $N = 20$ (lot size), $M = 4$ (defects in lot), and $n = 5$ (sample size).",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "dist_poisson",
+          "text_markdown": "The **Poisson distribution** with parameter $\\lambda = n p = 5 \\times 0.20 = 1.0$.",
+          "misconception_id": "confused_poisson_rate_model_with_finite_sampling_without_replacement",
+          "hint_markdown": "Poisson models arrival counts over continuous intervals without an upper bound, not finite lot sampling without replacement."
+        },
+        {
+          "id": "dist_exponential",
+          "text_markdown": "The **Exponential distribution** with rate parameter $\\lambda = 0.20$.",
+          "misconception_id": "confused_continuous_exponential_lifetimes_with_discrete_counts",
+          "hint_markdown": "Exponential is a continuous distribution for waiting times, not discrete item counts."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "dist_hypergeometric_correct"
+      },
+      "evidence_concept_ids": [
+        "hypergeometric_exact_model_identification"
+      ],
+      "explanation_markdown": "The **Hypergeometric distribution** is the exact mathematical model for the number of successes in $n$ draws without replacement from a finite population of size $N$ containing $M$ successes. Its PMF is $P(X = k) = \\frac{\\binom{M}{k} \\binom{N-M}{n-k}}{\\binom{N}{n}}$. In Excel, this is computed using `=HYPGEOM.DIST(sample_s, number_sample, population_s, number_pop, cumulative)`.",
+      "numeric_policy": null
+    },
+    {
+      "id": "sampling_fraction_threshold_rule",
+      "kind": "choice",
+      "prompt_markdown": "Under what condition would a Binomial distribution provide an acceptable approximation when sampling without replacement?",
+      "options": [
+        {
+          "id": "threshold_five_percent_rule",
+          "text_markdown": "When the sample size is no more than $5\\%$ of the population ($n/N \\le 0.05$); here, the sampling fraction is $5/20 = 25\\%$, which far exceeds the threshold.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "threshold_only_with_replacement",
+          "text_markdown": "A Binomial distribution is never allowed to approximate sampling without replacement under any circumstances, even if $N = 1{,}000{,}000$.",
+          "misconception_id": "believed_binomial_approximation_never_permitted",
+          "hint_markdown": "When the population is vast (e.g. $n/N < 0.05$), changes in probability from draw to draw are negligible, making the Binomial approximation highly accurate."
+        },
+        {
+          "id": "threshold_fifty_percent_rule",
+          "text_markdown": "When the sample size is less than $50\\%$ of the population ($n/N < 0.50$).",
+          "misconception_id": "confused_five_percent_rule_with_fifty_percent",
+          "hint_markdown": "The standard statistical rule of thumb is $5\\%$ ($n \\le 0.05 N$), not $50\\%$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "threshold_five_percent_rule"
+      },
+      "evidence_concept_ids": [
+        "finite_sampling_fraction_threshold_rule"
+      ],
+      "explanation_markdown": "The standard rule of thumb in business statistics states that sampling without replacement can be approximated by a Binomial distribution only when the sampling fraction is small: $n \\le 0.05 N$ (or $n/N \\le 5\\%$). In this scenario, $n/N = 5/20 = 25\\%$, which severely violates the threshold. For example, the exact Hypergeometric probability of finding $1$ defect is $P(X = 1) = \\frac{\\binom{4}{1}\\binom{16}{4}}{\\binom{20}{5}} = \\frac{7280}{15504} \\approx 0.4696$, whereas the Binomial formula gives $\\binom{5}{1}(0.2)^1(0.8)^4 = 0.4096$—an error of $6.0$ percentage points.",
+      "numeric_policy": null
+    }
+  ]
+}

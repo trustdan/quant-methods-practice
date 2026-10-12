@@ -1,0 +1,151 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "regout_slope_t_pvalue",
+  "version": 1,
+  "status": "active",
+  "family_id": "regression_output",
+  "rule_version": 1,
+  "module_id": "module_6",
+  "title": "Slope t-statistic and p-value inference from regression output",
+  "scenario_markdown": "An HR analytics team regresses annual compensation ($Y$, in thousands of dollars) on professional experience ($X$, in years) across a sample of $n = 25$ software engineers. The Excel regression table reports for predictor `Experience_Years`: coefficient $b_1 = 2.400$ and standard error $s_{b_1} = 0.800$. The residual degrees of freedom are $df = n - 2 = 23$. Test the hypothesis that experience has a non-zero linear relationship with compensation ($H_0: \\beta_1 = 0$ vs $H_1: \\beta_1 \\ne 0$) at $\\alpha = 0.05$.",
+  "parameters": {
+    "n": 25,
+    "k": 1,
+    "ssr": 90.0,
+    "sse": 230.0,
+    "sst": 320.0,
+    "confidence_level": 0.95,
+    "intercept_name": "Intercept",
+    "b0": 8.0,
+    "se_b0": 1.5,
+    "x1_name": "Experience_Years",
+    "b1": 2.4,
+    "se_b1": 0.8
+  },
+  "assumptions": [
+    "Simple linear regression model Y = beta0 + beta1*X + epsilon with homoscedastic, normally distributed residuals",
+    "Residual degrees of freedom df = n - k - 1 = 25 - 1 - 1 = 23",
+    "Hypothesis test for slope significance evaluates H0: beta1 = 0 vs H1: beta1 != 0"
+  ],
+  "concept_ids": [
+    "regout_slope_t_statistic_calculation",
+    "regout_slope_twotailed_pvalue_excel",
+    "regout_slope_significance_conclusion"
+  ],
+  "setting_group": "hr_compensation_experience_regression",
+  "source_refs": [
+    "Course Module 6: Regression Analysis",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T22:00:00Z",
+    "notes": "Reviewed derivation: b1 = 2.4, se_b1 = 0.8, n = 25, k = 1. df_res = 23. t = 2.4 / 0.8 = 3.00. t^2 = 9.0 = F (SSR=90, SSE=230, MSE=10, MSR=90, F=9.0). Two-tailed p-value = 0.006428. Critical t_{0.025, 23} = 2.0687. Reject H0 at alpha = 0.05. Excel: =T.DIST.2T(3.0, 23).",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "t_statistic_calculation",
+      "kind": "choice",
+      "prompt_markdown": "Compute the $t$-statistic for the slope coefficient: $t = \\frac{b_1 - 0}{s_{b_1}}$.",
+      "options": [
+        {
+          "id": "t_stat_correct",
+          "text_markdown": "$t = +3.000$ ($2.400 / 0.800$) with $df = 23$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "t_stat_inverted",
+          "text_markdown": "$t = +0.333$ ($0.800 / 2.400$)",
+          "misconception_id": "inverted_t_statistic_ratio",
+          "hint_markdown": "The $t$-statistic is the coefficient divided by its standard error ($b_1 / s_{b_1}$), not standard error over coefficient."
+        },
+        {
+          "id": "t_stat_multiplied",
+          "text_markdown": "$t = +1.920$ ($2.400 \\times 0.800$)",
+          "misconception_id": "multiplied_slope_by_standard_error",
+          "hint_markdown": "To standardise the slope, divide by the standard error: $2.4 / 0.8 = 3.0$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "t_stat_correct"
+      },
+      "evidence_concept_ids": [
+        "regout_slope_t_statistic_calculation"
+      ],
+      "explanation_markdown": "The $t$-statistic tests whether the sample slope $b_1$ differs from the null value $0$: $t = \\frac{b_1 - 0}{s_{b_1}} = \\frac{2.400}{0.800} = +3.000$. The slope estimate lies $3.000$ standard errors above zero, based on $df = n - 2 = 25 - 2 = 23$ residual degrees of freedom.",
+      "numeric_policy": null
+    },
+    {
+      "id": "pvalue_determination",
+      "kind": "choice",
+      "prompt_markdown": "Determine the two-tailed $p$-value for $t = 3.000$ with $df = 23$ and identify the corresponding Excel formula.",
+      "options": [
+        {
+          "id": "pval_correct",
+          "text_markdown": "$p\\text{-value} \\approx 0.0064$ ($0.64\\%$), computed using `=T.DIST.2T(3.0, 23)`",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "pval_one_tailed",
+          "text_markdown": "$p\\text{-value} \\approx 0.0032$, computed using `=T.DIST.RT(3.0, 23)`",
+          "misconception_id": "used_single_tail_for_two_tailed_slope_test",
+          "hint_markdown": "Testing $H_1: \\beta_1 \\ne 0$ is a two-tailed test, requiring doubling the single-tail probability."
+        },
+        {
+          "id": "pval_normal_approx",
+          "text_markdown": "$p\\text{-value} \\approx 0.0027$, computed using `=2*(1 - NORM.S.DIST(3.0, TRUE))`",
+          "misconception_id": "used_z_instead_of_t_for_slope_inference",
+          "hint_markdown": "Regression coefficient inference uses Student's $t$ with $df = n - k - 1 = 23$, not the standard normal distribution."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "pval_correct"
+      },
+      "evidence_concept_ids": [
+        "regout_slope_twotailed_pvalue_excel"
+      ],
+      "explanation_markdown": "Under $H_0$, the test statistic follows a $t$-distribution with $df = 23$. For a two-tailed test ($H_1: \\beta_1 \\ne 0$), the $p$-value is $2 \\times P(T_{23} \\ge 3.000) \\approx 0.00643$ ($0.64\\%$). In Excel, `=T.DIST.2T(3.0, 23)` evaluates this two-tailed area directly.",
+      "numeric_policy": null
+    },
+    {
+      "id": "significance_conclusion",
+      "kind": "choice",
+      "prompt_markdown": "What is the statistical decision at $\\alpha = 0.05$ (critical value $t_{0.025, 23} = 2.069$) and its interpretation for compensation policy?",
+      "options": [
+        {
+          "id": "conclusion_significant_correct",
+          "text_markdown": "Reject $H_0$ because $p\\text{-value} = 0.0064 < 0.05$ (and $|t| = 3.000 > 2.069$). Experience is a statistically significant linear predictor of compensation.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "conclusion_fail_to_reject",
+          "text_markdown": "Fail to reject $H_0$ because the slope of $2.4$ is small relative to total compensation.",
+          "misconception_id": "confused_slope_scale_with_statistical_significance",
+          "hint_markdown": "Statistical significance is determined by the p-value relative to alpha ($0.0064 < 0.05$), not the unstandardized numerical scale of the slope."
+        },
+        {
+          "id": "conclusion_causation_proved",
+          "text_markdown": "Reject $H_0$, proving that gaining experience directly causes compensation to increase by exactly \\$2,400 per year.",
+          "misconception_id": "inferred_causation_from_observational_regression_significance",
+          "hint_markdown": "Statistical significance confirms a linear association; it does not prove direct causation due to potential confounding factors (e.g. education, performance, firm tenure)."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "conclusion_significant_correct"
+      },
+      "evidence_concept_ids": [
+        "regout_slope_significance_conclusion"
+      ],
+      "explanation_markdown": "Because the $p$-value ($0.0064$) is strictly less than $\\alpha = 0.05$ (and $|t| = 3.000 > 2.069$), we reject the null hypothesis $H_0: \\beta_1 = 0$. There is statistically significant evidence of a positive linear association between professional experience and compensation. However, regression demonstrates association rather than isolated causation.",
+      "numeric_policy": null
+    }
+  ]
+}

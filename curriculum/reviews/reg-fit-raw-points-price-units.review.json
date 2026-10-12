@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "template_id": "reg_fit_raw_points_price_units",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T22:00:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "linear_regression",
+    "parameters": {
+      "n": 6,
+      "slope": -4.0,
+      "intercept": 120.0,
+      "r": -0.9877,
+      "r_squared": 0.9756,
+      "x_pred": 17.0
+    },
+    "canonical_probability": 0.9756,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 60.0,
+      "variance": 191.3333,
+      "standard_deviation": 13.8323
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "calculate_slope", "kind": "choice", "evidence": "reg_slope_from_sums_of_squares"},
+      {"id": "calculate_intercept", "kind": "choice", "evidence": "reg_intercept_from_means"},
+      {"id": "predict_at_price", "kind": "choice", "evidence": "reg_fitted_point_prediction"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Verified mathematically: 6 data points (10,78), (12,75), (14,63), (16,58), (18,45), (20,41). x_bar = 15.0, y_bar = 60.0. SS_xx = 70.0, SS_yy = 1148.0, SS_xy = -280.0. b1 = -280/70 = -4.0. b0 = 60 - (-4)(15) = 120.0. Predicted y_hat at x=17 is 52.0. R^2 = (-280)^2 / (70 * 1148) = 78400 / 80360 = 0.9756. Correlation r = -0.9877. Excel: =SLOPE, =INTERCEPT, =FORECAST.LINEAR."
+}

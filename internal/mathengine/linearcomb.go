@@ -58,3 +58,37 @@ func CovarianceFromCorrelation(rho, varX, varY float64) (float64, error) {
 	}
 	return rho * math.Sqrt(varX*varY), nil
 }
+
+// AffineMean computes E[aX + c] = a*E[X] + c.
+func AffineMean(a, meanX, c float64) float64 {
+	return a*meanX + c
+}
+
+// AffineVariance computes Var(aX + c) = a^2 * Var(X).
+// Invariant: The additive constant c contributes zero variance.
+func AffineVariance(a, varX float64) (float64, error) {
+	if math.IsNaN(varX) || varX < 0.0 {
+		return 0, fmt.Errorf("Var(X) must be non-negative, got %v", varX)
+	}
+	return a * a * varX, nil
+}
+
+// AffineStdDev computes SD(aX + c) = |a| * SD(X).
+// Invariant: The additive constant c contributes zero standard deviation.
+func AffineStdDev(a, sdX float64) (float64, error) {
+	if math.IsNaN(sdX) || sdX < 0.0 {
+		return 0, fmt.Errorf("SD(X) must be non-negative, got %v", sdX)
+	}
+	return math.Abs(a) * sdX, nil
+}
+
+// SumIndependentVariance computes Var(X + Y) = Var(X) + Var(Y) under independence.
+func SumIndependentVariance(varX, varY float64) (float64, error) {
+	return LinearCombVarianceIndependent(1.0, varX, 1.0, varY)
+}
+
+// DiffIndependentVariance computes Var(X - Y) = Var(X) + (-1)^2 * Var(Y) = Var(X) + Var(Y) under independence.
+// Invariant: Variances ALWAYS add for independent variables; Var(X - Y) never subtracts variances.
+func DiffIndependentVariance(varX, varY float64) (float64, error) {
+	return LinearCombVarianceIndependent(1.0, varX, -1.0, varY)
+}

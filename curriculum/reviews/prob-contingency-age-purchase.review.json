@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "template_id": "prob_contingency_age_purchase",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T22:30:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "concept_check",
+    "parameters": {
+      "topic": "probability_rules",
+      "concept": "contingency_tables_joint_marginal_conditional",
+      "objective": "Compute marginal, joint, and conditional probabilities from a two-way contingency table and test for statistical independence"
+    },
+    "canonical_probability": 0.12,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 0.36,
+      "variance": 0.2304,
+      "standard_deviation": 0.48
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "joint_vs_marginal", "kind": "choice", "evidence": "calculate_joint_and_marginal_probabilities"},
+      {"id": "conditional_probability", "kind": "choice", "evidence": "calculate_conditional_probability_from_subgroup"},
+      {"id": "independence_test", "kind": "choice", "evidence": "evaluate_statistical_independence_from_contingency_table"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Reviewed probability derivation: n = 500. Marginal P(B) = 180/500 = 0.360. Joint P(A1 and B) = 60/500 = 0.120. Conditional P(B | A1) = 60/200 = 0.300. P(B | A2) = 120/300 = 0.400. Because P(B | A1) = 0.300 != P(B) = 0.360, purchase is dependent on age (older cohort converts at 40% vs younger at 30%)."
+}

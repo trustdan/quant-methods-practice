@@ -1,0 +1,151 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "regout_t_squared_equals_f",
+  "version": 1,
+  "status": "active",
+  "family_id": "regression_output",
+  "rule_version": 1,
+  "module_id": "module_6",
+  "title": "Verifying the mathematical identity t-squared equals F in simple linear regression",
+  "scenario_markdown": "A hospital administration study models patient emergency room discharge volume ($Y$, in patients per shift) based on nurse staffing levels ($X$, in registered nurses on duty) across $n = 22$ emergency shifts ($k = 1$, residual $df = 20$). The regression summary report generated in Excel provides both the ANOVA table and the coefficient estimates:\n\n$$\\text{ANOVA: } \\text{Regression } df = 1, \\; \\text{Residual } df = 20, \\; F = 9.000, \\; \\text{Significance } F = 0.0071$$\n$$\\text{Coefficients: } b_1 = 1.500 \\text{ (Nurse\\_Staffing)}, \\quad s_{b_1} = 0.500, \\quad t\\text{ Stat} = 3.000, \\quad p\\text{-value} = 0.0071$$\n$$\\text{Intercept: } b_0 = 15.000, \\quad s_{b_0} = 3.000$$\n\nVerify the theoretical mathematical equivalence between the slope test statistic $t$ and the ANOVA $F$-statistic, examine their identical $p$-values, and determine why this identity holds exclusively when $k = 1$.",
+  "parameters": {
+    "n": 22,
+    "k": 1,
+    "ssr": 90.0,
+    "sse": 200.0,
+    "sst": 290.0,
+    "confidence_level": 0.95,
+    "intercept_name": "Intercept",
+    "b0": 15.0,
+    "se_b0": 3.0,
+    "x1_name": "Nurse_Staffing",
+    "b1": 1.5,
+    "se_b1": 0.5
+  },
+  "assumptions": [
+    "Simple linear regression model with exactly one explanatory predictor k = 1",
+    "Residual degrees of freedom df = n - k - 1 = 22 - 1 - 1 = 20",
+    "Under k = 1, the square of the slope test statistic t^2 is mathematically identical to the model ANOVA F-statistic"
+  ],
+  "concept_ids": [
+    "verify_t_squared_equals_f_identity",
+    "equivalence_of_t_and_f_p_values",
+    "explain_restriction_of_identity_to_single_predictor"
+  ],
+  "setting_group": "emergency_department_staffing_discharge_regression",
+  "source_refs": [
+    "Course Module 6: Regression Analysis",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T22:30:00Z",
+    "notes": "Reviewed derivation: n = 22, k = 1, df = 20. Slope t = 1.50 / 0.50 = 3.000. t^2 = 3.0^2 = 9.000 = F. ANOVA: SSR = 90, SSE = 200, MSE = 10, F = 90/10 = 9.000. Both tests yield p = 0.00707. Demonstrates that this identity holds only for simple regression (k = 1) because for multiple regression (k > 1), F tests all k predictors jointly while t tests individual partial slopes.",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "verify_identity_calculation",
+      "kind": "choice",
+      "prompt_markdown": "How do the numerical values of the slope test statistic $t$ and the ANOVA $F$-statistic relate in this regression output?",
+      "options": [
+        {
+          "id": "identity_holds_exact",
+          "text_markdown": "**$t^2 = F$ exactly**: $(3.000)^2 = 9.000 = F$. The square of the slope $t$-statistic equals the ANOVA $F$-statistic.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "identity_coincidence",
+          "text_markdown": "**It is an approximate coincidence**: $t^2$ and $F$ happen to be close because $n = 22$ is small, but they diverge in larger samples.",
+          "misconception_id": "believed_t_squared_equals_f_is_coincidence",
+          "hint_markdown": "The identity $t^2 = F$ is an exact algebraic and distribution identity whenever $k = 1$, regardless of sample size."
+        },
+        {
+          "id": "identity_square_root_reversed",
+          "text_markdown": "**$F^2 = t$**: $(9.000)^2 = 81.0 = t$.",
+          "misconception_id": "inverted_t_and_f_relationship",
+          "hint_markdown": "An $F$-variable with 1 numerator degree of freedom is the square of a $t$-variable: $F = t^2$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "identity_holds_exact"
+      },
+      "evidence_concept_ids": [
+        "verify_t_squared_equals_f_identity"
+      ],
+      "explanation_markdown": "In simple linear regression ($k = 1$), the slope test statistic is $t = \\frac{b_1}{s_{b_1}} = \\frac{1.500}{0.500} = 3.000$. Squaring this value gives $t^2 = (3.000)^2 = 9.000$. In the ANOVA table, $F = \\frac{MSR}{MSE} = \\frac{90.0}{10.0} = 9.000$. The identity **$t_1^2 = F$** holds exactly.",
+      "numeric_policy": null
+    },
+    {
+      "id": "equivalence_of_p_values",
+      "kind": "choice",
+      "prompt_markdown": "Why do the two-tailed $p$-value for the slope $t$-statistic and the `Significance F` from the ANOVA table have the identical value ($p = 0.0071$)?",
+      "options": [
+        {
+          "id": "p_values_mathematically_equivalent",
+          "text_markdown": "**They test the exact same hypothesis**: In simple regression, testing whether the overall model is useful ($H_0: \\beta_1 = 0$) is identical to testing whether the single predictor's slope is zero, and the area in the two tails of $t_{20}$ equals the upper tail area of $F_{1, 20}$.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "p_values_excel_copies_column",
+          "text_markdown": "**Software display duplication**: Excel calculates only one $p$-value and pastes it across both tables to conserve memory.",
+          "misconception_id": "believed_identical_p_value_is_copy_paste_artifact",
+          "hint_markdown": "Both values are derived independently from their respective theoretical distributions ($F_{1, 20}$ and $t_{20}$) and coincide due to probability theory."
+        },
+        {
+          "id": "p_values_always_005",
+          "text_markdown": "**All regression $p$-values round to $0.0071$**: That is the default standard error rate.",
+          "misconception_id": "believed_p_values_are_fixed_constants",
+          "hint_markdown": "The $p$-value varies with the data; here `=T.DIST.2T(3.0, 20)` and `=F.DIST.RT(9.0, 1, 20)` both equal $0.00707$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "p_values_mathematically_equivalent"
+      },
+      "evidence_concept_ids": [
+        "equivalence_of_t_and_f_p_values"
+      ],
+      "explanation_markdown": "By statistical distribution theory, if $T \\sim t(\\nu)$, then $T^2 \\sim F(1, \\nu)$. Therefore, the two-tailed probability $P(|T_{20}| \\ge 3.000)$ is mathematically identical to the upper-tail probability $P(F_{1, 20} \\ge 9.000)$. In Excel, `=T.DIST.2T(3.0, 20)` and `=F.DIST.RT(9.0, 1, 20)` both evaluate to $0.00707$.",
+      "numeric_policy": null
+    },
+    {
+      "id": "restriction_to_single_predictor",
+      "kind": "choice",
+      "prompt_markdown": "Does the identity $t^2 = F$ continue to hold in a multiple regression model with three predictors ($k = 3$)?",
+      "options": [
+        {
+          "id": "restriction_no_only_k_equals_one",
+          "text_markdown": "**No, it holds only when $k = 1$**: In multiple regression, the ANOVA $F$-test evaluates whether *at least one* of the $k$ predictors is significant ($H_0: \\beta_1 = \\beta_2 = \\beta_3 = 0$), whereas each $t$-test evaluates an individual predictor's marginal contribution holding others constant.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "restriction_yes_always_holds",
+          "text_markdown": "**Yes**: The sum of all $t^2$ values always equals $F^3$ in multiple regression.",
+          "misconception_id": "believed_t_squared_equals_f_generalizes_directly_to_multiple_regression",
+          "hint_markdown": "Because predictors in multiple regression can be correlated, individual $t$-tests do not simply sum or map directly to the overall model $F$-statistic."
+        },
+        {
+          "id": "restriction_only_if_r2_is_one",
+          "text_markdown": "**Only if $R^2 = 1.00$**: The relationship breaks down unless the model has zero unexplained error.",
+          "misconception_id": "confused_predictor_count_with_perfect_fit",
+          "hint_markdown": "The condition for $t^2 = F$ is strictly the number of predictors ($k = 1$), not $R^2 = 1.0$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "restriction_no_only_k_equals_one"
+      },
+      "evidence_concept_ids": [
+        "explain_restriction_of_identity_to_single_predictor"
+      ],
+      "explanation_markdown": "The equivalence $t_1^2 = F$ holds **only for simple linear regression ($k = 1$)**. In multiple regression ($k > 1$), the ANOVA $F$-test has degrees of freedom $(k, n-k-1)$ and tests the omnibus null hypothesis that all $k$ slope coefficients are simultaneously zero. Meanwhile, each individual coefficient has its own $t$-statistic testing whether that specific variable adds explanatory power given that the other $k-1$ variables are already in the model.",
+      "numeric_policy": null
+    }
+  ]
+}

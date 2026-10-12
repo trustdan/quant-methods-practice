@@ -24,6 +24,14 @@ Approved version is immutable. Editing wording creates a new version and fresh a
 
 ## CLI/UI parity
 
+### Rule-v2 calculated choices (October 11, 2026)
+
+The final Wave 4/5 computational templates use rule version 2 in `descriptive_stats`, `discrete_rv`, `linear_combination`, `two_sample_test` and `regression_output`. A stage's optional `calculation` names a supported engine quantity. Each numerical choice carries `numeric_value`; its label must be that number to four decimal places. At admission the Go engine derives the quantity from input-only parameters, checks that exactly one option matches at displayed precision, and verifies the stored choice key selects it. Changed inputs, forged keys, label/value mismatches, unknown quantities and colliding distractors fail closed. Conceptual stages still require delegated semantic review; this mechanism does not prove their prose correct. Existing rule-v1 content and historical snapshots remain intact.
+
+The rule-v2 operations and constraints live in `internal/mathengine/curriculum_calculations.go`. Paired problems derive differences from original before/after arrays. Directional p-values use the signed statistic and the requested left/right tail; neither is assumed to equal half a two-sided p-value. Quartiles explicitly use Excel's inclusive interpolation convention. Pooled tests explicitly assume equal population variances, and two-proportion tests enforce pooled expected success/failure counts of at least ten per group. Model fit comparisons require matching sample size and response total sum of squares, with the same observations and units separately attested in the scenario.
+
+`go run ./scripts/content-audit -dir curriculum/approved -reviewer codex_delegated_final_waves` validates the final 20 questions and regenerates [the complete worked preview](REMAINING-CONTENT-REVIEW.md). Adding `-reviews` exports matching review records for already-approved content and refuses to overwrite a different review. The audit tool never authorizes activation. `python scripts/check_content_coverage.py` verifies all 121 catalog items across the 22 objectives against approved templates and matching reviews, allowing the older immutable review formats only for their original version-1 templates.
+
 Plan commands for --validate-bank, --reconcile-all, --active-bank, --export-bank, --generate-candidate, --candidates, --preview-candidate, --approve-candidate, --reject-candidate and --retire-question. Review UI offers the same actions with visible provenance. No bulk approve by learner performance or model confidence.
 
 ## Stage 12 implementation (binomial candidates)

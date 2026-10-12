@@ -1,0 +1,151 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "regout_significance_f",
+  "version": 1,
+  "status": "active",
+  "family_id": "regression_output",
+  "rule_version": 1,
+  "module_id": "module_6",
+  "title": "Interpreting Significance F and overall regression ANOVA model utility",
+  "scenario_markdown": "A regional banking institution models commercial loan portfolio default rates ($Y$, in percent) based on borrower debt-service coverage ratio ($X$) across $n = 26$ commercial lending cohorts ($k = 1$, residual $df = 24$). The regression ANOVA summary table generated in Excel reports:\n\n| ANOVA | df | SS | MS | F | Significance F |\n|---|---|---|---|---|---|\n| **Regression** | $1$ | $200.00$ | $200.00$ | $16.00$ | $0.0005$ |\n| **Residual** | $24$ | $300.00$ | $12.50$ | | |\n| **Total** | $25$ | $500.00$ | | | |\n\nEvaluate the meaning of `Significance F`, determine the statistical decision at $\\alpha = 0.05$, and explain its mathematical link to the slope coefficient $t$-test.",
+  "parameters": {
+    "n": 26,
+    "k": 1,
+    "ssr": 200.0,
+    "sse": 300.0,
+    "sst": 500.0,
+    "confidence_level": 0.95,
+    "intercept_name": "Intercept",
+    "b0": 10.0,
+    "se_b0": 2.0,
+    "x1_name": "DSCR",
+    "b1": 2.0,
+    "se_b1": 0.5
+  },
+  "assumptions": [
+    "Simple linear regression model Y = beta0 + beta1*X + epsilon with homoscedastic, normally distributed residuals",
+    "Overall model utility test evaluates H0: beta1 = 0 vs H1: beta1 != 0",
+    "Significance F is the p-value corresponding to the F-statistic with df1 = 1 and df2 = 24"
+  ],
+  "concept_ids": [
+    "define_significance_f_as_anova_p_value",
+    "evaluate_overall_model_significance_decision",
+    "link_f_test_to_t_test_in_simple_regression"
+  ],
+  "setting_group": "commercial_banking_loan_default_anova",
+  "source_refs": [
+    "Course Module 6: Regression Analysis",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T22:30:00Z",
+    "notes": "Reviewed derivation: n = 26, k = 1, df_res = 24. ANOVA: SSR = 200, SSE = 300, SST = 500. MSR = 200, MSE = 12.50, F = 16.00. Significance F = F.DIST.RT(16, 1, 24) = 0.00052. Because 0.0005 <= 0.05, reject H0; model has significant explanatory power. In simple regression (k=1), t^2 = 4^2 = 16 = F, and Significance F equals the two-tailed slope p-value.",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "meaning_of_significance_f",
+      "kind": "choice",
+      "prompt_markdown": "What does the value reported under **Significance F** ($0.0005$) represent in the regression ANOVA table?",
+      "options": [
+        {
+          "id": "meaning_p_value_of_f_test",
+          "text_markdown": "**The $p$-value for the overall regression model**: It is the probability of observing an $F$-statistic as large as $16.00$ or greater under the null hypothesis that all slope coefficients are zero ($H_0: \\beta_1 = 0$).",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "meaning_critical_f_value",
+          "text_markdown": "**The critical $F$ cutoff value**: The boundary threshold that the $F$-statistic must exceed to achieve significance.",
+          "misconception_id": "confused_p_value_with_critical_f_cutoff",
+          "hint_markdown": "The critical cutoff would be obtained via `=F.INV.RT(0.05, 1, 24)`; 'Significance F' is Excel's term for the $p$-value."
+        },
+        {
+          "id": "meaning_percentage_variance",
+          "text_markdown": "**The coefficient of determination $R^2$**: The model explains $0.05\\%$ of total variance.",
+          "misconception_id": "confused_significance_f_with_r_squared",
+          "hint_markdown": "$R^2 = SSR / SST = 200 / 500 = 0.40$ ($40\\%$); 'Significance F' is the hypothesis test $p$-value."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "meaning_p_value_of_f_test"
+      },
+      "evidence_concept_ids": [
+        "define_significance_f_as_anova_p_value"
+      ],
+      "explanation_markdown": "In Microsoft Excel regression output, **Significance F** is simply the label for the **$p$-value of the overall $F$-test**. It is computed using `=F.DIST.RT(F_stat, df_reg, df_res)` (here `=F.DIST.RT(16.0, 1, 24)` $\\approx 0.00052$). It tests whether the regression model as a whole explains a statistically significant amount of variation in $Y$.",
+      "numeric_policy": null
+    },
+    {
+      "id": "overall_significance_decision",
+      "kind": "choice",
+      "prompt_markdown": "At significance level $\\alpha = 0.05$, what is the statistical conclusion regarding the regression model?",
+      "options": [
+        {
+          "id": "decision_reject_model_significant",
+          "text_markdown": "**Reject $H_0: \\beta_1 = 0$ ($p = 0.0005 \\le 0.05$)**: The regression model is statistically significant; debt-service coverage ratio accounts for a significant linear portion of default variation.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "decision_fail_not_significant",
+          "text_markdown": "**Fail to reject $H_0$**: Because $0.0005 < 0.05$, the test fails to reach significance.",
+          "misconception_id": "reversed_rejection_rule_for_p_values",
+          "hint_markdown": "The rejection rule is reject $H_0$ when $p \\le \\alpha$; since $0.0005 \\le 0.05$, we reject $H_0$."
+        },
+        {
+          "id": "decision_model_proves_causation",
+          "text_markdown": "**Reject $H_0$ and conclude that DSCR directly causes default rates to change**.",
+          "misconception_id": "claimed_statistical_significance_proves_causality",
+          "hint_markdown": "Statistical significance establishes linear association, not direct causality."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "decision_reject_model_significant"
+      },
+      "evidence_concept_ids": [
+        "evaluate_overall_model_significance_decision"
+      ],
+      "explanation_markdown": "Because $\\text{Significance } F = 0.0005 \\le 0.05$, we **reject the null hypothesis $H_0$**. The sample provides strong empirical evidence that the relationship between DSCR and default rates is not due to random chance, confirming that the regression model is statistically useful.",
+      "numeric_policy": null
+    },
+    {
+      "id": "f_test_link_to_t_test",
+      "kind": "choice",
+      "prompt_markdown": "For this simple linear regression model with a single predictor ($k = 1$), how does the overall ANOVA $F$-test relate to the $t$-test for the individual slope coefficient?",
+      "options": [
+        {
+          "id": "link_identical_tests",
+          "text_markdown": "**They are mathematically equivalent**: With $k = 1$, $F = t^2$ ($16.00 = 4.00^2$), and the $p$-value for the slope $t$-test is exactly equal to `Significance F` ($0.0005$).",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "link_completely_independent",
+          "text_markdown": "**They are completely unrelated**: The $F$-test evaluates the intercept, while the $t$-test evaluates the slope.",
+          "misconception_id": "believed_f_test_evaluates_intercept",
+          "hint_markdown": "The ANOVA $F$-test evaluates all slope coefficients simultaneously; when $k=1$, that is identical to testing the single slope."
+        },
+        {
+          "id": "link_f_test_always_disagrees",
+          "text_markdown": "**They test opposite hypotheses**: The $F$-test tests if slope is positive, while the $t$-test tests if slope is negative.",
+          "misconception_id": "confused_f_and_t_test_hypotheses",
+          "hint_markdown": "Both test the identical two-tailed null hypothesis $H_0: \\beta_1 = 0$ vs $H_1: \\beta_1 \\ne 0$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "link_identical_tests"
+      },
+      "evidence_concept_ids": [
+        "link_f_test_to_t_test_in_simple_regression"
+      ],
+      "explanation_markdown": "In simple linear regression ($k = 1$), testing the overall model is identical to testing the single predictor's slope. By distribution theory, an $F$-distribution with $1$ and $\\nu$ degrees of freedom is the square of a Student's $t$ variable with $\\nu$ degrees of freedom: $F(1, \\nu) = [t(\\nu)]^2$. Here $t = 2.0 / 0.5 = 4.0$, so $t^2 = 16.0 = F$, and their two-tailed $p$-values are mathematically identical ($0.00052$).",
+      "numeric_policy": null
+    }
+  ]
+}

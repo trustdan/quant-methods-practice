@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "template_id": "regout_slope_ci_interpretation",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T22:30:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "regression_output",
+    "parameters": {
+      "n": 22,
+      "k": 1,
+      "ssr": 2450.0,
+      "sse": 640.0,
+      "sst": 3090.0,
+      "confidence_level": 0.95,
+      "intercept_name": "Intercept",
+      "b0": 15.0,
+      "se_b0": 5.0,
+      "x1_name": "Sunlight_Hours",
+      "b1": 35.0,
+      "se_b1": 4.0
+    },
+    "canonical_probability": 0.000001,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 35.0,
+      "variance": 16.0,
+      "standard_deviation": 4.0
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "frequentist_interpretation", "kind": "choice", "evidence": "regout_slope_ci_frequentist_interpretation"},
+      {"id": "positive_bounds_significance", "kind": "choice", "evidence": "regout_slope_ci_strictly_positive_implication"},
+      {"id": "excel_ci_derivation", "kind": "choice", "evidence": "regout_slope_ci_excel_derivation"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Verified mathematically: b1 = 35.0, se_b1 = 4.0, n = 22, k = 1. df_res = 20. Critical t_{0.025, 20} = 2.08596. E = 2.08596 * 4.0 = 8.3439. 95% CI: [26.656, 43.344]. Bounds exclude 0, establishing statistical significance at alpha = 0.05. t = 35/4 = 8.75. F = 76.5625. SSR = 2450, SSE = 640, SST = 3090. MSE = 32, MSR = 2450. F = 2450/32 = 76.5625 = t^2. Excel: =35 - T.INV.2T(0.05, 20)*4."
+}

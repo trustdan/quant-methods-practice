@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "template_id": "ci_proportion_recommend",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T22:00:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "confidence_interval",
+    "parameters": {
+      "parameter": "proportion",
+      "point_estimate": 0.33,
+      "successes": 132,
+      "n": 400,
+      "confidence_level": 0.95
+    },
+    "canonical_probability": 0.95,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 0.33,
+      "variance": 0.00055275,
+      "standard_deviation": 0.0235106
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "standard_error_check", "kind": "choice", "evidence": "ci_proportion_standard_error"},
+      {"id": "margin_of_error_calc", "kind": "choice", "evidence": "ci_proportion_margin_of_error"},
+      {"id": "interval_construction", "kind": "choice", "evidence": "ci_proportion_interval_construction"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Verified mathematically: x = 132, n = 400, p_hat = 0.33. np = 132 >= 10, n(1-p) = 268 >= 10. SE = sqrt(0.33 * 0.67 / 400) = 0.0235106. Z_{0.025} = 1.959964. Margin of error = 0.0460799. Interval = [0.28392, 0.37608]. In Excel: =0.33 - NORM.S.INV(0.975)*SQRT(0.33*0.67/400) and =0.33 + NORM.S.INV(0.975)*SQRT(0.33*0.67/400)."
+}

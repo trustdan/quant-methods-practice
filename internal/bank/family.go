@@ -70,10 +70,18 @@ func (b *BinomialFamily) ValidateParameters(ruleVersion int, params map[string]i
 		return fmt.Errorf("binomial_pmf unsupported rule_version %d (supported: 1)", ruleVersion)
 	}
 
-	required := map[string]bool{"n": true, "p": true, "k": true}
+	allowed := map[string]bool{
+		"n":         true,
+		"p":         true,
+		"k":         true,
+		"operation": true,
+		"mean":      true,
+		"sd":        true,
+		"var":       true,
+	}
 	for k := range params {
-		if !required[k] {
-			return fmt.Errorf("binomial_pmf unknown parameter %q; only n, p, k allowed", k)
+		if !allowed[k] {
+			return fmt.Errorf("binomial_pmf unknown parameter %q; only n, p, k, operation, mean, sd, var allowed", k)
 		}
 	}
 
@@ -98,19 +106,38 @@ func (b *BinomialFamily) ValidateParameters(ruleVersion int, params map[string]i
 		return fmt.Errorf("binomial_pmf parameter \"p\" must be in range [0, 1], got %v", rawP)
 	}
 
-	// Validate k
-	rawK, ok := params["k"]
-	if !ok {
-		return fmt.Errorf("binomial_pmf missing required parameter \"k\"")
+	// Validate k or operation
+	if rawK, ok := params["k"]; ok {
+		kFloat, ok := toFloat(rawK)
+		if !ok || math.Floor(kFloat) != kFloat || kFloat < 0 {
+			return fmt.Errorf("binomial_pmf parameter \"k\" must be a non-negative integer, got %v", rawK)
+		}
+		k := int(kFloat)
+		if k > n {
+			return fmt.Errorf("binomial_pmf parameter \"k\" (%d) cannot exceed total trials \"n\" (%d)", k, n)
+		}
+	} else if rawOp, ok := params["operation"]; ok {
+		op, ok := rawOp.(string)
+		if !ok || (op != "mean_sd" && op != "mean" && op != "variance") {
+			return fmt.Errorf("binomial_pmf invalid operation %q", rawOp)
+		}
+	} else {
+		return fmt.Errorf("binomial_pmf missing required parameter \"k\" or \"operation\"")
 	}
-	kFloat, ok := toFloat(rawK)
-	if !ok || math.Floor(kFloat) != kFloat || kFloat < 0 {
-		return fmt.Errorf("binomial_pmf parameter \"k\" must be a non-negative integer, got %v", rawK)
-	}
-	k := int(kFloat)
 
-	if k > n {
-		return fmt.Errorf("binomial_pmf parameter \"k\" (%d) cannot exceed total trials \"n\" (%d)", k, n)
+	if rawMean, ok := params["mean"]; ok {
+		meanFloat, ok := toFloat(rawMean)
+		if !ok || math.Abs(meanFloat-float64(n)*pFloat) > 1e-4 {
+			return fmt.Errorf("binomial_pmf parameter \"mean\" must match n*p (%v)", float64(n)*pFloat)
+		}
+	}
+
+	if rawSD, ok := params["sd"]; ok {
+		sdFloat, ok := toFloat(rawSD)
+		expectedSD := math.Sqrt(float64(n) * pFloat * (1.0 - pFloat))
+		if !ok || math.Abs(sdFloat-expectedSD) > 1e-3 {
+			return fmt.Errorf("binomial_pmf parameter \"sd\" must match sqrt(n*p*(1-p)) (%v)", expectedSD)
+		}
 	}
 
 	return nil
@@ -187,10 +214,17 @@ func (s *SetProbabilityFamily) ValidateParameters(ruleVersion int, params map[st
 	}
 
 	allowed := map[string]bool{
-		"operation":      true,
-		"p_a":            true,
-		"p_b":            true,
-		"p_intersection": true,
+		"operation":        true,
+		"p_a":              true,
+		"p_b":              true,
+		"p_b1":             true,
+		"p_b2":             true,
+		"p_intersection":   true,
+		"cond_a_given_b1":  true,
+		"cond_a_given_b2":  true,
+		"target_partition": true,
+		"p_total":          true,
+		"posterior":        true,
 	}
 	for k := range params {
 		if !allowed[k] {
@@ -212,9 +246,30 @@ func (s *SetProbabilityFamily) ValidateParameters(ruleVersion int, params map[st
 		"complement":              true,
 		"conditional":             true,
 		"disjoint_vs_independent": true,
+		"multiplication":          true,
+		"independence_check":      true,
+		"bayes":                   true,
+		"probability_tree":        true,
 	}
 	if !validOps[op] {
 		return fmt.Errorf("set_probability invalid operation %q", op)
+	}
+
+	if op == "bayes" || op == "probability_tree" {
+		rawB1, ok := params["p_b1"]
+		if !ok {
+			return fmt.Errorf("set_probability operation %q requires parameter \"p_b1\"", op)
+		}
+		rawB2, ok := params["p_b2"]
+		if !ok {
+			return fmt.Errorf("set_probability operation %q requires parameter \"p_b2\"", op)
+		}
+		pB1, ok1 := toFloat(rawB1)
+		pB2, ok2 := toFloat(rawB2)
+		if !ok1 || !ok2 || pB1 < 0.0 || pB2 < 0.0 || math.Abs((pB1+pB2)-1.0) > 1e-4 {
+			return fmt.Errorf("set_probability p_b1 (%v) and p_b2 (%v) must be non-negative and sum to 1.0", rawB1, rawB2)
+		}
+		return nil
 	}
 
 	rawPA, ok := params["p_a"]
@@ -239,6 +294,12 @@ func (s *SetProbabilityFamily) ValidateParameters(ruleVersion int, params map[st
 		return fmt.Errorf("set_probability parameter \"p_b\" must be in [0, 1], got %v", rawPB)
 	}
 
+	if op == "independence_check" {
+		if _, ok := params["p_intersection"]; !ok {
+			return fmt.Errorf("set_probability operation \"independence_check\" requires parameter \"p_intersection\"")
+		}
+	}
+
 	if rawPInter, ok := params["p_intersection"]; ok {
 		pInter, ok := toFloat(rawPInter)
 		if !ok || pInter < 0.0 || pInter > 1.0 {
@@ -250,6 +311,7 @@ func (s *SetProbabilityFamily) ValidateParameters(ruleVersion int, params map[st
 	}
 
 	return nil
+
 }
 
 // LinearCombinationFamily implements expectation and variance of sums / linear combinations.
@@ -265,10 +327,14 @@ func (l *LinearCombinationFamily) ID() string {
 }
 
 func (l *LinearCombinationFamily) SupportedRuleVersions() []int {
-	return []int{1}
+	return []int{1, 2}
 }
 
 func (l *LinearCombinationFamily) ValidateParameters(ruleVersion int, params map[string]interface{}) error {
+	if ruleVersion == 2 {
+		_, err := mathengine.CurriculumCalculations(l.ID(), params)
+		return err
+	}
 	if ruleVersion != 1 {
 		return fmt.Errorf("linear_combination unsupported rule_version %d (supported: 1)", ruleVersion)
 	}
@@ -280,9 +346,16 @@ func (l *LinearCombinationFamily) ValidateParameters(ruleVersion int, params map
 		"c":         true,
 		"e_x":       true,
 		"e_y":       true,
+		"mean_x":    true,
+		"mean_y":    true,
 		"var_x":     true,
 		"var_y":     true,
+		"sd_x":      true,
+		"sd_y":      true,
 		"cov_xy":    true,
+		"mean":      true,
+		"var":       true,
+		"sd":        true,
 	}
 	for k := range params {
 		if !allowed[k] {
@@ -299,22 +372,32 @@ func (l *LinearCombinationFamily) ValidateParameters(ruleVersion int, params map
 		return fmt.Errorf("linear_combination parameter \"operation\" must be non-empty string, got %v", rawOp)
 	}
 
-	rawA, ok := params["a"]
-	if !ok {
-		return fmt.Errorf("linear_combination missing required parameter \"a\"")
-	}
-	_, ok = toFloat(rawA)
-	if !ok {
-		return fmt.Errorf("linear_combination parameter \"a\" must be a number, got %v", rawA)
-	}
+	if op == "affine" {
+		rawA, ok := params["a"]
+		if !ok {
+			return fmt.Errorf("linear_combination operation \"affine\" requires parameter \"a\"")
+		}
+		if _, ok := toFloat(rawA); !ok {
+			return fmt.Errorf("linear_combination parameter \"a\" must be a number, got %v", rawA)
+		}
+	} else if op == "sum_independent" || op == "diff_independent" {
+		// a and b are optional (implicitly 1 and 1 or 1 and -1)
+	} else {
+		rawA, ok := params["a"]
+		if !ok {
+			return fmt.Errorf("linear_combination missing required parameter \"a\"")
+		}
+		if _, ok := toFloat(rawA); !ok {
+			return fmt.Errorf("linear_combination parameter \"a\" must be a number, got %v", rawA)
+		}
 
-	rawB, ok := params["b"]
-	if !ok {
-		return fmt.Errorf("linear_combination missing required parameter \"b\"")
-	}
-	_, ok = toFloat(rawB)
-	if !ok {
-		return fmt.Errorf("linear_combination parameter \"b\" must be a number, got %v", rawB)
+		rawB, ok := params["b"]
+		if !ok {
+			return fmt.Errorf("linear_combination missing required parameter \"b\"")
+		}
+		if _, ok := toFloat(rawB); !ok {
+			return fmt.Errorf("linear_combination parameter \"b\" must be a number, got %v", rawB)
+		}
 	}
 
 	// Validate variances and covariance if provided
@@ -327,14 +410,30 @@ func (l *LinearCombinationFamily) ValidateParameters(ruleVersion int, params map
 			return fmt.Errorf("linear_combination parameter \"var_x\" must be non-negative, got %v", rawVarX)
 		}
 		hasVarX = true
+	} else if rawSDX, ok := params["sd_x"]; ok {
+		sdX, ok := toFloat(rawSDX)
+		if !ok || sdX < 0.0 {
+			return fmt.Errorf("linear_combination parameter \"sd_x\" must be non-negative, got %v", rawSDX)
+		}
+		varX = sdX * sdX
+		hasVarX = true
 	}
+
 	if rawVarY, ok := params["var_y"]; ok {
 		varY, ok = toFloat(rawVarY)
 		if !ok || varY < 0.0 {
 			return fmt.Errorf("linear_combination parameter \"var_y\" must be non-negative, got %v", rawVarY)
 		}
 		hasVarY = true
+	} else if rawSDY, ok := params["sd_y"]; ok {
+		sdY, ok := toFloat(rawSDY)
+		if !ok || sdY < 0.0 {
+			return fmt.Errorf("linear_combination parameter \"sd_y\" must be non-negative, got %v", rawSDY)
+		}
+		varY = sdY * sdY
+		hasVarY = true
 	}
+
 	if rawCov, ok := params["cov_xy"]; ok {
 		covXY, ok = toFloat(rawCov)
 		if !ok {
@@ -351,6 +450,7 @@ func (l *LinearCombinationFamily) ValidateParameters(ruleVersion int, params map
 	}
 
 	return nil
+
 }
 
 // NormalFamily implements the continuous normal distribution family.
@@ -788,7 +888,7 @@ func (h *HypothesisTestFamily) ValidateParameters(ruleVersion int, params map[st
 
 	allowed := map[string]bool{
 		"test_type": true, "null_value": true, "sample_stat": true, "n": true,
-		"sigma": true, "s": true, "tail": true, "alpha": true,
+		"sigma": true, "s": true, "tail": true, "alpha": true, "successes": true,
 	}
 	for k := range params {
 		if !allowed[k] {
@@ -890,6 +990,25 @@ func toFloat(val interface{}) (float64, bool) {
 	}
 }
 
+func toFloatSlice(val interface{}) ([]float64, bool) {
+	switch slice := val.(type) {
+	case []float64:
+		return slice, true
+	case []interface{}:
+		res := make([]float64, len(slice))
+		for i, item := range slice {
+			f, ok := toFloat(item)
+			if !ok {
+				return nil, false
+			}
+			res[i] = f
+		}
+		return res, true
+	default:
+		return nil, false
+	}
+}
+
 // ConceptCheckFamily implements conceptual questions with choice-only stages and verified distractors.
 type ConceptCheckFamily struct{}
 
@@ -980,10 +1099,14 @@ func (r *RegressionOutputFamily) ID() string {
 }
 
 func (r *RegressionOutputFamily) SupportedRuleVersions() []int {
-	return []int{1}
+	return []int{1, 2}
 }
 
 func (r *RegressionOutputFamily) ValidateParameters(ruleVersion int, params map[string]interface{}) error {
+	if ruleVersion == 2 {
+		_, err := mathengine.CurriculumCalculations(r.ID(), params)
+		return err
+	}
 	if ruleVersion != 1 {
 		return fmt.Errorf("regression_output unsupported rule_version %d (supported: 1)", ruleVersion)
 	}
@@ -1290,6 +1413,218 @@ func (s *SampleSizeFamily) ValidateParameters(ruleVersion int, params map[string
 	return nil
 }
 
+// DescriptiveStatsFamily implements descriptive statistics (mean, median, SD, CV, etc.).
+type DescriptiveStatsFamily struct{}
+
+func NewDescriptiveStatsFamily() *DescriptiveStatsFamily {
+	return &DescriptiveStatsFamily{}
+}
+
+func (d *DescriptiveStatsFamily) ID() string {
+	return "descriptive_stats"
+}
+
+func (d *DescriptiveStatsFamily) SupportedRuleVersions() []int {
+	return []int{1, 2}
+}
+
+func (d *DescriptiveStatsFamily) ValidateParameters(ruleVersion int, params map[string]interface{}) error {
+	if ruleVersion == 2 {
+		_, err := mathengine.CurriculumCalculations(d.ID(), params)
+		return err
+	}
+	if ruleVersion != 1 {
+		return fmt.Errorf("descriptive_stats unsupported rule_version %d (supported: 1)", ruleVersion)
+	}
+
+	allowed := map[string]bool{
+		"operation":           true,
+		"data":                true,
+		"mean":                true,
+		"median":              true,
+		"mode":                true,
+		"range":               true,
+		"sample_variance":     true,
+		"sample_sd":           true,
+		"population_variance": true,
+		"population_sd":       true,
+		"cv_percent":          true,
+		"cv":                  true,
+		"mean_a":              true,
+		"sd_a":                true,
+		"cv_a":                true,
+		"mean_b":              true,
+		"sd_b":                true,
+		"cv_b":                true,
+		"x":                   true,
+		"z":                   true,
+		"weights":             true,
+	}
+	for k := range params {
+		if !allowed[k] {
+			return fmt.Errorf("descriptive_stats unknown parameter %q", k)
+		}
+	}
+
+	rawOp, ok := params["operation"]
+	if !ok {
+		return fmt.Errorf("descriptive_stats missing required parameter \"operation\"")
+	}
+	op, ok := rawOp.(string)
+	if !ok || op == "" {
+		return fmt.Errorf("descriptive_stats parameter \"operation\" must be non-empty string, got %v", rawOp)
+	}
+
+	if rawData, ok := params["data"]; ok {
+		slice, ok := toFloatSlice(rawData)
+		if !ok || len(slice) < 2 {
+			return fmt.Errorf("descriptive_stats parameter \"data\" must be a list of at least 2 numbers, got %v", rawData)
+		}
+	}
+
+	return nil
+}
+
+// DiscreteRVFamily implements discrete random variables, PMF tables, and expected value/variance.
+type DiscreteRVFamily struct{}
+
+func NewDiscreteRVFamily() *DiscreteRVFamily {
+	return &DiscreteRVFamily{}
+}
+
+func (d *DiscreteRVFamily) ID() string {
+	return "discrete_rv"
+}
+
+func (d *DiscreteRVFamily) SupportedRuleVersions() []int {
+	return []int{1, 2}
+}
+
+func (d *DiscreteRVFamily) ValidateParameters(ruleVersion int, params map[string]interface{}) error {
+	if ruleVersion == 2 {
+		_, err := mathengine.CurriculumCalculations(d.ID(), params)
+		return err
+	}
+	if ruleVersion != 1 {
+		return fmt.Errorf("discrete_rv unsupported rule_version %d (supported: 1)", ruleVersion)
+	}
+
+	allowed := map[string]bool{
+		"operation":      true,
+		"values":         true,
+		"probabilities":  true,
+		"missing_index":  true,
+		"missing_prob":   true,
+		"expected_value": true,
+		"e_x2":           true,
+		"variance":       true,
+		"sd":             true,
+		"k":              true,
+		"prob":           true,
+	}
+	for k := range params {
+		if !allowed[k] {
+			return fmt.Errorf("discrete_rv unknown parameter %q", k)
+		}
+	}
+
+	rawOp, ok := params["operation"]
+	if !ok {
+		return fmt.Errorf("discrete_rv missing required parameter \"operation\"")
+	}
+	op, ok := rawOp.(string)
+	if !ok || op == "" {
+		return fmt.Errorf("discrete_rv parameter \"operation\" must be non-empty string, got %v", rawOp)
+	}
+
+	if rawVals, ok := params["values"]; ok {
+		vals, ok := toFloatSlice(rawVals)
+		if !ok || len(vals) == 0 {
+			return fmt.Errorf("discrete_rv parameter \"values\" must be a non-empty list of numbers")
+		}
+	}
+
+	if rawProbs, ok := params["probabilities"]; ok {
+		probs, ok := toFloatSlice(rawProbs)
+		if !ok || len(probs) == 0 {
+			return fmt.Errorf("discrete_rv parameter \"probabilities\" must be a non-empty list of numbers")
+		}
+	}
+
+	return nil
+}
+
+// TwoSampleTestFamily implements paired t-tests, independent two-sample t-tests, and two-proportion z-tests.
+type TwoSampleTestFamily struct{}
+
+func NewTwoSampleTestFamily() *TwoSampleTestFamily {
+	return &TwoSampleTestFamily{}
+}
+
+func (t *TwoSampleTestFamily) ID() string {
+	return "two_sample_test"
+}
+
+func (t *TwoSampleTestFamily) SupportedRuleVersions() []int {
+	return []int{1, 2}
+}
+
+func (t *TwoSampleTestFamily) ValidateParameters(ruleVersion int, params map[string]interface{}) error {
+	if ruleVersion == 2 {
+		_, err := mathengine.CurriculumCalculations(t.ID(), params)
+		return err
+	}
+	if ruleVersion != 1 {
+		return fmt.Errorf("two_sample_test unsupported rule_version %d (supported: 1)", ruleVersion)
+	}
+
+	allowed := map[string]bool{
+		"operation":           true,
+		"test_type":           true,
+		"n":                   true,
+		"mean_diff":           true,
+		"sd_diff":             true,
+		"hyp_diff":            true,
+		"n1":                  true,
+		"n2":                  true,
+		"mean1":               true,
+		"mean2":               true,
+		"var1":                true,
+		"var2":                true,
+		"pooled_var":          true,
+		"x1":                  true,
+		"x2":                  true,
+		"p1_hat":              true,
+		"p2_hat":              true,
+		"pooled_p":            true,
+		"df":                  true,
+		"t_stat":              true,
+		"z_stat":              true,
+		"p_value_one_tail":    true,
+		"p_value_two_tail":    true,
+		"t_critical_one_tail": true,
+		"t_critical_two_tail": true,
+		"alpha":               true,
+		"decision":            true,
+	}
+	for k := range params {
+		if !allowed[k] {
+			return fmt.Errorf("two_sample_test unknown parameter %q", k)
+		}
+	}
+
+	rawOp, ok := params["operation"]
+	if !ok {
+		return fmt.Errorf("two_sample_test missing required parameter \"operation\"")
+	}
+	op, ok := rawOp.(string)
+	if !ok || op == "" {
+		return fmt.Errorf("two_sample_test parameter \"operation\" must be non-empty string, got %v", rawOp)
+	}
+
+	return nil
+}
+
 var (
 	defaultRegistryOnce sync.Once
 	defaultRegistry     *Registry
@@ -1313,7 +1648,9 @@ func DefaultRegistry() *Registry {
 		defaultRegistry.Register(NewConceptCheckFamily())
 		defaultRegistry.Register(NewRegressionOutputFamily())
 		defaultRegistry.Register(NewSampleSizeFamily())
+		defaultRegistry.Register(NewDescriptiveStatsFamily())
+		defaultRegistry.Register(NewDiscreteRVFamily())
+		defaultRegistry.Register(NewTwoSampleTestFamily())
 	})
 	return defaultRegistry
 }
-

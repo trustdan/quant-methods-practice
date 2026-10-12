@@ -1,0 +1,140 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "regprob_autocorrelation",
+  "version": 1,
+  "status": "active",
+  "family_id": "concept_check",
+  "rule_version": 1,
+  "module_id": "module_6",
+  "title": "Recognizing time dependence in regression residuals",
+  "scenario_markdown": "A utility models monthly demand using temperature. In chronological order, its residuals form long positive runs followed by long negative runs. Adjacent months tend to have similar residual signs, while residual spread is roughly stable. The data are a time series, not independent stores.",
+  "parameters": {
+    "topic": "regression_diagnostics"
+  },
+  "assumptions": [
+    "Residuals are plotted in chronological order.",
+    "Runs suggest positive serial dependence, which should be checked rather than treated as proved.",
+    "Standard OLS inferential formulas here assume independent errors."
+  ],
+  "concept_ids": [
+    "serial_dependence_diagnosis",
+    "serial_dependence_inference",
+    "serial_dependence_followup"
+  ],
+  "setting_group": "utility_monthly_serial_residuals",
+  "source_refs": [
+    "docs/COURSE-MAP.md: learner-supplied module objectives, October 11, 2026",
+    "docs/CONTENT-BACKLOG.md: regprob-autocorrelation"
+  ],
+  "approval": {
+    "reviewer": "codex_delegated_final_waves",
+    "reviewed_at": "2026-10-12T04:32:26.275462Z",
+    "delegation_basis": "User explicitly replied on October 11, 2026 (America/Chicago): Yes—delegate review and activate after checks pass. Approval follows successful Go mathematical, bank admission, every-option grading and snapshot checks; assistant semantic review does not claim personal user reading.",
+    "notes": "Assistant reviewed the complete scenario, stage wording, all options, causal hints and worked explanations. Numerical choices are independently bound to Go engine quantities under rule v2; conceptual choices are semantically reviewed. Fixed parameters only; no cosmetic variation claimed as transfer. Stated course conventions remain unconfirmed where applicable. Validated one-to-one concept evidence, rejected ambiguous numeric distractors, and tested every option after snapshot serialization."
+  },
+  "stages": [
+    {
+      "id": "serial_dependence_diagnosis",
+      "kind": "choice",
+      "prompt_markdown": "Which regression assumption is most directly in question?",
+      "options": [
+        {
+          "id": "supported",
+          "text_markdown": "Error independence: adjacent residuals may be positively autocorrelated.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "misconception_a",
+          "text_markdown": "Errors must always alternate signs every month.",
+          "misconception_id": "serial_dependence_diagnosis_a",
+          "hint_markdown": "Independence does not require any deterministic sign pattern."
+        },
+        {
+          "id": "misconception_b",
+          "text_markdown": "The coefficient of determination must exceed 1.",
+          "misconception_id": "serial_dependence_diagnosis_b",
+          "hint_markdown": "Temporal dependence does not imply an impossible R-squared."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "supported"
+      },
+      "evidence_concept_ids": [
+        "serial_dependence_diagnosis"
+      ],
+      "explanation_markdown": "Long runs in time order suggest positive serial correlation: an unexplained positive deviation tends to be followed by another. This is distinct from curvature against a predictor or a fan-shaped spread.",
+      "numeric_policy": null
+    },
+    {
+      "id": "serial_dependence_inference",
+      "kind": "choice",
+      "prompt_markdown": "What is the key concern for conventional inference if errors are autocorrelated?",
+      "options": [
+        {
+          "id": "supported",
+          "text_markdown": "Standard OLS standard errors and tests can be unreliable when they ignore dependence.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "misconception_a",
+          "text_markdown": "OLS coefficients necessarily become exactly zero.",
+          "misconception_id": "serial_dependence_inference_a",
+          "hint_markdown": "Dependence affects uncertainty calculations without forcing coefficient values."
+        },
+        {
+          "id": "misconception_b",
+          "text_markdown": "Residual standard error alone automatically corrects all time dependence.",
+          "misconception_id": "serial_dependence_inference_b",
+          "hint_markdown": "The usual scalar residual variance does not model correlations across months."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "supported"
+      },
+      "evidence_concept_ids": [
+        "serial_dependence_inference"
+      ],
+      "explanation_markdown": "With serially dependent errors, conventional independent-error standard errors, confidence intervals and p-values can misstate uncertainty. Coefficient bias depends on additional assumptions; autocorrelation alone does not imply it.",
+      "numeric_policy": null
+    },
+    {
+      "id": "serial_dependence_followup",
+      "kind": "choice",
+      "prompt_markdown": "Which follow-up is appropriate?",
+      "options": [
+        {
+          "id": "supported",
+          "text_markdown": "Examine residuals over time and their autocorrelation; consider seasonal or time-series structure and suitable inference.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "misconception_a",
+          "text_markdown": "Shuffle the months until the runs disappear, then use the original p-values.",
+          "misconception_id": "serial_dependence_followup_a",
+          "hint_markdown": "Reordering a plot does not remove dependence in the observations."
+        },
+        {
+          "id": "misconception_b",
+          "text_markdown": "Add unrelated predictors until ordinary R-squared reaches 1.",
+          "misconception_id": "serial_dependence_followup_b",
+          "hint_markdown": "Extra variables without a justified temporal mechanism do not resolve dependence."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "supported"
+      },
+      "evidence_concept_ids": [
+        "serial_dependence_followup"
+      ],
+      "explanation_markdown": "Check whether omitted seasonality, trends, or a time-series error process explain the runs. A plot is a diagnostic prompt, not a complete proof or an automatic choice of correction.",
+      "numeric_policy": null
+    }
+  ]
+}

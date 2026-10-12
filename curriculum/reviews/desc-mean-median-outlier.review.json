@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "template_id": "desc_mean_median_outlier",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T23:05:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "descriptive_stats",
+    "parameters": {
+      "operation": "mean_median",
+      "data": [18.0, 20.0, 22.0, 24.0, 25.0, 26.0, 120.0],
+      "mean": 36.42857,
+      "median": 24.0
+    },
+    "canonical_probability": 0.5,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 36.42857,
+      "variance": 1373.952,
+      "standard_deviation": 37.06686
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "compute_mean", "kind": "choice", "evidence": "compute_sample_mean"},
+      {"id": "compute_median", "kind": "choice", "evidence": "compute_sample_median"},
+      {"id": "evaluate_outlier_sensitivity", "kind": "choice", "evidence": "evaluate_outlier_sensitivity_mean_vs_median"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Reviewed descriptive statistics calculation: Mean = 255 / 7 = 36.43k, Median = 24.0k. Identifies extreme right skew pulling mean above 6 of the 7 stores, making median the robust representative measure."
+}

@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "template_id": "concept_sampling_bias_online_poll",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T22:30:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "concept_check",
+    "parameters": {
+      "topic": "statistical_sampling_methods",
+      "concept": "sampling_bias_voluntary_response",
+      "objective": "Identify voluntary response bias, selection bias, and undercoverage in non-probability convenience samples"
+    },
+    "canonical_probability": 0.88,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 0.88,
+      "variance": 0.1056,
+      "standard_deviation": 0.32496
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "bias_source_identification", "kind": "choice", "evidence": "identify_voluntary_response_bias"},
+      {"id": "unjustified_generalization_critique", "kind": "choice", "evidence": "critique_unjustified_population_generalization"},
+      {"id": "remedy_survey_design", "kind": "choice", "evidence": "probability_sampling_design_remedy"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Reviewed conceptual alignment: Evaluates voluntary response bias and undercoverage in convenience polls. Emphasizes that large sample size (n = 12,000) does not cure systematic bias. Prescribes probability sampling (stratified or systematic) across transaction receipts as valid inferential remedy."
+}

@@ -1,0 +1,151 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "regout_compute_slope_ci",
+  "version": 1,
+  "status": "active",
+  "family_id": "regression_output",
+  "rule_version": 1,
+  "module_id": "module_6",
+  "title": "Computing slope confidence intervals from standard error and t-distribution",
+  "scenario_markdown": "A commercial real estate analytics group models office building valuation ($Y$, in thousands of dollars) based on rentable floor space ($X$, in hundreds of square feet) across $n = 27$ suburban corporate buildings ($k = 1$, residual $df = 25$). The regression summary output reports for the predictor `Floor_Space`:\n\n$$\\text{Coefficients: } b_1 = 120.000, \\quad \\text{Standard Error: } s_{b_1} = 15.000$$\n$$\\text{Intercept: } b_0 = 50.000, \\quad s_{b_0} = 6.000$$\n$$\\text{Two-tailed critical value: } t_{0.025, 25} = 2.0595$$\n\nConstruct the $95\\%$ confidence interval for the population slope parameter $\\beta_1$, determine its margin of error, and evaluate the business implications of the interval endpoints.",
+  "parameters": {
+    "n": 27,
+    "k": 1,
+    "ssr": 1600.0,
+    "sse": 625.0,
+    "sst": 2225.0,
+    "confidence_level": 0.95,
+    "intercept_name": "Intercept",
+    "b0": 50.0,
+    "se_b0": 6.0,
+    "x1_name": "Floor_Space",
+    "b1": 120.0,
+    "se_b1": 15.0
+  },
+  "assumptions": [
+    "Simple linear regression model Y = beta0 + beta1*X + epsilon with normal, homoscedastic errors",
+    "Residual degrees of freedom df = n - k - 1 = 27 - 1 - 1 = 25",
+    "Confidence interval formula for slope is b1 +- t_{alpha/2, df} * s_b1"
+  ],
+  "concept_ids": [
+    "calculate_slope_margin_of_error",
+    "construct_slope_confidence_interval_bounds",
+    "interpret_slope_confidence_interval_business_implications"
+  ],
+  "setting_group": "commercial_real_estate_valuation_slope_ci",
+  "source_refs": [
+    "Course Module 6: Regression Analysis",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T22:30:00Z",
+    "notes": "Reviewed derivation: n = 27, k = 1, df = 25. b1 = 120.00, se_b1 = 15.00. Critical t_{0.025, 25} = 2.05954. Margin of error E = 2.05954 * 15.00 = 30.893. 95% CI = [120.0 - 30.893, 120.0 + 30.893] = [89.107, 150.893]. Consistency: t1 = 120/15 = 8.0, F = 64.0 = t1^2. Excel: =120.0 - T.INV.2T(0.05, 25)*15.0.",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "compute_margin_of_error",
+      "kind": "choice",
+      "prompt_markdown": "What is the margin of error $E$ for the $95\\%$ confidence interval for the slope $\\beta_1$?",
+      "options": [
+        {
+          "id": "moe_correct_3089",
+          "text_markdown": "**$E = 30.893$**: Calculated as $E = t^* s_{b_1} = 2.0595 \\times 15.000 = 30.8925$.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "moe_using_normal_z",
+          "text_markdown": "**$E = 29.400$**: Calculated as $1.960 \\times 15.000$ using standard normal critical value $Z^* = 1.960$.",
+          "misconception_id": "used_normal_z_instead_of_t_for_slope_ci",
+          "hint_markdown": "Regression slope estimation relies on Student's $t$ with $df = n - 2 = 25$, where $t^* = 2.0595$, not normal $Z = 1.960$."
+        },
+        {
+          "id": "moe_using_intercept_se",
+          "text_markdown": "**$E = 12.357$**: Calculated using the intercept standard error ($2.0595 \\times 6.000$).",
+          "misconception_id": "used_intercept_standard_error_for_slope_ci",
+          "hint_markdown": "To construct an interval for the slope, you must use the slope's standard error $s_{b_1} = 15.000$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "moe_correct_3089"
+      },
+      "evidence_concept_ids": [
+        "calculate_slope_margin_of_error"
+      ],
+      "explanation_markdown": "The margin of error for a regression slope coefficient is $E = t_{\\alpha/2, n-2} \\times s_{b_1}$. With $n = 27$, the residual degrees of freedom are $df = 27 - 2 = 25$. Using the critical value $t_{0.025, 25} \\approx 2.0595$ (Excel: `=T.INV.2T(0.05, 25)`), we find $E = 2.05954 \\times 15.000 = 30.893$.",
+      "numeric_policy": null
+    },
+    {
+      "id": "construct_interval_bounds",
+      "kind": "choice",
+      "prompt_markdown": "What are the lower and upper bounds of the $95\\%$ confidence interval for the population slope $\\beta_1$?",
+      "options": [
+        {
+          "id": "bounds_correct_89_151",
+          "text_markdown": "**$[89.107, \\; 150.893]$**: Computed as $120.000 \\pm 30.893$.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "bounds_centered_on_zero",
+          "text_markdown": "**$[-30.893, \\; +30.893]$**: Centered on zero rather than the sample slope estimate $b_1$.",
+          "misconception_id": "centered_confidence_interval_on_zero",
+          "hint_markdown": "The center of the confidence interval is the point estimate $b_1 = 120.000$."
+        },
+        {
+          "id": "bounds_using_z",
+          "text_markdown": "**$[90.600, \\; 149.400]$**: Computed as $120.000 \\pm 29.400$.",
+          "misconception_id": "reported_z_interval_for_t_problem",
+          "hint_markdown": "This distractor uses the standard normal critical value $1.960$ instead of $t_{0.025, 25} = 2.0595$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "bounds_correct_89_151"
+      },
+      "evidence_concept_ids": [
+        "construct_slope_confidence_interval_bounds"
+      ],
+      "explanation_markdown": "The confidence interval bounds are obtained by subtracting and adding the margin of error to the point estimate: $\\text{Lower Bound} = 120.000 - 30.893 = 89.107$, and $\\text{Upper Bound} = 120.000 + 30.893 = 150.893$. In Excel, the Lower 95% is computed as `=120.0 - T.INV.2T(0.05, 25)*15.0`, and the Upper 95% as `=120.0 + T.INV.2T(0.05, 25)*15.0`.",
+      "numeric_policy": null
+    },
+    {
+      "id": "interpret_business_implications",
+      "kind": "choice",
+      "prompt_markdown": "What does the $95\\%$ confidence interval $[89.107, 150.893]$ tell the appraisal committee about property valuations?",
+      "options": [
+        {
+          "id": "implication_positive_incremental_value",
+          "text_markdown": "We are $95\\%$ confident that each additional $100\\text{ sq ft}$ of floor space increases the mean property valuation by between $\\\\$89{,}107$ and $\\\\$150{,}893$ (or $\\\\$891$ to $\\\\$1{,}509$ per square foot).",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "implication_includes_zero",
+          "text_markdown": "Because the interval is wide, floor space is not a statistically significant predictor of property valuation.",
+          "misconception_id": "believed_wide_interval_implies_insignificance",
+          "hint_markdown": "The interval $[89.107, 150.893]$ is strictly positive and completely excludes zero, proving high statistical significance ($p < 0.0001$)."
+        },
+        {
+          "id": "implication_fixed_total_price",
+          "text_markdown": "$95\\%$ of all buildings in the entire county have a total selling price between $\\\\$89{,}107$ and $\\\\$150{,}893$.",
+          "misconception_id": "confused_slope_interval_with_prediction_interval_for_y",
+          "hint_markdown": "This interval estimates the slope parameter $\\beta_1$ (incremental rate of change per unit of floor space), not total property sale prices."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "implication_positive_incremental_value"
+      },
+      "evidence_concept_ids": [
+        "interpret_slope_confidence_interval_business_implications"
+      ],
+      "explanation_markdown": "Because the $95\\%$ confidence interval $[89.107, 150.893]$ lies entirely above zero, floor space has a statistically significant positive linear relationship with valuation at $\\alpha = 0.05$. In managerial terms, the model estimates with $95\\%$ confidence that each additional $100\\text{ sq ft}$ adds between $\\\\$89{,}107$ and $\\\\$150{,}893$ to the expected property appraisal.",
+      "numeric_policy": null
+    }
+  ]
+}

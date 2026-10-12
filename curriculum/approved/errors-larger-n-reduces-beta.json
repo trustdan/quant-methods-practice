@@ -1,0 +1,142 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "errors_larger_n_reduces_beta",
+  "version": 1,
+  "status": "active",
+  "family_id": "concept_check",
+  "rule_version": 1,
+  "module_id": "module_5",
+  "title": "Sample size expansion as the mechanism to reduce Type II error and boost test power",
+  "scenario_markdown": "An aerospace materials lab conducts quality acceptance testing on titanium alloy turbine fasteners. The specification requires tensile strength of at least $500\\text{ MPa}$ ($H_0: \\mu \\ge 500\\text{ MPa}$ vs. $H_1: \\mu < 500\\text{ MPa}$). With significance level set at $\\alpha = 0.05$ and an initial sample size of $n = 25$ fasteners, the probability of a Type II error for detecting a true mean of $490\\text{ MPa}$ is $\\beta = 0.28$ (statistical power $1 - \\beta = 0.72$).\n\nThe chief safety engineer requires reducing the risk of releasing non-conforming fasteners ($\\\\beta$) to no more than $0.05$ ($5\\%$), while maintaining the false alarm rate at $\\alpha = 0.05$. Analyze how changing the sample size $n$ affects $\\beta$ and statistical power.",
+  "parameters": {
+    "topic": "hypothesis_testing_errors",
+    "concept": "sample_size_reduces_beta_and_increases_power",
+    "objective": "Explain how increasing sample size reduces Type II error probability beta and increases test power while holding alpha constant"
+  },
+  "assumptions": [
+    "Significance level alpha is held constant at 0.05",
+    "Tensile strength distribution has known or stable standard deviation sigma",
+    "Standard error of the mean is SE = sigma / sqrt(n)"
+  ],
+  "concept_ids": [
+    "increasing_n_reduces_beta_at_fixed_alpha",
+    "sampling_distribution_narrowing_mechanism",
+    "breaking_the_alpha_beta_tradeoff_via_sample_size"
+  ],
+  "setting_group": "aerospace_materials_turbine_fastener_power",
+  "source_refs": [
+    "Course Module 5: Hypothesis Testing",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T22:30:00Z",
+    "notes": "Reviewed conceptual alignment: At fixed alpha = 0.05, increasing n from 25 to 100 shrinks SE by half, separating the null and alternative sampling distributions. This drives beta down from 0.28 to < 0.05 and boosts power (1 - beta) from 0.72 to > 0.95. Proves that increasing sample size is the only way to reduce beta without inflating alpha.",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "effect_of_increasing_n",
+      "kind": "choice",
+      "prompt_markdown": "If the laboratory quadruples its sample size from $n = 25$ to $n = 100$ while maintaining $\\alpha = 0.05$, what happens to the Type II error probability $\\beta$ and test power $1 - \\beta$?",
+      "options": [
+        {
+          "id": "beta_decreases_power_increases",
+          "text_markdown": "**$\\beta$ decreases significantly and test power $1 - \\beta$ increases**: The test becomes far more capable of detecting sub-standard alloy batches.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "beta_increases_power_decreases",
+          "text_markdown": "**$\\beta$ increases and power decreases**: More data creates more opportunities for sampling errors.",
+          "misconception_id": "believed_larger_sample_increases_error_rates",
+          "hint_markdown": "Larger samples reduce standard error, making tests more accurate and powerful, not more error-prone."
+        },
+        {
+          "id": "beta_remains_unchanged",
+          "text_markdown": "**$\\beta$ is completely unaffected**: $\\beta$ is determined solely by the chosen $\\alpha$ level and does not depend on sample size.",
+          "misconception_id": "believed_beta_independent_of_sample_size",
+          "hint_markdown": "Sample size directly determines the overlap between the null and alternative distributions, directly controlling $\\beta$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "beta_decreases_power_increases"
+      },
+      "evidence_concept_ids": [
+        "increasing_n_reduces_beta_at_fixed_alpha"
+      ],
+      "explanation_markdown": "Increasing sample size $n$ narrows the standard error of the mean ($SE = \\sigma / \\sqrt{n}$). With a smaller standard error, both the null and alternative sampling distributions become much tighter with far less mutual overlap. At a fixed significance level $\\alpha = 0.05$, this reduction in overlap drastically shrinks $\\beta$ (Type II error) and increases statistical power ($1 - \\beta$).",
+      "numeric_policy": null
+    },
+    {
+      "id": "sampling_distribution_mechanism",
+      "kind": "choice",
+      "prompt_markdown": "What mathematical mechanism explains why increasing $n$ reduces $\\beta$ at fixed $\\alpha$?",
+      "options": [
+        {
+          "id": "mechanism_se_shrinks_separating_distributions",
+          "text_markdown": "**Standard error shrinks ($SE = \\sigma/\\sqrt{n}$)**: As $n$ grows, the spread of sample means under both $H_0$ and $H_1$ narrows, moving the non-rejection region farther away from the true mean under $H_1$.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "mechanism_critical_value_moves_to_infinity",
+          "text_markdown": "**The critical value moves to infinity**: Larger $n$ shifts the critical value so far out that rejection becomes impossible.",
+          "misconception_id": "believed_critical_value_approaches_infinity",
+          "hint_markdown": "At $\\alpha = 0.05$, the critical $Z$ value remains fixed at $-1.645$ (or approaches it for $t$ tests); it does not diverge."
+        },
+        {
+          "id": "mechanism_population_variance_shrinks",
+          "text_markdown": "**The true population variance $\\sigma^2$ is compressed to zero**: Surveying more items alters the physical properties of the titanium alloy.",
+          "misconception_id": "confused_sampling_variance_with_population_variance",
+          "hint_markdown": "Population parameters $\\mu$ and $\\sigma$ are fixed physical constants; only the standard error of the sample mean shrinks."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "mechanism_se_shrinks_separating_distributions"
+      },
+      "evidence_concept_ids": [
+        "sampling_distribution_narrowing_mechanism"
+      ],
+      "explanation_markdown": "Under the Central Limit Theorem, the spread of the sample mean is $\\sigma_{\\bar{x}} = \\frac{\\sigma}{\\sqrt{n}}$. Quadrupling $n$ from $25$ to $100$ cuts the standard error in half. Consequently, the distribution of $\\bar{x}$ when $\\mu = 490$ has very little probability area extending into the non-rejection region of the null hypothesis ($\\\\bar{x} \\ge 500 - 1.645 \\sigma_{\\\\bar{x}}$), driving $\\beta$ toward zero.",
+      "numeric_policy": null
+    },
+    {
+      "id": "breaking_tradeoff",
+      "kind": "choice",
+      "prompt_markdown": "For a fixed sample size $n$, decreasing $\\alpha$ always increases $\\beta$. Why is increasing sample size $n$ unique in statistical decision theory?",
+      "options": [
+        {
+          "id": "breaking_only_way_to_shrink_both_errors",
+          "text_markdown": "**It is the only operational method to reduce both $\\alpha$ and $\\beta$ simultaneously**: Increasing data collection provides more statistical information, allowing the decision maker to shrink Type I error and Type II error at the same time.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "breaking_allows_zero_error",
+          "text_markdown": "**It eliminates all statistical error entirely**: Any sample with $n \\ge 100$ guarantees $\\alpha = 0$ and $\\beta = 0$.",
+          "misconception_id": "believed_large_n_eliminates_all_error",
+          "hint_markdown": "As long as sampling is used rather than a census, random sampling variation remains, so error probabilities never reach absolute zero."
+        },
+        {
+          "id": "breaking_alters_null_hypothesis",
+          "text_markdown": "**It automatically proves the null hypothesis is true**: Large samples confirm $H_0$ as absolute truth.",
+          "misconception_id": "believed_sample_size_changes_underlying_truth",
+          "hint_markdown": "Sample size does not alter truth; it simply gives the test greater acuity to detect departures from the null."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "breaking_only_way_to_shrink_both_errors"
+      },
+      "evidence_concept_ids": [
+        "breaking_the_alpha_beta_tradeoff_via_sample_size"
+      ],
+      "explanation_markdown": "With a fixed sample size, $\\alpha$ and $\\beta$ are locked in an inescapable inverse trade-off: lowering the false alarm rate ($\\alpha$) inevitably increases missed detections ($\\beta$). **Increasing sample size $n$ is the only tool that breaks this trade-off**, because adding genuine empirical information reduces total sampling uncertainty, allowing researchers to achieve both a low $\\alpha$ (e.g. $0.01$) and high power (e.g. $1 - \\beta = 0.99$) simultaneously.",
+      "numeric_policy": null
+    }
+  ]
+}

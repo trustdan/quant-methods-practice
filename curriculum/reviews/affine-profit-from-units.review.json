@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "template_id": "affine_profit_from_units",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T23:20:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "linear_combination",
+    "parameters": {
+      "operation": "affine",
+      "a": 50.0,
+      "c": -200.0,
+      "mean_x": 30.0,
+      "sd_x": 6.0,
+      "var_x": 36.0,
+      "mean": 1300.0,
+      "var": 90000.0,
+      "sd": 300.0
+    },
+    "canonical_probability": 0.5,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 1300.0,
+      "variance": 90000.0,
+      "standard_deviation": 300.0
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "compute_expected_profit", "kind": "choice", "evidence": "compute_expected_value_affine_transformation"},
+      {"id": "compute_variance_profit", "kind": "choice", "evidence": "compute_variance_affine_transformation"},
+      {"id": "compute_sd_profit", "kind": "choice", "evidence": "evaluate_constant_zero_variance_property"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Reviewed affine transformation rules: E[50X - 200] = 50(30) - 200 = $1,300. Var(50X - 200) = 50^2 * 36 = 90,000. SD = 50 * 6 = $300. Confirmed that fixed cost -200 shifts the mean but has zero effect on variance."
+}

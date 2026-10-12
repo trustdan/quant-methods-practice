@@ -1,0 +1,119 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "drv_insurance_break_even",
+  "version": 1,
+  "status": "active",
+  "family_id": "discrete_rv",
+  "rule_version": 2,
+  "module_id": "module_2",
+  "title": "Expected insurance payout and an actuarial break-even premium",
+  "scenario_markdown": "For a one-year policy, insurer payout L is $0 with probability 0.970, $1000 with probability 0.025, or $10000 with probability 0.005. A fixed annual premium is collected once. Ignore administration, commissions, investment income, capital costs and profit loading. Find the premium giving zero expected underwriting profit under these simplified assumptions.",
+  "parameters": {
+    "operation": "pmf",
+    "probabilities": [
+      0.97,
+      0.025,
+      0.005
+    ],
+    "values": [
+      0,
+      1000,
+      10000
+    ]
+  },
+  "assumptions": [
+    "The payouts are mutually exclusive and exhaustive.",
+    "No costs or revenue other than the stated payout and fixed premium are modeled.",
+    "Break-even refers to expected profit, not a guarantee on an individual policy."
+  ],
+  "concept_ids": [
+    "insurance_expected_payout",
+    "insurance_expected_break_even"
+  ],
+  "setting_group": "insurance_expected_underwriting_break_even",
+  "source_refs": [
+    "docs/COURSE-MAP.md: learner-supplied module objectives, October 11, 2026",
+    "docs/CONTENT-BACKLOG.md: drv-insurance-break-even"
+  ],
+  "approval": {
+    "reviewer": "codex_delegated_final_waves",
+    "reviewed_at": "2026-10-12T04:32:26.275462Z",
+    "delegation_basis": "User explicitly replied on October 11, 2026 (America/Chicago): Yes—delegate review and activate after checks pass. Approval follows successful Go mathematical, bank admission, every-option grading and snapshot checks; assistant semantic review does not claim personal user reading.",
+    "notes": "Assistant reviewed the complete scenario, stage wording, all options, causal hints and worked explanations. Numerical choices are independently bound to Go engine quantities under rule v2; conceptual choices are semantically reviewed. Fixed parameters only; no cosmetic variation claimed as transfer. Stated course conventions remain unconfirmed where applicable. Validated one-to-one concept evidence, rejected ambiguous numeric distractors, and tested every option after snapshot serialization."
+  },
+  "stages": [
+    {
+      "calculation": "mean",
+      "id": "insurance_expected_payout",
+      "kind": "choice",
+      "prompt_markdown": "What is expected payout in dollars per policy? Select the value rounded to four decimal places.",
+      "options": [
+        {
+          "numeric_value": 75,
+          "id": "supported",
+          "text_markdown": "$75.0000$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "numeric_value": 5500,
+          "id": "misconception_a",
+          "text_markdown": "$5500.0000$",
+          "misconception_id": "insurance_expected_payout_a",
+          "hint_markdown": "Do not average only the two positive payouts; include their probabilities."
+        },
+        {
+          "numeric_value": 25,
+          "id": "misconception_b",
+          "text_markdown": "$25.0000$",
+          "misconception_id": "insurance_expected_payout_b",
+          "hint_markdown": "Include the rare $10000 payout as well as the $1000 payout."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "supported"
+      },
+      "evidence_concept_ids": [
+        "insurance_expected_payout"
+      ],
+      "explanation_markdown": "$E[L]=0(0.970)+1000(0.025)+10000(0.005)=25+50=75$. Excel: `=SUMPRODUCT(A2:A4,B2:B4)`.",
+      "numeric_policy": null
+    },
+    {
+      "id": "insurance_expected_break_even",
+      "kind": "choice",
+      "prompt_markdown": "Which premium gives zero expected underwriting profit in this model?",
+      "options": [
+        {
+          "id": "supported",
+          "text_markdown": "$75 per policy, because expected profit is premium minus expected payout.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "misconception_a",
+          "text_markdown": "$0, because the most likely payout is zero.",
+          "misconception_id": "insurance_expected_break_even_a",
+          "hint_markdown": "Break-even depends on expected payout across all outcomes, not the modal payout."
+        },
+        {
+          "id": "misconception_b",
+          "text_markdown": "$10000, because the premium must equal the largest possible claim to break even in expectation.",
+          "misconception_id": "insurance_expected_break_even_b",
+          "hint_markdown": "Expected break-even is different from covering the worst outcome on each policy."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "supported"
+      },
+      "evidence_concept_ids": [
+        "insurance_expected_break_even"
+      ],
+      "explanation_markdown": "For fixed premium c, $E[c-L]=c-E[L]$. Set c=75. Individual policies can make or lose money; a real insurer must also account for costs, capital, risk and loading outside this simplified model.",
+      "numeric_policy": null
+    }
+  ]
+}

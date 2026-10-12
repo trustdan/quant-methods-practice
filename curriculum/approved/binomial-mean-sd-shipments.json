@@ -1,0 +1,146 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "binomial_mean_sd_shipments",
+  "version": 1,
+  "status": "active",
+  "family_id": "binomial_pmf",
+  "rule_version": 1,
+  "module_id": "module_2",
+  "title": "Mean and standard deviation of a binomial distribution in batch quality inspection",
+  "scenario_markdown": "An electronics manufacturing facility receives a bulk delivery of $n = 200$ surface-mount microcontrollers. Long-run supplier audit data indicates that individual microcontrollers have an independent defect probability of $p = 0.02$ ($2.0\\%$). Let $X$ denote the number of defective microcontrollers in a shipment, where $X \\sim \\text{Bin}(n = 200, p = 0.02)$. Compute the expected number of defective units, the standard deviation, and interpret these moments for quality control planning.",
+  "parameters": {
+    "operation": "mean_sd",
+    "n": 200,
+    "p": 0.02,
+    "mean": 4.0,
+    "sd": 1.979898987322333,
+    "var": 3.92
+  },
+  "assumptions": [
+    "Independent Bernoulli trials with constant defect probability p = 0.02 across all n = 200 items",
+    "Expected value of a Binomial random variable: E[X] = mu = n * p",
+    "Variance of a Binomial random variable: Var(X) = sigma^2 = n * p * (1 - p)",
+    "Standard deviation: SD(X) = sigma = sqrt(Var(X)) = sqrt(n * p * (1 - p))"
+  ],
+  "concept_ids": [
+    "binomial_expected_value_calculation",
+    "binomial_standard_deviation_calculation",
+    "binomial_moments_operational_interpretation"
+  ],
+  "setting_group": "electronics_shipment_quality_control",
+  "source_refs": [
+    "Course Module 2: Discrete Random Variables",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T22:30:00Z",
+    "notes": "Reviewed derivation: n = 200, p = 0.02. E[X] = 200 * 0.02 = 4.0 defective units. Var(X) = 200 * 0.02 * 0.98 = 3.92. SD(X) = sqrt(3.92) = 1.979899 approx 1.98 units. Dispels common traps of omitting (1-p) (which yields SD = 2.0) and reporting variance 3.92 instead of SD.",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "expected_value_calculation",
+      "kind": "choice",
+      "prompt_markdown": "Compute the **expected number** of defective microcontrollers in the shipment: $E[X] = \\mu$.",
+      "options": [
+        {
+          "id": "mean_correct",
+          "text_markdown": "$E[X] = 4.0\\text{ defective units}$ ($200 \\times 0.02$)",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "mean_just_p",
+          "text_markdown": "$E[X] = 0.02\\text{ units}$",
+          "misconception_id": "reported_single_trial_probability_instead_of_expected_count",
+          "hint_markdown": "The single-trial defect probability is $p = 0.02$; the expected total count across $n = 200$ trials is $n \\times p$."
+        },
+        {
+          "id": "mean_decimal_shift",
+          "text_markdown": "$E[X] = 40.0\\text{ units}$ ($200 \\times 0.20$)",
+          "misconception_id": "decimal_place_error_in_percentage_conversion",
+          "hint_markdown": "A $2\\%$ defect rate corresponds to $p = 0.02$, not $0.20$ ($200 \\times 0.02 = 4.0$)."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "mean_correct"
+      },
+      "evidence_concept_ids": [
+        "binomial_expected_value_calculation"
+      ],
+      "explanation_markdown": "The expected value of a Binomial random variable is $E[X] = \\mu = n p$. Multiplying $n = 200$ trials by the single-trial success probability $p = 0.02$ yields $E[X] = 200 \\times 0.02 = 4.0$ defective components. In Excel, this is computed directly via `=200*0.02`.",
+      "numeric_policy": null
+    },
+    {
+      "id": "standard_deviation_calculation",
+      "kind": "choice",
+      "prompt_markdown": "Compute the **standard deviation** of the number of defective microcontrollers: $\\text{SD}(X) = \\sigma$.",
+      "options": [
+        {
+          "id": "sd_correct",
+          "text_markdown": "$\\sigma = \\sqrt{200 \\times 0.02 \\times 0.98} = \\sqrt{3.92} \\approx 1.98\\text{ units}$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "sd_reported_variance",
+          "text_markdown": "$\\sigma = 3.92\\text{ units}$ ($200 \\times 0.02 \\times 0.98$)",
+          "misconception_id": "reported_variance_instead_of_standard_deviation",
+          "hint_markdown": "$3.92$ is the variance $\\sigma^2$; remember to take the square root to obtain standard deviation: $\\sqrt{3.92} \\approx 1.98$."
+        },
+        {
+          "id": "sd_omitted_q",
+          "text_markdown": "$\\sigma = \\sqrt{200 \\times 0.02} = \\sqrt{4.0} = 2.00\\text{ units}$",
+          "misconception_id": "omitted_complement_factor_one_minus_p",
+          "hint_markdown": "Binomial variance requires multiplying by $(1 - p) = 0.98$; omitting $(1 - p)$ is the Poisson formula $\\sigma = \\sqrt{\\lambda}$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "sd_correct"
+      },
+      "evidence_concept_ids": [
+        "binomial_standard_deviation_calculation"
+      ],
+      "explanation_markdown": "The variance of a Binomial distribution is $\\text{Var}(X) = \\sigma^2 = n p (1 - p) = 200 \\times 0.02 \\times 0.98 = 3.92$. Taking the square root gives the standard deviation: $\\sigma = \\sqrt{3.92} \\approx 1.9799 \\approx 1.98$ defective components. In Excel: `=SQRT(200*0.02*(1-0.02))`.",
+      "numeric_policy": null
+    },
+    {
+      "id": "moments_interpretation",
+      "kind": "choice",
+      "prompt_markdown": "What do $E[X] = 4.0$ and $\\sigma \\approx 1.98$ signify for the manufacturer's incoming receiving inspection?",
+      "options": [
+        {
+          "id": "interp_long_run_average_dispersion",
+          "text_markdown": "Across repeated shipments of $200$ microcontrollers, incoming lots will average $4.0$ defective units, with a typical shipment-to-shipment dispersion of roughly $1.98$ units around this mean.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "interp_exact_every_time",
+          "text_markdown": "Every individual shipment of $200$ microcontrollers is guaranteed to contain between $2$ and $6$ defective units, with exactly $4$ in the majority of shipments.",
+          "misconception_id": "confused_expected_value_with_deterministic_guarantee",
+          "hint_markdown": "A random variable varies from shipment to shipment; $E[X]$ is a long-run theoretical average, not a guaranteed range."
+        },
+        {
+          "id": "interp_two_sigma_rule_violated",
+          "text_markdown": "Because $\\sigma = 1.98$ is close to $E[X] = 4.0$, the defect rate is unpredictable and cannot be modeled by probability.",
+          "misconception_id": "confused_standard_deviation_magnitude_with_model_invalidity",
+          "hint_markdown": "Having $\\sigma \\approx 1.98$ with $\\mu = 4.0$ is completely consistent with the Binomial model and quantifies the exact predictable variation."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "interp_long_run_average_dispersion"
+      },
+      "evidence_concept_ids": [
+        "binomial_moments_operational_interpretation"
+      ],
+      "explanation_markdown": "The expected value $\\mu = 4.0$ represents the long-run center of the distribution if the manufacturer were to inspect hundreds of independent 200-unit shipments. The standard deviation $\\sigma \\approx 1.98$ measures typical variability around this average. By Chebyshev's inequality and empirical approximations, roughly $95\\%$ of shipments will have defect counts within $\\mu \\pm 2\\sigma \\approx [0.04, 7.96]$, or between $0$ and $8$ defective components.",
+      "numeric_policy": null
+    }
+  ]
+}

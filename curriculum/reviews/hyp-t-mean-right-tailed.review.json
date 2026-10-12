@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "template_id": "hyp_t_mean_right_tailed",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T22:00:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "hypothesis_test",
+    "parameters": {
+      "test_type": "mean_t",
+      "null_value": 50.0,
+      "sample_stat": 53.1,
+      "s": 6.2,
+      "n": 20,
+      "alpha": 0.05,
+      "tail": "right_tailed"
+    },
+    "canonical_probability": 0.01878,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 53.1,
+      "variance": 38.44,
+      "standard_deviation": 6.2
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "degrees_freedom_and_statistic", "kind": "choice", "evidence": "hyp_t_test_degrees_freedom_statistic"},
+      {"id": "right_tailed_pvalue", "kind": "choice", "evidence": "hyp_right_tailed_pvalue_excel"},
+      {"id": "decision_and_action", "kind": "choice", "evidence": "hyp_t_test_decision_and_action"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Verified mathematically: null_mu = 50.0, x_bar = 53.1, s = 6.2, n = 20. df = 19. SE = 6.2 / sqrt(20) = 1.38636. t = 3.1 / 1.38636 = 2.23607. Upper tail p-value = 0.01878. Critical t_{0.05, 19} = 1.7291. Decision: reject H0 at alpha = 0.05 since t = 2.236 > 1.729 and p = 0.0188 < 0.05. Excel: =T.DIST.RT(2.236, 19)."
+}

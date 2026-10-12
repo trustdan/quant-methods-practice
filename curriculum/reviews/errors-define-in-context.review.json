@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "template_id": "errors_define_in_context",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T22:00:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "concept_check",
+    "parameters": {
+      "topic": "hypothesis_testing_errors",
+      "concept": "type_i_and_type_ii_errors_in_context",
+      "objective": "Distinguish Type I and Type II errors in quality control decision-making"
+    },
+    "canonical_probability": 1.0,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 0.0,
+      "variance": 0.0,
+      "standard_deviation": 0.0
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "type_i_in_context", "kind": "choice", "evidence": "type_i_error_producer_risk_context"},
+      {"id": "type_ii_in_context", "kind": "choice", "evidence": "type_ii_error_consumer_risk_context"},
+      {"id": "error_tradeoff", "kind": "choice", "evidence": "error_tradeoff_sample_size_dynamics"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Reviewed conceptual alignment: Type I error = rejecting conforming lot (producer's risk); Type II error = clearing defective lot (consumer's risk). Stage 3 rigorously covers the inverse trade-off between alpha and beta when sample size is fixed, and how expanding n is required to shrink both simultaneously."
+}

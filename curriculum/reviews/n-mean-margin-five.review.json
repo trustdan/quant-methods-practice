@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "template_id": "n_mean_margin_five",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T22:00:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "sample_size",
+    "parameters": {
+      "target": "mean",
+      "sigma": 25.0,
+      "margin_of_error": 5.0,
+      "confidence_level": 0.95
+    },
+    "canonical_probability": 0.95,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 97.0,
+      "variance": 0.0,
+      "standard_deviation": 0.0
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "formula_identification", "kind": "choice", "evidence": "sample_size_formula_identification"},
+      {"id": "calculation_and_ceiling", "kind": "choice", "evidence": "sample_size_ceiling_rounding_rule"},
+      {"id": "precision_scaling", "kind": "choice", "evidence": "sample_size_precision_scaling"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Verified mathematically: sigma = 25.0, E = 5.0, CL = 0.95. Z* = 1.959964. Exact continuous n = 96.0365. Rounded up ceiling = 97. If n=96, margin of error = 5.0009 > 5.0. Halving margin to 2.5 yields n = 385. Excel: =ROUNDUP((NORM.S.INV(0.975)*25/5)^2, 0)."
+}

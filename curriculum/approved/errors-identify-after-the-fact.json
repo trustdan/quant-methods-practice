@@ -1,0 +1,142 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "errors_identify_after_the_fact",
+  "version": 1,
+  "status": "active",
+  "family_id": "concept_check",
+  "rule_version": 1,
+  "module_id": "module_5",
+  "title": "Retrospective identification of Type I and Type II errors from ground truth",
+  "scenario_markdown": "In statistical quality control and algorithmic audit systems, decision makers establish hypotheses and take action based on sample data, but subsequent full-scale investigation or ground truth reveals the actual state of reality.\n\nConsider two distinct operational cases:\n- **Case A (Merchant Fraud System)**: A risk engine tests $H_0: \\text{Merchant account is legitimate}$ vs. $H_1: \\text{Merchant account is fraudulent}$. Based on a sample of high-velocity transactions, the engine rejects $H_0$ and terminates the merchant's payment gateway. A subsequent comprehensive forensic audit proves definitively that the merchant was completely legitimate, suffering zero compromised transactions.\n- **Case B (Pathogen Screening)**: A biomanufacturing lab tests $H_0: \\text{Vaccine batch is sterile}$ vs. $H_1: \\text{Vaccine batch is contaminated}$. An automated testing swab yields a sample statistic that fails to reject $H_0$, and the batch is approved for distribution. Retrospective biological culturing later proves the batch was contaminated with active bacteria.\n\nClassify each decision outcome retrospectively as a correct decision, a Type I error, or a Type II error.",
+  "parameters": {
+    "topic": "hypothesis_testing_errors",
+    "concept": "retrospective_error_classification",
+    "objective": "Classify operational outcomes after ground truth is revealed as Type I error (false positive) or Type II error (false negative)"
+  },
+  "assumptions": [
+    "Ground truth is conclusively known in both retrospective investigations",
+    "Type I error is defined as rejecting a true null hypothesis (false alarm)",
+    "Type II error is defined as failing to reject a false null hypothesis (missed detection)"
+  ],
+  "concept_ids": [
+    "classify_type_i_error_retrospectively",
+    "classify_type_ii_error_retrospectively",
+    "frequentist_truth_matrix_principles"
+  ],
+  "setting_group": "fraud_detection_and_pathogen_retrospective_audit",
+  "source_refs": [
+    "Course Module 5: Hypothesis Testing",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T22:30:00Z",
+    "notes": "Reviewed conceptual alignment: Case A rejected H0 when H0 was true (Type I error / False Positive). Case B failed to reject H0 when H0 was false (Type II error / False Negative). Clarifies the four cells of the classic hypothesis testing decision matrix.",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "classify_case_a",
+      "kind": "choice",
+      "prompt_markdown": "In **Case A** (the payment gateway shut down a merchant who was subsequently proven legitimate), what type of decision error occurred?",
+      "options": [
+        {
+          "id": "case_a_type_i",
+          "text_markdown": "**Type I error (False Positive)**: The system rejected a null hypothesis that was actually true.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "case_a_type_ii",
+          "text_markdown": "**Type II error (False Negative)**: The system failed to take enough action to catch the fraud.",
+          "misconception_id": "confused_type_i_with_type_ii",
+          "hint_markdown": "The system took action and rejected $H_0$; when a true null hypothesis is rejected, that is a Type I error."
+        },
+        {
+          "id": "case_a_correct_decision",
+          "text_markdown": "**Correct decision**: Because the decision was backed by a statistically valid sample, no error occurred.",
+          "misconception_id": "believed_statistical_procedure_cannot_commit_an_error",
+          "hint_markdown": "Sampling always carries a probability $\\alpha$ of a false alarm; when the null is true and rejected, an error has occurred."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "case_a_type_i"
+      },
+      "evidence_concept_ids": [
+        "classify_type_i_error_retrospectively"
+      ],
+      "explanation_markdown": "In Case A, $H_0$ was that the merchant was legitimate. Ground truth confirmed that $H_0$ was **true**. However, the test **rejected $H_0$**. Rejecting a true null hypothesis is by definition a **Type I error** (also called a false positive, producer's risk, or false alarm). The probability of this occurring is governed by $\\alpha$.",
+      "numeric_policy": null
+    },
+    {
+      "id": "classify_case_b",
+      "kind": "choice",
+      "prompt_markdown": "In **Case B** (a contaminated vaccine batch was approved for distribution because the swab test failed to reject $H_0$), what type of decision error occurred?",
+      "options": [
+        {
+          "id": "case_b_type_ii",
+          "text_markdown": "**Type II error (False Negative)**: The test failed to reject a null hypothesis that was actually false.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "case_b_type_i",
+          "text_markdown": "**Type I error (False Positive)**: An error occurred in a laboratory, which is always classified as Type I.",
+          "misconception_id": "believed_all_serious_errors_are_type_i",
+          "hint_markdown": "The test failed to detect the contamination ($H_1$ was true, but $H_0$ was not rejected); failing to reject a false null is Type II."
+        },
+        {
+          "id": "case_b_correct_decision",
+          "text_markdown": "**Correct decision**: The laboratory adhered to standard protocol, so the decision was statistically flawless.",
+          "misconception_id": "confused_protocol_compliance_with_error_free_outcome",
+          "hint_markdown": "Releasing a contaminated batch is an erroneous conclusion resulting from random sampling failure (governed by $\\beta$)."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "case_b_type_ii"
+      },
+      "evidence_concept_ids": [
+        "classify_type_ii_error_retrospectively"
+      ],
+      "explanation_markdown": "In Case B, $H_0$ stated that the batch was sterile. Ground truth proved that $H_0$ was **false** (contamination existed). However, the sample failed to detect it and **failed to reject $H_0$**. Failing to reject a false null hypothesis is by definition a **Type II error** (false negative, consumer's risk, or missed defect). The probability of this error is $\\beta$.",
+      "numeric_policy": null
+    },
+    {
+      "id": "truth_matrix_principles",
+      "kind": "choice",
+      "prompt_markdown": "Which fundamental principle of statistical decision theory explains why both Type I and Type II errors are inherent to hypothesis testing?",
+      "options": [
+        {
+          "id": "principle_sampling_cannot_guarantee_truth",
+          "text_markdown": "**Sample data never provides $100\\%$ certainty about population parameters**: Because inference relies on incomplete sample information, every decision rule must balance the probability of a false alarm ($\\alpha$) against a missed detection ($\\beta$).",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "principle_errors_only_caused_by_math_bugs",
+          "text_markdown": "**Errors only occur when analysts make calculation mistakes**: If formulas are applied properly, error probabilities are exactly zero.",
+          "misconception_id": "believed_statistical_errors_are_human_arithmetic_mistakes",
+          "hint_markdown": "Statistical errors (Type I and Type II) are probabilistic risks arising from random sampling variation, not computational arithmetic bugs."
+        },
+        {
+          "id": "principle_one_error_always_equals_one",
+          "text_markdown": "**$\\alpha + \\beta$ always sums to $1.0$**: If $\\alpha = 0.05$, then $\\beta$ must equal $0.95$.",
+          "misconception_id": "believed_alpha_and_beta_sum_to_one",
+          "hint_markdown": "$\\alpha$ and $\\beta$ are conditional probabilities evaluated under mutually exclusive states of reality; they do not sum to $1$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "principle_sampling_cannot_guarantee_truth"
+      },
+      "evidence_concept_ids": [
+        "frequentist_truth_matrix_principles"
+      ],
+      "explanation_markdown": "Statistical hypothesis testing evaluates decisions under incomplete sample information. The decision space is partitioned into a $2 \\times 2$ matrix: if $H_0$ is true, we either make a correct decision ($1-\\alpha$) or commit a **Type I error** ($\\alpha$). If $H_0$ is false, we either make a correct decision / power ($1-\\beta$) or commit a **Type II error** ($\\beta$). These error rates represent inescapable probabilities of sampling uncertainty.",
+      "numeric_policy": null
+    }
+  ]
+}

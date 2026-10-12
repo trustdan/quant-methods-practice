@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "template_id": "prob_multiplication_independent_suppliers",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T22:00:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "set_probability",
+    "parameters": {
+      "operation": "multiplication",
+      "p_a": 0.90,
+      "p_b": 0.85,
+      "p_intersection": 0.765
+    },
+    "canonical_probability": 0.765,
+    "canonical_rational": "153/200",
+    "moments": {
+      "mean": 0.765,
+      "variance": 0.0,
+      "standard_deviation": 0.0
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "multiplication_formula", "kind": "choice", "evidence": "prob_multiplication_rule_formula"},
+      {"id": "joint_calculation", "kind": "choice", "evidence": "prob_independent_joint_calculation"},
+      {"id": "conditional_invariance", "kind": "choice", "evidence": "prob_independence_definition_conditional"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Verified mathematically: P(A) = 0.90, P(B) = 0.85. Independence: P(A cap B) = P(A) * P(B) = 0.765. Fréchet bounds satisfied: max(0, 0.9+0.85-1)=0.75 <= 0.765 <= min(0.9, 0.85)=0.85. P(A|B) = 0.765 / 0.85 = 0.90 = P(A)."
+}

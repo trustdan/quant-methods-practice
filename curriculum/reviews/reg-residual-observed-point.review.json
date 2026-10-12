@@ -1,0 +1,16 @@
+{
+  "template_id": "reg_residual_observed_point",
+  "status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T22:30:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "reviewed_rules": [1],
+  "checklist": {
+    "math_verified_by_engine": true,
+    "distractor_misconceptions_valid": true,
+    "hints_pedagogically_useful": true,
+    "excel_formulas_checked": true,
+    "no_latex_formatting_regressions": true
+  },
+  "notes": "Verified linear regression point prediction and residual calculation: at x = 20, y_hat = 17.2 + 2.24(20) = 62.0. With observed y = 60.0, residual e = y - y_hat = 60.0 - 62.0 = -2.0. Distractors target inverted sign (y_hat - y), confusing observed with predicted, and assuming residual at the mean is zero."
+}

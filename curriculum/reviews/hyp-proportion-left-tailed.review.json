@@ -1,0 +1,16 @@
+{
+  "template_id": "hyp_proportion_left_tailed",
+  "status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T22:30:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "reviewed_rules": [1],
+  "checklist": {
+    "math_verified_by_engine": true,
+    "distractor_misconceptions_valid": true,
+    "hints_pedagogically_useful": true,
+    "excel_formulas_checked": true,
+    "no_latex_formatting_regressions": true
+  },
+  "notes": "Verified left-tailed one-sample proportion test: null_p = 0.20, x = 28, n = 200 -> p_hat = 0.14. SE_0 = sqrt(0.20 * 0.80 / 200) = 0.028284. Z = -2.1213. Left-tailed p-value = 0.01695 (approx 0.0170). Critical value z_0.05 = -1.645. Reject H0. Excel formula: =NORM.S.DIST((0.14-0.20)/SQRT(0.20*0.80/200), TRUE). Distractors cover using sample proportion in SE, doubling p-value, sign inversion, and decision rule errors."
+}

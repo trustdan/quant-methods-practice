@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "template_id": "regout_compute_slope_ci",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T22:30:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "regression_output",
+    "parameters": {
+      "n": 27,
+      "k": 1,
+      "ssr": 1600.0,
+      "sse": 625.0,
+      "sst": 2225.0,
+      "confidence_level": 0.95,
+      "intercept_name": "Intercept",
+      "b0": 50.0,
+      "se_b0": 6.0,
+      "x1_name": "Floor_Space",
+      "b1": 120.0,
+      "se_b1": 15.0
+    },
+    "canonical_probability": 0.0001,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 120.0,
+      "variance": 225.0,
+      "standard_deviation": 15.0
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "compute_margin_of_error", "kind": "choice", "evidence": "calculate_slope_margin_of_error"},
+      {"id": "construct_interval_bounds", "kind": "choice", "evidence": "construct_slope_confidence_interval_bounds"},
+      {"id": "interpret_business_implications", "kind": "choice", "evidence": "interpret_slope_confidence_interval_business_implications"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Reviewed derivation: n = 27, k = 1, df = 25. b1 = 120.00, se_b1 = 15.00. Critical t_{0.025, 25} = 2.05954. Margin of error E = 2.05954 * 15.00 = 30.893. 95% CI = [120.0 - 30.893, 120.0 + 30.893] = [89.107, 150.893]. Consistency: t1 = 120/15 = 8.0, F = 64.0 = t1^2. Excel: =120.0 - T.INV.2T(0.05, 25)*15.0."
+}

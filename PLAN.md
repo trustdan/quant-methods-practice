@@ -28,6 +28,8 @@ Stage 00 through Stage 17 are **complete within their recorded scope** (Stage 12
 
 ## Priorities and dependencies
 
+October 11, 2026 content milestone: all 121 planned additions are authored, explicitly delegated where newly approved, validated and active; the bank contains 137 questions and meets all 22 objective count targets. See [coverage](docs/CONTENT-BACKLOG.md) and [final-sprint review](docs/REMAINING-CONTENT-REVIEW.md). This completes the current breadth backlog within Stage 20; transfer quality, ongoing course-convention confirmation, Stage 18 arcade parity and Stage 19 release hardening remain separate work.
+
 Stages 00-07 establish useful offline practice. Stages 08-14 carry over learning evidence, AI, saved notes, creative review, complete solutions and exams. Stages 15-16 need actual course details for specific methods. Their source-dependent portions may remain open while generic verified features and Stage 17-18 game work proceed; document the reason and unmet gates.
 
 Arcade work depends on a stable browser shell, navigation and score storage. It must not delay the first offline release. If the user explicitly reprioritizes the game, a thin skippable attract screen may be added after Stage 07, with later arcade gates still open. Do not claim game mechanics teach probability unless an actual learning design is reviewed.

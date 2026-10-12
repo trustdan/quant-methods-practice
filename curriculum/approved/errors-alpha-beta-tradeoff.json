@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "errors_alpha_beta_tradeoff",
+  "version": 1,
+  "status": "active",
+  "family_id": "concept_check",
+  "rule_version": 1,
+  "module_id": "module_5",
+  "title": "The inverse trade-off between Alpha and Beta at fixed sample size",
+  "scenario_markdown": "A semiconductor manufacturing fabrication facility tests wafer electrical resistance to ensure process stability ($H_0: \\mu = 50\\ \\Omega$ vs $H_1: \\mu \\ne 50\\ \\Omega$). To reduce false alarms that unnecessarily halt the cleanroom production line, process engineering reduces the test significance level from $\\alpha = 0.05$ to $\\alpha = 0.01$, while holding the sample size strictly fixed at $n = 50$ wafers per shift.",
+  "parameters": {
+    "topic": "alpha_beta_tradeoff",
+    "concept": "inverse_tradeoff_fixed_sample_size",
+    "objective": "Understand why lowering alpha increases beta and why increasing n reduces both"
+  },
+  "assumptions": [
+    "Sample size n = 50 remains unchanged",
+    "Underlying process variation sigma is stable",
+    "A specific alternative value mu_1 != 50 is evaluated for power"
+  ],
+  "concept_ids": [
+    "hyp_alpha_beta_inverse_tradeoff",
+    "hyp_sample_size_impact_on_both_errors"
+  ],
+  "setting_group": "semiconductor_cleanroom_process_control",
+  "source_refs": [
+    "Course Module 5: Hypothesis Testing",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T22:30:00Z",
+    "notes": "Reviewed conceptual relationship between alpha and beta. For a fixed sample size, lowering alpha pushes the critical value outward, expanding the non-rejection region and inevitably increasing beta (reducing power). The only way to lower both error rates simultaneously is to increase sample size n.",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "effect_on_beta_and_power",
+      "kind": "choice",
+      "prompt_markdown": "What happens to the probability of a Type II error ($\\beta$) and the statistical power of the test ($1 - \\beta$) as a direct consequence of lowering $\\alpha$ from $0.05$ to $0.01$ with sample size fixed at $n = 50$?",
+      "options": [
+        {
+          "id": "tradeoff_correct",
+          "text_markdown": "$\\beta$ increases, and statistical power ($1 - \\beta$) decreases.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "tradeoff_both_decrease",
+          "text_markdown": "Both $\\alpha$ and $\\beta$ decrease because a smaller significance level makes the test more rigorous overall.",
+          "misconception_id": "believes_alpha_and_beta_move_in_same_direction",
+          "hint_markdown": "Lowering $\\alpha$ demands stronger evidence to reject $H_0$, which increases the probability of failing to reject a false null (raising $\\beta$)."
+        },
+        {
+          "id": "tradeoff_beta_unchanged",
+          "text_markdown": "$\\beta$ remains completely unchanged because $\\beta$ depends solely on sample size $n$, not on $\\alpha$.",
+          "misconception_id": "thinks_beta_is_independent_of_alpha",
+          "hint_markdown": "The critical cutoff that separates rejection from non-rejection is directly dictated by $\\alpha$; moving this boundary directly alters the area under the alternative distribution ($\\beta$)."
+        },
+        {
+          "id": "tradeoff_power_increases",
+          "text_markdown": "$\\beta$ decreases, and statistical power ($1 - \\beta$) increases.",
+          "misconception_id": "confusing_power_with_confidence_level",
+          "hint_markdown": "Power is $1 - \\beta$. As $\\beta$ rises when $\\alpha$ is lowered, power falls."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "tradeoff_correct"
+      },
+      "explanation_markdown": "For a fixed sample size $n$, there is an inescapable inverse trade-off between $\\alpha$ and $\\beta$. Decreasing $\\alpha$ from $0.05$ to $0.01$ moves the critical values further into the tails, widening the \"Fail to reject $H_0$\" region. While this reduces false alarms (Type I errors), it makes it harder to detect true shifts away from $50\\ \\Omega$, thereby increasing $\\beta$ (Type II error) and lowering test power ($1 - \\beta$).",
+      "evidence_concept_ids": [
+        "hyp_alpha_beta_inverse_tradeoff"
+      ]
+    },
+    {
+      "id": "how_to_reduce_both",
+      "kind": "choice",
+      "prompt_markdown": "What is the only method by which process engineers can reduce both Type I error probability ($\\alpha$) and Type II error probability ($\\beta$) at the same time?",
+      "options": [
+        {
+          "id": "solution_increase_n_correct",
+          "text_markdown": "Increase the sample size $n$, which shrinks standard error and reduces overlap between the null and alternative sampling distributions.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "solution_switch_to_one_tailed",
+          "text_markdown": "Switch the test from a two-tailed test to a one-tailed test without gathering additional data.",
+          "misconception_id": "using_one_tailed_to_artificially_gain_power_without_data",
+          "hint_markdown": "Switching tails alters directionality and tail area, but does not provide extra information or overcome the fundamental error trade-off."
+        },
+        {
+          "id": "solution_change_formula",
+          "text_markdown": "Use the standard normal $z$-distribution instead of the $t$-distribution.",
+          "misconception_id": "confusing_test_statistic_choice_with_sampling_variance",
+          "hint_markdown": "Changing the reference distribution without changing underlying sampling variance cannot reduce both errors simultaneously."
+        },
+        {
+          "id": "solution_set_p_value",
+          "text_markdown": "Set the $p$-value equal to $\\alpha / 2$.",
+          "misconception_id": "confusing_p_value_with_design_parameters",
+          "hint_markdown": "The $p$-value is an outcome calculated from observed sample data, not a tunable engineering parameter."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "solution_increase_n_correct"
+      },
+      "explanation_markdown": "The only way to achieve a \"free lunch\" in statistical testing\u2014reducing $\\alpha$ and $\\beta$ simultaneously\u2014is to collect more data (increase $n$). A larger sample size compresses the standard error ($SE = \\sigma / \\sqrt{n}$), pulling the sampling distributions under $H_0$ and $H_1$ further apart so that their overlapping error regions both shrink.",
+      "evidence_concept_ids": [
+        "hyp_sample_size_impact_on_both_errors"
+      ]
+    }
+  ]
+}

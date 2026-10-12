@@ -1,0 +1,148 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "affine_profit_from_units",
+  "version": 1,
+  "status": "active",
+  "family_id": "linear_combination",
+  "rule_version": 1,
+  "module_id": "module_2",
+  "title": "Affine transformation of a random variable: expected profit and variance",
+  "scenario_markdown": "A specialty bakery models daily demand for custom celebration cakes as a random variable $X$ with expected sales $E[X] = 30.0\\text{ cakes}$ and standard deviation $\\operatorname{SD}(X) = 6.0\\text{ cakes}$ (variance $\\operatorname{Var}(X) = 36.0$).\n\nEach cake sells for \\$50, and the bakery incurs fixed daily facility overhead of \\$200 regardless of volume. Daily net operating profit $Y$ is given by the linear affine equation:\n\n$$Y = 50X - 200$$\n\nCalculate the expected daily profit $E[Y]$, evaluate the variance $\\operatorname{Var}(Y)$, and determine the standard deviation $\\operatorname{SD}(Y)$ of daily profit.",
+  "parameters": {
+    "operation": "affine",
+    "a": 50.0,
+    "c": -200.0,
+    "mean_x": 30.0,
+    "sd_x": 6.0,
+    "var_x": 36.0,
+    "mean": 1300.0,
+    "var": 90000.0,
+    "sd": 300.0
+  },
+  "assumptions": [
+    "X has known mean 30 and variance 36",
+    "Linear transformation theorem: E[aX + c] = a*E[X] + c",
+    "Variance of affine transformation: Var(aX + c) = a^2 * Var(X); constant c adds zero variance"
+  ],
+  "concept_ids": [
+    "compute_expected_value_affine_transformation",
+    "compute_variance_affine_transformation",
+    "evaluate_constant_zero_variance_property"
+  ],
+  "setting_group": "bakery_daily_profit_linear_transformation",
+  "source_refs": [
+    "Course Module 2: Discrete Random Variables & Probability Distributions",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T23:20:00Z",
+    "notes": "Reviewed affine transformation rules: E[50X - 200] = 50(30) - 200 = $1,300. Var(50X - 200) = 50^2 * 36 = 90,000. SD = 50 * 6 = $300. Confirmed that fixed cost -200 shifts the mean but has zero effect on variance.",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "compute_expected_profit",
+      "kind": "choice",
+      "prompt_markdown": "What is the expected daily net profit $E[Y]$?",
+      "options": [
+        {
+          "id": "e_y_correct",
+          "text_markdown": "**$E[Y] = \\$1{,}300.00$**: $E[50X - 200] = 50 \\cdot E[X] - 200 = 50(30) - 200 = 1500 - 200 = 1300$.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "e_y_forgot_overhead",
+          "text_markdown": "**$E[Y] = \\$1{,}500.00$**: Calculated as revenue $50(30) = 1500$, omitting the fixed cost.",
+          "misconception_id": "omitted_constant_term_in_expectation",
+          "hint_markdown": "Expectation is linear: the constant -200 directly subtracts from the expected revenue."
+        },
+        {
+          "id": "e_y_scaled_overhead",
+          "text_markdown": "**$E[Y] = \\$150.00$**: Calculated as $50(30 - 200) = 50(-170)$.",
+          "misconception_id": "subtracted_overhead_from_unit_count",
+          "hint_markdown": "The overhead $200 is already in dollar units; it is subtracted from total revenue 50X, not from unit count X."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "e_y_correct"
+      },
+      "evidence_concept_ids": [
+        "compute_expected_value_affine_transformation"
+      ],
+      "explanation_markdown": "By the **linearity of expectation**, for any constants $a$ and $c$:\n\n$$E[aX + c] = a E[X] + c$$\n$$E[Y] = 50 E[X] - 200 = 50(30.0) - 200 = 1{,}500 - 200 = \\$1{,}300.00$$",
+      "numeric_policy": null
+    },
+    {
+      "id": "compute_variance_profit",
+      "kind": "choice",
+      "prompt_markdown": "What is the variance of daily net profit, $\\operatorname{Var}(Y)$?",
+      "options": [
+        {
+          "id": "var_y_correct",
+          "text_markdown": "**$\\operatorname{Var}(Y) = 90{,}000\\text{ dollars}^2$**: $\\operatorname{Var}(50X - 200) = 50^2 \\cdot \\operatorname{Var}(X) = 2{,}500 \\times 36 = 90{,}000$.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "var_y_subtracted_overhead_squared",
+          "text_markdown": "**$\\operatorname{Var}(Y) = 50{,}000\\text{ dollars}^2$**: Calculated as $50^2(36) - 200^2 = 90{,}000 - 40{,}000 = 50{,}000$.",
+          "misconception_id": "subtracted_constant_squared_from_variance",
+          "hint_markdown": "A constant has zero variability (Var(c) = 0). A fixed cost never subtracts from variance."
+        },
+        {
+          "id": "var_y_linear_scaling",
+          "text_markdown": "**$\\operatorname{Var}(Y) = 1{,}800\\text{ dollars}^2$**: Scaled linearly by $50$: $50 \\times 36 = 1{,}800$.",
+          "misconception_id": "failed_to_square_scaling_constant_for_variance",
+          "hint_markdown": "When multiplying a random variable by constant a, variance scales by a^2, not a."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "var_y_correct"
+      },
+      "evidence_concept_ids": [
+        "compute_variance_affine_transformation"
+      ],
+      "explanation_markdown": "For any constants $a$ and $c$, the variance transformation rule states:\n\n$$\\operatorname{Var}(aX + c) = a^2 \\operatorname{Var}(X)$$\n$$\\operatorname{Var}(Y) = 50^2 \\operatorname{Var}(X) = 2{,}500 \\times 36.0 = 90{,}000\\text{ dollars}^2$$\n\nBecause the \\$200 fixed overhead is a constant that does not change from day to day, it has zero variance ($\\operatorname{Var}(-200) = 0$) and does not alter the dispersion of profit.",
+      "numeric_policy": null
+    },
+    {
+      "id": "compute_sd_profit",
+      "kind": "choice",
+      "prompt_markdown": "What is the standard deviation of daily net profit, $\\operatorname{SD}(Y)$, and how did the fixed overhead affect it?",
+      "options": [
+        {
+          "id": "sd_y_correct",
+          "text_markdown": "**$\\operatorname{SD}(Y) = \\$300.00$**: $\\operatorname{SD}(Y) = |50| \\times \\operatorname{SD}(X) = 50 \\times 6 = \\$300$. The fixed overhead of $-\\$200$ has **zero effect** on the standard deviation.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "sd_y_subtracted_overhead",
+          "text_markdown": "**$\\operatorname{SD}(Y) = \\$100.00$**: Calculated as $50(6) - 200 = 300 - 200 = 100$.",
+          "misconception_id": "subtracted_constant_from_standard_deviation",
+          "hint_markdown": "Constants shift the distribution's location without altering its width. Standard deviation is strictly SD(aX + c) = |a|*SD(X)."
+        },
+        {
+          "id": "sd_y_no_scaling",
+          "text_markdown": "**$\\operatorname{SD}(Y) = \\$6.00$**: Standard deviation does not change when units are converted to dollars.",
+          "misconception_id": "believed_standard_deviation_is_unitless",
+          "hint_markdown": "Converting from units to dollars multiplies standard deviation by the selling price $50/unit."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "sd_y_correct"
+      },
+      "evidence_concept_ids": [
+        "evaluate_constant_zero_variance_property"
+      ],
+      "explanation_markdown": "The standard deviation is the square root of the variance:\n\n$$\\operatorname{SD}(Y) = \\sqrt{\\operatorname{Var}(Y)} = \\sqrt{90{,}000} = |50| \\times \\operatorname{SD}(X) = 50 \\times 6 = \\$300.00$$\n\n**Key Invariant**: Adding or subtracting a constant $c$ (such as fixed rent or overhead) shifts the entire distribution along the number line, altering its center ($E[Y]$) without stretching or compressing its spread. Therefore, $\\operatorname{SD}(aX + c) = |a|\\operatorname{SD}(X)$.",
+      "numeric_policy": null
+    }
+  ]
+}

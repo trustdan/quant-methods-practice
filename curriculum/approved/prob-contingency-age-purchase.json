@@ -1,0 +1,143 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "prob_contingency_age_purchase",
+  "version": 1,
+  "status": "active",
+  "family_id": "concept_check",
+  "rule_version": 1,
+  "module_id": "module_1",
+  "title": "Computing joint, marginal, and conditional probabilities from a contingency table",
+  "scenario_markdown": "A digital marketing team analyzes conversion responses from an email promotional campaign sent to $n = 500$ registered retail customers. Customers are cross-classified by age category ($A_1$: Under 30 years old; $A_2$: 30 years or older) and purchase behavior ($B$: Made a purchase; $B^c$: Did not make a purchase):\n\n| Age Group | Purchased ($B$) | Did Not Purchase ($B^c$) | Total |\n|---|---|---|---|\n| **Under 30 ($A_1$)** | $60$ | $140$ | $200$ |\n| **30 or Older ($A_2$)** | $120$ | $180$ | $300$ |\n| **Total** | $180$ | $320$ | $500$ |\n\nCalculate the relevant probabilities, distinguish joint from marginal and conditional outcomes, and evaluate whether purchase behavior is independent of age category.",
+  "parameters": {
+    "topic": "probability_rules",
+    "concept": "contingency_tables_joint_marginal_conditional",
+    "objective": "Compute marginal, joint, and conditional probabilities from a two-way contingency table and test for statistical independence"
+  },
+  "assumptions": [
+    "Total sample size is n = 500 recipients",
+    "Joint probability P(A and B) = count(A and B) / n",
+    "Marginal probability P(B) = total(B) / n",
+    "Conditional probability P(B | A) = count(A and B) / total(A)"
+  ],
+  "concept_ids": [
+    "calculate_joint_and_marginal_probabilities",
+    "calculate_conditional_probability_from_subgroup",
+    "evaluate_statistical_independence_from_contingency_table"
+  ],
+  "setting_group": "email_marketing_conversion_contingency_table",
+  "source_refs": [
+    "Course Module 1: Descriptive Measures & Basic Probability",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T22:30:00Z",
+    "notes": "Reviewed probability derivation: n = 500. Marginal P(B) = 180/500 = 0.360. Joint P(A1 and B) = 60/500 = 0.120. Conditional P(B | A1) = 60/200 = 0.300. P(B | A2) = 120/300 = 0.400. Because P(B | A1) = 0.300 != P(B) = 0.360, purchase is dependent on age (older cohort converts at 40% vs younger at 30%).",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "joint_vs_marginal",
+      "kind": "choice",
+      "prompt_markdown": "What is the **joint probability** that a randomly selected recipient is under 30 years old AND made a purchase, $P(A_1 \\cap B)$?",
+      "options": [
+        {
+          "id": "joint_correct_012",
+          "text_markdown": "**$P(A_1 \\cap B) = \\frac{60}{500} = 0.120$ ($12.0\\%$)**: The count in the intersection cell divided by the grand total.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "joint_marginal_purchase",
+          "text_markdown": "**$P(B) = \\frac{180}{500} = 0.360$ ($36.0\\%$)**: The total count of all purchasers divided by the grand total.",
+          "misconception_id": "reported_marginal_probability_instead_of_joint",
+          "hint_markdown": "This is the marginal probability of making a purchase across all age groups; joint probability requires satisfying both conditions simultaneously ($60/500$)."
+        },
+        {
+          "id": "joint_conditional_subgroup",
+          "text_markdown": "**$P(B \\mid A_1) = \\frac{60}{200} = 0.300$ ($30.0\\%$)**: The count of purchasers under 30 divided by the row total.",
+          "misconception_id": "reported_conditional_probability_instead_of_joint",
+          "hint_markdown": "Dividing by the row total $200$ gives conditional probability; joint probability divides by the grand total $500$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "joint_correct_012"
+      },
+      "evidence_concept_ids": [
+        "calculate_joint_and_marginal_probabilities"
+      ],
+      "explanation_markdown": "A **joint probability** $P(A_1 \\cap B)$ is the probability that two events occur simultaneously. From the table, the intersection cell of 'Under 30' and 'Purchased' contains $60$ recipients out of the grand total of $500$, giving $P(A_1 \\cap B) = \\frac{60}{500} = 0.120$ ($12.0\\%$).",
+      "numeric_policy": null
+    },
+    {
+      "id": "conditional_probability",
+      "kind": "choice",
+      "prompt_markdown": "Given that a customer is under 30 years old ($A_1$), what is the **conditional probability** that they made a purchase, $P(B \\mid A_1)$?",
+      "options": [
+        {
+          "id": "cond_correct_030",
+          "text_markdown": "**$P(B \\mid A_1) = \\frac{60}{200} = 0.300$ ($30.0\\%$)**: The sample space is restricted to the $200$ recipients in the 'Under 30' row.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "cond_inverted_condition",
+          "text_markdown": "**$P(A_1 \\mid B) = \\frac{60}{180} \\approx 0.333$ ($33.3\\%$)**: Dividing by the column total of purchasers.",
+          "misconception_id": "inverted_conditioning_event",
+          "hint_markdown": "The condition is that the customer is under 30 ($A_1$), so the denominator must be the row total $200$, not the purchaser column total $180$."
+        },
+        {
+          "id": "cond_joint_total",
+          "text_markdown": "**$P(A_1 \\cap B) = \\frac{60}{500} = 0.120$ ($12.0\\%$)**: Dividing by the grand total of $500$.",
+          "misconception_id": "reported_joint_probability_instead_of_conditional",
+          "hint_markdown": "Conditional probability conditions on the subset: $P(B \\mid A_1) = \\frac{P(A_1 \\cap B)}{P(A_1)} = \\frac{60}{200} = 0.300$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "cond_correct_030"
+      },
+      "evidence_concept_ids": [
+        "calculate_conditional_probability_from_subgroup"
+      ],
+      "explanation_markdown": "By the definition of **conditional probability**, $P(B \\mid A_1) = \\frac{P(A_1 \\cap B)}{P(A_1)} = \\frac{60 / 500}{200 / 500} = \\frac{60}{200} = 0.300$ ($30.0\\%$). The given condition 'Under 30' restricts the effective sample space to the row of $200$ younger customers.",
+      "numeric_policy": null
+    },
+    {
+      "id": "independence_test",
+      "kind": "choice",
+      "prompt_markdown": "Is the purchase decision ($B$) statistically **independent** of whether the customer is under 30 ($A_1$)?",
+      "options": [
+        {
+          "id": "indep_dependent_not_equal",
+          "text_markdown": "**No, the events are dependent**: Because $P(B \\mid A_1) = 0.300 \\ne P(B) = 0.360$ (and $P(B \\mid A_2) = \\frac{120}{300} = 0.400$), knowing a customer's age category alters the probability that they will make a purchase.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "indep_independent_because_sum_1",
+          "text_markdown": "**Yes, the events are independent**: Because the rows sum to $500$, all categories in a contingency table are automatically independent.",
+          "misconception_id": "confused_contingency_table_margins_with_independence",
+          "hint_markdown": "Rows and columns always sum to grand totals; independence requires conditional probabilities to equal overall marginal probabilities."
+        },
+        {
+          "id": "indep_independent_because_positive",
+          "text_markdown": "**Yes, the events are independent**: Because $P(A_1 \\cap B) = 0.120 > 0$, any positive intersection implies statistical independence.",
+          "misconception_id": "confused_non_zero_intersection_with_independence",
+          "hint_markdown": "Independence requires $P(A_1 \\cap B) = P(A_1) \\times P(B)$; here $0.120 \\ne 0.40 \\times 0.36 = 0.144$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "indep_dependent_not_equal"
+      },
+      "evidence_concept_ids": [
+        "evaluate_statistical_independence_from_contingency_table"
+      ],
+      "explanation_markdown": "Two events are independent if and only if $P(B \\mid A_1) = P(B)$ (or equivalently $P(A_1 \\cap B) = P(A_1) P(B)$). Here, the overall marginal purchase rate is $P(B) = \\frac{180}{500} = 0.360$. For younger customers, the conversion rate is only $P(B \\mid A_1) = 0.300$, whereas for older customers it is $P(B \\mid A_2) = \\frac{120}{300} = 0.400$. Because $0.300 \\ne 0.360 \\ne 0.400$, **purchase behavior and age category are statistically dependent** (older recipients convert at a higher rate).",
+      "numeric_policy": null
+    }
+  ]
+}

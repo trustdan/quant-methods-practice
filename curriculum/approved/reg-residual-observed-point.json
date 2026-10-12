@@ -1,0 +1,120 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "reg_residual_observed_point",
+  "version": 1,
+  "status": "active",
+  "family_id": "linear_regression",
+  "rule_version": 1,
+  "module_id": "module_6",
+  "title": "Calculating and interpreting the residual for an observed retail store",
+  "scenario_markdown": "A retail operations analyst fits a simple linear regression to model weekly sales revenue ($Y$, in thousands of dollars) as a function of local advertising spend ($X$, in hundreds of dollars) across $n = 5$ regional stores. The sample data is: Store 1: $(10, 40)$, Store 2: $(15, 52)$, Store 3: $(20, 60)$, Store 4: $(25, 72)$, and Store 5: $(30, 86)$. Summary sums of squares confirm: $\\bar{x} = 20.0$, $\\bar{y} = 62.0$, $SS_{xx} = 250.0$, and $SS_{xy} = 560.0$, yielding the fitted regression line $\\hat{y} = 17.2 + 2.24 x$. Calculate the fitted value $\\hat{y}$ and residual $e$ for Store 3, where $x = 20$ and actual revenue was $y = 60$.",
+  "parameters": {
+    "n": 5,
+    "slope": 2.24,
+    "intercept": 17.2,
+    "r": 0.9962,
+    "r_squared": 0.9924,
+    "x_pred": 20.0
+  },
+  "assumptions": [
+    "Linear relationship between local ad spend and weekly revenue across the domain [$10, $30]",
+    "Residual is defined as observed minus predicted: e = y - y_hat",
+    "Independent observations across stores"
+  ],
+  "concept_ids": [
+    "reg_fitted_prediction_calculation",
+    "reg_residual_formula_y_minus_yhat"
+  ],
+  "setting_group": "retail_store_advertising_sales_residual",
+  "source_refs": [
+    "Course Module 6: Simple Linear Regression",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T22:30:00Z",
+    "notes": "Reviewed derivation: OLS model y_hat = 17.2 + 2.24*x. At Store 3 (x = 20, y = 60): y_hat = 17.2 + 2.24(20) = 62.0. Residual e = y - y_hat = 60.0 - 62.0 = -2.0 (underperformed expected sales by $2,000). Distractors address inverted residual sign (y_hat - y = +2.0) and confusing observed y with predicted y_hat. Excel: =60 - FORECAST.LINEAR(20, y_range, x_range).",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "compute_predicted_y",
+      "kind": "choice",
+      "prompt_markdown": "Calculate the model-predicted sales revenue $\\hat{y}$ for Store 3 using its advertising spend $x = 20$ (hundreds of dollars).",
+      "options": [
+        {
+          "id": "pred_correct",
+          "text_markdown": "$\\hat{y} = 62.0\\text{ (\\$62,000)}$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "pred_actual_value",
+          "text_markdown": "$\\hat{y} = 60.0\\text{ (\\$60,000)}$",
+          "misconception_id": "confusing_observed_actual_with_model_prediction",
+          "hint_markdown": "$\\$60,000$ is the actual observed revenue $y$; the model prediction $\\hat{y}$ comes from substituting $x = 20$ into the equation $17.2 + 2.24(20)$."
+        },
+        {
+          "id": "pred_forgot_intercept",
+          "text_markdown": "$\\hat{y} = 44.8\\text{ (\\$44,800)}$",
+          "misconception_id": "omitted_intercept_in_prediction",
+          "hint_markdown": "Do not omit the intercept $b_0 = 17.2$; compute $17.2 + 2.24(20) = 17.2 + 44.8 = 62.0$."
+        },
+        {
+          "id": "pred_swapped_coefficients",
+          "text_markdown": "$\\hat{y} = 346.24\\text{ (\\$346,240)}$",
+          "misconception_id": "swapped_slope_and_intercept_in_prediction",
+          "hint_markdown": "The slope is $2.24$ and the intercept is $17.2$, not $2.24 + 17.2(20)$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "pred_correct"
+      },
+      "explanation_markdown": "Substituting $x = 20$ into the regression equation: $$\\hat{y} = 17.2 + 2.24(20) = 17.2 + 44.8 = 62.0\\text{ (\\$62,000)}$$ Notice that because $x = 20 = \\bar{x}$, the predicted value equals the sample mean $\\bar{y} = 62.0$.",
+      "evidence_concept_ids": [
+        "reg_fitted_prediction_calculation"
+      ]
+    },
+    {
+      "id": "compute_and_interpret_residual",
+      "kind": "choice",
+      "prompt_markdown": "Compute the residual $e = y - \\hat{y}$ for Store 3 and provide its operational business interpretation.",
+      "options": [
+        {
+          "id": "res_correct",
+          "text_markdown": "$e = -2.0\\text{ (\\$-\\$2,000)}$: Store 3 generated $\\$2,000$ less revenue than predicted by the regression line based on its advertising spend.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "res_inverted_sign",
+          "text_markdown": "$e = +2.0\\text{ (+\\$2,000)}$: Store 3 exceeded model expectations by $\\$2,000$.",
+          "misconception_id": "inverted_residual_definition_yhat_minus_y",
+          "hint_markdown": "The residual is strictly defined as actual minus predicted ($e = y - \\hat{y} = 60 - 62 = -2.0$), not $\\hat{y} - y$."
+        },
+        {
+          "id": "res_zero_on_mean",
+          "text_markdown": "$e = 0.0$: Because $x = \\bar{x}$, the residual for this point must automatically equal zero.",
+          "misconception_id": "confusing_sum_of_residuals_with_individual_residual",
+          "hint_markdown": "The sum of all residuals $\\sum e_i = 0$, but an individual store's residual at $\\bar{x}$ only equals zero if its actual $y$ happens to land exactly on $\\bar{y}$."
+        },
+        {
+          "id": "res_percentage",
+          "text_markdown": "$e = -3.33\\%$: The residual is always expressed as a percentage of the total sums of squares.",
+          "misconception_id": "expressed_residual_as_percentage_of_ss",
+          "hint_markdown": "Residuals are measured in the original units of the dependent variable $y$ (thousands of dollars)."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "res_correct"
+      },
+      "explanation_markdown": "The residual is the vertical deviation from the fitted line: $$e = y - \\hat{y} = 60.0 - 62.0 = -2.0\\text{ (in thousands, or } -\\$2{,}000)$$ The negative sign indicates that Store 3 performed below the expected sales benchmark for stores investing $\\$2{,}000$ in local advertising.",
+      "evidence_concept_ids": [
+        "reg_residual_formula_y_minus_yhat"
+      ]
+    }
+  ]
+}

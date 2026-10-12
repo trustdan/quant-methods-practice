@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "template_id": "concept_data_types_business",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T22:30:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "concept_check",
+    "parameters": {
+      "topic": "business_data_classification",
+      "concept": "categorical_numerical_discrete_continuous_scales",
+      "objective": "Classify operational business variables into categorical/numerical, discrete/continuous, and nominal/ordinal/interval/ratio scales"
+    },
+    "canonical_probability": 0.5,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 0.0,
+      "variance": 0.0,
+      "standard_deviation": 0.0
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "categorical_vs_numerical", "kind": "choice", "evidence": "classify_categorical_versus_numerical"},
+      {"id": "discrete_vs_continuous", "kind": "choice", "evidence": "classify_discrete_versus_continuous_numerical"},
+      {"id": "measurement_scales", "kind": "choice", "evidence": "identify_levels_of_measurement"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Reviewed taxonomy: Store_Region = Categorical Nominal; Satisfaction_Rating = Categorical Ordinal; Units_Returned = Numerical Discrete; Monthly_Revenue = Numerical Continuous. Addresses student traps where numbered Likert ratings are mistreated as continuous quantities and cents in dollars are claimed to make financial variables discrete."
+}

@@ -1,0 +1,146 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "desc_zscore_empirical_rule",
+  "version": 1,
+  "status": "active",
+  "family_id": "descriptive_stats",
+  "rule_version": 2,
+  "module_id": "module_1",
+  "title": "Standardizing sales and applying the empirical rule",
+  "scenario_markdown": "A large sales team's quarterly revenue distribution is approximately bell-shaped, with mean 100 thousand dollars and standard deviation 20 thousand dollars. A representative sells 140 thousand dollars. Use the empirical rule as an approximation, rather than assuming exact normal probabilities.",
+  "parameters": {
+    "mean": 100,
+    "operation": "z_score",
+    "sd": 20,
+    "x": 140
+  },
+  "assumptions": [
+    "All revenue values use the same units: thousands of dollars.",
+    "The empirical rule is appropriate as an approximation for the stated bell-shaped distribution."
+  ],
+  "concept_ids": [
+    "sales_z_score",
+    "empirical_rule_two_sd",
+    "empirical_rule_condition"
+  ],
+  "setting_group": "sales_team_standardization",
+  "source_refs": [
+    "docs/COURSE-MAP.md: learner-supplied module objectives, October 11, 2026",
+    "docs/CONTENT-BACKLOG.md: desc-zscore-empirical-rule"
+  ],
+  "approval": {
+    "reviewer": "codex_delegated_final_waves",
+    "reviewed_at": "2026-10-12T04:32:26.275462Z",
+    "delegation_basis": "User explicitly replied on October 11, 2026 (America/Chicago): Yes—delegate review and activate after checks pass. Approval follows successful Go mathematical, bank admission, every-option grading and snapshot checks; assistant semantic review does not claim personal user reading.",
+    "notes": "Assistant reviewed the complete scenario, stage wording, all options, causal hints and worked explanations. Numerical choices are independently bound to Go engine quantities under rule v2; conceptual choices are semantically reviewed. Fixed parameters only; no cosmetic variation claimed as transfer. Stated course conventions remain unconfirmed where applicable. Validated one-to-one concept evidence, rejected ambiguous numeric distractors, and tested every option after snapshot serialization."
+  },
+  "stages": [
+    {
+      "calculation": "z",
+      "id": "sales_z_score",
+      "kind": "choice",
+      "prompt_markdown": "What is this representative's z-score? Select the value rounded to four decimal places.",
+      "options": [
+        {
+          "numeric_value": 2,
+          "id": "supported",
+          "text_markdown": "$2.0000$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "numeric_value": 7,
+          "id": "misconception_a",
+          "text_markdown": "$7.0000$",
+          "misconception_id": "sales_z_score_a",
+          "hint_markdown": "Subtract the mean before dividing by SD."
+        },
+        {
+          "numeric_value": -2,
+          "id": "misconception_b",
+          "text_markdown": "$-2.0000$",
+          "misconception_id": "sales_z_score_b",
+          "hint_markdown": "The observation is above the mean, so its z-score is positive."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "supported"
+      },
+      "evidence_concept_ids": [
+        "sales_z_score"
+      ],
+      "explanation_markdown": "$z=(140-100)/20=2$. Excel: `=STANDARDIZE(140,100,20)`. This sales result is two SD above the team mean.",
+      "numeric_policy": null
+    },
+    {
+      "id": "empirical_rule_two_sd",
+      "kind": "choice",
+      "prompt_markdown": "Approximately what share of sales results falls from 60 to 140 thousand dollars?",
+      "options": [
+        {
+          "id": "supported",
+          "text_markdown": "About 95%, since these endpoints are two SD below and above the mean.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "misconception_a",
+          "text_markdown": "About 68%, because every symmetric interval contains one SD.",
+          "misconception_id": "empirical_rule_two_sd_a",
+          "hint_markdown": "Count how many SD each endpoint is from the mean."
+        },
+        {
+          "id": "misconception_b",
+          "text_markdown": "Exactly 100%, because no result can be farther than two SD from its mean.",
+          "misconception_id": "empirical_rule_two_sd_b",
+          "hint_markdown": "The empirical rule allows observations outside two SD."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "supported"
+      },
+      "evidence_concept_ids": [
+        "empirical_rule_two_sd"
+      ],
+      "explanation_markdown": "The interval is $100\\pm2(20)$. The empirical rule assigns about 95% of a bell-shaped distribution within two SD. Under an exact normal model the value is about 95.45%, which is a different calculation.",
+      "numeric_policy": null
+    },
+    {
+      "id": "empirical_rule_condition",
+      "kind": "choice",
+      "prompt_markdown": "Could the same 95% approximation be assumed for a strongly skewed sales distribution?",
+      "options": [
+        {
+          "id": "supported",
+          "text_markdown": "No; mean and SD alone do not justify the bell-shaped empirical-rule percentages.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "misconception_a",
+          "text_markdown": "Yes; every distribution has exactly 95% within two SD.",
+          "misconception_id": "empirical_rule_condition_a",
+          "hint_markdown": "The empirical rule depends on distribution shape."
+        },
+        {
+          "id": "misconception_b",
+          "text_markdown": "Yes; positive sales values guarantee symmetry.",
+          "misconception_id": "empirical_rule_condition_b",
+          "hint_markdown": "Nonnegative support does not imply a bell-shaped distribution."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "supported"
+      },
+      "evidence_concept_ids": [
+        "empirical_rule_condition"
+      ],
+      "explanation_markdown": "A z-score still standardizes using mean and SD, but empirical-rule percentages require a suitable shape. Check the distribution before using them.",
+      "numeric_policy": null
+    }
+  ]
+}

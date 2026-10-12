@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "template_id": "mreg_which_predictors_significant",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T22:00:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "regression_output",
+    "parameters": {
+      "n": 30,
+      "k": 3,
+      "ssr": 1200.0,
+      "sse": 400.0,
+      "sst": 1600.0,
+      "confidence_level": 0.95,
+      "intercept_name": "Intercept",
+      "b0": 25.0,
+      "se_b0": 5.0,
+      "x1_name": "Floor_Space",
+      "b1": 12.5,
+      "se_b1": 3.2,
+      "x2_name": "Competitor_Distance",
+      "b2": -4.8,
+      "se_b2": 2.2,
+      "x3_name": "Local_Population",
+      "b3": 0.35,
+      "se_b3": 0.70
+    },
+    "canonical_probability": 0.75,
+    "canonical_rational": "3/4",
+    "moments": {
+      "mean": 0.75,
+      "variance": 0.0,
+      "standard_deviation": 0.0
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "overall_f_vs_individual_t", "kind": "choice", "evidence": "mreg_overall_model_f_vs_individual_t"},
+      {"id": "identify_significant_predictors", "kind": "choice", "evidence": "mreg_identify_significant_predictors"},
+      {"id": "model_refinement", "kind": "choice", "evidence": "mreg_model_refinement_parsimony"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Verified mathematically: n = 30, k = 3, df_res = 26. SSR = 1200, SSE = 400, SST = 1600. F = 26.0 (p < 0.0001). X1 t = 3.906 (p = 0.0006 < 0.05). X2 t = -2.182 (p = 0.0384 < 0.05). X3 t = 0.500 (p = 0.6213 > 0.05). X1 and X2 are significant; X3 is not. Removing X3 demonstrates model parsimony."
+}

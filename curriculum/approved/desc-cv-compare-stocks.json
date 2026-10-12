@@ -1,0 +1,146 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "desc_cv_compare_stocks",
+  "version": 1,
+  "status": "active",
+  "family_id": "descriptive_stats",
+  "rule_version": 1,
+  "module_id": "module_1",
+  "title": "Comparing relative investment risk using the coefficient of variation",
+  "scenario_markdown": "A wealth management advisor evaluates the historical annual returns and volatility of two mutual funds for an institutional endowment client:\n\n- **Fund A (Tech Growth)**: Sample mean annual return $\\bar{x}_A = 12.0\\%$, standard deviation $s_A = 4.0\\%$.\n- **Fund B (Stable Income)**: Sample mean annual return $\\bar{x}_B = 4.0\\%$, standard deviation $s_B = 2.0\\%$.\n\nWhile Fund A has twice the absolute standard deviation of Fund B, the two funds operate at vastly different return baselines. Compute the coefficient of variation (CV) for both investments and determine which asset exhibits higher relative risk per unit of return.",
+  "parameters": {
+    "operation": "coefficient_of_variation",
+    "mean_a": 12.0,
+    "sd_a": 4.0,
+    "cv_a": 33.33333,
+    "mean_b": 4.0,
+    "sd_b": 2.0,
+    "cv_b": 50.0
+  },
+  "assumptions": [
+    "Both funds exhibit positive sample mean returns",
+    "Coefficient of variation is defined as CV = (s / x_bar) * 100%",
+    "Relative risk is measured as dispersion normalized by mean return"
+  ],
+  "concept_ids": [
+    "compute_coefficient_of_variation_fund_a",
+    "compute_coefficient_of_variation_fund_b",
+    "evaluate_relative_dispersion_investment_risk"
+  ],
+  "setting_group": "investment_portfolio_relative_risk",
+  "source_refs": [
+    "Course Module 1: Descriptive Measures & Basic Probability",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T23:10:00Z",
+    "notes": "Reviewed coefficient of variation: CV_A = 4/12 = 33.33%, CV_B = 2/4 = 50.00%. Identifies that Fund B carries higher relative volatility per unit of expected return despite having smaller raw standard deviation.",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "compute_cv_fund_a",
+      "kind": "choice",
+      "prompt_markdown": "What is the coefficient of variation ($CV_A$) for **Fund A** (Tech Growth)?",
+      "options": [
+        {
+          "id": "cv_a_correct",
+          "text_markdown": "**$CV_A = 33.3\\%$**: $CV_A = \\frac{s_A}{\\bar{x}_A} \\times 100\\% = \\frac{4.0}{12.0} \\times 100\\% = 33.33\\%$.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "cv_a_inverted",
+          "text_markdown": "**$CV_A = 300.0\\%$**: Calculated as $\\frac{\\bar{x}_A}{s_A} = \\frac{12.0}{4.0} \\times 100\\%$.",
+          "misconception_id": "inverted_cv_ratio_mean_over_sd",
+          "hint_markdown": "The coefficient of variation puts standard deviation in the numerator and mean in the denominator: CV = s / x_bar."
+        },
+        {
+          "id": "cv_a_difference",
+          "text_markdown": "**$CV_A = 8.0\\%$**: Calculated as the difference $\\bar{x}_A - s_A = 12.0 - 4.0$.",
+          "misconception_id": "subtracted_sd_from_mean_instead_of_ratio",
+          "hint_markdown": "The CV is a relative ratio (s / x_bar), not an absolute difference."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "cv_a_correct"
+      },
+      "evidence_concept_ids": [
+        "compute_coefficient_of_variation_fund_a"
+      ],
+      "explanation_markdown": "The **coefficient of variation (CV)** measures relative dispersion as a percentage of the mean:\n\n$$CV_A = \\left(\\frac{s_A}{\\bar{x}_A}\\right) \\times 100\\% = \\left(\\frac{4.0\\%}{12.0\\%}\\right) \\times 100\\% = 33.33\\%$$\n\nIn Excel: `=(4.0 / 12.0) * 100`.",
+      "numeric_policy": null
+    },
+    {
+      "id": "compute_cv_fund_b",
+      "kind": "choice",
+      "prompt_markdown": "What is the coefficient of variation ($CV_B$) for **Fund B** (Stable Income)?",
+      "options": [
+        {
+          "id": "cv_b_correct",
+          "text_markdown": "**$CV_B = 50.0\\%$**: $CV_B = \\frac{s_B}{\\bar{x}_B} \\times 100\\% = \\frac{2.0}{4.0} \\times 100\\% = 50.00\\%$.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "cv_b_inverted",
+          "text_markdown": "**$CV_B = 200.0\\%$**: Calculated as $\\frac{\\bar{x}_B}{s_B} = \\frac{4.0}{2.0} \\times 100\\%$.",
+          "misconception_id": "inverted_cv_ratio_mean_over_sd",
+          "hint_markdown": "CV is the ratio of standard deviation to mean: 2.0 / 4.0 = 0.50 (50%)."
+        },
+        {
+          "id": "cv_b_raw_sd",
+          "text_markdown": "**$CV_B = 2.0\\%$**: The coefficient of variation is simply the raw standard deviation.",
+          "misconception_id": "confused_cv_with_raw_standard_deviation",
+          "hint_markdown": "Raw standard deviation is an absolute measure; CV scales standard deviation by the mean."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "cv_b_correct"
+      },
+      "evidence_concept_ids": [
+        "compute_coefficient_of_variation_fund_b"
+      ],
+      "explanation_markdown": "For Fund B:\n\n$$CV_B = \\left(\\frac{s_B}{\\bar{x}_B}\\right) \\times 100\\% = \\left(\\frac{2.0\\%}{4.0\\%}\\right) \\times 100\\% = 50.00\\%$$\n\nIn Excel: `=(2.0 / 4.0) * 100`.",
+      "numeric_policy": null
+    },
+    {
+      "id": "evaluate_relative_risk",
+      "kind": "choice",
+      "prompt_markdown": "Which fund exhibits greater **relative risk** per percentage point of expected return, and what managerial insight does this reveal?",
+      "options": [
+        {
+          "id": "risk_correct",
+          "text_markdown": "**Fund B has higher relative risk ($50.0\\% > 33.3\\%$)**: Despite its smaller absolute standard deviation ($2.0\\% < 4.0\\%$), Fund B requires taking on $0.50\\%$ of volatility for every $1\\%$ of return, whereas Fund A requires only $0.33\\%$ of volatility per $1\\%$ of return.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "risk_fund_a_absolute_only",
+          "text_markdown": "**Fund A has higher relative risk**: Because $s_A = 4.0\\% > s_B = 2.0\\%$, the asset with the higher standard deviation is always riskier in every context.",
+          "misconception_id": "relied_solely_on_absolute_sd_ignoring_baseline_mean",
+          "hint_markdown": "Absolute SD ignores the return scale. An investor earning 12% with 4% SD achieves much higher return efficiency than earning 4% with 2% SD."
+        },
+        {
+          "id": "risk_both_equal",
+          "text_markdown": "Both funds carry identical risk because both have positive Sharpe-like ratios.",
+          "misconception_id": "assumed_positive_returns_equalize_risk",
+          "hint_markdown": "The CV ratios differ sharply (33.3% vs 50.0%), proving unequal return-to-risk profiles."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "risk_correct"
+      },
+      "evidence_concept_ids": [
+        "evaluate_relative_dispersion_investment_risk"
+      ],
+      "explanation_markdown": "Comparing **absolute standard deviation** ($s_A = 4.0\\%$ vs $s_B = 2.0\\%$) creates a misleading impression that Fund B is safer. However, when normalized by expected return, **Fund B has higher relative risk ($CV = 50.0\\%$)** than Fund A ($CV = 33.3\\%$). For every unit of return produced, Fund B exposes the investor to $50\\%$ more relative volatility than Fund A.",
+      "numeric_policy": null
+    }
+  ]
+}

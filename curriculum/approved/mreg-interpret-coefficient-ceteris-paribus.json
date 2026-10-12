@@ -1,0 +1,157 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "mreg_interpret_coefficient_ceteris_paribus",
+  "version": 1,
+  "status": "active",
+  "family_id": "regression_output",
+  "rule_version": 1,
+  "module_id": "module_6",
+  "title": "Interpreting partial regression coefficients under the ceteris paribus condition",
+  "scenario_markdown": "A residential property valuation model predicts home selling prices ($Y$, in thousands of dollars) using three explanatory predictors across $n = 35$ single-family homes ($k = 3$, residual $df = 31$):\n- $X_1$: Living Area (`Square_Footage`, in thousands of square feet)\n- $X_2$: Distance to Employment Center (`Commute_Distance`, in miles)\n- $X_3$: Local District Academic Quality (`School_Rating`, on a 1–10 scale)\n\nThe estimated multiple regression model generated in Excel reports:\n\n$$\\hat{Y} = 150.0 + 85.0 X_1 - 12.0 X_2 + 25.0 X_3$$\n\n$$\\text{Standard errors: } s_{b_0} = 25.0, \\; s_{b_1} = 12.0, \\; s_{b_2} = 3.0, \\; s_{b_3} = 5.0$$\n\nInterpret the estimated slope coefficient for commute distance ($b_2 = -12.0$) and analyze the necessity of the *ceteris paribus* (holding other variables constant) requirement in multiple regression.",
+  "parameters": {
+    "n": 35,
+    "k": 3,
+    "ssr": 3600.0,
+    "sse": 1240.0,
+    "sst": 4840.0,
+    "confidence_level": 0.95,
+    "intercept_name": "Intercept",
+    "b0": 150.0,
+    "se_b0": 25.0,
+    "x1_name": "Square_Footage",
+    "b1": 85.0,
+    "se_b1": 12.0,
+    "x2_name": "Commute_Distance",
+    "b2": -12.0,
+    "se_b2": 3.0,
+    "x3_name": "School_Rating",
+    "b3": 25.0,
+    "se_b3": 5.0
+  },
+  "assumptions": [
+    "Multiple linear regression model Y = beta0 + beta1*X1 + beta2*X2 + beta3*X3 + epsilon",
+    "Predictor coefficients bj represent partial regression slopes under ceteris paribus",
+    "Residual degrees of freedom df = n - k - 1 = 35 - 3 - 1 = 31"
+  ],
+  "concept_ids": [
+    "interpret_partial_slope_ceteris_paribus",
+    "critique_omission_of_holding_variables_constant",
+    "distinguish_partial_slope_from_simple_bivariate_slope"
+  ],
+  "setting_group": "residential_housing_valuation_multiple_regression",
+  "source_refs": [
+    "Course Module 6: Regression Analysis",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T22:30:00Z",
+    "notes": "Reviewed partial slope interpretation: b2 = -12.0 indicates an estimated $12,000 decrease in price per additional mile of commute distance, strictly holding square footage and school rating constant. Contrasts with simple regression slope to show how omitted variables and intercorrelations alter coefficient estimates.",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "interpret_partial_slope",
+      "kind": "choice",
+      "prompt_markdown": "What is the correct, rigorous interpretation of the estimated coefficient $b_2 = -12.0$ for `Commute_Distance`?",
+      "options": [
+        {
+          "id": "interpret_correct_ceteris_paribus",
+          "text_markdown": "**Holding square footage and school rating constant**, each additional mile of commute distance is associated with an estimated decrease in mean selling price of $12.0\\text{ thousand dollars}$ ($\\\\$12{,}000$).",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "interpret_unconditional",
+          "text_markdown": "Each additional mile of commute distance reduces home selling price by $\\\\$12{,}000$, regardless of what happens to the size or school rating of the home.",
+          "misconception_id": "omitted_ceteris_paribus_condition",
+          "hint_markdown": "In multiple regression, coefficients are partial slopes that isolate the effect of one variable only when all other model predictors are held constant."
+        },
+        {
+          "id": "interpret_percentage_change",
+          "text_markdown": "Every mile of commute distance causes home prices to decrease by $12.0\\%$.",
+          "misconception_id": "confused_unit_rate_of_change_with_percentage_change",
+          "hint_markdown": "$b_2 = -12.0$ is an absolute change in units of $Y$ ($\\\\$12{,}000$), not an elasticity or percentage change."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "interpret_correct_ceteris_paribus"
+      },
+      "evidence_concept_ids": [
+        "interpret_partial_slope_ceteris_paribus"
+      ],
+      "explanation_markdown": "In multiple regression, the slope coefficient $b_j$ is a **partial regression slope**. It represents the estimated change in the mean of $Y$ for a 1-unit increase in $X_j$, **ceteris paribus** (holding all other predictors $X_1, X_3, \\dots$ fixed). Here, each additional mile of commute distance reduces estimated price by $\\\\$12{,}000$, provided living area and school quality remain unchanged.",
+      "numeric_policy": null
+    },
+    {
+      "id": "critique_omission_of_control",
+      "kind": "choice",
+      "prompt_markdown": "Why is the phrase *'holding all other predictors constant'* strictly necessary when interpreting coefficients in multiple regression?",
+      "options": [
+        {
+          "id": "critique_predictors_are_correlated",
+          "text_markdown": "**Predictors in business and economics are rarely independent**: In real estate, homes farther from city centers often have larger lot sizes or different school districts. Without controlling for other variables, the commute distance effect would be confounded by home size and school differences.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "critique_statutory_requirement",
+          "text_markdown": "**It is purely a legal disclaimer**: It has no statistical or mathematical significance.",
+          "misconception_id": "believed_ceteris_paribus_is_formalistic_boiler_plate",
+          "hint_markdown": "The mathematical derivation of partial slopes explicitly projects $Y$ onto the orthogonal complement of the other predictors; it is central to the mathematics."
+        },
+        {
+          "id": "critique_prevents_multicollinearity",
+          "text_markdown": "**It forces the correlation between predictors to become exactly zero**: Saying the phrase eliminates multicollinearity in the spreadsheet.",
+          "misconception_id": "confused_interpretation_clause_with_data_orthogonalization",
+          "hint_markdown": "Verbal statements do not change sample correlations; the clause reflects the statistical conditioning performed by the OLS matrix projection."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "critique_predictors_are_correlated"
+      },
+      "evidence_concept_ids": [
+        "critique_omission_of_holding_variables_constant"
+      ],
+      "explanation_markdown": "In observational data, independent variables are usually intercorrelated (e.g., suburban homes farther from work tend to have larger square footage). If an analyst fails to hold square footage constant, an increase in commute distance might coincide with an increase in home size, masking the true negative penalty of distance. The partial slope isolates the unique marginal effect of distance.",
+      "numeric_policy": null
+    },
+    {
+      "id": "partial_vs_simple_slope",
+      "kind": "choice",
+      "prompt_markdown": "If the analyst ran a simple bivariate regression of price ($Y$) on commute distance ($X_2$) alone, the simple slope was only $-4.0$. Why does the coefficient become $-12.0$ in the multiple regression?",
+      "options": [
+        {
+          "id": "slope_difference_omitted_variable_bias",
+          "text_markdown": "**Omitted variable bias in the simple model**: In the bivariate regression, the negative effect of commute distance was partially masked because distant homes tended to be larger ($X_1$). Controlling for square footage unmasks the true, stronger penalty for long commutes.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "slope_difference_calculation_error",
+          "text_markdown": "**The multiple regression model contains a calculation error**: Adding predictors can never change the slope of an existing variable.",
+          "misconception_id": "believed_slopes_are_invariant_to_adding_predictors",
+          "hint_markdown": "Coefficients change whenever added variables are correlated with existing predictors; this is the essence of multivariable conditioning."
+        },
+        {
+          "id": "slope_difference_degrees_of_freedom",
+          "text_markdown": "**The change is due solely to losing two degrees of freedom**: Degrees of freedom always triple coefficient magnitudes.",
+          "misconception_id": "confused_degrees_of_freedom_with_partial_slopes",
+          "hint_markdown": "Degrees of freedom affect critical values and standard errors, not the point estimates of partial slopes."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "slope_difference_omitted_variable_bias"
+      },
+      "evidence_concept_ids": [
+        "distinguish_partial_slope_from_simple_bivariate_slope"
+      ],
+      "explanation_markdown": "This demonstrates **omitted variable bias** and the difference between simple and partial slopes. In the simple regression, distance was correlated with square footage (distant homes were bigger and therefore more expensive), which offset part of the commute penalty. Once square footage was included in the multiple regression, that confounding effect was controlled, revealing the true underlying distance penalty of $-\\\\$12{,}000$ per mile.",
+      "numeric_policy": null
+    }
+  ]
+}

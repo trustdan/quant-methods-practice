@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "template_id": "desc_sample_sd_delivery_times",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T23:08:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "descriptive_stats",
+    "parameters": {
+      "operation": "variance_sd",
+      "data": [12.0, 16.0, 18.0, 20.0, 22.0, 32.0],
+      "mean": 20.0,
+      "sample_variance": 46.4,
+      "sample_sd": 6.81175,
+      "population_variance": 38.66667,
+      "population_sd": 6.21825
+    },
+    "canonical_probability": 0.5,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 20.0,
+      "variance": 46.4,
+      "standard_deviation": 6.81175
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "sum_squared_deviations", "kind": "choice", "evidence": "calculate_sum_of_squared_deviations"},
+      {"id": "compute_sample_sd", "kind": "choice", "evidence": "compute_sample_standard_deviation_bessel"},
+      {"id": "stdev_s_vs_stdev_p", "kind": "choice", "evidence": "distinguish_stdev_s_vs_stdev_p"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Reviewed sample dispersion math: sum of squares = 232.0, sample variance s^2 = 232/5 = 46.4, sample SD s = sqrt(46.4) = 6.81 min. Contrasted with population SD sqrt(232/6) = 6.22 min and verified Excel STDEV.S vs STDEV.P."
+}

@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "n_proportion_pilot",
+  "version": 1,
+  "status": "active",
+  "family_id": "sample_size",
+  "rule_version": 1,
+  "module_id": "module_4",
+  "title": "Sample size determination for customer churn with pilot proportion",
+  "scenario_markdown": "A telecommunications company plans a customer satisfaction study to estimate the proportion of subscribers considering switching to a competitor within the next quarter. Management requires a $95\\%$ confidence level and a margin of error no larger than $E = 0.03$ ($3$ percentage points). An exploratory pilot survey of $50$ customers previously found a churn interest proportion of $\\hat{p} = 0.20$. Determine the minimum sample size $n$ needed for the upcoming study.",
+  "parameters": {
+    "target": "proportion",
+    "margin_of_error": 0.03,
+    "confidence_level": 0.95,
+    "p": 0.2
+  },
+  "assumptions": [
+    "The target subscriber population is large enough that the finite population correction is negligible",
+    "The pilot study proportion p* = 0.20 provides a reasonable preliminary planning estimate",
+    "Independent random sampling of active subscribers"
+  ],
+  "concept_ids": [
+    "sample_size_proportion_formula",
+    "sample_size_pilot_vs_conservative_planning"
+  ],
+  "setting_group": "telecom_customer_churn_survey",
+  "source_refs": [
+    "Course Module 4: Sample Size Determination",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T22:30:00Z",
+    "notes": "Reviewed derivation: p* = 0.20, E = 0.03, 95% confidence (z = 1.960). n = (1.95996^2 * 0.20 * 0.80) / (0.03^2) = 0.61463 / 0.0009 = 682.93. Always round up to guarantee precision: n = 683. Contrast with conservative p=0.50 (n = 1068) saving 385 respondents. Excel: =ROUNDUP((NORM.S.INV(0.975)^2 * 0.20 * 0.80)/(0.03^2), 0).",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "sample_size_calc",
+      "kind": "choice",
+      "prompt_markdown": "Using the pilot estimate $p^* = 0.20$, calculate the unrounded required sample size $n = \\frac{z^2 p^*(1 - p^*)}{E^2}$ and state the final integer sample size.",
+      "options": [
+        {
+          "id": "n_correct",
+          "text_markdown": "$n = 682.93 \\implies 683\\text{ subscribers}$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "n_floor_rounded",
+          "text_markdown": "$n = 682.93 \\implies 682\\text{ subscribers}$",
+          "misconception_id": "floor_rounding_sample_size",
+          "hint_markdown": "Sample size must always be rounded UP to the next whole integer; $n = 682$ produces a margin of error strictly greater than $0.03$."
+        },
+        {
+          "id": "n_conservative_used",
+          "text_markdown": "$n = 1{,}067.07 \\implies 1{,}068\\text{ subscribers}$",
+          "misconception_id": "used_conservative_p_when_pilot_available",
+          "hint_markdown": "Because a valid pilot estimate $p^* = 0.20$ is available, use $p^*(1-p^*) = 0.16$ rather than the conservative $0.50(0.50) = 0.25$."
+        },
+        {
+          "id": "n_wrong_cl_90",
+          "text_markdown": "$n = 480.98 \\implies 481\\text{ subscribers}$",
+          "misconception_id": "wrong_confidence_z_used",
+          "hint_markdown": "The required confidence level is $95\\%$ ($z = 1.960$), not $90\\%$ ($z = 1.645$)."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "n_correct"
+      },
+      "explanation_markdown": "Substitute $z = 1.960$, $p^* = 0.20$, and $E = 0.03$: $$n = \\frac{(1.95996)^2 (0.20)(0.80)}{(0.03)^2} = \\frac{3.84146 \\times 0.16}{0.0009} = \\frac{0.61463}{0.0009} \\approx 682.93$$ Because a fraction of a respondent cannot be surveyed, the ceiling rule rounds up to $n = 683$.",
+      "evidence_concept_ids": [
+        "sample_size_proportion_formula"
+      ]
+    },
+    {
+      "id": "compare_with_conservative",
+      "kind": "choice",
+      "prompt_markdown": "How many fewer survey respondents are required by leveraging the pilot estimate $p^* = 0.20$ compared to using the conservative planning value $p^* = 0.50$?",
+      "options": [
+        {
+          "id": "savings_correct",
+          "text_markdown": "Savings of $385\\text{ respondents}$ ($1{,}068 - 683$)",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "savings_no_savings",
+          "text_markdown": "Zero savings; conservative planning is always required regardless of pilot data.",
+          "misconception_id": "believes_pilot_estimate_cannot_be_used",
+          "hint_markdown": "When prior pilot data or historical benchmarks are credible, using $p^*$ dramatically reduces required sample size and survey costs."
+        },
+        {
+          "id": "savings_unrounded",
+          "text_markdown": "Savings of $384.14\\text{ respondents}$",
+          "misconception_id": "reported_fractional_sample_savings",
+          "hint_markdown": "Both sample sizes must be converted to whole integers using the ceiling rule before computing practical survey savings."
+        },
+        {
+          "id": "savings_linear_subtraction",
+          "text_markdown": "Savings of $30\\text{ respondents}$ based on the $0.50 - 0.20 = 0.30$ difference in proportion.",
+          "misconception_id": "linear_subtraction_of_proportions_for_sample_size",
+          "hint_markdown": "Sample size depends quadratically on the variance term $p(1-p)/E^2$, not linearly on $p$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "savings_correct"
+      },
+      "explanation_markdown": "Under conservative planning with $p^* = 0.50$, $n_{\\text{cons}} = \\lceil 1.95996^2 \\times 0.25 / 0.0009 \\rceil = \\lceil 1{,}067.07 \\rceil = 1{,}068$. Utilizing the pilot estimate reduces the requirement to $683$, saving $1{,}068 - 683 = 385\\text{ respondents}$ (a $36\\%$ reduction in survey costs).",
+      "evidence_concept_ids": [
+        "sample_size_pilot_vs_conservative_planning"
+      ]
+    }
+  ]
+}

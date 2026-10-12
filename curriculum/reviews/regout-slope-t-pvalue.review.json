@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "template_id": "regout_slope_t_pvalue",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T22:00:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "regression_output",
+    "parameters": {
+      "n": 25,
+      "k": 1,
+      "ssr": 90.0,
+      "sse": 230.0,
+      "sst": 320.0,
+      "confidence_level": 0.95,
+      "intercept_name": "Intercept",
+      "b0": 8.0,
+      "se_b0": 1.5,
+      "x1_name": "Experience_Years",
+      "b1": 2.4,
+      "se_b1": 0.8
+    },
+    "canonical_probability": 0.006428,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 2.4,
+      "variance": 0.64,
+      "standard_deviation": 0.8
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "t_statistic_calculation", "kind": "choice", "evidence": "regout_slope_t_statistic_calculation"},
+      {"id": "pvalue_determination", "kind": "choice", "evidence": "regout_slope_twotailed_pvalue_excel"},
+      {"id": "significance_conclusion", "kind": "choice", "evidence": "regout_slope_significance_conclusion"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Verified mathematically: b1 = 2.40, se_b1 = 0.80, n = 25, k = 1. df_res = 23. t = 2.4 / 0.8 = 3.00. SSR = 90, SSE = 230, SST = 320. MSE = 10, MSR = 90, F = 9.0 = t^2. Two-tailed p-value = 0.006428. Critical t_{0.025, 23} = 2.06866. Reject H0 at alpha = 0.05 since p < 0.05. Excel: =T.DIST.2T(3.0, 23)."
+}

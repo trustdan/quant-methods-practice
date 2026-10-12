@@ -1,0 +1,151 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "regout_r_from_r2_sign",
+  "version": 1,
+  "status": "active",
+  "family_id": "regression_output",
+  "rule_version": 1,
+  "module_id": "module_6",
+  "title": "Determining correlation r from R-squared and the slope coefficient sign",
+  "scenario_markdown": "An automotive market analyst evaluates vehicle depreciation by fitting a simple linear regression of used car selling price ($Y$, in thousands of dollars) on vehicle age ($X$, in years) across $n = 11$ vehicles ($k = 1$, residual $df = 9$). The regression summary output reports:\n\n$$\\text{Regression Statistics: } R^2 = 0.640$$\n$$\\text{Coefficients: } b_0 = 35.000 \\text{ (Intercept)}, \\quad b_1 = -2.000 \\text{ (Vehicle\\_Age)}$$\n$$\\text{Standard Errors: } s_{b_0} = 2.000, \\quad s_{b_1} = 0.500$$\n\nDetermine the sample correlation coefficient $r$ between vehicle age and selling price, analyze its direction and magnitude, and evaluate how the sign of $r$ is derived.",
+  "parameters": {
+    "n": 11,
+    "k": 1,
+    "ssr": 64.0,
+    "sse": 36.0,
+    "sst": 100.0,
+    "confidence_level": 0.95,
+    "intercept_name": "Intercept",
+    "b0": 35.0,
+    "se_b0": 2.0,
+    "x1_name": "Vehicle_Age",
+    "b1": -2.0,
+    "se_b1": 0.5
+  },
+  "assumptions": [
+    "Simple linear regression model Y = beta0 + beta1*X + epsilon",
+    "In simple linear regression (k = 1), R^2 = r^2",
+    "The sign of the sample correlation coefficient r is identical to the sign of the slope coefficient b1"
+  ],
+  "concept_ids": [
+    "derive_r_from_r_squared_and_slope_sign",
+    "interpret_correlation_direction_and_magnitude",
+    "distinguish_r_sign_from_r_squared_positivity"
+  ],
+  "setting_group": "used_car_age_depreciation_correlation",
+  "source_refs": [
+    "Course Module 6: Regression Analysis",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T22:30:00Z",
+    "notes": "Reviewed derivation: R^2 = 0.640 => |r| = sqrt(0.640) = 0.800. Slope b1 = -2.00 < 0 confirms inverse relationship, so r = -0.800. Explains why R^2 is strictly non-negative (squaring hides direction), while r carries the sign of b1. Consistency: t1 = -2.0/0.5 = -4.0, F = 16.0 = (-4)^2. Excel: =-SQRT(0.64) or =CORREL.",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "derive_correlation_coefficient",
+      "kind": "choice",
+      "prompt_markdown": "What is the sample correlation coefficient $r$ between vehicle age and selling price?",
+      "options": [
+        {
+          "id": "r_correct_negative_08",
+          "text_markdown": "**$r = -0.800$**: The magnitude is $|r| = \\sqrt{R^2} = \\sqrt{0.640} = 0.800$, and the negative slope $b_1 = -2.000$ indicates an inverse relationship, requiring $r < 0$.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "r_positive_08",
+          "text_markdown": "**$r = +0.800$**: The square root of $R^2$ is always strictly positive, so correlation can never be negative.",
+          "misconception_id": "failed_to_apply_negative_sign_to_correlation",
+          "hint_markdown": "The square root function $\\sqrt{R^2}$ returns only the magnitude; the sign of $r$ must match the sign of the slope $b_1$."
+        },
+        {
+          "id": "r_equals_r_squared",
+          "text_markdown": "**$r = 0.640$**: Correlation coefficient $r$ and coefficient of determination $R^2$ are identical values.",
+          "misconception_id": "confused_r_with_r_squared",
+          "hint_markdown": "$R^2$ is the square of correlation ($R^2 = r^2$), so $r = \\pm \\sqrt{R^2}$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "r_correct_negative_08"
+      },
+      "evidence_concept_ids": [
+        "derive_r_from_r_squared_and_slope_sign"
+      ],
+      "explanation_markdown": "In simple linear regression, the coefficient of determination is the square of the correlation coefficient: $R^2 = r^2$. Taking the square root gives the magnitude: $|r| = \\sqrt{0.640} = 0.800$. Because OLS slope $b_1 = r \\frac{s_y}{s_x}$ and standard deviations $s_y, s_x$ are strictly positive, **$r$ and $b_1$ must always share the exact same mathematical sign**. Since $b_1 = -2.000 < 0$, we have $r = -0.800$.",
+      "numeric_policy": null
+    },
+    {
+      "id": "interpret_correlation_magnitude",
+      "kind": "choice",
+      "prompt_markdown": "How should a correlation of $r = -0.800$ be interpreted in this business context?",
+      "options": [
+        {
+          "id": "interpret_strong_inverse",
+          "text_markdown": "**A strong inverse (negative) linear relationship**: Older vehicles systematically command lower selling prices, with $64\\%$ of the price variation explained by vehicle age.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "interpret_weak_inverse",
+          "text_markdown": "**A weak inverse relationship**: Because $-0.800$ is negative, it indicates very little linear association.",
+          "misconception_id": "confused_negative_sign_with_weak_strength",
+          "hint_markdown": "Strength is determined by absolute value $|r|$; $0.80$ is a strong correlation regardless of whether it is positive or negative."
+        },
+        {
+          "id": "interpret_perfect_deterministic",
+          "text_markdown": "**A deterministic physical law**: Every single car depreciates by exactly $\\\\$2{,}000$ every single year with zero residual error.",
+          "misconception_id": "confused_strong_correlation_with_deterministic_perfection",
+          "hint_markdown": "Only $r = -1.000$ ($R^2 = 1.0$) is perfectly deterministic; here $36\\%$ of variance remains unexplained ($SSE = 36$)."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "interpret_strong_inverse"
+      },
+      "evidence_concept_ids": [
+        "interpret_correlation_direction_and_magnitude"
+      ],
+      "explanation_markdown": "The magnitude $|r| = 0.800$ indicates a **strong linear association**. The negative sign indicates an inverse relationship: as age increases, selling price decreases. Furthermore, $R^2 = (-0.80)^2 = 0.640$ means vehicle age explains $64.0\\%$ of the sample variation in used vehicle prices.",
+      "numeric_policy": null
+    },
+    {
+      "id": "r_squared_positivity_distinction",
+      "kind": "choice",
+      "prompt_markdown": "Why does Microsoft Excel's `SUMMARY OUTPUT` report `R Square` as positive $0.640$ even though the underlying relationship is negative?",
+      "options": [
+        {
+          "id": "distinction_squaring_eliminates_direction",
+          "text_markdown": "**Squaring any real number yields a non-negative value ($(-0.800)^2 = +0.640$)**: $R^2 = SSR / SST$ represents a ratio of sums of squares (variance explained), which is strictly non-negative and measures strength of fit, not direction.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "distinction_excel_bug",
+          "text_markdown": "**Software reporting bug**: Excel should report $R^2 = -0.640$ when slopes are negative.",
+          "misconception_id": "believed_r_squared_should_be_negative_for_inverse_slopes",
+          "hint_markdown": "$R^2$ is bounded mathematically between $0$ and $1$; it cannot be negative."
+        },
+        {
+          "id": "distinction_positive_means_prices_rise",
+          "text_markdown": "**Positive $R^2$ means car prices actually increase**: The regression slope must be ignored when $R^2 > 0$.",
+          "misconception_id": "believed_positive_r_squared_overrides_negative_slope",
+          "hint_markdown": "The negative slope $b_1 = -2.000$ defines the direction of change; $R^2$ only measures goodness-of-fit."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "distinction_squaring_eliminates_direction"
+      },
+      "evidence_concept_ids": [
+        "distinguish_r_sign_from_r_squared_positivity"
+      ],
+      "explanation_markdown": "The coefficient of determination is defined as $R^2 = \\frac{SSR}{SST}$. Because sums of squares $SSR = \\sum (\\hat{y} - \\bar{y})^2$ and $SST = \\sum (y - \\bar{y})^2$ are sums of squared deviations, $R^2$ is mathematically constrained to $[0, 1]$. Squaring eliminates the sign of $r$ ($(-0.8)^2 = (+0.8)^2 = 0.64$). To recover the direction of the relationship, the analyst must check the sign of the slope coefficient $b_1$.",
+      "numeric_policy": null
+    }
+  ]
+}

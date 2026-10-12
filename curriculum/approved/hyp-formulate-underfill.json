@@ -1,0 +1,142 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "hyp_formulate_underfill",
+  "version": 1,
+  "status": "active",
+  "family_id": "concept_check",
+  "rule_version": 1,
+  "module_id": "module_5",
+  "title": "Formulating hypotheses for suspected product underfill",
+  "scenario_markdown": "A consumer watchdog agency tests a commercial brand of olive oil labeled as containing $16.0\\text{ fluid ounces}$ per bottle. Recent customer complaints allege that bottles are routinely underfilled. The agency plans a statistical hypothesis test to investigate whether there is convincing empirical evidence that the true population mean volume $\\mu$ is less than $16.0\\text{ fl oz}$.",
+  "parameters": {
+    "topic": "hypothesis_formulation",
+    "concept": "underfill_one_tailed_test",
+    "objective": "Formulate null and alternative hypotheses for suspected underfilling"
+  },
+  "assumptions": [
+    "The population parameter of interest is the true mean fill volume mu across all produced bottles",
+    "Hypotheses are formulated prior to inspecting the sample data",
+    "The alternative hypothesis carries the burden of proof for regulatory action"
+  ],
+  "concept_ids": [
+    "hypothesis_alternative_research_claim",
+    "hypothesis_null_status_quo_formulation",
+    "hypothesis_tail_direction_identification"
+  ],
+  "setting_group": "consumer_protection_olive_oil_fill",
+  "source_refs": [
+    "Course Module 5: Hypothesis Testing",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T22:00:00Z",
+    "notes": "Reviewed conceptual structure: H0: mu = 16.0 (or mu >= 16.0) vs H1: mu < 16.0. Left-tailed test. Distractors test swapping H0/H1, two-tailed confusion, and sample stat notation.",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "formulate_alternative",
+      "kind": "choice",
+      "prompt_markdown": "Which statement correctly formulates the alternative hypothesis ($H_1$ or $H_a$) for the agency's investigation?",
+      "options": [
+        {
+          "id": "h1_correct",
+          "text_markdown": "$H_1: \\mu < 16.0\\text{ fl oz}$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "h1_sample_statistic",
+          "text_markdown": "$H_1: \\bar{x} < 16.0\\text{ fl oz}$",
+          "misconception_id": "hypotheses_state_sample_statistic",
+          "hint_markdown": "Hypotheses are always statements about unknown population parameters ($\\\\mu$), never about sample statistics ($\\\\bar{x}$) which are observed directly from data."
+        },
+        {
+          "id": "h1_two_tailed",
+          "text_markdown": "$H_1: \\mu \\ne 16.0\\text{ fl oz}$",
+          "misconception_id": "used_two_tailed_for_directional_claim",
+          "hint_markdown": "The agency specifically suspects underfilling (volumes less than 16), which is a directional, one-sided research hypothesis."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "h1_correct"
+      },
+      "evidence_concept_ids": [
+        "hypothesis_alternative_research_claim"
+      ],
+      "explanation_markdown": "The alternative hypothesis ($H_1$) represents the research claim that investigators seek to establish by collecting evidence. Because complaints allege underfilling, the directional claim is that the population mean volume is strictly less than the label claim: $H_1: \\mu < 16.0\\text{ fl oz}$.",
+      "numeric_policy": null
+    },
+    {
+      "id": "formulate_null",
+      "kind": "choice",
+      "prompt_markdown": "Which statement correctly formulates the corresponding null hypothesis ($H_0$)?",
+      "options": [
+        {
+          "id": "h0_correct",
+          "text_markdown": "$H_0: \\mu = 16.0\\text{ fl oz}$ (or $\\mu \\ge 16.0\\text{ fl oz}$)",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "h0_strict_inequality",
+          "text_markdown": "$H_0: \\mu < 16.0\\text{ fl oz}$",
+          "misconception_id": "strict_inequality_in_null",
+          "hint_markdown": "The null hypothesis must always contain the condition of equality ($=$, $\\\\le$, or $\\\\ge$), representing the baseline status quo."
+        },
+        {
+          "id": "h0_opposite_equality",
+          "text_markdown": "$H_0: \\mu > 16.0\\text{ fl oz}$",
+          "misconception_id": "omitted_equality_in_null",
+          "hint_markdown": "The null hypothesis must include equality to provide a specific parameter anchor for calculating test statistics and p-values."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "h0_correct"
+      },
+      "evidence_concept_ids": [
+        "hypothesis_null_status_quo_formulation"
+      ],
+      "explanation_markdown": "The null hypothesis ($H_0$) represents the baseline status quo—that the manufacturer is adhering to its label claim and bottles average at least $16.0\\text{ fl oz}$. In introductory statistics, it is conventionally written as $H_0: \\mu = 16.0\\text{ fl oz}$ (or $H_0: \\mu \\ge 16.0$), always containing the equality condition.",
+      "numeric_policy": null
+    },
+    {
+      "id": "tail_direction",
+      "kind": "choice",
+      "prompt_markdown": "What tail structure does this hypothesis test possess, and where does the rejection region lie?",
+      "options": [
+        {
+          "id": "tail_correct",
+          "text_markdown": "A left-tailed (lower-tailed) test, where the rejection region consists of unusually small sample means far below $16.0$.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "tail_right",
+          "text_markdown": "A right-tailed (upper-tailed) test, because a large number of underfill complaints was received.",
+          "misconception_id": "confused_tail_direction_with_complaint_count",
+          "hint_markdown": "Test tail direction is determined by the mathematical sign in the alternative hypothesis ($<$, meaning values in the lower tail)."
+        },
+        {
+          "id": "tail_two_sided",
+          "text_markdown": "A two-tailed test, dividing $\\alpha$ equally between both upper and lower tails.",
+          "misconception_id": "belief_all_tests_are_two_tailed",
+          "hint_markdown": "A two-tailed test is used only when any difference in either direction is of interest ($\\\\ne$). Underfilling is strictly directional ($<$)."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "tail_correct"
+      },
+      "evidence_concept_ids": [
+        "hypothesis_tail_direction_identification"
+      ],
+      "explanation_markdown": "Because the alternative hypothesis is $H_1: \\mu < 16.0$, this is a left-tailed (lower-tailed) test. Rejection of $H_0$ occurs only when the observed sample mean $\\bar{x}$ falls sufficiently far below $16.0$ into the lower tail that such a result would be exceedingly unlikely if $H_0$ were true.",
+      "numeric_policy": null
+    }
+  ]
+}

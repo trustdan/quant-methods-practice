@@ -1,0 +1,158 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "mreg_which_predictors_significant",
+  "version": 1,
+  "status": "active",
+  "family_id": "regression_output",
+  "rule_version": 1,
+  "module_id": "module_6",
+  "title": "Evaluating predictor significance in multiple linear regression",
+  "scenario_markdown": "A retail analytics firm estimates store revenue ($Y$, in thousands of dollars) using three predictor variables across $n = 30$ store locations ($k = 3$): store size `Floor_Space` ($X_1$, in thousands of sq ft), proximity `Competitor_Distance` ($X_2$, in miles), and community size `Local_Population` ($X_3$, in thousands of residents). The multiple regression output displays the following results with $df_{\\text{res}} = 30 - 3 - 1 = 26$:\n- Model ANOVA: $SSR = 1200.0$, $SSE = 400.0$, $F = 26.00$ ($p < 0.0001$)\n- `Floor_Space`: $b_1 = 12.50$, $s_{b_1} = 3.20$, $t = 3.906$, $p = 0.0006$\n- `Competitor_Distance`: $b_2 = -4.80$, $s_{b_2} = 2.20$, $t = -2.182$, $p = 0.0384$\n- `Local_Population`: $b_3 = 0.35$, $s_{b_3} = 0.70$, $t = 0.500$, $p = 0.6213$\nEvaluate predictor significance at significance level $\\alpha = 0.05$.",
+  "parameters": {
+    "n": 30,
+    "k": 3,
+    "ssr": 1200.0,
+    "sse": 400.0,
+    "sst": 1600.0,
+    "confidence_level": 0.95,
+    "intercept_name": "Intercept",
+    "b0": 25.0,
+    "se_b0": 5.0,
+    "x1_name": "Floor_Space",
+    "b1": 12.5,
+    "se_b1": 3.2,
+    "x2_name": "Competitor_Distance",
+    "b2": -4.8,
+    "se_b2": 2.2,
+    "x3_name": "Local_Population",
+    "b3": 0.35,
+    "se_b3": 0.7
+  },
+  "assumptions": [
+    "Multiple linear regression model with k = 3 explanatory variables and n = 30 observations",
+    "Residual degrees of freedom df = n - k - 1 = 30 - 3 - 1 = 26",
+    "Individual predictor t-tests test H0: betaj = 0 vs H1: betaj != 0 conditional on all other predictors remaining in the model",
+    "Overall F-test evaluates H0: beta1 = beta2 = beta3 = 0 vs H1: at least one betaj != 0"
+  ],
+  "concept_ids": [
+    "mreg_overall_model_f_vs_individual_t",
+    "mreg_identify_significant_predictors",
+    "mreg_model_refinement_parsimony"
+  ],
+  "setting_group": "retail_store_revenue_multiple_regression",
+  "source_refs": [
+    "Course Module 6: Regression Analysis",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T22:00:00Z",
+    "notes": "Reviewed derivation: n = 30, k = 3, df_res = 26. SSR = 1200, SSE = 400, SST = 1600. R^2 = 0.750, MSR = 400, MSE = 15.3846, F = 26.00 (p < 0.0001). X1 t = 3.906 (p = 0.0006 < 0.05). X2 t = -2.182 (p = 0.0384 < 0.05). X3 t = 0.500 (p = 0.6213 > 0.05). X1 and X2 are statistically significant; X3 is not.",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "overall_f_vs_individual_t",
+      "kind": "choice",
+      "prompt_markdown": "What is the key conceptual difference between the overall model $F$-test ($F = 26.00$, $p < 0.0001$) and the individual coefficient $t$-tests?",
+      "options": [
+        {
+          "id": "f_vs_t_correct",
+          "text_markdown": "The $F$-test evaluates whether the entire set of predictors collectively explains significant variation, whereas each $t$-test assesses the unique partial contribution of an individual predictor given that all other predictors are in the model.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "f_vs_t_all_must_be_sig",
+          "text_markdown": "A significant $F$-test proves that every individual predictor in the equation must also be statistically significant.",
+          "misconception_id": "believed_significant_f_guarantees_all_predictors_significant",
+          "hint_markdown": "A significant F-test only guarantees that *at least one* predictor is non-zero; individual predictors can still have zero effect."
+        },
+        {
+          "id": "f_vs_t_redundant",
+          "text_markdown": "The $F$-test and the individual $t$-tests are completely redundant tests of the exact same hypotheses.",
+          "misconception_id": "believed_multiple_regression_f_and_t_are_identical",
+          "hint_markdown": "In multiple regression ($k > 1$), F and t test different hypotheses. They only coincide when $k = 1$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "f_vs_t_correct"
+      },
+      "evidence_concept_ids": [
+        "mreg_overall_model_f_vs_individual_t"
+      ],
+      "explanation_markdown": "The overall $F$-test evaluates the omnibus null hypothesis $H_0: \\beta_1 = \\beta_2 = \\beta_3 = 0$. Rejection ($p < 0.0001$) confirms that the regression model explains significant variation as a whole. However, individual $t$-tests test $H_0: \\beta_j = 0$ holding all other predictors constant. Individual coefficients may fail to achieve significance even when the overall model is highly significant.",
+      "numeric_policy": null
+    },
+    {
+      "id": "identify_significant_predictors",
+      "kind": "choice",
+      "prompt_markdown": "At the $\\alpha = 0.05$ significance level, which predictor variables are statistically significant?",
+      "options": [
+        {
+          "id": "sig_correct",
+          "text_markdown": "`Floor_Space` ($p = 0.0006$) and `Competitor_Distance` ($p = 0.0384$) only.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "sig_all_three",
+          "text_markdown": "All three predictors, because the overall model $F$-test is significant ($p < 0.0001$).",
+          "misconception_id": "ignored_individual_pvalues_due_to_f",
+          "hint_markdown": "Inspect the individual p-values: `Local_Population` has $p = 0.6213$, which is well above $\\alpha = 0.05$."
+        },
+        {
+          "id": "sig_floor_space_only",
+          "text_markdown": "`Floor_Space` only, because `Competitor_Distance` has a negative coefficient.",
+          "misconception_id": "confused_negative_slope_with_lack_of_significance",
+          "hint_markdown": "A negative coefficient simply indicates an inverse relationship; statistical significance depends on $|t|$ and the p-value ($0.0384 < 0.05$)."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "sig_correct"
+      },
+      "evidence_concept_ids": [
+        "mreg_identify_significant_predictors"
+      ],
+      "explanation_markdown": "We compare each individual two-tailed $p$-value to $\\alpha = 0.05$:\n- `Floor_Space`: $p = 0.0006 < 0.05 \\implies$ Statistically significant positive effect ($+12.50$).\n- `Competitor_Distance`: $p = 0.0384 < 0.05 \\implies$ Statistically significant negative effect ($-4.80$).\n- `Local_Population`: $p = 0.6213 > 0.05 \\implies$ Not statistically significant ($t = 0.50$).",
+      "numeric_policy": null
+    },
+    {
+      "id": "model_refinement",
+      "kind": "choice",
+      "prompt_markdown": "Based on these results and the principle of model parsimony, what is the recommended next modeling step?",
+      "options": [
+        {
+          "id": "refine_drop_x3_correct",
+          "text_markdown": "Remove `Local_Population` from the model and refit a reduced two-predictor model containing only `Floor_Space` and `Competitor_Distance`.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "refine_keep_all",
+          "text_markdown": "Keep all three variables because $R^2 = 0.75$ will decrease if any variable is eliminated.",
+          "misconception_id": "prioritized_raw_r2_over_parsimony_and_adjusted_r2",
+          "hint_markdown": "Adding useless variables inflates raw $R^2$ but penalizes adjusted $R^2$ and degrades model precision. Insignificant predictors should be pruned."
+        },
+        {
+          "id": "refine_drop_x2_due_to_negative",
+          "text_markdown": "Remove `Competitor_Distance` because negative coefficients complicate interpretation.",
+          "misconception_id": "removed_valid_negative_predictor",
+          "hint_markdown": "Negative coefficients reflect legitimate inverse real-world relationships and must not be removed when statistically significant."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "refine_drop_x3_correct"
+      },
+      "evidence_concept_ids": [
+        "mreg_model_refinement_parsimony"
+      ],
+      "explanation_markdown": "In multiple regression, the principle of parsimony favors the simplest model that adequately explains the data. Because `Local_Population` has $p = 0.6213 > 0.05$, it provides no statistically significant marginal explanatory power given the presence of store size and competitor distance. Removing it eliminates noise, preserves degrees of freedom, and often improves adjusted $R^2$ and prediction stability.",
+      "numeric_policy": null
+    }
+  ]
+}

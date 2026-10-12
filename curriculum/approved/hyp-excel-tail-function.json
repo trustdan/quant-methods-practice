@@ -1,0 +1,143 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "hyp_excel_tail_function",
+  "version": 1,
+  "status": "active",
+  "family_id": "concept_check",
+  "rule_version": 1,
+  "module_id": "module_5",
+  "title": "Selecting Excel functions for right-tailed, left-tailed, and two-tailed t-test p-values",
+  "scenario_markdown": "A financial data analyst conducts hypothesis tests on portfolio returns with unknown population variance, calculating a Student's $t$ test statistic with $df = 24$ degrees of freedom:\n\n1. **Hypothesis Test A**: An investment team claims a trading algorithm generates positive excess return ($H_0: \\mu \\le 0$ vs. $H_1: \\mu > 0$), resulting in $t = +2.15$.\n2. **Hypothesis Test B**: A risk auditor investigates whether a new branch underperforms the baseline fee margin ($H_0: \\mu \\ge 5.0$ vs. $H_1: \\mu < 5.0$), resulting in $t = -2.15$.\n3. **Hypothesis Test C**: A compliance officer tests whether average trade execution speed deviates from contractual target ($H_0: \\mu = 100$ vs. $H_1: \\mu \\ne 100$), with observed $|t| = 2.15$.\n\nMatch each alternative hypothesis structure to its exact Excel function syntax (`=T.DIST.RT`, `=T.DIST`, and `=T.DIST.2T`) and avoid syntax errors.",
+  "parameters": {
+    "topic": "hypothesis_testing_software_syntax",
+    "concept": "excel_t_distribution_tail_functions",
+    "objective": "Select the proper Excel distribution function based on the directional tail of the alternative hypothesis"
+  },
+  "assumptions": [
+    "Degrees of freedom df = 24",
+    "Right-tailed tests require the upper survival tail P(T >= t)",
+    "Left-tailed tests require the cumulative lower tail P(T <= t)",
+    "Two-tailed tests require the sum of both tails P(|T| >= |t|)"
+  ],
+  "concept_ids": [
+    "select_excel_right_tailed_function",
+    "select_excel_left_tailed_function",
+    "select_excel_two_tailed_function"
+  ],
+  "setting_group": "financial_portfolio_excel_testing_syntax",
+  "source_refs": [
+    "Course Module 5: Hypothesis Testing",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T23:30:00Z",
+    "notes": "Reviewed Excel syntax rules: H1: mu > mu0 uses T.DIST.RT(t, df); H1: mu < mu0 uses T.DIST(t, df, TRUE); H1: mu != mu0 uses T.DIST.2T(ABS(t), df). Clarified ABS requirement for T.DIST.2T. Completes Row 5.3 at 6/6.",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "right_tailed_function",
+      "kind": "choice",
+      "prompt_markdown": "Which Excel formula correctly computes the $p$-value for **Hypothesis Test A** ($H_1: \\mu > 0$ with $t = +2.15$ and $df = 24$)?",
+      "options": [
+        {
+          "id": "rt_correct",
+          "text_markdown": "**`=T.DIST.RT(2.15, 24)`**: Calculates the right-tail probability $P(T_{24} \\ge 2.15)$ directly.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "rt_cumulative_lower",
+          "text_markdown": "**`=T.DIST(2.15, 24, TRUE)`**: Calculates the area to the right because $t$ is positive.",
+          "misconception_id": "confused_cumulative_distribution_with_right_tail",
+          "hint_markdown": "T.DIST with TRUE always returns cumulative area to the LEFT (lower tail). For an upper tail, you need T.DIST.RT or 1 - T.DIST."
+        },
+        {
+          "id": "rt_inverse_function",
+          "text_markdown": "**`=T.INV(2.15, 24)`**: Computes the right-tail probability from a given critical threshold.",
+          "misconception_id": "confused_inverse_quantile_with_probability_distribution",
+          "hint_markdown": "T.INV takes a probability and returns a t critical cutoff; it cannot take a t statistic to find a p-value."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "rt_correct"
+      },
+      "evidence_concept_ids": [
+        "select_excel_right_tailed_function"
+      ],
+      "explanation_markdown": "For a **right-tailed test** ($H_1: \\mu > \\mu_0$), the $p$-value is the upper-tail probability $P(T \\ge t)$. In modern Excel, `=T.DIST.RT(x, deg_freedom)` directly evaluates the right tail without requiring subtraction from $1$.",
+      "numeric_policy": null
+    },
+    {
+      "id": "left_tailed_function",
+      "kind": "choice",
+      "prompt_markdown": "Which Excel formula correctly computes the $p$-value for **Hypothesis Test B** ($H_1: \\mu < 5.0$ with $t = -2.15$ and $df = 24$)?",
+      "options": [
+        {
+          "id": "lt_correct",
+          "text_markdown": "**`=T.DIST(-2.15, 24, TRUE)`**: Calculates the cumulative left-tail probability $P(T_{24} \\le -2.15)$ directly.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "lt_used_rt_with_negative",
+          "text_markdown": "**`=T.DIST.RT(-2.15, 24)`**: Calculates the left-tail probability by passing a negative test statistic.",
+          "misconception_id": "believed_t_dist_rt_flips_direction_for_negative_values",
+          "hint_markdown": "T.DIST.RT always integrates to the RIGHT (+infinity). Passing -2.15 returns 1 - p-value (approx 0.979) rather than the tiny left tail."
+        },
+        {
+          "id": "lt_omitted_cumulative_flag",
+          "text_markdown": "**`=T.DIST(-2.15, 24, FALSE)`**: Setting cumulative to FALSE finds the left-tail $p$-value.",
+          "misconception_id": "confused_probability_density_height_with_p_value",
+          "hint_markdown": "Setting the third argument to FALSE returns the height of the probability density function f(t), not an area/probability."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "lt_correct"
+      },
+      "evidence_concept_ids": [
+        "select_excel_left_tailed_function"
+      ],
+      "explanation_markdown": "For a **left-tailed test** ($H_1: \\mu < \\mu_0$), the $p$-value is the cumulative lower-tail area $P(T \\le t)$. The function `=T.DIST(x, deg_freedom, cumulative)` with `cumulative = TRUE` returns this lower-tail probability directly: `=T.DIST(-2.15, 24, TRUE)`.",
+      "numeric_policy": null
+    },
+    {
+      "id": "two_tailed_function",
+      "kind": "choice",
+      "prompt_markdown": "Which Excel formula correctly computes the two-tailed $p$-value for **Hypothesis Test C** ($H_1: \\mu \\ne 100$ with observed $t = -2.15$ and $df = 24$)?",
+      "options": [
+        {
+          "id": "tt_correct",
+          "text_markdown": "**`=T.DIST.2T(ABS(-2.15), 24)`** (or `=T.DIST.2T(2.15, 24)`): Returns the two-tailed probability $2 \\times P(T_{24} \\ge 2.15)$, requiring a strictly positive first argument.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "tt_negative_input_crash",
+          "text_markdown": "**`=T.DIST.2T(-2.15, 24)`**: Evaluates both tails directly using the signed test statistic.",
+          "misconception_id": "passed_negative_t_stat_to_t_dist_2t",
+          "hint_markdown": "T.DIST.2T requires x > 0. Passing a negative value like -2.15 causes Excel to return a #NUM! error."
+        },
+        {
+          "id": "tt_divided_by_two",
+          "text_markdown": "**`=T.DIST.2T(2.15, 24) / 2`**: Because it is two-tailed, the Excel result must be halved.",
+          "misconception_id": "divided_two_tailed_function_by_two",
+          "hint_markdown": "T.DIST.2T has ALREADY multiplied the one-tail area by 2. Dividing by 2 converts it back into a one-tailed probability."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "tt_correct"
+      },
+      "evidence_concept_ids": [
+        "select_excel_two_tailed_function"
+      ],
+      "explanation_markdown": "For a **two-tailed test** ($H_1: \\mu \\ne \\mu_0$), the $p$-value is $2 \\times P(T \\ge |t|)$. In Excel, `=T.DIST.2T(x, deg_freedom)` performs this doubling automatically, but **strictly requires $x > 0$**. If your calculated test statistic is negative, you must wrap it in `ABS()`: `=T.DIST.2T(ABS(-2.15), 24)` or `=2 * T.DIST.RT(2.15, 24)`.",
+      "numeric_policy": null
+    }
+  ]
+}

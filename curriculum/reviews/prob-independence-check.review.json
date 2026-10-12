@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "template_id": "prob_independence_check",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T22:30:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "set_probability",
+    "parameters": {
+      "operation": "independence_check",
+      "p_a": 0.4,
+      "p_b": 0.5,
+      "p_intersection": 0.2
+    },
+    "canonical_probability": 0.2,
+    "canonical_rational": "1/5",
+    "moments": {
+      "mean": 0.2,
+      "variance": 0.16,
+      "standard_deviation": 0.4
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "independence_multiplication_test", "kind": "choice", "evidence": "prob_independence_multiplication_test"},
+      {"id": "conditional_invariance_verification", "kind": "choice", "evidence": "prob_independence_conditional_invariance"},
+      {"id": "contrast_cohort2_dependence", "kind": "choice", "evidence": "prob_dependence_cohort_contrast"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Verified mathematically: P(A) = 0.40, P(B) = 0.50. Cohort 1: P(A cap B) = 0.20 = P(A)*P(B) = 0.40 * 0.50, satisfying independence. P(A|B) = 0.20/0.50 = 0.40 = P(A). Cohort 2: P(A cap B) = 0.25 != 0.20, establishing dependence and positive association (P(A|B) = 0.50 > 0.40). Clarifies mutual exclusivity vs independence."
+}

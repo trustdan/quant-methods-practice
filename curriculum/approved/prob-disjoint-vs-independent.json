@@ -1,0 +1,142 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "prob_disjoint_vs_independent",
+  "version": 1,
+  "status": "active",
+  "family_id": "concept_check",
+  "rule_version": 1,
+  "module_id": "module_1",
+  "title": "Proving that mutually exclusive events cannot be independent",
+  "scenario_markdown": "A digital payments platform analyzes payment method selections during retail e-commerce checkout transactions. A customer checking out can pay using either a Credit Card (event $A$) or a Digital Wallet (event $B$). The merchant's point-of-sale architecture does not permit split payments on a single purchase, meaning the two payment methods cannot be used together on the same transaction ($A \\cap B = \\emptyset$).\n\nHistorical analytics show that $60\\%$ of shoppers pay with credit cards ($P(A) = 0.60$) and $30\\%$ pay with digital wallets ($P(B) = 0.30$). A marketing coordinator presents the slide: *'Because payment methods are mutually exclusive, choosing a credit card has no connection to choosing a digital wallet—so events A and B are statistically independent!'*\n\nEvaluate this assertion, prove mathematically why mutually exclusive events with non-zero probabilities cannot be independent, and analyze the conditional probability relationship.",
+  "parameters": {
+    "topic": "probability_rules",
+    "concept": "disjoint_vs_independent_misconception",
+    "objective": "Dispel the misconception that mutually exclusive events are independent, prove that disjoint events with positive probabilities are dependent, and contrast their definitions"
+  },
+  "assumptions": [
+    "Events A and B are mutually exclusive (disjoint) with P(A and B) = 0",
+    "Both events have strictly positive marginal probabilities: P(A) = 0.60 > 0 and P(B) = 0.30 > 0",
+    "Statistical independence requires P(A and B) = P(A) * P(B) and P(B | A) = P(B)"
+  ],
+  "concept_ids": [
+    "mathematical_proof_disjoint_implies_dependent",
+    "conditional_probability_proof_of_dependence",
+    "distinguish_mutually_exclusive_from_independent"
+  ],
+  "setting_group": "ecommerce_checkout_payment_probability_rules",
+  "source_refs": [
+    "Course Module 1: Descriptive Measures & Basic Probability",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T22:30:00Z",
+    "notes": "Reviewed probability proof: Mutually exclusive implies P(A and B) = 0. But if independent, P(A and B) = P(A)*P(B) = 0.60*0.30 = 0.180 != 0. Conditional probability P(B | A) = 0 != P(B) = 0.30 proves that knowing A occurred gives complete information that B cannot occur. Proves disjoint events with non-zero probabilities are always dependent.",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "mathematical_contradiction_proof",
+      "kind": "choice",
+      "prompt_markdown": "What does the multiplication rule prove regarding whether events $A$ and $B$ can be statistically independent?",
+      "options": [
+        {
+          "id": "proof_dependent_zero_ne_product",
+          "text_markdown": "**They cannot be independent**: For mutually exclusive events, $P(A \\cap B) = 0$. But if they were independent, the multiplication rule requires $P(A \\cap B) = P(A) \\times P(B) = 0.60 \\times 0.30 = 0.180$. Because $0 \\ne 0.180$, the events are **dependent**.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "proof_independent_because_disjoint",
+          "text_markdown": "**They are independent**: Mutually exclusive is simply another term for independent, so $P(A \\cap B) = 0$ proves independence.",
+          "misconception_id": "confused_mutually_exclusive_with_independent",
+          "hint_markdown": "Mutually exclusive means $P(A \\cap B) = 0$; independence requires $P(A \\cap B) = P(A) P(B) > 0$. They are completely different concepts."
+        },
+        {
+          "id": "proof_independent_if_sum_le_one",
+          "text_markdown": "**They are independent because $P(A) + P(B) = 0.90 \\le 1.0$**: Any probabilities that sum to less than $1$ are independent.",
+          "misconception_id": "confused_probability_axiom_bounds_with_independence",
+          "hint_markdown": "Probabilities summing to less than $1$ merely confirms that other outcomes exist (e.g. paying with cash or gift cards); it does not establish independence."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "proof_dependent_zero_ne_product"
+      },
+      "evidence_concept_ids": [
+        "mathematical_proof_disjoint_implies_dependent"
+      ],
+      "explanation_markdown": "By definition, if events $A$ and $B$ are **mutually exclusive (disjoint)**, they cannot occur together: $P(A \\cap B) = 0$. However, the mathematical test for **independence** requires that $P(A \\cap B) = P(A) P(B)$. Here, $P(A) P(B) = 0.60 \\times 0.30 = 0.180$. Because $0 \\ne 0.180$, the condition for independence fails. In fact, two mutually exclusive events with non-zero probabilities can **never** be independent.",
+      "numeric_policy": null
+    },
+    {
+      "id": "conditional_probability_perspective",
+      "kind": "choice",
+      "prompt_markdown": "If a customer chooses to pay with a Credit Card (event $A$ has occurred), what is the conditional probability that they pay with a Digital Wallet, $P(B \\mid A)$?",
+      "options": [
+        {
+          "id": "cond_probability_zero",
+          "text_markdown": "**$P(B \\mid A) = 0.000$**: Because split payments are impossible, knowing that $A$ occurred guarantees that $B$ cannot occur. Since $P(B \\mid A) = 0 \\ne P(B) = 0.30$, the events are strongly dependent.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "cond_probability_unaffected",
+          "text_markdown": "**$P(B \\mid A) = 0.300$**: The occurrence of $A$ has zero effect on the probability of $B$.",
+          "misconception_id": "assumed_independence_holds_for_disjoint_events",
+          "hint_markdown": "If $A$ occurs, the customer is paying with a credit card; since they cannot split payments, the chance of paying with a digital wallet drops to zero."
+        },
+        {
+          "id": "cond_probability_sixty",
+          "text_markdown": "**$P(B \\mid A) = 0.600$**: The conditional probability always equals $P(A)$.",
+          "misconception_id": "confused_conditional_probability_with_conditioning_event",
+          "hint_markdown": "$P(B \\mid A) = \\frac{P(A \\cap B)}{P(A)} = \\frac{0}{0.60} = 0$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "cond_probability_zero"
+      },
+      "evidence_concept_ids": [
+        "conditional_probability_proof_of_dependence"
+      ],
+      "explanation_markdown": "By the conditional probability formula, $P(B \\mid A) = \\frac{P(A \\cap B)}{P(A)} = \\frac{0}{0.60} = 0.000$. Before knowing anything about the customer, the probability they use a digital wallet is $P(B) = 0.30$. Once we learn they used a credit card, the probability they used a digital wallet collapses from $0.30$ to $0.00$. Knowing that $A$ occurred provides **maximum information** about $B$, which is the very definition of statistical dependence.",
+      "numeric_policy": null
+    },
+    {
+      "id": "distinguish_definitions",
+      "kind": "choice",
+      "prompt_markdown": "Which summary correctly contrasts the concepts of **mutually exclusive** versus **independent** events?",
+      "options": [
+        {
+          "id": "contrast_correct",
+          "text_markdown": "**Mutually exclusive is about non-overlap; independence is about informational neutrality**: Mutually exclusive means events cannot happen simultaneously ($A \\cap B = \\emptyset$). Independent means the occurrence of one event provides zero information about the probability of the other ($P(B \\mid A) = P(B)$).",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "contrast_same_thing",
+          "text_markdown": "**They are identical concepts**: Statisticians use 'mutually exclusive' for business and 'independent' for scientific research.",
+          "misconception_id": "believed_terms_are_synonyms_across_domains",
+          "hint_markdown": "They are fundamentally different mathematical conditions: mutually exclusive events are actually highly dependent."
+        },
+        {
+          "id": "contrast_always_co_occur",
+          "text_markdown": "**Independent events can never occur separately**: Independent events must always happen at the exact same moment.",
+          "misconception_id": "confused_independent_events_with_identical_events",
+          "hint_markdown": "Independent events can co-occur ($P(A \\cap B) = P(A)P(B) > 0$) or occur separately without affecting each other."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "contrast_correct"
+      },
+      "evidence_concept_ids": [
+        "distinguish_mutually_exclusive_from_independent"
+      ],
+      "explanation_markdown": "The two concepts address entirely different properties:\n- **Mutually exclusive (disjoint)** is an *occurrence condition*: events cannot happen at the same time ($A \\cap B = \\emptyset$, $P(A \\cap B) = 0$). Venn diagrams show two non-overlapping circles.\n- **Independent** is an *informational condition*: learning that $A$ occurred does not change the likelihood of $B$ ($P(B \\mid A) = P(B)$). Venn diagrams show overlapping areas proportional to the product of their individual probabilities.",
+      "numeric_policy": null
+    }
+  ]
+}

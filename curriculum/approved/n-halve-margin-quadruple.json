@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "n_halve_margin_quadruple",
+  "version": 1,
+  "status": "active",
+  "family_id": "concept_check",
+  "rule_version": 1,
+  "module_id": "module_4",
+  "title": "The inverse-square precision scaling law for sample size",
+  "scenario_markdown": "A hospital administration team surveys outpatient waiting times. In the initial survey round, a sample size of $n = 100$ yielded a margin of error of $E = 10\\text{ minutes}$ at the $95\\%$ confidence level. Hospital leadership announces a continuous improvement initiative and requests that the subsequent survey achieve twice the precision, cutting the margin of error in half to $E_{\\text{new}} = 5\\text{ minutes}$, while maintaining the same $95\\%$ confidence level and assuming the population variance $\\sigma^2$ remains unchanged.",
+  "parameters": {
+    "topic": "sample_size_precision_scaling",
+    "concept": "inverse_square_law_for_margin_of_error",
+    "objective": "Understand why halving margin of error requires quadrupling sample size"
+  },
+  "assumptions": [
+    "Population standard deviation sigma and confidence level remain unchanged between surveys",
+    "Finite population correction is negligible"
+  ],
+  "concept_ids": [
+    "sample_size_inverse_square_law",
+    "clt_diminishing_marginal_returns"
+  ],
+  "setting_group": "healthcare_operations_wait_times",
+  "source_refs": [
+    "Course Module 4: Sample Size Determination",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T22:30:00Z",
+    "notes": "Reviewed conceptual relationship between margin of error and sample size. Because n = (z*sigma/E)^2, replacing E with E/2 multiplies n by (1/(1/2))^2 = 4. Highlights diminishing marginal returns in data collection.",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "scaling_multiplier",
+      "kind": "choice",
+      "prompt_markdown": "By what factor must the hospital multiply its initial sample size ($n = 100$) to reduce the margin of error by half (from $10\\text{ minutes}$ to $5\\text{ minutes}$)?",
+      "options": [
+        {
+          "id": "factor_quadruple_correct",
+          "text_markdown": "$4\\times$ (increase sample size to $n = 400$)",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "factor_double",
+          "text_markdown": "$2\\times$ (increase sample size to $n = 200$)",
+          "misconception_id": "linear_scaling_sample_size_misconception",
+          "hint_markdown": "Sample size depends inversely on the square of the margin of error ($n \\propto 1/E^2$), not linearly on $1/E$."
+        },
+        {
+          "id": "factor_sqrt_two",
+          "text_markdown": "$\\sqrt{2} \\approx 1.41\\times$ (increase sample size to $n = 141$)",
+          "misconception_id": "inverted_square_root_scaling",
+          "hint_markdown": "While standard error scales with $1/\\sqrt{n}$, solving for $n$ squares the reciprocal of the margin of error factor: $(2)^2 = 4$."
+        },
+        {
+          "id": "factor_eight",
+          "text_markdown": "$8\\times$ (increase sample size to $n = 800$)",
+          "misconception_id": "cubic_scaling_misconception",
+          "hint_markdown": "The power on the margin of error in the sample size formula is quadratic ($E^2$), not cubic."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "factor_quadruple_correct"
+      },
+      "explanation_markdown": "The sample size formula is $n = \\left(\\frac{z\\sigma}{E}\\right)^2$. If the margin of error is halved to $E' = E/2$, then $n' = \\left(\\frac{z\\sigma}{E/2}\\right)^2 = 4 \\left(\\frac{z\\sigma}{E}\\right)^2 = 4n$. Halving the margin of error requires quadrupling the sample size from $100$ to $400$.",
+      "evidence_concept_ids": [
+        "sample_size_inverse_square_law"
+      ]
+    },
+    {
+      "id": "precision_cost_implication",
+      "kind": "choice",
+      "prompt_markdown": "What fundamental principle of inferential statistics explains why doubling survey precision requires four times as much data?",
+      "options": [
+        {
+          "id": "principle_sqrt_clt_correct",
+          "text_markdown": "Because the standard error of the sample mean decreases only with the square root of sample size ($SE = \\sigma / \\sqrt{n}$), creating diminishing returns to sample size.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "principle_degrees_of_freedom",
+          "text_markdown": "Because degrees of freedom grow slower than the sample size itself.",
+          "misconception_id": "confusing_df_growth_with_se_decay",
+          "hint_markdown": "Degrees of freedom grow linearly ($n-1$), which actually stabilizes critical values rather than creating the quadratic sample requirement."
+        },
+        {
+          "id": "principle_pop_size_exhaustion",
+          "text_markdown": "Because sampling without replacement alters the population variance as the sample grows.",
+          "misconception_id": "attributing_scaling_to_fpc",
+          "hint_markdown": "The quadratic scaling law holds even in infinite or very large populations where FPC does not apply."
+        },
+        {
+          "id": "principle_type_one_error",
+          "text_markdown": "Because the significance level $\\alpha$ must be cut in half whenever the margin of error is halved.",
+          "misconception_id": "conflating_confidence_level_with_margin_of_error",
+          "hint_markdown": "The confidence level (and $\\alpha$) remains unchanged at $95\\%$; the margin of error relates to sample size, not $\\alpha$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "principle_sqrt_clt_correct"
+      },
+      "explanation_markdown": "The Central Limit Theorem dictates that the variability of sample averages shrinks at the rate of $1/\\sqrt{n}$. To cut the spread in half, $\\sqrt{n}$ must double, which requires $n$ to quadruple. This mathematical property produces diminishing marginal returns to data collection in all empirical research.",
+      "evidence_concept_ids": [
+        "clt_diminishing_marginal_returns"
+      ]
+    }
+  ]
+}

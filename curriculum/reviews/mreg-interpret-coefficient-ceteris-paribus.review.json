@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "template_id": "mreg_interpret_coefficient_ceteris_paribus",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T22:30:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "regression_output",
+    "parameters": {
+      "n": 35,
+      "k": 3,
+      "ssr": 3600.0,
+      "sse": 1240.0,
+      "sst": 4840.0,
+      "confidence_level": 0.95,
+      "intercept_name": "Intercept",
+      "b0": 150.0,
+      "se_b0": 25.0,
+      "x1_name": "Square_Footage",
+      "b1": 85.0,
+      "se_b1": 12.0,
+      "x2_name": "Commute_Distance",
+      "b2": -12.0,
+      "se_b2": 3.0,
+      "x3_name": "School_Rating",
+      "b3": 25.0,
+      "se_b3": 5.0
+    },
+    "canonical_probability": 0.0004,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": -12.0,
+      "variance": 9.0,
+      "standard_deviation": 3.0
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "interpret_partial_slope", "kind": "choice", "evidence": "interpret_partial_slope_ceteris_paribus"},
+      {"id": "critique_omission_of_control", "kind": "choice", "evidence": "critique_omission_of_holding_variables_constant"},
+      {"id": "partial_vs_simple_slope", "kind": "choice", "evidence": "distinguish_partial_slope_from_simple_bivariate_slope"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Reviewed partial slope interpretation: b2 = -12.0 indicates an estimated $12,000 decrease in price per additional mile of commute distance, strictly holding square footage and school rating constant. Contrasts with simple regression slope to show how omitted variables and intercorrelations alter coefficient estimates."
+}

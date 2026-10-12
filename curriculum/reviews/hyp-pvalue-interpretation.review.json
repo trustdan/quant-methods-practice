@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "template_id": "hyp_pvalue_interpretation",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T22:30:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "concept_check",
+    "parameters": {
+      "topic": "hypothesis_testing_p_values",
+      "concept": "p_value_frequentist_interpretation_and_misconceptions",
+      "objective": "State the precise frequentist definition of a p-value and debunk the inverse probability and chance fallacies"
+    },
+    "canonical_probability": 0.03,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 0.0,
+      "variance": 1.0,
+      "standard_deviation": 1.0
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "p_value_definition", "kind": "choice", "evidence": "define_p_value_frequentist_conditional"},
+      {"id": "debunk_inverse_probability", "kind": "choice", "evidence": "debunk_inverse_probability_null_is_true_fallacy"},
+      {"id": "debunk_chance_fallacy", "kind": "choice", "evidence": "debunk_p_value_chance_fallacy"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Reviewed conceptual alignment: Evaluates p-value = 0.030. Establishes the correct conditional definition P(data at least as extreme | H0 is true). Debunks the pervasive inverse probability fallacy P(H0 is true | data) = 0.03 and the chance fallacy."
+}

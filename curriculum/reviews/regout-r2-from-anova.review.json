@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "template_id": "regout_r2_from_anova",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T22:00:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "regression_output",
+    "parameters": {
+      "n": 25,
+      "k": 1,
+      "ssr": 450.0,
+      "sse": 150.0,
+      "sst": 600.0,
+      "confidence_level": 0.95,
+      "intercept_name": "Intercept",
+      "b0": 15.0,
+      "se_b0": 2.5,
+      "x1_name": "Advertising",
+      "b1": 4.1533119,
+      "se_b1": 0.50
+    },
+    "canonical_probability": 0.75,
+    "canonical_rational": "3/4",
+    "moments": {
+      "mean": 0.75,
+      "variance": 0.0,
+      "standard_deviation": 0.0
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "r2_computation", "kind": "choice", "evidence": "regout_r2_computation_anova"},
+      {"id": "r2_interpretation", "kind": "choice", "evidence": "regout_r2_interpretation_variance_explained"},
+      {"id": "multiple_r_link", "kind": "choice", "evidence": "regout_multiple_r_correlation_link"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Verified mathematically: n = 25, k = 1, SSR = 450, SSE = 150, SST = 600. R^2 = 450/600 = 0.750. Multiple R = sqrt(0.75) = 0.8660. df_res = 23, MSE = 150/23 = 6.521739. F = 450 / 6.521739 = 69.0. t_slope = 4.1533119 / 0.5 = 8.30662. t^2 = 69.00 = F. All ANOVA identities and simple regression consistency checks pass exactly."
+}

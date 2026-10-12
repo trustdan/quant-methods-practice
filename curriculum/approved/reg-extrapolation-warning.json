@@ -1,0 +1,142 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "reg_extrapolation_warning",
+  "version": 1,
+  "status": "active",
+  "family_id": "concept_check",
+  "rule_version": 1,
+  "module_id": "module_6",
+  "title": "Danger of extrapolation beyond the observed predictor range",
+  "scenario_markdown": "A chemical process development team studies the relationship between reaction temperature ($X$, in degrees Celsius) and product yield ($Y$, in kilograms per batch). Using experimental pilot runs, they fit an Ordinary Least Squares regression model across $n = 15$ test batches:\n\n$$\\hat{y} = 15.0 + 1.80x, \\quad R^2 = 0.92$$\n\n$$\\text{Observed sample range of temperature: } 20.0^\\circ\\text{C} \\le x \\le 60.0^\\circ\\text{C}$$\n\nAn operations manager wants to maximize production and calculates a predicted yield for a proposed industrial run at $x = 120.0^\\circ\\text{C}$:\n\n$$\\hat{y} = 15.0 + 1.80(120.0) = 231.0\\text{ kg}$$\n\nCritique this prediction and analyze the statistical risks of making predictions outside the experimental data range.",
+  "parameters": {
+    "topic": "linear_regression",
+    "concept": "regression_extrapolation_and_relevant_range",
+    "objective": "Identify extrapolation beyond the relevant range of predictor data and explain why linear regression predictions outside the sample range are invalid"
+  },
+  "assumptions": [
+    "Observed sample predictor values strictly span [20.0, 60.0] degrees Celsius",
+    "Proposed target temperature x = 120.0 degrees Celsius lies far outside the sample domain",
+    "Linear regression fits the relationship only within the relevant range of observed data"
+  ],
+  "concept_ids": [
+    "diagnose_extrapolation_beyond_relevant_range",
+    "explain_physical_and_statistical_risks_of_extrapolation",
+    "define_relevant_range_principle"
+  ],
+  "setting_group": "chemical_yield_reaction_temperature_extrapolation",
+  "source_refs": [
+    "Course Module 6: Regression Analysis",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T22:30:00Z",
+    "notes": "Reviewed conceptual alignment: Observed range is 20 to 60 deg C. Predicting at x = 120 deg C is severe extrapolation. High R^2 = 0.92 only validates linearity within the observed range. Explains why physical processes break down (decomposition, phase change) and why statistical confidence bands expand hyperbolically outside the sample mean.",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "diagnose_extrapolation",
+      "kind": "choice",
+      "prompt_markdown": "Why is the manager's prediction of $\\hat{y} = 231.0\\text{ kg}$ at $x = 120.0^\\circ\\text{C}$ statistically hazardous and unreliable?",
+      "options": [
+        {
+          "id": "extrapolation_outside_range",
+          "text_markdown": "**It is severe extrapolation**: $120.0^\\circ\\text{C}$ lies far beyond the observed data range ($[20.0^\\circ\\text{C}, 60.0^\\circ\\text{C}]$), and there is zero empirical evidence that the linear relationship holds at that extreme temperature.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "extrapolation_arithmetic_wrong",
+          "text_markdown": "**The arithmetic calculation is incorrect**: $15.0 + 1.80(120.0)$ equals $185.0$, not $231.0$.",
+          "misconception_id": "believed_extrapolation_is_an_arithmetic_mistake",
+          "hint_markdown": "The arithmetic $15.0 + 216.0 = 231.0$ is correct; the error is applying the equation outside the domain of observed data."
+        },
+        {
+          "id": "extrapolation_invalid_r2",
+          "text_markdown": "**$R^2 = 0.92$ is too low**: A regression model cannot be used for any predictions unless $R^2$ is at least $0.99$.",
+          "misconception_id": "believed_r2_must_exceed_099_for_prediction",
+          "hint_markdown": "$R^2 = 0.92$ represents very strong fit within the sample; the defect is predicting outside the sample range."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "extrapolation_outside_range"
+      },
+      "evidence_concept_ids": [
+        "diagnose_extrapolation_beyond_relevant_range"
+      ],
+      "explanation_markdown": "This is a classic case of **extrapolation**. A regression line is only validated within the **relevant range** of the independent variable ($20.0^\\circ\\text{C} \\le x \\le 60.0^\\circ\\text{C}$). Assuming that the identical linear relationship continues unchanged up to $120.0^\\circ\\text{C}$ (double the maximum observed temperature) has zero empirical foundation.",
+      "numeric_policy": null
+    },
+    {
+      "id": "physical_and_statistical_risks",
+      "kind": "choice",
+      "prompt_markdown": "What physical and statistical phenomena typically occur when extrapolating regression models beyond the observed data?",
+      "options": [
+        {
+          "id": "risks_curvature_and_expanding_error",
+          "text_markdown": "**Non-linear curvature and ballooning prediction variance**: Physical relationships often saturate or reverse (e.g., chemical degradation or boiling at extreme temperatures), while prediction interval width expands hyperbolically as $x$ moves away from $\\bar{x}$.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "risks_intercept_becomes_negative",
+          "text_markdown": "**The intercept automatically changes sign**: Calculating a high prediction forces $b_0$ to become negative in future runs.",
+          "misconception_id": "believed_predictions_retroactively_change_fitted_coefficients",
+          "hint_markdown": "Making predictions does not alter the already-estimated coefficients $b_0$ and $b_1$."
+        },
+        {
+          "id": "risks_r_squared_drops_to_zero",
+          "text_markdown": "**$R^2$ drops to zero immediately**: The software retroactively deletes the model.",
+          "misconception_id": "confused_model_diagnostics_with_runtime_execution",
+          "hint_markdown": "$R^2$ describes sample variance explained; the risk is that the model's predictions at extreme $x$ will be drastically wrong."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "risks_curvature_and_expanding_error"
+      },
+      "evidence_concept_ids": [
+        "explain_physical_and_statistical_risks_of_extrapolation"
+      ],
+      "explanation_markdown": "In real-world applications, processes that appear linear over a narrow experimental window frequently exhibit **diminishing returns, plateaus, or catastrophic breakdown** at extreme values (e.g. at $120^\\circ\\text{C}$, the solvent may boil away or the product may decompose). Statistically, standard error of prediction is proportional to $\\sqrt{1 + \\frac{1}{n} + \\frac{(x^* - \\bar{x})^2}{SS_{xx}}}$, which grows quadratically as $x^*$ moves away from $\\bar{x}$.",
+      "numeric_policy": null
+    },
+    {
+      "id": "relevant_range_principle",
+      "kind": "choice",
+      "prompt_markdown": "What is the sound methodological rule regarding the application of regression models for prediction?",
+      "options": [
+        {
+          "id": "rule_stay_within_relevant_range",
+          "text_markdown": "**Restrict predictions to the relevant range**: Linear regression should only be used to interpolate predictions within or immediately adjacent to the range of observed values of the independent variable.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "rule_any_positive_value_allowed",
+          "text_markdown": "**Any positive value is valid**: As long as $x > 0$, linear models are globally valid across all positive numbers.",
+          "misconception_id": "believed_regression_is_globally_valid_for_positive_numbers",
+          "hint_markdown": "Empirical regression models are local linear approximations, not universal physical laws."
+        },
+        {
+          "id": "rule_only_exact_sample_points",
+          "text_markdown": "**Only predict at exact points in the dataset**: Predictions cannot be made for any $x$ value that was not explicitly included in the sample.",
+          "misconception_id": "believed_interpolation_is_also_invalid",
+          "hint_markdown": "Interpolation (predicting between observed data points, such as $x = 35^\\circ\\text{C}$) is the primary valid purpose of regression."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "rule_stay_within_relevant_range"
+      },
+      "evidence_concept_ids": [
+        "define_relevant_range_principle"
+      ],
+      "explanation_markdown": "The foundational principle of regression prediction is that an empirical model is valid only within the **relevant range** $[x_{\\min}, x_{\\max}]$ of the sampled explanatory variable. Predicting inside this interval is valid **interpolation**. Predicting outside this interval is dangerous **extrapolation** and should be avoided unless verified by additional domain theory or empirical data.",
+      "numeric_policy": null
+    }
+  ]
+}

@@ -110,3 +110,43 @@ func TestDisjointnessDoesNotImplyIndependence(t *testing.T) {
 		t.Errorf("Independent events with positive probability are not disjoint")
 	}
 }
+
+func TestMultiplicationIndependentEvents(t *testing.T) {
+	prod, err := mathengine.Multiplication(0.90, 0.85)
+	if err != nil {
+		t.Fatalf("Multiplication(0.90, 0.85) failed: %v", err)
+	}
+	want := 0.765
+	if math.Abs(prod-want) > 1e-12 {
+		t.Errorf("Multiplication(0.90, 0.85) = %v, want %v", prod, want)
+	}
+
+	// Range error cases
+	if _, err := mathengine.Multiplication(-0.1, 0.5); err == nil {
+		t.Errorf("Expected error for negative pA, got nil")
+	}
+	if _, err := mathengine.Multiplication(0.5, 1.1); err == nil {
+		t.Errorf("Expected error for pB > 1, got nil")
+	}
+}
+
+func TestTotalProbabilityAndBayes(t *testing.T) {
+	// Plant 1 (60%, 2% defect) vs Plant 2 (40%, 5% defect)
+	// P(D) = 0.60(0.02) + 0.40(0.05) = 0.012 + 0.020 = 0.032
+	// P(Plant 2 | D) = 0.020 / 0.032 = 0.625
+	tot, err := mathengine.TotalProbability2(0.60, 0.40, 0.02, 0.05)
+	if err != nil {
+		t.Fatalf("TotalProbability2 failed: %v", err)
+	}
+	if math.Abs(tot-0.032) > 1e-9 {
+		t.Errorf("expected total probability 0.032, got %v", tot)
+	}
+
+	bayes2, err := mathengine.Bayes2(0.60, 0.40, 0.02, 0.05, 2)
+	if err != nil {
+		t.Fatalf("Bayes2 failed: %v", err)
+	}
+	if math.Abs(bayes2-0.625) > 1e-9 {
+		t.Errorf("expected Bayes posterior 0.625, got %v", bayes2)
+	}
+}

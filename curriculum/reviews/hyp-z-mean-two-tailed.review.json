@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "template_id": "hyp_z_mean_two_tailed",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T22:00:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "hypothesis_test",
+    "parameters": {
+      "test_type": "mean_z",
+      "null_value": 2.0,
+      "sample_stat": 2.02,
+      "sigma": 0.05,
+      "n": 36,
+      "alpha": 0.05,
+      "tail": "two_tailed"
+    },
+    "canonical_probability": 0.016395,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 2.02,
+      "variance": 0.0025,
+      "standard_deviation": 0.05
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "test_statistic_calc", "kind": "choice", "evidence": "hyp_z_test_statistic_calculation"},
+      {"id": "pvalue_calc", "kind": "choice", "evidence": "hyp_two_tailed_pvalue_calculation"},
+      {"id": "decision_and_conclusion", "kind": "choice", "evidence": "hyp_statistical_decision_and_conclusion"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Verified mathematically: null_mu = 2.00, x_bar = 2.02, sigma = 0.05, n = 36. SE = 0.05 / 6 = 0.0083333. Z = 2.40. One-tail area = 0.0081975, two-tail p-value = 0.016395. Critical Z* = 1.959964. Decision: reject H0 at alpha = 0.05 since p < 0.05 and |Z| > 1.960. Excel: =2*(1 - NORM.S.DIST(2.40, TRUE))."
+}

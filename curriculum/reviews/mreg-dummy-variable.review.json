@@ -1,0 +1,74 @@
+{
+  "delegation_basis": "User explicitly replied on October 11, 2026 (America/Chicago): Yes—delegate review and activate after checks pass. Approval follows successful Go mathematical, bank admission, every-option grading and snapshot checks; assistant semantic review does not claim personal user reading.",
+  "mathematical_audit": {
+    "engine_quantities": {
+      "adjusted_r2": 0.71,
+      "b1": 3,
+      "b2": 8,
+      "f": 36.5,
+      "p1": 0.0000021156505642639145,
+      "p2": 0.0004425691414541574,
+      "p_f": 2.1057694276511805e-8,
+      "prediction": 58,
+      "r2": 0.73,
+      "se": 3.1622776601683795
+    },
+    "family_id": "regression_output",
+    "four_decimal_choice_collision_check": "passed for calculation-bound stages",
+    "parameters": {
+      "model": {
+        "confidence_level": 0.95,
+        "intercept": {
+          "coeff": 20,
+          "name": "Intercept",
+          "std_err": 2
+        },
+        "k": 2,
+        "n": 30,
+        "predictors": [
+          {
+            "coeff": 3,
+            "name": "Advertising",
+            "std_err": 0.5
+          },
+          {
+            "coeff": 8,
+            "name": "Urban",
+            "std_err": 2
+          }
+        ],
+        "sse": 270,
+        "ssr": 730
+      },
+      "operation": "model",
+      "x": [
+        10,
+        1
+      ]
+    },
+    "rule_version": 2
+  },
+  "notes": "Assistant reviewed the complete scenario, stage wording, all options, causal hints and worked explanations. Numerical choices are independently bound to Go engine quantities under rule v2; conceptual choices are semantically reviewed. Fixed parameters only; no cosmetic variation claimed as transfer. Stated course conventions remain unconfirmed where applicable. Validated one-to-one concept evidence, rejected ambiguous numeric distractors, and tested every option after snapshot serialization.",
+  "pedagogical_audit": {
+    "assumptions": [
+      "Rural stores (D=0) form the reference category; urban stores have D=1.",
+      "The model is additive with a common advertising slope and no interaction.",
+      "Indicator-variable teaching is generic pending course confirmation; association alone is not causal."
+    ],
+    "concept_count": 3,
+    "full_preview": "docs/REMAINING-CONTENT-REVIEW.md",
+    "one_to_one_evidence_mapping": true,
+    "review_scope": "Complete scenario, options, diagnostic hints and explanations reviewed by assistant under explicit user delegation; no user personal reading claimed.",
+    "sources": [
+      "docs/COURSE-MAP.md: learner-supplied module objectives, October 11, 2026",
+      "docs/CONTENT-BACKLOG.md: mreg-dummy-variable"
+    ],
+    "stage_count": 3
+  },
+  "review_status": "approved",
+  "reviewed_at": "2026-10-12T04:32:26.275462Z",
+  "reviewer": "codex_delegated_final_waves",
+  "schema_version": 1,
+  "template_id": "mreg_dummy_variable",
+  "template_version": 1
+}

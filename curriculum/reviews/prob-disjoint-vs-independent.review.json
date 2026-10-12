@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "template_id": "prob_disjoint_vs_independent",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T22:30:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "concept_check",
+    "parameters": {
+      "topic": "probability_rules",
+      "concept": "disjoint_vs_independent_misconception",
+      "objective": "Dispel the misconception that mutually exclusive events are independent, prove that disjoint events with positive probabilities are dependent, and contrast their definitions"
+    },
+    "canonical_probability": 0.0,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 0.6,
+      "variance": 0.24,
+      "standard_deviation": 0.4899
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "mathematical_contradiction_proof", "kind": "choice", "evidence": "mathematical_proof_disjoint_implies_dependent"},
+      {"id": "conditional_probability_perspective", "kind": "choice", "evidence": "conditional_probability_proof_of_dependence"},
+      {"id": "distinguish_definitions", "kind": "choice", "evidence": "distinguish_mutually_exclusive_from_independent"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Reviewed probability proof: Mutually exclusive implies P(A and B) = 0. But if independent, P(A and B) = P(A)*P(B) = 0.60*0.30 = 0.180 != 0. Conditional probability P(B | A) = 0 != P(B) = 0.30 proves that knowing A occurred gives complete information that B cannot occur. Proves disjoint events with non-zero probabilities are always dependent."
+}

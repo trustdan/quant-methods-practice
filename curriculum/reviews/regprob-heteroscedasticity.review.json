@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "template_id": "regprob_heteroscedasticity",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T22:30:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "concept_check",
+    "parameters": {
+      "topic": "regression_diagnostics",
+      "concept": "heteroscedasticity_non_constant_variance",
+      "objective": "Identify heteroscedasticity from a fan-shaped residual plot, analyze its impact on standard errors and hypothesis tests, and prescribe remedies"
+    },
+    "canonical_probability": 0.05,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 0.0,
+      "variance": 1.0,
+      "standard_deviation": 1.0
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "diagnose_assumption_violation", "kind": "choice", "evidence": "diagnose_heteroscedasticity_from_fan_plot"},
+      {"id": "consequences_for_inference", "kind": "choice", "evidence": "evaluate_consequences_of_heteroscedasticity_on_inference"},
+      {"id": "prescribe_remedies", "kind": "choice", "evidence": "prescribe_remedies_for_heteroscedasticity"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Reviewed conceptual alignment: Fan-shaped residual plot indicates heteroscedasticity (violation of constant error variance). Point estimates b0, b1 remain unbiased, but standard errors are biased, invalidating t-tests and confidence intervals. Prescribes logarithmic transformation or robust standard errors."
+}

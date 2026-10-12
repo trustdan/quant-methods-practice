@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "template_id": "desc_cv_compare_stocks",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T23:10:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "descriptive_stats",
+    "parameters": {
+      "operation": "coefficient_of_variation",
+      "mean_a": 12.0,
+      "sd_a": 4.0,
+      "cv_a": 33.33333,
+      "mean_b": 4.0,
+      "sd_b": 2.0,
+      "cv_b": 50.0
+    },
+    "canonical_probability": 0.5,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 8.0,
+      "variance": 16.0,
+      "standard_deviation": 4.0
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "compute_cv_fund_a", "kind": "choice", "evidence": "compute_coefficient_of_variation_fund_a"},
+      {"id": "compute_cv_fund_b", "kind": "choice", "evidence": "compute_coefficient_of_variation_fund_b"},
+      {"id": "evaluate_relative_risk", "kind": "choice", "evidence": "evaluate_relative_dispersion_investment_risk"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Reviewed coefficient of variation: CV_A = 4/12 = 33.33%, CV_B = 2/4 = 50.00%. Identifies that Fund B carries higher relative volatility per unit of expected return despite having smaller raw standard deviation."
+}

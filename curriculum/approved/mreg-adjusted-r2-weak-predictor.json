@@ -1,0 +1,201 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "mreg_adjusted_r2_weak_predictor",
+  "version": 1,
+  "status": "active",
+  "family_id": "regression_output",
+  "rule_version": 2,
+  "module_id": "module_6",
+  "title": "A weak predictor can reduce adjusted R-squared",
+  "scenario_markdown": "Using the same 30 cafes and response (SST=1000), a model with advertising and price has k=2, SSR=700, SSE=300. Adding window count gives k=3, SSR=702, SSE=298. Both models have intercepts. Decide whether the small fit improvement offsets the extra predictor under adjusted R-squared.",
+  "parameters": {
+    "model": {
+      "confidence_level": 0.95,
+      "intercept": {
+        "coeff": 20,
+        "name": "Intercept",
+        "std_err": 2
+      },
+      "k": 2,
+      "n": 30,
+      "predictors": [
+        {
+          "coeff": 3,
+          "name": "Advertising",
+          "std_err": 0.6
+        },
+        {
+          "coeff": -2,
+          "name": "Price",
+          "std_err": 0.5
+        }
+      ],
+      "sse": 300,
+      "ssr": 700
+    },
+    "model_b": {
+      "confidence_level": 0.95,
+      "intercept": {
+        "coeff": 20,
+        "name": "Intercept",
+        "std_err": 2
+      },
+      "k": 3,
+      "n": 30,
+      "predictors": [
+        {
+          "coeff": 3,
+          "name": "Advertising",
+          "std_err": 0.6
+        },
+        {
+          "coeff": -2,
+          "name": "Price",
+          "std_err": 0.5
+        },
+        {
+          "coeff": 0.1,
+          "name": "WindowCount",
+          "std_err": 0.239390251
+        }
+      ],
+      "sse": 298,
+      "ssr": 702
+    },
+    "operation": "compare_models"
+  },
+  "assumptions": [
+    "These are nested least-squares models on the identical response rows.",
+    "Adjusted R-squared penalizes added predictors through residual degrees of freedom.",
+    "Predictor retention may also depend on a pre-specified purpose and subject knowledge."
+  ],
+  "concept_ids": [
+    "weak_predictor_raw_r2",
+    "weak_predictor_adjusted_r2",
+    "weak_predictor_retention_decision"
+  ],
+  "setting_group": "cafe_weak_window_predictor",
+  "source_refs": [
+    "docs/COURSE-MAP.md: learner-supplied module objectives, October 11, 2026",
+    "docs/CONTENT-BACKLOG.md: mreg-adjusted-r2-weak-predictor"
+  ],
+  "approval": {
+    "reviewer": "codex_delegated_final_waves",
+    "reviewed_at": "2026-10-12T04:32:26.275462Z",
+    "delegation_basis": "User explicitly replied on October 11, 2026 (America/Chicago): Yes—delegate review and activate after checks pass. Approval follows successful Go mathematical, bank admission, every-option grading and snapshot checks; assistant semantic review does not claim personal user reading.",
+    "notes": "Assistant reviewed the complete scenario, stage wording, all options, causal hints and worked explanations. Numerical choices are independently bound to Go engine quantities under rule v2; conceptual choices are semantically reviewed. Fixed parameters only; no cosmetic variation claimed as transfer. Stated course conventions remain unconfirmed where applicable. Validated one-to-one concept evidence, rejected ambiguous numeric distractors, and tested every option after snapshot serialization."
+  },
+  "stages": [
+    {
+      "calculation": "r2_b",
+      "id": "weak_predictor_raw_r2",
+      "kind": "choice",
+      "prompt_markdown": "What is ordinary R-squared after adding window count? Select the value rounded to four decimal places.",
+      "options": [
+        {
+          "numeric_value": 0.702,
+          "id": "supported",
+          "text_markdown": "$0.7020$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "numeric_value": 0.7,
+          "id": "misconception_a",
+          "text_markdown": "$0.7000$",
+          "misconception_id": "weak_predictor_raw_r2_a",
+          "hint_markdown": "Use the new SSR and SSE."
+        },
+        {
+          "numeric_value": 0.298,
+          "id": "misconception_b",
+          "text_markdown": "$0.2980$",
+          "misconception_id": "weak_predictor_raw_r2_b",
+          "hint_markdown": "SSE/SST is the unexplained fraction."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "supported"
+      },
+      "evidence_concept_ids": [
+        "weak_predictor_raw_r2"
+      ],
+      "explanation_markdown": "$R_B^2=702/1000=0.7020$. An added predictor in nested OLS cannot lower ordinary R-squared. Excel: `=702/1000`.",
+      "numeric_policy": null
+    },
+    {
+      "calculation": "adjusted_r2_b",
+      "id": "weak_predictor_adjusted_r2",
+      "kind": "choice",
+      "prompt_markdown": "What is adjusted R-squared after adding window count? Select the value rounded to four decimal places.",
+      "options": [
+        {
+          "numeric_value": 0.6676153846153847,
+          "id": "supported",
+          "text_markdown": "$0.6676$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "numeric_value": 0.702,
+          "id": "misconception_a",
+          "text_markdown": "$0.7020$",
+          "misconception_id": "weak_predictor_adjusted_r2_a",
+          "hint_markdown": "Adjusted R-squared includes a predictor penalty."
+        },
+        {
+          "numeric_value": 0.6777777778,
+          "id": "misconception_b",
+          "text_markdown": "$0.6778$",
+          "misconception_id": "weak_predictor_adjusted_r2_b",
+          "hint_markdown": "That is the adjusted value before adding the predictor."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "supported"
+      },
+      "evidence_concept_ids": [
+        "weak_predictor_adjusted_r2"
+      ],
+      "explanation_markdown": "$\\bar R_B^2=1-(298/26)/(1000/29)=0.6676$. Before addition it was $1-(300/27)/(1000/29)=0.6778$.",
+      "numeric_policy": null
+    },
+    {
+      "id": "weak_predictor_retention_decision",
+      "kind": "choice",
+      "prompt_markdown": "If adjusted fit is the stated criterion, what does the comparison support?",
+      "options": [
+        {
+          "id": "supported",
+          "text_markdown": "Prefer the simpler model: the small SSE decrease does not offset the loss of one residual degree of freedom.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "misconception_a",
+          "text_markdown": "Keep every new predictor whenever ordinary R-squared increases.",
+          "misconception_id": "weak_predictor_retention_decision_a",
+          "hint_markdown": "Ordinary R-squared rewards added flexibility even when improvement is negligible."
+        },
+        {
+          "id": "misconception_b",
+          "text_markdown": "Window count has been proved to have exactly zero population effect.",
+          "misconception_id": "weak_predictor_retention_decision_b",
+          "hint_markdown": "A weak sample contribution is not proof of a zero population coefficient."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "supported"
+      },
+      "evidence_concept_ids": [
+        "weak_predictor_retention_decision"
+      ],
+      "explanation_markdown": "Adjusted R-squared falls from 0.6778 to 0.6676. This criterion favors the simpler model, while theoretical controls or prediction goals could justify a different choice. It is not an automatic deletion rule for every setting.",
+      "numeric_policy": null
+    }
+  ]
+}

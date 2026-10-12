@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "hyp_steps_and_conclusion",
+  "version": 1,
+  "status": "active",
+  "family_id": "concept_check",
+  "rule_version": 1,
+  "module_id": "module_5",
+  "title": "The 5-step hypothesis testing protocol and concluding without accepting the null",
+  "scenario_markdown": "A financial auditor tests whether the mean loan origination processing time at a regional bank conforms to the service-level target of $\\mu = 100\\text{ hours}$ ($H_0: \\mu = 100$ vs $H_1: \\mu \\ne 100$). Using a sample of $n = 45$ loan files, the test produces a $p$-value of $0.18$. At the designated significance level of $\\alpha = 0.05$, the junior auditor writes in the official audit report: \"Because the $p$-value of $0.18$ exceeds $\\alpha = 0.05$, we accept the null hypothesis and have proven that the mean processing time equals exactly $100$ hours.\"",
+  "parameters": {
+    "topic": "hypothesis_testing_procedure",
+    "concept": "fail_to_reject_vs_accept_null",
+    "objective": "Understand decision rule and conclude without falsely accepting the null"
+  },
+  "assumptions": [
+    "Significance level alpha = 0.05 is chosen prior to examining the data",
+    "Independent random sample of loan processing times"
+  ],
+  "concept_ids": [
+    "hyp_fail_to_reject_vs_accept_null",
+    "hyp_five_step_procedure_ordering"
+  ],
+  "setting_group": "financial_banking_audit_operations",
+  "source_refs": [
+    "Course Module 5: Hypothesis Testing",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T22:30:00Z",
+    "notes": "Reviewed conceptual question on the decision rule and phrasing of conclusions. Highlights the classic trap of 'accepting H0 as proof of truth' versus 'failing to reject H0 due to lack of contrary evidence', along with the standard 5-step hypothesis testing framework.",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "evaluate_auditor_conclusion",
+      "kind": "choice",
+      "prompt_markdown": "What is the fundamental statistical flaw in the junior auditor's report conclusion?",
+      "options": [
+        {
+          "id": "conclusion_fail_to_reject_correct",
+          "text_markdown": "We never \"accept\" $H_0$ as proven fact; we only \"fail to reject\" $H_0$. A large $p$-value simply means the sample data does not provide sufficient evidence to refute the null hypothesis.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "conclusion_inverted_decision",
+          "text_markdown": "The auditor should have rejected $H_0$ because a $p$-value of $0.18$ represents an $18\\%$ chance of an extreme result, which is large.",
+          "misconception_id": "inverted_p_value_decision_rule",
+          "hint_markdown": "The decision rule rejects $H_0$ only when $p \\le \\alpha$. When $p > \\alpha$, we fail to reject $H_0$."
+        },
+        {
+          "id": "conclusion_alpha_manipulation",
+          "text_markdown": "The conclusion is invalid only because the auditor forgot to raise $\\alpha$ to $0.20$ so that the null could be rejected.",
+          "misconception_id": "p_hacking_alpha_manipulation",
+          "hint_markdown": "Significance level $\\alpha$ must be fixed before data analysis; post-hoc adjustment to force rejection is invalid p-hacking."
+        },
+        {
+          "id": "conclusion_sample_size_flaw",
+          "text_markdown": "The conclusion is flawed because two-tailed tests cannot be conducted with sample sizes less than $100$.",
+          "misconception_id": "arbitrary_sample_size_hurdle_for_tests",
+          "hint_markdown": "Hypothesis tests are valid for any sample size where distribution assumptions or the CLT ($n = 45 \\ge 30$) hold."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "conclusion_fail_to_reject_correct"
+      },
+      "explanation_markdown": "Hypothesis testing operates under the presumption of innocence for $H_0$. Failing to find sufficient evidence against $H_0$ ($p = 0.18 > 0.05$) does not prove $H_0$ is true\u2014just as a verdict of \"not guilty\" in a courtroom means \"not proven guilty beyond a reasonable doubt,\" not \"proven innocent.\" We state: \"We fail to reject $H_0$. There is insufficient evidence to conclude that the true mean processing time differs from $100$ hours.\"",
+      "evidence_concept_ids": [
+        "hyp_fail_to_reject_vs_accept_null"
+      ]
+    },
+    {
+      "id": "five_step_sequence",
+      "kind": "choice",
+      "prompt_markdown": "What is the standard, logically sound chronological sequence for conducting a hypothesis test?",
+      "options": [
+        {
+          "id": "sequence_correct",
+          "text_markdown": "1. State $H_0$ and $H_1$ $\\to$ 2. Specify $\\alpha$ $\\to$ 3. Collect data and compute test statistic & $p$-value $\\to$ 4. Apply decision rule ($p \\le \\alpha$) $\\to$ 5. State managerial conclusion in context.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "sequence_p_first",
+          "text_markdown": "1. Compute $p$-value $\\to$ 2. Choose $\\alpha$ smaller than $p$ $\\to$ 3. State $H_0$ $\\to$ 4. State $H_1$ $\\to$ 5. Conclude.",
+          "misconception_id": "data_snooping_reversed_testing_order",
+          "hint_markdown": "Hypotheses and $\\alpha$ must be determined before calculating test statistics to prevent confirmation bias."
+        },
+        {
+          "id": "sequence_skip_alpha",
+          "text_markdown": "1. State $H_0$ and $H_1$ $\\to$ 2. Compute sample mean $\\to$ 3. Reject $H_0$ if sample mean differs from $\\mu_0$ $\\to$ 4. Choose $\\alpha$ $\\to$ 5. Report.",
+          "misconception_id": "omitted_formal_decision_rule_and_sampling_error",
+          "hint_markdown": "Hypothesis testing requires standardizing sampling error through a test statistic and comparing against a pre-established $\\alpha$."
+        },
+        {
+          "id": "sequence_conclusion_before_decision",
+          "text_markdown": "1. State business goal $\\to$ 2. Decide to reject or accept $H_0$ $\\to$ 3. State $H_0$ and $H_1$ $\\to$ 4. Calculate $Z$ $\\to$ 5. Confirm conclusion.",
+          "misconception_id": "predetermined_outcome_testing_bias",
+          "hint_markdown": "A test must remain objective; the decision to reject or fail to reject must strictly follow the comparison of $p$-value to $\\alpha$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "sequence_correct"
+      },
+      "explanation_markdown": "The formal 5-step hypothesis testing framework is: (1) Formulate null and alternative hypotheses, (2) Specify the significance level $\\alpha$, (3) Gather sample data and calculate the standardized test statistic and corresponding $p$-value, (4) Make the statistical decision by comparing $p$-value to $\\alpha$, and (5) State the managerial conclusion in the specific business context.",
+      "evidence_concept_ids": [
+        "hyp_five_step_procedure_ordering"
+      ]
+    }
+  ]
+}

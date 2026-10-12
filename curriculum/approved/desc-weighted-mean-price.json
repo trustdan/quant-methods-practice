@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "desc_weighted_mean_price",
+  "version": 1,
+  "status": "active",
+  "family_id": "descriptive_stats",
+  "rule_version": 2,
+  "module_id": "module_1",
+  "title": "Computing a unit-weighted selling price",
+  "scenario_markdown": "A subscription retailer sells 100 basic packages at $10, 50 standard packages at $20, and 50 premium packages at $40. Find total revenue per package across all 200 packages, treating units sold as the weights.",
+  "parameters": {
+    "data": [
+      10,
+      20,
+      40
+    ],
+    "operation": "weighted_mean",
+    "weights": [
+      100,
+      50,
+      50
+    ]
+  },
+  "assumptions": [
+    "Prices and quantities refer to the same period and exclude tax and returns.",
+    "The target is revenue per package, so weights are unit counts rather than revenue shares."
+  ],
+  "concept_ids": [
+    "unit_weighted_mean_price",
+    "unit_weighted_mean_interpretation"
+  ],
+  "setting_group": "subscription_package_weighted_price",
+  "source_refs": [
+    "docs/COURSE-MAP.md: learner-supplied module objectives, October 11, 2026",
+    "docs/CONTENT-BACKLOG.md: desc-weighted-mean-price"
+  ],
+  "approval": {
+    "reviewer": "codex_delegated_final_waves",
+    "reviewed_at": "2026-10-12T04:32:26.275462Z",
+    "delegation_basis": "User explicitly replied on October 11, 2026 (America/Chicago): Yes—delegate review and activate after checks pass. Approval follows successful Go mathematical, bank admission, every-option grading and snapshot checks; assistant semantic review does not claim personal user reading.",
+    "notes": "Assistant reviewed the complete scenario, stage wording, all options, causal hints and worked explanations. Numerical choices are independently bound to Go engine quantities under rule v2; conceptual choices are semantically reviewed. Fixed parameters only; no cosmetic variation claimed as transfer. Stated course conventions remain unconfirmed where applicable. Validated one-to-one concept evidence, rejected ambiguous numeric distractors, and tested every option after snapshot serialization."
+  },
+  "stages": [
+    {
+      "calculation": "mean",
+      "id": "unit_weighted_mean_price",
+      "kind": "choice",
+      "prompt_markdown": "What is the average selling price in dollars per package? Select the value rounded to four decimal places.",
+      "options": [
+        {
+          "numeric_value": 20,
+          "id": "supported",
+          "text_markdown": "$20.0000$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "numeric_value": 23.3333333333,
+          "id": "misconception_a",
+          "text_markdown": "$23.3333$",
+          "misconception_id": "unit_weighted_mean_price_a",
+          "hint_markdown": "The three products have unequal unit counts; do not weight them equally."
+        },
+        {
+          "numeric_value": 4000,
+          "id": "misconception_b",
+          "text_markdown": "$4000.0000$",
+          "misconception_id": "unit_weighted_mean_price_b",
+          "hint_markdown": "Revenue must be divided by the total number of packages."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "supported"
+      },
+      "evidence_concept_ids": [
+        "unit_weighted_mean_price"
+      ],
+      "explanation_markdown": "$\\bar p_w=(10(100)+20(50)+40(50))/(100+50+50)=4000/200=20$. Excel: `=SUMPRODUCT(A2:A4,B2:B4)/SUM(B2:B4)` with prices in A and quantities in B.",
+      "numeric_policy": null
+    },
+    {
+      "id": "unit_weighted_mean_interpretation",
+      "kind": "choice",
+      "prompt_markdown": "Why does the unweighted average of the three listed prices answer a different question?",
+      "options": [
+        {
+          "id": "supported",
+          "text_markdown": "It gives each product one vote instead of giving each sold package one vote.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "misconception_a",
+          "text_markdown": "An unweighted mean is always mathematically undefined when values differ.",
+          "misconception_id": "unit_weighted_mean_interpretation_a",
+          "hint_markdown": "The arithmetic mean exists; its weights describe the wrong target here."
+        },
+        {
+          "id": "misconception_b",
+          "text_markdown": "The highest price must receive the largest weight.",
+          "misconception_id": "unit_weighted_mean_interpretation_b",
+          "hint_markdown": "Unit volume, not price, determines the weights for revenue per package."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "supported"
+      },
+      "evidence_concept_ids": [
+        "unit_weighted_mean_interpretation"
+      ],
+      "explanation_markdown": "The unweighted price mean is $70/3=23.3333$. It describes an equally weighted product list. The transaction mix has twice as many basic packages as either other package, yielding $20 per package.",
+      "numeric_policy": null
+    }
+  ]
+}

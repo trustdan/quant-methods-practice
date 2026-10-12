@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "errors_which_is_worse",
+  "version": 1,
+  "status": "active",
+  "family_id": "concept_check",
+  "rule_version": 1,
+  "module_id": "module_5",
+  "title": "Evaluating the cost asymmetry of Type I vs Type II errors in business",
+  "scenario_markdown": "A food processing enterprise tests daily production batches of baby formula for bacterial pathogen contamination before release to grocery distribution networks. The quality assurance team establishes the following testing hypotheses:\n\n$$H_0: \\text{Batch is safe (free of harmful pathogens)}$$\n$$H_1: \\text{Batch is contaminated (pathogen present)}$$\n\nMeanwhile, the marketing department runs an A/B test on promotional email subject lines where $H_0: \\text{No difference in open rate}$ vs $H_1: \\text{Subject line B increases open rate}$.",
+  "parameters": {
+    "topic": "type_one_and_two_errors",
+    "concept": "error_cost_asymmetry",
+    "objective": "Evaluate asymmetric business costs of Type I and Type II errors to drive testing design"
+  },
+  "assumptions": [
+    "Test decisions carry distinct business, legal, and operational consequences",
+    "Hypotheses reflect standard status quo vs discovery framing"
+  ],
+  "concept_ids": [
+    "hyp_type_one_vs_type_two_errors",
+    "hyp_risk_driven_alpha_selection"
+  ],
+  "setting_group": "food_safety_quality_assurance",
+  "source_refs": [
+    "Course Module 5: Hypothesis Testing",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T22:30:00Z",
+    "notes": "Reviewed conceptual question on the practical cost asymmetry between Type I and Type II errors. Demonstrates why statistical design (alpha and sample size/power) is driven by the real-world penalty of making the more dangerous error.",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "identify_errors_food_safety",
+      "kind": "choice",
+      "prompt_markdown": "In the baby formula pathogen test, identify what a Type II error represents and evaluate its business and ethical consequence compared to a Type I error.",
+      "options": [
+        {
+          "id": "eval_type_two_worse_correct",
+          "text_markdown": "Type II error: Failing to reject $H_0$ when the batch is actually contaminated (shipping contaminated formula to consumers). This is far worse than Type I (scrapping a safe batch), as it risks severe infant illness, loss of life, and catastrophic corporate liability.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "eval_swapped_error_definitions",
+          "text_markdown": "Type II error: Rejecting $H_0$ when the batch is safe (destroying safe formula), which is worse because of immediate financial inventory loss.",
+          "misconception_id": "swapped_type_one_and_type_two_definitions",
+          "hint_markdown": "Rejecting a true null hypothesis is a Type I error (false positive), not a Type II error."
+        },
+        {
+          "id": "eval_errors_always_equal",
+          "text_markdown": "Both errors carry identical consequences because probability theory treats $\\alpha$ and $\\beta$ symmetrically.",
+          "misconception_id": "believes_statistical_errors_have_equal_real_world_cost",
+          "hint_markdown": "While $\\alpha$ and $\\beta$ are both probabilities, their real-world costs and liabilities are heavily asymmetric in almost all business and medical applications."
+        },
+        {
+          "id": "eval_type_one_always_worse",
+          "text_markdown": "Type I error is always worse in every business application by definition of the scientific method.",
+          "misconception_id": "dogmatic_belief_that_type_one_is_always_worse",
+          "hint_markdown": "In safety, toxicity, and fraud detection, failing to catch a hazard (Type II error) is typically far more dangerous than a false alarm (Type I error)."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "eval_type_two_worse_correct"
+      },
+      "explanation_markdown": "A Type I error is rejecting $H_0$ when $H_0$ is true (false alarm: flagging a safe batch as contaminated and scrapping it). A Type II error is failing to reject $H_0$ when $H_0$ is false (missed hazard: failing to detect pathogens and shipping contaminated formula). Because shipping dangerous formula causes severe public health harm and massive lawsuits, Type II error is dramatically more perilous in this setting.",
+      "evidence_concept_ids": [
+        "hyp_type_one_vs_type_two_errors"
+      ]
+    },
+    {
+      "id": "design_response_to_asymmetry",
+      "kind": "choice",
+      "prompt_markdown": "How should the engineering leadership design the testing protocol when a Type II error is catastrophic?",
+      "options": [
+        {
+          "id": "design_high_power_correct",
+          "text_markdown": "Design the test with high statistical power ($1 - \\beta \\ge 0.99$), use larger sample volumes, and allow a higher significance level $\\alpha$ (e.g., $0.05$ or $0.10$) if necessary to minimize $\\beta$.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "design_set_alpha_tiny",
+          "text_markdown": "Set $\\alpha$ as close to zero as possible (e.g., $\\alpha = 0.0001$) while keeping the sample size small.",
+          "misconception_id": "reducing_alpha_worsens_type_two_risk",
+          "hint_markdown": "Shrinking $\\alpha$ with fixed sample size makes the rejection threshold harder to cross, which directly increases $\\beta$ (the probability of a Type II error!)."
+        },
+        {
+          "id": "design_ignore_power",
+          "text_markdown": "Focus exclusively on the $p$-value and ignore sample size and power altogether.",
+          "misconception_id": "ignoring_power_in_hypothesis_testing_design",
+          "hint_markdown": "Without adequate sample size and power, a small-sample test cannot reliably detect low-concentration pathogens."
+        },
+        {
+          "id": "design_marketing_comparison",
+          "text_markdown": "Apply the exact same test standards used in the marketing email A/B test because $\\alpha = 0.05$ is a universal legal mandate.",
+          "misconception_id": "universal_alpha_fallacy",
+          "hint_markdown": "The value $\\alpha = 0.05$ is a convention, not a mandate; risk-sensitive domains adjust $\\alpha$, $\\beta$, and $n$ to reflect domain costs."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "design_high_power_correct"
+      },
+      "explanation_markdown": "When Type II error carries immense risk, the priority is minimizing $\\beta$ (maximizing power $1 - \\beta$). Quality teams achieve this by investing in larger sample sizes $n$ and accepting a higher false alarm rate $\\alpha$ if necessary, ensuring that dangerous contamination is virtually never missed.",
+      "evidence_concept_ids": [
+        "hyp_risk_driven_alpha_selection"
+      ]
+    }
+  ]
+}

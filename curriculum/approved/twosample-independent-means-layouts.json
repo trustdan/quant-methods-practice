@@ -1,0 +1,156 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "twosample_independent_means_layouts",
+  "version": 1,
+  "status": "active",
+  "family_id": "two_sample_test",
+  "rule_version": 2,
+  "module_id": "module_5",
+  "title": "Comparing independent store-layout means with stipulated pooling",
+  "scenario_markdown": "A pilot compares basket totals from independent random samples under two store layouts. Layout A: n=20, sample mean $52, sample variance 36 dollars squared. Layout B: n=20, sample mean $48, sample variance 64 dollars squared. Assume normal populations with equal population variances; use the pooled t test of equal means versus a two-sided difference at alpha=0.05. This pooled convention is stipulated for this exercise; the course's pooled-versus-Welch convention remains unconfirmed.",
+  "parameters": {
+    "alpha": 0.05,
+    "mean1": 52,
+    "mean2": 48,
+    "n1": 20,
+    "n2": 20,
+    "operation": "pooled",
+    "var1": 36,
+    "var2": 64
+  },
+  "assumptions": [
+    "The groups and all observations are independent.",
+    "Normality and equal population variances are assumed, not deduced from the sample summaries.",
+    "A minus B defines the statistic, with a two-sided alternative."
+  ],
+  "concept_ids": [
+    "independent_layout_pooled_variance",
+    "independent_layout_two_tail_pvalue",
+    "independent_layout_nonsignificance"
+  ],
+  "setting_group": "independent_layout_basket_totals",
+  "source_refs": [
+    "docs/COURSE-MAP.md: learner-supplied module objectives, October 11, 2026",
+    "docs/CONTENT-BACKLOG.md: twosample-independent-means-layouts",
+    "https://support.microsoft.com/en-us/excel/functions/t-test-function"
+  ],
+  "approval": {
+    "reviewer": "codex_delegated_final_waves",
+    "reviewed_at": "2026-10-12T04:32:26.275462Z",
+    "delegation_basis": "User explicitly replied on October 11, 2026 (America/Chicago): Yes—delegate review and activate after checks pass. Approval follows successful Go mathematical, bank admission, every-option grading and snapshot checks; assistant semantic review does not claim personal user reading.",
+    "notes": "Assistant reviewed the complete scenario, stage wording, all options, causal hints and worked explanations. Numerical choices are independently bound to Go engine quantities under rule v2; conceptual choices are semantically reviewed. Fixed parameters only; no cosmetic variation claimed as transfer. Stated course conventions remain unconfirmed where applicable. Validated one-to-one concept evidence, rejected ambiguous numeric distractors, and tested every option after snapshot serialization."
+  },
+  "stages": [
+    {
+      "calculation": "pooled_variance",
+      "id": "independent_layout_pooled_variance",
+      "kind": "choice",
+      "prompt_markdown": "What is the pooled variance in dollars squared? Select the value rounded to four decimal places.",
+      "options": [
+        {
+          "numeric_value": 50,
+          "id": "supported",
+          "text_markdown": "$50.0000$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "numeric_value": 100,
+          "id": "misconception_a",
+          "text_markdown": "$100.0000$",
+          "misconception_id": "independent_layout_pooled_variance_a",
+          "hint_markdown": "Pool with degrees-of-freedom weights rather than adding variances directly."
+        },
+        {
+          "numeric_value": 7.0710678119,
+          "id": "misconception_b",
+          "text_markdown": "$7.0711$",
+          "misconception_id": "independent_layout_pooled_variance_b",
+          "hint_markdown": "That is the pooled SD, not variance."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "supported"
+      },
+      "evidence_concept_ids": [
+        "independent_layout_pooled_variance"
+      ],
+      "explanation_markdown": "$s_p^2=(19(36)+19(64))/38=50$. Excel: `=((20-1)*36+(20-1)*64)/(20+20-2)`. Residual df is 38.",
+      "numeric_policy": null
+    },
+    {
+      "calculation": "p_two",
+      "id": "independent_layout_two_tail_pvalue",
+      "kind": "choice",
+      "prompt_markdown": "What is the two-sided p-value? Select the value rounded to four decimal places.",
+      "options": [
+        {
+          "numeric_value": 0.08161241660950048,
+          "id": "supported",
+          "text_markdown": "$0.0816$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "numeric_value": 0.0408,
+          "id": "misconception_a",
+          "text_markdown": "$0.0408$",
+          "misconception_id": "independent_layout_two_tail_pvalue_a",
+          "hint_markdown": "Do not report just one tail for a two-sided alternative."
+        },
+        {
+          "numeric_value": 0.05,
+          "id": "misconception_b",
+          "text_markdown": "$0.0500$",
+          "misconception_id": "independent_layout_two_tail_pvalue_b",
+          "hint_markdown": "Calculate the p-value; alpha is the threshold."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "supported"
+      },
+      "evidence_concept_ids": [
+        "independent_layout_two_tail_pvalue"
+      ],
+      "explanation_markdown": "$SE=\\sqrt{50(1/20+1/20)}=\\sqrt5$ and $t=4/\\sqrt5=1.7889$. Excel: `=T.DIST.2T(ABS(4/SQRT(5)),38)` or `=T.TEST(A2:A21,B2:B21,2,2)` on raw samples.",
+      "numeric_policy": null
+    },
+    {
+      "id": "independent_layout_nonsignificance",
+      "kind": "choice",
+      "prompt_markdown": "At alpha=0.05, which conclusion is appropriate?",
+      "options": [
+        {
+          "id": "supported",
+          "text_markdown": "Fail to reject equal population means; these samples provide insufficient evidence of a difference at this threshold.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "misconception_a",
+          "text_markdown": "Accept that the two population means are exactly equal.",
+          "misconception_id": "independent_layout_nonsignificance_a",
+          "hint_markdown": "Failure to reject does not prove equality."
+        },
+        {
+          "id": "misconception_b",
+          "text_markdown": "Reject H0 because the observed sample means differ by $4.",
+          "misconception_id": "independent_layout_nonsignificance_b",
+          "hint_markdown": "A sample difference must be assessed relative to its uncertainty."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "supported"
+      },
+      "evidence_concept_ids": [
+        "independent_layout_nonsignificance"
+      ],
+      "explanation_markdown": "The p-value is about 0.0816, above 0.05. The observed difference is positive, but this test does not establish a nonzero population difference or demonstrate practical equivalence.",
+      "numeric_policy": null
+    }
+  ]
+}

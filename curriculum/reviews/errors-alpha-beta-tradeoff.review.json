@@ -1,0 +1,16 @@
+{
+  "template_id": "errors_alpha_beta_tradeoff",
+  "status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T22:30:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "reviewed_rules": [1],
+  "checklist": {
+    "math_verified_by_engine": true,
+    "distractor_misconceptions_valid": true,
+    "hints_pedagogically_useful": true,
+    "excel_formulas_checked": true,
+    "no_latex_formatting_regressions": true
+  },
+  "notes": "Reviewed conceptual question on the alpha-beta trade-off. Demonstrates that lowering alpha at fixed sample size increases beta and decreases power, and highlights increasing sample size n as the only way to reduce both error probabilities simultaneously."
+}

@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "template_id": "reg_extrapolation_warning",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T22:30:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "concept_check",
+    "parameters": {
+      "topic": "linear_regression",
+      "concept": "regression_extrapolation_and_relevant_range",
+      "objective": "Identify extrapolation beyond the relevant range of predictor data and explain why linear regression predictions outside the sample range are invalid"
+    },
+    "canonical_probability": 0.05,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 40.0,
+      "variance": 133.33,
+      "standard_deviation": 11.55
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "diagnose_extrapolation", "kind": "choice", "evidence": "diagnose_extrapolation_beyond_relevant_range"},
+      {"id": "physical_and_statistical_risks", "kind": "choice", "evidence": "explain_physical_and_statistical_risks_of_extrapolation"},
+      {"id": "relevant_range_principle", "kind": "choice", "evidence": "define_relevant_range_principle"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Reviewed conceptual alignment: Observed range is 20 to 60 deg C. Predicting at x = 120 deg C is severe extrapolation. High R^2 = 0.92 only validates linearity within the observed range. Explains why physical processes break down (decomposition, phase change) and why statistical confidence bands expand hyperbolically outside the sample mean."
+}

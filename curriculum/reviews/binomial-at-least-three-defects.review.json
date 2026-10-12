@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "template_id": "binomial_at_least_three_defects",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T22:00:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "binomial_pmf",
+    "parameters": {
+      "n": 12,
+      "p": 0.15,
+      "k": 3
+    },
+    "canonical_probability": 0.26418,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 1.8,
+      "variance": 1.53,
+      "standard_deviation": 1.23693
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "complement_setup", "kind": "choice", "evidence": "binomial_cumulative_complement_setup"},
+      {"id": "cumulative_lower_calc", "kind": "choice", "evidence": "binomial_cumulative_lower_summation"},
+      {"id": "tail_calc", "kind": "choice", "evidence": "binomial_tail_probability_calculation"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Verified mathematically: n = 12, p = 0.15. P(X=0) = 0.142242, P(X=1) = 0.301218, P(X=2) = 0.292359. P(X<=2) = 0.735819. Upper tail P(X>=3) = 1 - 0.735819 = 0.264181. Excel: =1 - BINOM.DIST(2, 12, 0.15, TRUE)."
+}

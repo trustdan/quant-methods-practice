@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "template_id": "regout_r_from_r2_sign",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T22:30:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "regression_output",
+    "parameters": {
+      "n": 11,
+      "k": 1,
+      "ssr": 64.0,
+      "sse": 36.0,
+      "sst": 100.0,
+      "confidence_level": 0.95,
+      "intercept_name": "Intercept",
+      "b0": 35.0,
+      "se_b0": 2.0,
+      "x1_name": "Vehicle_Age",
+      "b1": -2.0,
+      "se_b1": 0.5
+    },
+    "canonical_probability": 0.003,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": -2.0,
+      "variance": 0.25,
+      "standard_deviation": 0.5
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "derive_correlation_coefficient", "kind": "choice", "evidence": "derive_r_from_r_squared_and_slope_sign"},
+      {"id": "interpret_correlation_magnitude", "kind": "choice", "evidence": "interpret_correlation_direction_and_magnitude"},
+      {"id": "r_squared_positivity_distinction", "kind": "choice", "evidence": "distinguish_r_sign_from_r_squared_positivity"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Reviewed derivation: R^2 = 0.640 => |r| = sqrt(0.640) = 0.800. Slope b1 = -2.00 < 0 confirms inverse relationship, so r = -0.800. Explains why R^2 is strictly non-negative (squaring hides direction), while r carries the sign of b1. Consistency: t1 = -2.0/0.5 = -4.0, F = 16.0 = (-4)^2. Excel: =-SQRT(0.64) or =CORREL."
+}

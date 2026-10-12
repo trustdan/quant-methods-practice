@@ -1,0 +1,16 @@
+{
+  "template_id": "n_proportion_pilot",
+  "status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T22:30:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "reviewed_rules": [1],
+  "checklist": {
+    "math_verified_by_engine": true,
+    "distractor_misconceptions_valid": true,
+    "hints_pedagogically_useful": true,
+    "excel_formulas_checked": true,
+    "no_latex_formatting_regressions": true
+  },
+  "notes": "Verified sample size for proportion: p* = 0.20, E = 0.03, 95% confidence level. Analytical n = 682.93 -> rounded up to 683. Conservative comparison with p*=0.50 yields n = 1068, showing 385 respondent savings. Distractors address floor rounding, conservative over-sampling, and incorrect z critical values."
+}

@@ -189,4 +189,3 @@ func TestSamplingDistributionMeanHelpers(t *testing.T) {
 		t.Errorf("expected P(Xbar <= 86) ~ 0.9332, got %v", pBelow)
 	}
 }
-

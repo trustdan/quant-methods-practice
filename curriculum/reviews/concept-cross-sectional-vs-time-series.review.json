@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "template_id": "concept_cross_sectional_vs_time_series",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T22:30:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "concept_check",
+    "parameters": {
+      "topic": "data_structures_in_business",
+      "concept": "cross_sectional_vs_time_series_data",
+      "objective": "Classify data as cross-sectional or time-series, distinguish their temporal dimensions, and match appropriate analytical inquiries to each structure"
+    },
+    "canonical_probability": 0.5,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 0.0,
+      "variance": 1.0,
+      "standard_deviation": 1.0
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "classify_datasets", "kind": "choice", "evidence": "classify_cross_sectional_and_time_series_data"},
+      {"id": "dimension_distinction", "kind": "choice", "evidence": "distinguish_entity_vs_temporal_dimensions"},
+      {"id": "match_analytical_questions", "kind": "choice", "evidence": "match_analytical_questions_to_data_structure"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Reviewed conceptual alignment: Classifies Dataset A as cross-sectional (multiple entities at one point in time) and Dataset B as time-series (single entity tracked over sequential time). Matches comparative benchmarking to cross-sectional and trend/seasonality forecasting to time-series."
+}

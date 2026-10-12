@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "template_id": "n_proportion_conservative",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T22:00:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "sample_size",
+    "parameters": {
+      "target": "proportion",
+      "p": 0.50,
+      "margin_of_error": 0.04,
+      "confidence_level": 0.90
+    },
+    "canonical_probability": 0.90,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 423.0,
+      "variance": 0.0,
+      "standard_deviation": 0.0
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "conservative_p_justification", "kind": "choice", "evidence": "sample_size_conservative_p_justification"},
+      {"id": "calculation_and_ceiling", "kind": "choice", "evidence": "sample_size_proportion_calculation"},
+      {"id": "prior_information_savings", "kind": "choice", "evidence": "sample_size_prior_information_savings"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Verified mathematically: p* = 0.50, E = 0.04, CL = 0.90. Z_{0.05} = 1.6448536. Exact continuous n = 422.741. Ceiling n = 423. With prior p = 0.20, continuous n = 270.554, ceiling n = 271, saving 152 respondents. In Excel: =ROUNDUP((NORM.S.INV(0.95)^2)*0.25/(0.04^2), 0)."
+}

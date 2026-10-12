@@ -1,0 +1,198 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "desc_quartiles_iqr_fences",
+  "version": 1,
+  "status": "active",
+  "family_id": "descriptive_stats",
+  "rule_version": 2,
+  "module_id": "module_1",
+  "title": "Quartiles and outlier fences using Excel's inclusive convention",
+  "scenario_markdown": "Nine observed call-handling times are 2, 3, 4, 5, 6, 7, 8, 9, and 30 minutes. Use Excel QUARTILE.INC, defined by zero-based position (n-1)p with linear interpolation, and the 1.5 IQR outlier rule. The course's required quartile convention is still unconfirmed.",
+  "parameters": {
+    "data": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      30
+    ],
+    "operation": "quartiles_inc"
+  },
+  "assumptions": [
+    "Use QUARTILE.INC rather than QUARTILE.EXC or a median-of-halves method.",
+    "An outlier flag is a diagnostic, not permission to remove an observation."
+  ],
+  "concept_ids": [
+    "inclusive_first_quartile",
+    "inclusive_third_quartile",
+    "iqr_upper_fence",
+    "iqr_outlier_followup"
+  ],
+  "setting_group": "call_handling_inclusive_quartiles",
+  "source_refs": [
+    "docs/COURSE-MAP.md: learner-supplied module objectives, October 11, 2026",
+    "docs/CONTENT-BACKLOG.md: desc-quartiles-iqr-fences",
+    "https://support.microsoft.com/en-us/excel/functions/quartile-inc-function"
+  ],
+  "approval": {
+    "reviewer": "codex_delegated_final_waves",
+    "reviewed_at": "2026-10-12T04:32:26.275462Z",
+    "delegation_basis": "User explicitly replied on October 11, 2026 (America/Chicago): Yes—delegate review and activate after checks pass. Approval follows successful Go mathematical, bank admission, every-option grading and snapshot checks; assistant semantic review does not claim personal user reading.",
+    "notes": "Assistant reviewed the complete scenario, stage wording, all options, causal hints and worked explanations. Numerical choices are independently bound to Go engine quantities under rule v2; conceptual choices are semantically reviewed. Fixed parameters only; no cosmetic variation claimed as transfer. Stated course conventions remain unconfirmed where applicable. Validated one-to-one concept evidence, rejected ambiguous numeric distractors, and tested every option after snapshot serialization."
+  },
+  "stages": [
+    {
+      "calculation": "q1",
+      "id": "inclusive_first_quartile",
+      "kind": "choice",
+      "prompt_markdown": "What is Q1 in minutes under the stated inclusive convention? Select the value rounded to four decimal places.",
+      "options": [
+        {
+          "numeric_value": 4,
+          "id": "supported",
+          "text_markdown": "$4.0000$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "numeric_value": 3.5,
+          "id": "misconception_a",
+          "text_markdown": "$3.5000$",
+          "misconception_id": "inclusive_first_quartile_a",
+          "hint_markdown": "A median-of-halves convention can produce a different value; use (n-1)*0.25."
+        },
+        {
+          "numeric_value": 6,
+          "id": "misconception_b",
+          "text_markdown": "$6.0000$",
+          "misconception_id": "inclusive_first_quartile_b",
+          "hint_markdown": "The median is Q2, not Q1."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "supported"
+      },
+      "evidence_concept_ids": [
+        "inclusive_first_quartile"
+      ],
+      "explanation_markdown": "Position $(9-1)(0.25)=2$ is the third ordered observation, 4 minutes. Excel: `=QUARTILE.INC(A2:A10,1)`.",
+      "numeric_policy": null
+    },
+    {
+      "calculation": "q3",
+      "id": "inclusive_third_quartile",
+      "kind": "choice",
+      "prompt_markdown": "What is Q3 in minutes? Select the value rounded to four decimal places.",
+      "options": [
+        {
+          "numeric_value": 8,
+          "id": "supported",
+          "text_markdown": "$8.0000$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "numeric_value": 8.5,
+          "id": "misconception_a",
+          "text_markdown": "$8.5000$",
+          "misconception_id": "inclusive_third_quartile_a",
+          "hint_markdown": "Use the stated inclusive position, not an exclusive convention."
+        },
+        {
+          "numeric_value": 30,
+          "id": "misconception_b",
+          "text_markdown": "$30.0000$",
+          "misconception_id": "inclusive_third_quartile_b",
+          "hint_markdown": "Q3 is the 75th percentile, not the maximum."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "supported"
+      },
+      "evidence_concept_ids": [
+        "inclusive_third_quartile"
+      ],
+      "explanation_markdown": "Position $(9-1)(0.75)=6$ is the seventh ordered observation, 8 minutes. Excel: `=QUARTILE.INC(A2:A10,3)`.",
+      "numeric_policy": null
+    },
+    {
+      "calculation": "upper_fence",
+      "id": "iqr_upper_fence",
+      "kind": "choice",
+      "prompt_markdown": "What is the upper 1.5 IQR fence in minutes? Select the value rounded to four decimal places.",
+      "options": [
+        {
+          "numeric_value": 14,
+          "id": "supported",
+          "text_markdown": "$14.0000$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "numeric_value": 12,
+          "id": "misconception_a",
+          "text_markdown": "$12.0000$",
+          "misconception_id": "iqr_upper_fence_a",
+          "hint_markdown": "Add 1.5 times IQR to Q3, not just IQR."
+        },
+        {
+          "numeric_value": 10,
+          "id": "misconception_b",
+          "text_markdown": "$10.0000$",
+          "misconception_id": "iqr_upper_fence_b",
+          "hint_markdown": "Use Q3 as the upper-fence anchor rather than Q1."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "supported"
+      },
+      "evidence_concept_ids": [
+        "iqr_upper_fence"
+      ],
+      "explanation_markdown": "$IQR=8-4=4$; upper fence $=8+1.5(4)=14$. The lower fence is $4-6=-2$. Excel: `=Q3+1.5*(Q3-Q1)`.",
+      "numeric_policy": null
+    },
+    {
+      "id": "iqr_outlier_followup",
+      "kind": "choice",
+      "prompt_markdown": "Which observation is flagged, and what should happen next?",
+      "options": [
+        {
+          "id": "supported",
+          "text_markdown": "30 minutes is above 14; investigate its context and accuracy before deciding how to handle it.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "misconception_a",
+          "text_markdown": "Every observation above Q3 must be deleted.",
+          "misconception_id": "iqr_outlier_followup_a",
+          "hint_markdown": "The upper quartile is not the upper outlier fence."
+        },
+        {
+          "id": "misconception_b",
+          "text_markdown": "30 minutes must be a recording error because it is flagged.",
+          "misconception_id": "iqr_outlier_followup_b",
+          "hint_markdown": "Unusual observations can be valid; the fence does not establish their cause."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "supported"
+      },
+      "evidence_concept_ids": [
+        "iqr_outlier_followup"
+      ],
+      "explanation_markdown": "Only 30 lies outside [-2,14]. Investigate data quality and operational circumstances, and document any handling decision. Quartile conventions can affect fences, so the chosen method must be stated.",
+      "numeric_policy": null
+    }
+  ]
+}

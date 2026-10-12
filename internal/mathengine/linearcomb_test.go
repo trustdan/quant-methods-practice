@@ -116,3 +116,48 @@ func TestCovarianceFromCorrelation(t *testing.T) {
 		t.Errorf("Expected error for rho > 1, got nil")
 	}
 }
+
+func TestAffineTransformations(t *testing.T) {
+	// Y = 50X - 200 with E[X] = 30, SD = 6 (Var = 36)
+	meanY := mathengine.AffineMean(50.0, 30.0, -200.0)
+	if meanY != 1300.0 {
+		t.Errorf("expected AffineMean 1300, got %v", meanY)
+	}
+
+	varY, err := mathengine.AffineVariance(50.0, 36.0)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if varY != 90000.0 {
+		t.Errorf("expected AffineVariance 90000, got %v", varY)
+	}
+
+	sdY, err := mathengine.AffineStdDev(50.0, 6.0)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if sdY != 300.0 {
+		t.Errorf("expected AffineStdDev 300, got %v", sdY)
+	}
+}
+
+func TestIndependentSumAndDifference(t *testing.T) {
+	// Independent Store 1 (Var 160) and Store 2 (Var 90)
+	// Var(X + Y) = 160 + 90 = 250
+	// Var(X - Y) = 160 + 90 = 250 (variances ALWAYS add!)
+	vSum, err := mathengine.SumIndependentVariance(160.0, 90.0)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if vSum != 250.0 {
+		t.Errorf("expected SumIndependentVariance 250, got %v", vSum)
+	}
+
+	vDiff, err := mathengine.DiffIndependentVariance(160.0, 90.0)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if vDiff != 250.0 {
+		t.Errorf("expected DiffIndependentVariance 250, got %v", vDiff)
+	}
+}

@@ -1,0 +1,16 @@
+{
+  "template_id": "hyp_formulate_right_tailed_sales",
+  "status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T22:30:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "reviewed_rules": [1],
+  "checklist": {
+    "math_verified_by_engine": true,
+    "distractor_misconceptions_valid": true,
+    "hints_pedagogically_useful": true,
+    "excel_formulas_checked": true,
+    "no_latex_formatting_regressions": true
+  },
+  "notes": "Reviewed conceptual question on right-tailed hypothesis formulation for sales lift. Distractors cover null/alternative swapping, stating hypotheses on sample statistics, using two-tailed tests for directional claims, and confusing nominal differences with statistical significance."
+}

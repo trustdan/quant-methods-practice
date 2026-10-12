@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "template_id": "hyp_formulate_underfill",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T22:00:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "concept_check",
+    "parameters": {
+      "topic": "hypothesis_formulation",
+      "concept": "underfill_one_tailed_test",
+      "objective": "Formulate null and alternative hypotheses for suspected underfilling"
+    },
+    "canonical_probability": 1.0,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 16.0,
+      "variance": 0.0,
+      "standard_deviation": 0.0
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "formulate_alternative", "kind": "choice", "evidence": "hypothesis_alternative_research_claim"},
+      {"id": "formulate_null", "kind": "choice", "evidence": "hypothesis_null_status_quo_formulation"},
+      {"id": "tail_direction", "kind": "choice", "evidence": "hypothesis_tail_direction_identification"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Reviewed conceptual alignment: H0: mu = 16.0 fl oz vs H1: mu < 16.0 fl oz. Verified all distractors have documented misconceptions and constructive hints. Stage 1 addresses sample stat vs parameter; Stage 2 addresses strict inequality in H0; Stage 3 clarifies left-tailed directionality."
+}

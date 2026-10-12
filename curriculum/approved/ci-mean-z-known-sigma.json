@@ -1,0 +1,144 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "ci_mean_z_known_sigma",
+  "version": 1,
+  "status": "active",
+  "family_id": "confidence_interval",
+  "rule_version": 1,
+  "module_id": "module_4",
+  "title": "Confidence interval for population mean with known standard deviation",
+  "scenario_markdown": "An industrial quality engineer monitors the tensile strength of composite polymer rods. Extensive historical production data establishes that the population standard deviation is known to be $\\sigma = 12.0\\text{ MPa}$. A random sample of $n = 49$ rods yields a sample mean tensile strength of $\\bar{x} = 150.0\\text{ MPa}$. Construct and interpret a $95\\%$ confidence interval for the true population mean tensile strength $\\mu$.",
+  "parameters": {
+    "parameter": "mean_z",
+    "point_estimate": 150.0,
+    "sigma": 12.0,
+    "n": 49,
+    "confidence_level": 0.95
+  },
+  "assumptions": [
+    "Tensile strength follows an approximately normal distribution or CLT applies since n = 49 >= 30",
+    "Independent random sample of composite polymer rods",
+    "Population standard deviation is known from historical quality controls (sigma = 12.0 MPa), justifying the standard normal Z distribution"
+  ],
+  "concept_ids": [
+    "ci_z_known_sigma_selection",
+    "ci_z_margin_of_error_calculation",
+    "ci_mean_bounds_and_interpretation"
+  ],
+  "setting_group": "manufacturing_polymer_tensile_strength",
+  "source_refs": [
+    "Course Module 4: Sampling Distribution & Confidence Interval",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T22:00:00Z",
+    "notes": "Reviewed derivation: sigma = 12.0, n = 49, SE = 12/7 = 1.7143. Z_{0.025} = 1.95996. MOE = 1.95996 * 1.714286 = 3.360. Interval = [146.64, 153.36]. Excel: =CONFIDENCE.NORM(0.05, 12, 49).",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "critical_value_distribution",
+      "kind": "choice",
+      "prompt_markdown": "Which critical value distribution and value should be used to construct this $95\\%$ confidence interval?",
+      "options": [
+        {
+          "id": "z_crit_correct",
+          "text_markdown": "Standard normal distribution with $Z^* = 1.960$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "t_crit_degrees_freedom",
+          "text_markdown": "Student's $t$-distribution with $df = n - 1 = 48$ ($t^* \\approx 2.011$)",
+          "misconception_id": "used_t_when_sigma_known",
+          "hint_markdown": "Student's t is required when sigma is unknown and estimated by s. When sigma is known, use the standard normal Z distribution."
+        },
+        {
+          "id": "z_crit_ninety_percent",
+          "text_markdown": "Standard normal distribution with $Z^* = 1.645$",
+          "misconception_id": "confused_confidence_levels",
+          "hint_markdown": "$Z^* = 1.645$ corresponds to a $90\\%$ confidence interval; for $95\\%$, the two-tailed critical value is $Z^* = 1.960$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "z_crit_correct"
+      },
+      "evidence_concept_ids": [
+        "ci_z_known_sigma_selection"
+      ],
+      "explanation_markdown": "Because the true population standard deviation $\\sigma = 12.0\\text{ MPa}$ is known and $n = 49 \\ge 30$, the sampling distribution of $\\bar{X}$ is normal with standard error $\\sigma / \\sqrt{n}$. For a $95\\%$ confidence level, $\\alpha = 0.05$ split evenly across both tails gives $\\alpha/2 = 0.025$, yielding critical value $Z^* = 1.960$. Excel formula: `=NORM.S.INV(0.975)`.",
+      "numeric_policy": null
+    },
+    {
+      "id": "margin_of_error_calc",
+      "kind": "choice",
+      "prompt_markdown": "Calculate the margin of error $E = Z^* \\cdot \\frac{\\sigma}{\\sqrt{n}}$ for this $95\\%$ confidence interval.",
+      "options": [
+        {
+          "id": "moe_correct",
+          "text_markdown": "$E = 3.36\\text{ MPa}$ ($1.960 \\times 1.7143\\text{ MPa}$)",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "moe_forgot_sqrt_n",
+          "text_markdown": "$E = 23.52\\text{ MPa}$ ($1.960 \\times 12.0\\text{ MPa}$)",
+          "misconception_id": "omitted_sqrt_n_in_standard_error",
+          "hint_markdown": "Remember that standard error is $\\sigma / \\sqrt{n} = 12 / \\sqrt{49} = 1.7143\\text{ MPa}$, not $\\sigma$ directly."
+        },
+        {
+          "id": "moe_divided_by_n",
+          "text_markdown": "$E = 0.48\\text{ MPa}$ ($1.960 \\times 12.0 / 49$)",
+          "misconception_id": "divided_by_n_instead_of_sqrt_n",
+          "hint_markdown": "Standard error divides by $\\sqrt{n} = 7$, not by $n = 49$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "moe_correct"
+      },
+      "evidence_concept_ids": [
+        "ci_z_margin_of_error_calculation"
+      ],
+      "explanation_markdown": "The standard error is $SE = \\frac{\\sigma}{\\sqrt{n}} = \\frac{12.0}{\\sqrt{49}} = \\frac{12.0}{7} \\approx 1.7143\\text{ MPa}$. The margin of error is $E = Z^* \\times SE = 1.95996 \\times 1.714286 \\approx 3.360\\text{ MPa}$. In Excel, `=CONFIDENCE.NORM(0.05, 12, 49)` directly computes this margin of error as $3.360$.",
+      "numeric_policy": null
+    },
+    {
+      "id": "confidence_interval_bounds",
+      "kind": "choice",
+      "prompt_markdown": "Determine the resulting $95\\%$ confidence interval and identify its valid statistical interpretation.",
+      "options": [
+        {
+          "id": "interval_correct",
+          "text_markdown": "$[146.64, 153.36]\\text{ MPa}$: We are $95\\%$ confident that the true population mean tensile strength $\\mu$ lies between $146.64\\text{ MPa}$ and $153.36\\text{ MPa}$.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "interval_individual_rods",
+          "text_markdown": "$[146.64, 153.36]\\text{ MPa}$: $95\\%$ of all individual polymer rods have tensile strength between $146.64\\text{ MPa}$ and $153.36\\text{ MPa}$.",
+          "misconception_id": "confuse_ci_with_individual_tolerance_spread",
+          "hint_markdown": "A confidence interval estimates the unknown population mean parameter $\\mu$, not the dispersion of individual observations."
+        },
+        {
+          "id": "interval_wrong_bounds",
+          "text_markdown": "$[138.00, 162.00]\\text{ MPa}$: Computed as $\\bar{x} \\pm \\sigma = 150 \\pm 12$.",
+          "misconception_id": "used_population_sigma_as_margin_of_error",
+          "hint_markdown": "The confidence interval bounds are $\\bar{x} \\pm E = 150 \\pm 3.36$, not $\\bar{x} \\pm \\sigma$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "interval_correct"
+      },
+      "evidence_concept_ids": [
+        "ci_mean_bounds_and_interpretation"
+      ],
+      "explanation_markdown": "The confidence interval bounds are $\\bar{x} \\pm E = 150.0 \\pm 3.36 = [146.64, 153.36]\\text{ MPa}$. Under repeated random sampling of size $49$, $95\\%$ of such constructed intervals will enclose the fixed, unknown population parameter $\\mu$.",
+      "numeric_policy": null
+    }
+  ]
+}

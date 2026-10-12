@@ -1,0 +1,147 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "lincomb_difference_independent",
+  "version": 1,
+  "status": "active",
+  "family_id": "linear_combination",
+  "rule_version": 1,
+  "module_id": "module_2",
+  "title": "Difference of independent random variables: why variances always add",
+  "scenario_markdown": "A regional operations manager compares daily customer foot traffic between two independent retail outlets:\n\n- **Store 1 ($X_1$)**: Expected daily visitors $E[X_1] = 150$, variance $\\operatorname{Var}(X_1) = 160$ ($\\operatorname{SD}(X_1) \\approx 12.65$).\n- **Store 2 ($X_2$)**: Expected daily visitors $E[X_2] = 120$, variance $\\operatorname{Var}(X_2) = 90$ ($\\operatorname{SD}(X_2) \\approx 9.49$).\n\nThe manager tracks the daily traffic differential $D = X_1 - X_2$. Assuming the two stores serve distinct customer bases and operate independently, compute the expected difference $E[D]$, evaluate the variance $\\operatorname{Var}(D)$, and analyze why variances must always add.",
+  "parameters": {
+    "operation": "diff_independent",
+    "mean_x": 150.0,
+    "var_x": 160.0,
+    "mean_y": 120.0,
+    "var_y": 90.0,
+    "mean": 30.0,
+    "var": 250.0,
+    "sd": 15.81139
+  },
+  "assumptions": [
+    "X1 and X2 are statistically independent (Cov(X1, X2) = 0)",
+    "Expectations subtract linearly: E[X1 - X2] = E[X1] - E[X2]",
+    "Under independence, Var(X1 - X2) = 1^2*Var(X1) + (-1)^2*Var(X2) = Var(X1) + Var(X2)"
+  ],
+  "concept_ids": [
+    "compute_difference_of_expectations",
+    "compute_variance_of_difference_independent",
+    "explain_why_variances_always_add"
+  ],
+  "setting_group": "retail_customer_traffic_differential",
+  "source_refs": [
+    "Course Module 2: Discrete Random Variables & Probability Distributions",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T23:28:00Z",
+    "notes": "Reviewed variance of difference: E[D] = 150 - 120 = 30. Var(X1 - X2) = 160 + 90 = 250 (never 160 - 90 = 70). SD(D) = sqrt(250) = 15.81. Thoroughly disproves the common error of subtracting variances.",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "compute_expected_differential",
+      "kind": "choice",
+      "prompt_markdown": "What is the expected daily traffic difference between the two stores, $E[D] = E[X_1 - X_2]$?",
+      "options": [
+        {
+          "id": "e_diff_correct",
+          "text_markdown": "**$E[D] = 30\\text{ visitors}$**: $E[X_1 - X_2] = E[X_1] - E[X_2] = 150 - 120 = 30$.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "e_diff_sum",
+          "text_markdown": "**$E[D] = 270\\text{ visitors}$**: Calculated as $150 + 120 = 270$.",
+          "misconception_id": "added_expectations_for_difference_variable",
+          "hint_markdown": "D is the difference X1 - X2, so expectations subtract: 150 - 120 = 30."
+        },
+        {
+          "id": "e_diff_ratio",
+          "text_markdown": "**$E[D] = 1.25\\text{ visitors}$**: Calculated as the ratio $\\frac{150}{120} = 1.25$.",
+          "misconception_id": "computed_ratio_instead_of_difference",
+          "hint_markdown": "The differential is defined as X1 - X2, not X1 / X2."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "e_diff_correct"
+      },
+      "evidence_concept_ids": [
+        "compute_difference_of_expectations"
+      ],
+      "explanation_markdown": "By linearity of expectation:\n\n$$E[D] = E[X_1 - X_2] = E[X_1] - E[X_2] = 150 - 120 = 30\\text{ visitors/day}$$",
+      "numeric_policy": null
+    },
+    {
+      "id": "compute_variance_differential",
+      "kind": "choice",
+      "prompt_markdown": "Assuming independence, what is the variance of the daily difference, $\\operatorname{Var}(D) = \\operatorname{Var}(X_1 - X_2)$?",
+      "options": [
+        {
+          "id": "var_diff_correct",
+          "text_markdown": "**$\\operatorname{Var}(D) = 250\\text{ visitors}^2$**: $\\operatorname{Var}(X_1 - X_2) = 1^2 \\operatorname{Var}(X_1) + (-1)^2 \\operatorname{Var}(X_2) = 160 + 90 = 250$.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "var_diff_subtracted",
+          "text_markdown": "**$\\operatorname{Var}(D) = 70\\text{ visitors}^2$**: $\\operatorname{Var}(X_1 - X_2) = \\operatorname{Var}(X_1) - \\operatorname{Var}(X_2) = 160 - 90 = 70$.",
+          "misconception_id": "subtracted_variances_for_difference_variable",
+          "hint_markdown": "Variances NEVER subtract. In the formula Var(aX + bY) = a^2*Var(X) + b^2*Var(Y), b = -1 squares to (-1)^2 = +1."
+        },
+        {
+          "id": "var_diff_sd_subtracted_sq",
+          "text_markdown": "**$\\operatorname{Var}(D) = 10\\text{ visitors}^2$**: Calculated as $(\\sqrt{160} - \\sqrt{90})^2 \\approx (12.65 - 9.49)^2 = 3.16^2 \\approx 10.0$.",
+          "misconception_id": "subtracted_standard_deviations_and_squared",
+          "hint_markdown": "Variances add directly; you cannot subtract standard deviations."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "var_diff_correct"
+      },
+      "evidence_concept_ids": [
+        "compute_variance_of_difference_independent"
+      ],
+      "explanation_markdown": "We express $X_1 - X_2$ as the linear combination $1 \\cdot X_1 + (-1) \\cdot X_2$. For independent random variables:\n\n$$\\operatorname{Var}(aX_1 + bX_2) = a^2 \\operatorname{Var}(X_1) + b^2 \\operatorname{Var}(X_2)$$\n$$\\operatorname{Var}(X_1 - X_2) = 1^2 (160) + (-1)^2 (90) = 1(160) + 1(90) = 160 + 90 = 250\\text{ visitors}^2$$\n\nBecause the negative coefficient $(-1)$ is squared, $(-1)^2 = +1$, the two variances **add** together.",
+      "numeric_policy": null
+    },
+    {
+      "id": "explain_variances_always_add",
+      "kind": "choice",
+      "prompt_markdown": "Why do variances **always add** when taking the difference of two independent random variables, rather than canceling each other out?",
+      "options": [
+        {
+          "id": "reason_correct",
+          "text_markdown": "**Subtracting two uncertain quantities increases overall uncertainty**: Random variation in Store 1 and independent random variation in Store 2 both contribute to fluctuations in the gap; one cannot reliably cancel the other out.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "reason_negative_impossible",
+          "text_markdown": "Because variance is mathematically defined as a squared quantity, negative variances are impossible so subtraction is replaced by addition.",
+          "misconception_id": "believed_rule_is_merely_an_arbitrary_sign_convention",
+          "hint_markdown": "The addition of variance reflects real physical compounding of uncertainty from independent random sources, not an arbitrary convention."
+        },
+        {
+          "id": "reason_only_when_x1_larger",
+          "text_markdown": "Variances only add if Store 1's variance is greater than Store 2's variance.",
+          "misconception_id": "believed_variance_addition_depends_on_magnitude_order",
+          "hint_markdown": "Variances add universally for all independent variables regardless of which variance is larger."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "reason_correct"
+      },
+      "evidence_concept_ids": [
+        "explain_why_variances_always_add"
+      ],
+      "explanation_markdown": "When comparing two separate, independent processes, the difference $X_1 - X_2$ fluctuates due to randomness in $X_1$ **and** randomness in $X_2$. On days when Store 1 happens to have unusually high traffic while Store 2 happens to have unusually low traffic, the gap expands dramatically. Compounding two independent uncertainties always yields greater total dispersion ($\\\\\\operatorname{SD}(D) = \\sqrt{250} \\approx 15.81 > 12.65$), never less.",
+      "numeric_policy": null
+    }
+  ]
+}

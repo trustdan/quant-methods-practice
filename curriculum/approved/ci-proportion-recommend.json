@@ -1,0 +1,144 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "ci_proportion_recommend",
+  "version": 1,
+  "status": "active",
+  "family_id": "confidence_interval",
+  "rule_version": 1,
+  "module_id": "module_4",
+  "title": "Confidence interval for customer recommendation proportion",
+  "scenario_markdown": "A marketing analytics team surveys $n = 400$ randomly selected retail customers, asking whether they would recommend the brand to a colleague. Exactly $x = 132$ respondents answer affirmatively, yielding a sample proportion of $\\hat{p} = \\frac{132}{400} = 0.330$ ($33.0\\%$). Construct and interpret a $95\\%$ confidence interval for the true population recommendation proportion $p$.",
+  "parameters": {
+    "parameter": "proportion",
+    "point_estimate": 0.33,
+    "successes": 132,
+    "n": 400,
+    "confidence_level": 0.95
+  },
+  "assumptions": [
+    "Independent random sample of retail customers",
+    "Large-sample normal approximation conditions are satisfied: n*p_hat = 132 >= 10 and n*(1 - p_hat) = 268 >= 10",
+    "Population of retail customers is much larger than the sample size (sampling fraction < 5%)"
+  ],
+  "concept_ids": [
+    "ci_proportion_standard_error",
+    "ci_proportion_margin_of_error",
+    "ci_proportion_interval_construction"
+  ],
+  "setting_group": "retail_customer_recommendation_survey",
+  "source_refs": [
+    "Course Module 4: Sampling Distribution & Confidence Interval",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T22:00:00Z",
+    "notes": "Reviewed derivation: p_hat = 132/400 = 0.33. SE = sqrt(0.33 * 0.67 / 400) = sqrt(0.00055275) = 0.0235106. Z* = 1.959964. Margin of error = 1.959964 * 0.0235106 = 0.04608. Interval = [0.2839, 0.3761].",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "standard_error_check",
+      "kind": "choice",
+      "prompt_markdown": "Verify the normality condition and compute the standard error of the sample proportion $SE_{\\hat{p}} = \\sqrt{\\frac{\\hat{p}(1-\\hat{p})}{n}}$.",
+      "options": [
+        {
+          "id": "se_correct",
+          "text_markdown": "Conditions met ($132 \\ge 10$ and $268 \\ge 10$); $SE_{\\hat{p}} = 0.0235$ ($2.35\\%$)",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "se_forgot_sqrt",
+          "text_markdown": "Conditions met; $SE_{\\hat{p}} = 0.00055$ ($0.055\\%$)",
+          "misconception_id": "forgot_sqrt_in_proportion_se",
+          "hint_markdown": "Do not forget to take the square root of the variance $\\frac{\\hat{p}(1-\\hat{p})}{n} = \\frac{0.2211}{400} = 0.00055275$."
+        },
+        {
+          "id": "se_conservative_p",
+          "text_markdown": "Conditions met; $SE_{\\hat{p}} = 0.0250$ using $p = 0.50$",
+          "misconception_id": "used_conservative_p_for_known_sample",
+          "hint_markdown": "When sample data is observed, standard error is estimated using the sample proportion $\\hat{p} = 0.33$, not conservative $p = 0.50$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "se_correct"
+      },
+      "evidence_concept_ids": [
+        "ci_proportion_standard_error"
+      ],
+      "explanation_markdown": "First verify normality: $n\\hat{p} = 400(0.33) = 132 \\ge 10$ and $n(1-\\hat{p}) = 400(0.67) = 268 \\ge 10$. Both exceed $10$, so the sampling distribution of $\\hat{p}$ is approximately normal. The standard error is $SE_{\\hat{p}} = \\sqrt{\\frac{0.33(1 - 0.33)}{400}} = \\sqrt{\\frac{0.2211}{400}} = \\sqrt{0.00055275} \\approx 0.02351$ ($2.35\\%$). Excel: `=SQRT(0.33*(1-0.33)/400)`.",
+      "numeric_policy": null
+    },
+    {
+      "id": "margin_of_error_calc",
+      "kind": "choice",
+      "prompt_markdown": "Calculate the margin of error $E = Z^* \\cdot SE_{\\hat{p}}$ for this $95\\%$ confidence interval (using $Z^* = 1.960$).",
+      "options": [
+        {
+          "id": "moe_correct",
+          "text_markdown": "$E = 0.0461$ ($4.61$ percentage points)",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "moe_used_t",
+          "text_markdown": "$E = 0.0464$ based on Student's $t$ with $df = 399$",
+          "misconception_id": "used_t_for_proportion",
+          "hint_markdown": "Proportion inference relies on the Central Limit Theorem and the standard normal Z distribution; Student's t is not used for single proportions."
+        },
+        {
+          "id": "moe_wrong_z",
+          "text_markdown": "$E = 0.0387$ ($3.87$ percentage points) using $Z^* = 1.645$",
+          "misconception_id": "used_90_pct_z_for_95_pct_ci",
+          "hint_markdown": "A $95\\%$ confidence interval requires $Z^* = 1.960$, not $1.645$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "moe_correct"
+      },
+      "evidence_concept_ids": [
+        "ci_proportion_margin_of_error"
+      ],
+      "explanation_markdown": "With $Z^* = 1.960$ for a $95\\%$ confidence level, the margin of error is $E = 1.95996 \\times 0.0235106 \\approx 0.04608$ (or approximately $4.61$ percentage points). In Excel: `=NORM.S.INV(0.975)*SQRT(0.33*(1-0.33)/400)`.",
+      "numeric_policy": null
+    },
+    {
+      "id": "interval_construction",
+      "kind": "choice",
+      "prompt_markdown": "Construct the $95\\%$ confidence interval and identify the correct business interpretation.",
+      "options": [
+        {
+          "id": "interval_correct",
+          "text_markdown": "$[0.2839, 0.3761]$ (or $28.4\\%$ to $37.6\\%$): We are $95\\%$ confident that the true population recommendation proportion $p$ is between $28.4\\%$ and $37.6\\%$.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "interval_subtracted_wrong",
+          "text_markdown": "$[0.3065, 0.3535]$: Adding and subtracting the standard error $SE = 0.0235$ rather than the margin of error $E$.",
+          "misconception_id": "used_standard_error_instead_of_moe",
+          "hint_markdown": "The confidence interval is $\\hat{p} \\pm E = \\hat{p} \\pm Z^* \\cdot SE$, not $\\hat{p} \\pm SE$."
+        },
+        {
+          "id": "interval_probabilistic_claim",
+          "text_markdown": "$[0.2839, 0.3761]$: There is a $95\\%$ probability that the sample proportion $\\hat{p}$ was equal to $33\\%$.",
+          "misconception_id": "misinterpreted_confidence_level_as_sample_certainty",
+          "hint_markdown": "The sample proportion is known with certainty ($33\\%$). The $95\\%$ confidence reflects the long-run capture rate of the unknown population parameter $p$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "interval_correct"
+      },
+      "evidence_concept_ids": [
+        "ci_proportion_interval_construction"
+      ],
+      "explanation_markdown": "The confidence interval bounds are $\\hat{p} \\pm E = 0.3300 \\pm 0.0461 = [0.2839, 0.3761]$, or $28.39\\%$ to $37.61\\%$. We can conclude with $95\\%$ confidence that the true proportion of all retail customers who would recommend the brand falls within this range.",
+      "numeric_policy": null
+    }
+  ]
+}

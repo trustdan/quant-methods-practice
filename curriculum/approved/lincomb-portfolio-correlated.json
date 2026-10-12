@@ -1,0 +1,155 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "lincomb_portfolio_correlated",
+  "version": 1,
+  "status": "active",
+  "family_id": "linear_combination",
+  "rule_version": 2,
+  "module_id": "module_2",
+  "title": "Portfolio variance with a covariance term",
+  "scenario_markdown": "A fictional portfolio assigns weights 0.60 and 0.40 to returns X and Y. Mean returns are 8 and 4 percentage points; SDs are 10 and 5 percentage points; correlation is 0.30. Compute moments of R=0.60X+0.40Y. Use percentage-point units consistently, not decimal returns.",
+  "parameters": {
+    "a": 0.6,
+    "b": 0.4,
+    "mean_x": 8,
+    "mean_y": 4,
+    "operation": "portfolio",
+    "rho": 0.3,
+    "var_x": 100,
+    "var_y": 25
+  },
+  "assumptions": [
+    "Weights are fixed, sum to one, and returns have finite second moments.",
+    "Correlation 0.30 is given; independence must not be assumed.",
+    "Variance and covariance use squared percentage-point units."
+  ],
+  "concept_ids": [
+    "portfolio_covariance_from_correlation",
+    "portfolio_correlated_variance",
+    "portfolio_positive_correlation_effect"
+  ],
+  "setting_group": "fictional_correlated_return_portfolio",
+  "source_refs": [
+    "docs/COURSE-MAP.md: learner-supplied module objectives, October 11, 2026",
+    "docs/CONTENT-BACKLOG.md: lincomb-portfolio-correlated"
+  ],
+  "approval": {
+    "reviewer": "codex_delegated_final_waves",
+    "reviewed_at": "2026-10-12T04:32:26.275462Z",
+    "delegation_basis": "User explicitly replied on October 11, 2026 (America/Chicago): Yes—delegate review and activate after checks pass. Approval follows successful Go mathematical, bank admission, every-option grading and snapshot checks; assistant semantic review does not claim personal user reading.",
+    "notes": "Assistant reviewed the complete scenario, stage wording, all options, causal hints and worked explanations. Numerical choices are independently bound to Go engine quantities under rule v2; conceptual choices are semantically reviewed. Fixed parameters only; no cosmetic variation claimed as transfer. Stated course conventions remain unconfirmed where applicable. Validated one-to-one concept evidence, rejected ambiguous numeric distractors, and tested every option after snapshot serialization."
+  },
+  "stages": [
+    {
+      "calculation": "covariance",
+      "id": "portfolio_covariance_from_correlation",
+      "kind": "choice",
+      "prompt_markdown": "What is Cov(X,Y) in squared percentage-point units? Select the value rounded to four decimal places.",
+      "options": [
+        {
+          "numeric_value": 15,
+          "id": "supported",
+          "text_markdown": "$15.0000$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "numeric_value": 0.3,
+          "id": "misconception_a",
+          "text_markdown": "$0.3000$",
+          "misconception_id": "portfolio_covariance_from_correlation_a",
+          "hint_markdown": "Correlation is dimensionless; multiply it by both SDs."
+        },
+        {
+          "numeric_value": 750,
+          "id": "misconception_b",
+          "text_markdown": "$750.0000$",
+          "misconception_id": "portfolio_covariance_from_correlation_b",
+          "hint_markdown": "Use SDs 10 and 5, not variances 100 and 25."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "supported"
+      },
+      "evidence_concept_ids": [
+        "portfolio_covariance_from_correlation"
+      ],
+      "explanation_markdown": "$\\operatorname{Cov}(X,Y)=\\rho\\sigma_X\\sigma_Y=0.30(10)(5)=15$. Excel: `=0.3*10*5`.",
+      "numeric_policy": null
+    },
+    {
+      "calculation": "variance",
+      "id": "portfolio_correlated_variance",
+      "kind": "choice",
+      "prompt_markdown": "What is Var(R) in squared percentage-point units? Select the value rounded to four decimal places.",
+      "options": [
+        {
+          "numeric_value": 47.2,
+          "id": "supported",
+          "text_markdown": "$47.2000$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "numeric_value": 40,
+          "id": "misconception_a",
+          "text_markdown": "$40.0000$",
+          "misconception_id": "portfolio_correlated_variance_a",
+          "hint_markdown": "Include the positive covariance contribution."
+        },
+        {
+          "numeric_value": 70,
+          "id": "misconception_b",
+          "text_markdown": "$70.0000$",
+          "misconception_id": "portfolio_correlated_variance_b",
+          "hint_markdown": "Square each portfolio weight in its own variance term."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "supported"
+      },
+      "evidence_concept_ids": [
+        "portfolio_correlated_variance"
+      ],
+      "explanation_markdown": "$\\operatorname{Var}(R)=0.6^2(100)+0.4^2(25)+2(0.6)(0.4)(15)=36+4+7.2=47.2$. SD is $\\sqrt{47.2}=6.8702$ percentage points and mean is 6.4 percentage points. Excel: `=0.6^2*100+0.4^2*25+2*0.6*0.4*0.3*10*5`.",
+      "numeric_policy": null
+    },
+    {
+      "id": "portfolio_positive_correlation_effect",
+      "kind": "choice",
+      "prompt_markdown": "Compared with the same inputs but zero correlation, what changes?",
+      "options": [
+        {
+          "id": "supported",
+          "text_markdown": "Variance rises from 40 to 47.2; the mean stays 6.4 percentage points.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "misconception_a",
+          "text_markdown": "The mean rises because positive correlation increases expected returns.",
+          "misconception_id": "portfolio_positive_correlation_effect_a",
+          "hint_markdown": "The expectation formula has no covariance term."
+        },
+        {
+          "id": "misconception_b",
+          "text_markdown": "Variance falls because positive correlation always improves diversification.",
+          "misconception_id": "portfolio_positive_correlation_effect_b",
+          "hint_markdown": "The cross term is positive for positive weights and positive covariance."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "supported"
+      },
+      "evidence_concept_ids": [
+        "portfolio_positive_correlation_effect"
+      ],
+      "explanation_markdown": "Zero correlation removes the cross term but does not alter the weighted mean. Correlation and independence are different concepts; zero correlation is sufficient for this variance calculation without proving independence.",
+      "numeric_policy": null
+    }
+  ]
+}

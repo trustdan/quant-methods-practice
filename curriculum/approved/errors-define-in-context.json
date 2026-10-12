@@ -1,0 +1,142 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "errors_define_in_context",
+  "version": 1,
+  "status": "active",
+  "family_id": "concept_check",
+  "rule_version": 1,
+  "module_id": "module_5",
+  "title": "Type I and Type II errors in manufacturing quality control",
+  "scenario_markdown": "A semiconductor manufacturing facility conducts acceptance sampling on production batches of automotive microchips. The null hypothesis is $H_0: \\text{The batch meets quality standards}$ (conforming batch), and the alternative hypothesis is $H_1: \\text{The batch is defective}$. If $H_0$ is rejected, the entire batch is destroyed at heavy manufacturer expense. If $H_0$ is not rejected, the batch is cleared and shipped to vehicle assembly plants.",
+  "parameters": {
+    "topic": "hypothesis_testing_errors",
+    "concept": "type_i_and_type_ii_errors_in_context",
+    "objective": "Distinguish Type I and Type II errors in quality control decision-making"
+  },
+  "assumptions": [
+    "A decision to reject H0 or fail to reject H0 is made based on sample data",
+    "The true state of nature (batch is conforming vs defective) is fixed but unknown to inspectors",
+    "Type I error probability is controlled by significance level alpha; Type II error probability is beta"
+  ],
+  "concept_ids": [
+    "type_i_error_producer_risk_context",
+    "type_ii_error_consumer_risk_context",
+    "error_tradeoff_sample_size_dynamics"
+  ],
+  "setting_group": "semiconductor_acceptance_sampling_errors",
+  "source_refs": [
+    "Course Module 5: Hypothesis Testing",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T22:00:00Z",
+    "notes": "Reviewed conceptual definitions: Type I is rejecting true H0 (scrapping good chips / producer risk); Type II is failing to reject false H0 (shipping bad chips / consumer risk). Trade-off dynamics verify alpha vs beta trade-off and role of n.",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "type_i_in_context",
+      "kind": "choice",
+      "prompt_markdown": "What constitutes a Type I error in this specific quality control context, and what are its direct business consequences?",
+      "options": [
+        {
+          "id": "type_i_correct",
+          "text_markdown": "Rejecting $H_0$ when $H_0$ is true: Scrapping a perfectly conforming batch of microchips (Producer's risk / false alarm).",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "type_i_swapped_with_type_ii",
+          "text_markdown": "Failing to reject $H_0$ when $H_0$ is false: Shipping a defective batch of microchips to automakers.",
+          "misconception_id": "swapped_type_i_and_type_ii_definitions",
+          "hint_markdown": "Failing to detect a defective condition is a Type II error (false negative), not a Type I error."
+        },
+        {
+          "id": "type_i_correct_decision",
+          "text_markdown": "Rejecting $H_0$ when $H_0$ is false: Correctly identifying and destroying a defective batch.",
+          "misconception_id": "confused_error_with_statistical_power",
+          "hint_markdown": "Rejecting a false null hypothesis is a correct decision (statistical power $1 - \\beta$), not an error."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "type_i_correct"
+      },
+      "evidence_concept_ids": [
+        "type_i_error_producer_risk_context"
+      ],
+      "explanation_markdown": "A Type I error occurs when the test rejects a true null hypothesis ($P(\\text{Reject } H_0 \\mid H_0 \\text{ is true}) = \\alpha$). In this context, $H_0$ states the batch meets standards; rejecting it means declaring a good batch defective and scrapping it. In industrial quality control, this is known as the Producer's Risk.",
+      "numeric_policy": null
+    },
+    {
+      "id": "type_ii_in_context",
+      "kind": "choice",
+      "prompt_markdown": "What constitutes a Type II error in this context, and what are its direct business consequences?",
+      "options": [
+        {
+          "id": "type_ii_correct",
+          "text_markdown": "Failing to reject $H_0$ when $H_0$ is false: Clearing and shipping a defective batch of microchips to automakers (Consumer's risk / missed defect).",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "type_ii_swapped_with_type_i",
+          "text_markdown": "Rejecting $H_0$ when $H_0$ is true: Discarding a batch that met all engineering specifications.",
+          "misconception_id": "swapped_type_ii_for_type_i",
+          "hint_markdown": "Rejecting a conforming batch is a false positive (Type I error), not a Type II error."
+        },
+        {
+          "id": "type_ii_correct_acceptance",
+          "text_markdown": "Failing to reject $H_0$ when $H_0$ is true: Shipping a conforming batch to customers as intended.",
+          "misconception_id": "confused_type_ii_error_with_correct_retention",
+          "hint_markdown": "Retaining $H_0$ when the batch is truly conforming is a correct decision ($1 - \\alpha$), not an error."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "type_ii_correct"
+      },
+      "evidence_concept_ids": [
+        "type_ii_error_consumer_risk_context"
+      ],
+      "explanation_markdown": "A Type II error occurs when the test fails to reject a false null hypothesis ($P(\\text{Fail to reject } H_0 \\mid H_0 \\text{ is false}) = \\beta$). Here, $H_0$ is false because the batch is defective. Failing to reject it means clearing the defective chips for shipment, risking safety recalls and liability. In quality engineering, this is known as the Consumer's Risk.",
+      "numeric_policy": null
+    },
+    {
+      "id": "error_tradeoff",
+      "kind": "choice",
+      "prompt_markdown": "If plant managers reduce the significance level from $\\alpha = 0.05$ to $\\alpha = 0.01$ without altering the sample size $n$, what is the effect on the Type II error probability $\\beta$?",
+      "options": [
+        {
+          "id": "tradeoff_beta_increases",
+          "text_markdown": "$\\beta$ increases: Requiring stronger evidence to reject $H_0$ makes it harder to detect defective batches, increasing the risk of shipping bad chips.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "tradeoff_beta_decreases",
+          "text_markdown": "$\\beta$ decreases: Lowering $\\alpha$ improves overall testing precision, reducing both types of errors simultaneously.",
+          "misconception_id": "belief_both_errors_decrease_together_without_larger_n",
+          "hint_markdown": "For a fixed sample size, $\\alpha$ and $\\beta$ have an inverse relationship: reducing the false-alarm rate $\\alpha$ always widens the non-rejection region, increasing missed defects $\\beta$."
+        },
+        {
+          "id": "tradeoff_beta_unchanged",
+          "text_markdown": "$\\beta$ remains unchanged because $\\alpha$ and $\\beta$ are mathematically independent parameters.",
+          "misconception_id": "belief_alpha_and_beta_are_independent",
+          "hint_markdown": "Changing the critical cutoff shifts the decision boundary, directly altering both tail areas."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "tradeoff_beta_increases"
+      },
+      "evidence_concept_ids": [
+        "error_tradeoff_sample_size_dynamics"
+      ],
+      "explanation_markdown": "For any fixed sample size $n$, there is an inherent trade-off between Type I and Type II errors. Lowering $\\alpha$ moves the rejection threshold further into the tails, requiring more extreme evidence before rejecting $H_0$. This reduces false scrap alarms (Type I), but simultaneously makes it easier for subtle defects to slip through undetected, thereby increasing $\\beta$ (Type II error). The only way to decrease both $\\alpha$ and $\\beta$ simultaneously is to increase the sample size $n$.",
+      "numeric_policy": null
+    }
+  ]
+}

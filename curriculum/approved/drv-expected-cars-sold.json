@@ -1,0 +1,143 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "drv_expected_cars_sold",
+  "version": 1,
+  "status": "active",
+  "family_id": "discrete_rv",
+  "rule_version": 1,
+  "module_id": "module_2",
+  "title": "Expected value of a discrete random variable using SUMPRODUCT",
+  "scenario_markdown": "A regional automobile franchise models the daily vehicle sales volume $X$ at its flagship showroom using the following discrete probability mass function:\n\n| Vehicles Sold ($x$) | $0$ | $1$ | $2$ | $3$ | $4$ |\n| :--- | :---: | :---: | :---: | :---: | :---: |\n| **Probability $P(X = x)$** | $0.10$ | $0.25$ | $0.35$ | $0.20$ | $0.10$ |\n\nCalculate the mathematical expectation (mean) $E[X]$, identify the standard spreadsheet formula, and interpret the resulting expected value in an operational planning context.",
+  "parameters": {
+    "operation": "expected_value",
+    "values": [0.0, 1.0, 2.0, 3.0, 4.0],
+    "probabilities": [0.10, 0.25, 0.35, 0.20, 0.10],
+    "expected_value": 1.95
+  },
+  "assumptions": [
+    "X is a finite discrete random variable with support {0, 1, 2, 3, 4}",
+    "Expected value is the probability-weighted sum of all possible outcomes",
+    "Spreadsheet implementation uses SUMPRODUCT across values and probabilities"
+  ],
+  "concept_ids": [
+    "compute_expected_value_discrete_rv",
+    "identify_excel_sumproduct_formula",
+    "interpret_expected_value_long_run_mean"
+  ],
+  "setting_group": "automotive_dealership_daily_sales_pmf",
+  "source_refs": [
+    "Course Module 2: Discrete Random Variables & Probability Distributions",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T23:16:00Z",
+    "notes": "Reviewed expectation calculation: E[X] = 0(0.10) + 1(0.25) + 2(0.35) + 3(0.20) + 4(0.10) = 1.95 cars/day. Confirmed Excel SUMPRODUCT implementation and long-run average interpretation.",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "compute_expected_value",
+      "kind": "choice",
+      "prompt_markdown": "What is the expected number of vehicles sold per day, $E[X]$?",
+      "options": [
+        {
+          "id": "e_correct",
+          "text_markdown": "**$E[X] = 1.95\\text{ vehicles}$**: $0(0.10) + 1(0.25) + 2(0.35) + 3(0.20) + 4(0.10) = 0 + 0.25 + 0.70 + 0.60 + 0.40 = 1.95$.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "e_unweighted_average",
+          "text_markdown": "**$E[X] = 2.00\\text{ vehicles}$**: The unweighted arithmetic average of the possible outcomes $\\frac{0 + 1 + 2 + 3 + 4}{5} = 2.00$.",
+          "misconception_id": "computed_simple_average_ignoring_unequal_probabilities",
+          "hint_markdown": "A simple average assumes all outcomes are equally likely (each 0.20); expected value must weight each outcome by its actual probability."
+        },
+        {
+          "id": "e_mode_selection",
+          "text_markdown": "**$E[X] = 2.00\\text{ vehicles}$**: The outcome with the highest probability ($0.35$).",
+          "misconception_id": "confused_expected_value_with_mode",
+          "hint_markdown": "The outcome with highest probability is the mode; expected value is the weighted average center of mass."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "e_correct"
+      },
+      "evidence_concept_ids": [
+        "compute_expected_value_discrete_rv"
+      ],
+      "explanation_markdown": "The expected value of a discrete random variable is the probability-weighted sum of all possible outcomes:\n\n$$E[X] = \\mu = \\sum_{x} x \\cdot P(X = x)$$\n$$E[X] = 0(0.10) + 1(0.25) + 2(0.35) + 3(0.20) + 4(0.10)$$\n$$E[X] = 0 + 0.25 + 0.70 + 0.60 + 0.40 = 1.95\\text{ vehicles/day}$$",
+      "numeric_policy": null
+    },
+    {
+      "id": "identify_excel_formula",
+      "kind": "choice",
+      "prompt_markdown": "Assuming outcomes $x$ are in cells `A2:A6` and probabilities $P(X=x)$ are in cells `B2:B6`, which Excel formula directly calculates $E[X]$?",
+      "options": [
+        {
+          "id": "excel_sumproduct_correct",
+          "text_markdown": "**`=SUMPRODUCT(A2:A6, B2:B6)`**: Multiplies corresponding elements in both arrays and sums the products.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "excel_average_only",
+          "text_markdown": "**`=AVERAGE(A2:A6)`**: Averages the values in column A.",
+          "misconception_id": "used_simple_average_in_spreadsheet",
+          "hint_markdown": "AVERAGE only calculates the unweighted mean of column A and completely ignores the probability weights in column B."
+        },
+        {
+          "id": "excel_product_only",
+          "text_markdown": "**`=PRODUCT(A2:A6, B2:B6)`**: Multiplies all ten numbers together.",
+          "misconception_id": "confused_sumproduct_with_product",
+          "hint_markdown": "PRODUCT multiplies all numbers across both ranges together into a single scalar rather than performing paired multiplication and summation."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "excel_sumproduct_correct"
+      },
+      "evidence_concept_ids": [
+        "identify_excel_sumproduct_formula"
+      ],
+      "explanation_markdown": "In Microsoft Excel, `=SUMPRODUCT(array1, array2)` evaluates $\\sum a_i b_i$ in a single formula call without requiring a helper column. Entering `=SUMPRODUCT(A2:A6, B2:B6)` yields exactly $1.95$.",
+      "numeric_policy": null
+    },
+    {
+      "id": "interpret_expected_value",
+      "kind": "choice",
+      "prompt_markdown": "How should the dealership General Manager interpret the expected value $E[X] = 1.95$ vehicles?",
+      "options": [
+        {
+          "id": "interp_correct",
+          "text_markdown": "**It is the theoretical long-run average daily sales over many operating days**: On any single day, the dealership can only sell an integer number of cars ($0, 1, 2, 3$, or $4$), but averaged over a month (e.g. 20 selling days), they can expect approximately $20 \\times 1.95 = 39$ total cars.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "interp_must_occur_daily",
+          "text_markdown": "Every day the dealership will sell almost exactly 2 cars, with fractional 0.05 carryover.",
+          "misconception_id": "believed_expected_value_must_occur_on_individual_trials",
+          "hint_markdown": "Individual outcomes are discrete integers; expected value is a mathematical long-run summary mean that need not be a possible individual outcome."
+        },
+        {
+          "id": "interp_guaranteed_minimum",
+          "text_markdown": "The dealership is guaranteed to sell at least 1.95 vehicles each day.",
+          "misconception_id": "confused_expected_value_with_lower_bound",
+          "hint_markdown": "The minimum possible sale is 0 vehicles (which happens 10% of the time); expectation is not a lower bound."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "interp_correct"
+      },
+      "evidence_concept_ids": [
+        "interpret_expected_value_long_run_mean"
+      ],
+      "explanation_markdown": "An expected value represents the **long-run center of mass** of the distribution over repeated independent realizations. Even though $1.95$ is not an integer in the support (you cannot sell $0.95$ of a car on any given Tuesday), over $100$ business days the dealership will sell approximately $195$ total vehicles.",
+      "numeric_policy": null
+    }
+  ]
+}

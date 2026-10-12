@@ -1,0 +1,140 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "regprob_outlier_influence",
+  "version": 1,
+  "status": "active",
+  "family_id": "concept_check",
+  "rule_version": 1,
+  "module_id": "module_6",
+  "title": "Investigating a store that changes the fitted slope",
+  "scenario_markdown": "A store-level regression of sales on advertising has a positive slope for the main cluster. A distant high-advertising store has low sales; including it changes the fitted slope to negative. The store is much farther along the predictor axis than the other stores. The analyst has not yet checked the record.",
+  "parameters": {
+    "topic": "regression_diagnostics"
+  },
+  "assumptions": [
+    "The change in fitted slope is based on a sensitivity comparison with and without the store.",
+    "Distance along X concerns leverage; influence concerns changes to the fitted model.",
+    "An unusual observation may be valid and must not be removed solely to obtain a preferred result."
+  ],
+  "concept_ids": [
+    "leverage_vs_influence",
+    "influential_store_investigation",
+    "influence_reporting_limit"
+  ],
+  "setting_group": "store_advertising_influence_sensitivity",
+  "source_refs": [
+    "docs/COURSE-MAP.md: learner-supplied module objectives, October 11, 2026",
+    "docs/CONTENT-BACKLOG.md: regprob-outlier-influence"
+  ],
+  "approval": {
+    "reviewer": "codex_delegated_final_waves",
+    "reviewed_at": "2026-10-12T04:32:26.275462Z",
+    "delegation_basis": "User explicitly replied on October 11, 2026 (America/Chicago): Yes—delegate review and activate after checks pass. Approval follows successful Go mathematical, bank admission, every-option grading and snapshot checks; assistant semantic review does not claim personal user reading.",
+    "notes": "Assistant reviewed the complete scenario, stage wording, all options, causal hints and worked explanations. Numerical choices are independently bound to Go engine quantities under rule v2; conceptual choices are semantically reviewed. Fixed parameters only; no cosmetic variation claimed as transfer. Stated course conventions remain unconfirmed where applicable. Validated one-to-one concept evidence, rejected ambiguous numeric distractors, and tested every option after snapshot serialization."
+  },
+  "stages": [
+    {
+      "id": "leverage_vs_influence",
+      "kind": "choice",
+      "prompt_markdown": "Which diagnosis is supported by the description?",
+      "options": [
+        {
+          "id": "supported",
+          "text_markdown": "The store has high leverage and is influential, since its inclusion materially changes the fitted slope.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "misconception_a",
+          "text_markdown": "Every point with high leverage must be influential in every dataset.",
+          "misconception_id": "leverage_vs_influence_a",
+          "hint_markdown": "Leverage creates potential influence; the observed slope change demonstrates influence here."
+        },
+        {
+          "id": "misconception_b",
+          "text_markdown": "The store has low leverage because its sales are low.",
+          "misconception_id": "leverage_vs_influence_b",
+          "hint_markdown": "Leverage depends on predictor positions, not whether Y is low."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "supported"
+      },
+      "evidence_concept_ids": [
+        "leverage_vs_influence"
+      ],
+      "explanation_markdown": "The unusual X value creates high leverage. The observed change in slope is direct sensitivity evidence of influence. A vertical outlier, leverage, and influence are related but distinct.",
+      "numeric_policy": null
+    },
+    {
+      "id": "influential_store_investigation",
+      "kind": "choice",
+      "prompt_markdown": "What should the analyst do first?",
+      "options": [
+        {
+          "id": "supported",
+          "text_markdown": "Check data accuracy and business context, inspect diagnostics, and report sensitivity to the store.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "misconception_a",
+          "text_markdown": "Delete the store immediately so the desired positive slope returns.",
+          "misconception_id": "influential_store_investigation_a",
+          "hint_markdown": "A preferred result is not a valid data-exclusion criterion."
+        },
+        {
+          "id": "misconception_b",
+          "text_markdown": "Hide the model including the store from the report.",
+          "misconception_id": "influential_store_investigation_b",
+          "hint_markdown": "Material sensitivity belongs in an honest analysis."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "supported"
+      },
+      "evidence_concept_ids": [
+        "influential_store_investigation"
+      ],
+      "explanation_markdown": "Verify units, data entry and whether the store belongs to the target population. If valid, it may reveal a distinct regime or an inadequate model. Any exclusion needs a defensible, documented reason.",
+      "numeric_policy": null
+    },
+    {
+      "id": "influence_reporting_limit",
+      "kind": "choice",
+      "prompt_markdown": "What does the slope reversal imply for interpretation?",
+      "options": [
+        {
+          "id": "supported",
+          "text_markdown": "The association is sensitive to one observation; avoid presenting a stable or causal advertising effect from this fit alone.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "misconception_a",
+          "text_markdown": "Advertising has been proved to cause lower sales everywhere.",
+          "misconception_id": "influence_reporting_limit_a",
+          "hint_markdown": "A sensitive observational slope cannot establish causation or universal effects."
+        },
+        {
+          "id": "misconception_b",
+          "text_markdown": "The main-cluster fit is automatically the true population model.",
+          "misconception_id": "influence_reporting_limit_b",
+          "hint_markdown": "The cluster also requires a justified population and modeling assumptions."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "supported"
+      },
+      "evidence_concept_ids": [
+        "influence_reporting_limit"
+      ],
+      "explanation_markdown": "Report both sensitivity and uncertainty. Consider model form, population scope, robust analysis and more data as appropriate. The direction of a fitted coefficient is not a causal guarantee.",
+      "numeric_policy": null
+    }
+  ]
+}

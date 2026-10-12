@@ -1,5 +1,231 @@
 # Handoff
 
+## Final Wave 4 + Wave 5 complete - October 11, 2026 (Windows)
+
+Completed the remaining **20 questions** (7 from Wave 4, 13 from Wave 5), with **60 stages**, 20 matching review records and explicit user-delegated approval. The active bank is now **137 questions: 16 original + all 121 planned additions**, covering all **22 published objective targets**. Current approval timestamps are UTC October 12, corresponding to the October 11 client date in America/Chicago. The user's explicit delegation was: "Yes—delegate review and activate after checks pass." New records identify `codex_delegated_final_waves`; they do not claim personal user reading or rely on the earlier vague roadmap-authorization notes.
+
+### Content and implementation
+
+- Wave 4: `twosample-read-excel-output`, `regout-compare-models-fit`, `mreg-adjusted-r2-weak-predictor`, `mreg-overall-f-vs-individual-t`, `mreg-dummy-variable`, `regprob-nonlinearity`, `regprob-autocorrelation`.
+- Wave 5: `desc-zscore-empirical-rule`, `desc-weighted-mean-price`, `desc-quartiles-iqr-fences`, `drv-compare-projects-risk`, `drv-insurance-break-even`, `drv-cumulative-from-table`, `lincomb-weekly-demand-sum-vs-scale`, `lincomb-portfolio-correlated`, `twosample-paired-training`, `twosample-independent-means-layouts`, `twosample-two-proportion-ads`, `regprob-outlier-influence`, `regprob-omitted-variable-causation`.
+- New JSON lives under `curriculum/approved/` with matching `curriculum/reviews/*.review.json`. [Full worked preview](REMAINING-CONTENT-REVIEW.md) includes every scenario, assumption, choice, hint, key and explanation.
+- `internal/mathengine/curriculum_calculations.go` adds reviewed rule-v2, input-only operations over the existing engines, inclusive interpolated quantiles, paired differences from raw arrays, signed directional p-values, strict PMF checks and pooled normal-approximation checks. `internal/bank/calculations.go`, the family registry, parser, optional domain fields and illustrative schema bind calculation stages to Go-derived quantities and reject key/input/label drift and colliding distractors. Original rule-v1 content is preserved; no historical learner snapshots are changed.
+- `internal/mathengine/curriculum_calculations_test.go` uses hand-derived fixtures, including exact Cauchy directional tails. `internal/bank/calculations_test.go` grades every option in all 20 templates after snapshot serialization and checks unresolved public projections withhold calculation metadata and keys. Existing legacy family work from the prior session remains intact.
+- `scripts/content-audit/main.go` validates final-sprint content and regenerates its complete preview; `-reviews` exports matching already-approved review records and refuses different overwrites. It never grants approval. `scripts/check_content_coverage.py` checks every catalog slug, all 22 objective counts, review identity/status/version and the 137 unique bank IDs; older review formats are accepted only for original v1 templates.
+- `tests/e2e/worksheets.spec.ts` now exercises all 20 new questions and 60 stages through the native offline browser UI, checks persisted correct attempts and MathJax errors, and verifies quartile/portfolio content fits at 375px width. Test databases and credential stores are isolated temporary directories.
+- Updated README, PLAN, CONTENT-BACKLOG, QUESTION-BANK and NUMERICS. Applied Go formatting; pre-existing extra blank lines and CRLF formatting were normalized as required by the repository check, without unrelated logic changes.
+
+### Verification actually run
+
+- `go test -count=1 ./internal/mathengine ./internal/bank`: passed, including independent fixtures, invalid-input checks, wrong-direction tails, parameter/key drift rejection, every distractor grade and snapshot round-trips.
+- `go run ./scripts/content-audit -derive` while still unapproved drafts, then `go run ./scripts/content-audit -dir curriculum/approved -reviewer codex_delegated_final_waves -reviews`: all 20 passed; review records contain canonical engine quantities rather than invented probability/moment placeholders.
+- `powershell -ExecutionPolicy Bypass -File scripts/test.ps1`: passed after allowing subprocess launch outside the restricted sandbox. Includes scaffold validation, TypeScript, lint, **100/100 frontend unit tests**, production UI/native executable build, **15/15 existing browser tests**, Go formatting, all 15 internal package tests and vet. The first restricted attempt stopped at Vitest/esbuild `spawn EPERM`; it did not indicate a test assertion failure.
+- `npm run test:e2e -- worksheets.spec.ts` after adding the focused content check: **3/3 passed**, including all 60 new stages, no external requests or MathJax errors. One initial test locator timed out because an exact implicit-label lookup did not match the label containing a select; corrected to scope the select within its visible label and reran successfully.
+- `python scripts/check_content_coverage.py`: passed - **121/121 additions, 22/22 objectives, 137 unique active templates**.
+- Final complete `scripts/test.ps1` rerun after adding the new browser test and correcting approval text encoding: **passed with 100 frontend tests and all 16 browser tests**, native rebuild, Go formatting/tests/vet. `go test ./scripts/content-audit` compiles the audit command (no test files); `go vet ./scripts/content-audit` passes. Repeated approved review export passes with CRLF/LF normalization. CLI `bin/quant-practice.exe -data-dir .cache/final-bank-smoke -list-bank` loads the final bank from the rebuilt executable in isolated local data. Generated changes to existing screenshot fixtures were removed; the new browser assertions remain.
+
+### Remaining scope and next work
+
+No catalog questions remain to author. Inclusive quartiles, pooled versus Welch and dummy-variable assessment coverage remain unconfirmed course conventions, explicitly labeled in the affected exercises. No private course files were supplied (inventory remains `.gitkeep` only), and no new claim of instructor-specific alignment, live provider verification or learning effectiveness is made.
+
+The local content changes are not committed. Per the backlog's delivery rule, the final 20 checklist boxes remain open until their files are committed; authoring, delegated approval, activation and validation are complete. Preserve all existing local sprint work when preparing that commit. Stage 18 arcade parity and Stage 19 release hardening remain the next implementation stages; Stage 20 ongoing transfer-quality review is not finished merely by meeting counts.
+
+---
+
+## Dispersed Wave 4 Sprint (13 Questions Completed + All 4 Engines Implemented — Bank Reaches 117 Questions!) — October 11, 2026 (Windows)
+
+Successfully implemented all remaining engine prerequisites, authored, audited, and approved **13 new questions** in **Dispersed Wave 4**, expanding the active approved repository from 104 to **117 approved questions** (16 baseline + 101 new), and achieving **100% completion of Row 1.3 (6/6) and Row 5.3 (6/6)**!
+
+- **Engine Prerequisites Implemented & Verified**:
+  - `ENG-DESC` (`descriptive_stats`): `internal/mathengine/descriptive.go` with mean, median, mode, range, sample/population variance and standard deviation, coefficient of variation ($CV$), $z$-scores, and weighted means. Unit tests in `internal/mathengine/descriptive_test.go`.
+  - `ENG-PMF` (`discrete_rv`): `internal/mathengine/discrete_rv.go` with discrete probability distribution validation, solving missing probabilities, expected value ($E[X]$), second moment ($E[X^2]$), variance ($\operatorname{Var}(X) = E[X^2] - \mu^2$), standard deviation, and interval/tail probabilities. Unit tests in `internal/mathengine/discrete_rv_test.go`.
+  - `ENG-AFFINE` (`linear_combination` extension): `internal/mathengine/linearcomb.go` extended with affine transformations ($E[aX+c] = aE[X]+c, \operatorname{Var}(aX+c) = a^2\operatorname{Var}(X), \operatorname{SD}(aX+c) = |a|\operatorname{SD}(X)$) where constant $c$ contributes zero variance, plus sum and difference of independent random variables ($\operatorname{Var}(X \pm Y) = \operatorname{Var}(X) + \operatorname{Var}(Y)$). Unit tests in `internal/mathengine/linearcomb_test.go`.
+  - `ENG-TWOSAMPLE` (`two_sample_test`): `internal/mathengine/two_sample.go` with paired samples $t$-tests ($df = n - 1$), independent two-sample pooled $t$-tests ($df = n_1 + n_2 - 2$), and two-sample pooled proportion $z$-tests. Unit tests in `internal/mathengine/two_sample_test.go`.
+  - `ENG-PROB-EXT` (`set_probability` extension): `internal/mathengine/setprob.go` extended with Law of Total Probability and Bayes' Theorem for 2-partitions. Unit tests in `internal/mathengine/setprob_test.go`.
+  - Registered all new families and parameter rules in `internal/bank/family.go` and verified in `internal/bank/bank_test.go`.
+
+- **Module 1 Completed in Wave 4 (4 questions — Row 1.3 reaches 6/6 milestone!)**:
+  - `curriculum/approved/desc-mean-median-outlier.json` + review: monthly sales of $7$ retail branches ($\{18, 20, 22, 24, 25, 26, 120\}$ in thousands), computing mean $\bar{x} = 255/7 \approx \$36.43\text{k}$ vs median $\$24.00\text{k}$, showing how the $\$120\text{k}$ flagship outlier inflates the mean above $85.7\%$ of branches, and establishing the median as the robust representative measure.
+  - `curriculum/approved/desc-sample-sd-delivery-times.json` + review: $6$ courier delivery times ($\{12, 16, 18, 20, 22, 32\}$ min), computing sum of squared deviations $SS = 232.0$, sample variance $s^2 = 232/5 = 46.40$, sample SD $s = \sqrt{46.4} \approx 6.81\text{ min}$, and contrasting with population SD $\sigma = \sqrt{232/6} \approx 6.22\text{ min}$. Excel: `=STDEV.S` vs `=STDEV.P` and Bessel's correction ($n - 1$).
+  - `curriculum/approved/desc-cv-compare-stocks.json` + review: comparing Tech Growth Fund A ($\bar{x}_A = 12.0\%, s_A = 4.0\%$) vs Stable Income Fund B ($\bar{x}_B = 4.0\%, s_B = 2.0\%$), computing $CV_A = 4/12 = 33.3\%$ vs $CV_B = 2/4 = 50.0\%$, and showing Fund B carries higher relative risk per unit of return despite having half the absolute standard deviation.
+  - `curriculum/approved/prob-two-plant-defect-tree.json` + review: automotive microchips from Plant 1 ($60\%$, $2\%$ defect) and Plant 2 ($40\%$, $5\%$ defect), applying Total Probability $P(D) = 0.60(0.02) + 0.40(0.05) = 0.032$ ($3.2\%$) and Bayes' Theorem $P(\text{Plant 2} \mid D) = 0.020 / 0.032 = 0.625$ ($62.5\%$), showing how prior $40\%$ updates to $62.5\%$ posterior. **Completes Row 1.3 at 6/6!**
+
+- **Module 2 Completed in Wave 4 (7 questions — Rows 2.1 at 3/6, Row 2.2 at 4/6)**:
+  - `curriculum/approved/drv-valid-pmf-missing-value.json` + review: dealership daily car sales $X \in \{0, 1, 2, 3, 4\}$, solving missing $P(X = 3) = 1.00 - 0.80 = 0.20$, verifying PMF validity axioms ($0 \le P(x) \le 1, \sum P(x) = 1$), and computing tail $P(X \ge 2) = 0.35 + 0.20 + 0.10 = 0.65$ ($65\%$).
+  - `curriculum/approved/drv-expected-cars-sold.json` + review: dealership daily sales, computing $E[X] = \mu = 0(0.10) + 1(0.25) + 2(0.35) + 3(0.20) + 4(0.10) = 1.95\text{ cars/day}$, identifying Excel formula `=SUMPRODUCT(A2:A6, B2:B6)`, and interpreting long-run daily sales expectation.
+  - `curriculum/approved/drv-variance-cars-sold.json` + review: dealership sales, computing second moment $E[X^2] = 5.05$, variance $\operatorname{Var}(X) = 5.05 - (1.95)^2 = 1.2475\text{ cars}^2$, standard deviation $\sigma = \sqrt{1.2475} \approx 1.1169\text{ cars}$, and dispelling the common trap of forgetting to subtract $\mu^2$.
+  - `curriculum/approved/affine-profit-from-units.json` + review: bakery custom cake sales ($E[X] = 30, \operatorname{SD}(X) = 6$), profit equation $Y = 50X - 200$, computing $E[Y] = 50(30) - 200 = \$1{,}300$, variance $\operatorname{Var}(Y) = 50^2(36) = 90{,}000$, and standard deviation $\operatorname{SD}(Y) = 50 \times 6 = \$300$, proving fixed cost $-\$200$ shifts the mean but has zero effect on variance.
+  - `curriculum/approved/affine-currency-conversion.json` + review: European branch expenses $E[X] = 40{,}000\text{ EUR}, \operatorname{SD}(X) = 5{,}000\text{ EUR}$, converted to USD at $1.10$, computing $E[Y] = \$44{,}000$, $\operatorname{SD}(Y) = \$5{,}500$, and $\operatorname{Var}(Y) = 1.10^2(25\text{M}) = 30{,}250{,}000\text{ dollars}^2$, contrasting linear SD scaling ($1.10\times$) with quadratic variance scaling ($1.21\times$).
+  - `curriculum/approved/lincomb-total-two-product-lines.json` + review: independent daily revenues Line A ($E = \$12\text{k}, \operatorname{SD} = \$1.5\text{k}$) and Line B ($E = \$8\text{k}, \operatorname{SD} = \$2.0\text{k}$), computing expected total $E[T] = \$20{,}000$, variance $\operatorname{Var}(T) = 2.25\text{M} + 4.0\text{M} = 6.25\text{M}$, and $\operatorname{SD}(T) = \sqrt{6.25\text{M}} = \$2{,}500$, disproving naive addition of standard deviations ($\$3{,}500$).
+  - `curriculum/approved/lincomb-difference-independent.json` + review: independent customer traffic Store 1 ($E = 150, \operatorname{Var} = 160$) and Store 2 ($E = 120, \operatorname{Var} = 90$), expected difference $E[D] = 150 - 120 = 30$, variance $\operatorname{Var}(D) = 160 + 90 = 250$ (never $160 - 90 = 70$), and standard deviation $\operatorname{SD}(D) = \sqrt{250} \approx 15.81$, establishing why variances always add for independent variables.
+
+- **Module 5 Completed in Wave 4 (2 questions — Row 5.3 reaches 6/6 milestone!)**:
+  - `curriculum/approved/hyp-excel-tail-function.json` + review: selecting Excel functions for $t$-tests ($df = 24$): right-tailed ($H_1: \mu > \mu_0$) uses `=T.DIST.RT(2.15, 24)`; left-tailed ($H_1: \mu < \mu_0$) uses `=T.DIST(-2.15, 24, TRUE)`; two-tailed ($H_1: \mu \ne \mu_0$) uses `=T.DIST.2T(ABS(t), 24)` and explaining the $x > 0$ requirement. **Completes Row 5.3 at 6/6!**
+  - `curriculum/approved/twosample-choose-design.json` + review: classifying experimental setups: before/after sales training on same reps (paired $t$-test, $df = 24$), open office vs cubicles on separate workers (independent two-sample $t$-test, $df = 58$), support resolution times vs $15.0\text{ min}$ SLA benchmark (one-sample $t$-test, $df = 39$), and explaining how paired designs control for subject heterogeneity to maximize power.
+
+- **Verification Status**:
+  - `python scripts/validate_scaffold.py`: Pass (0 errors across 257 JSON files, 33 Markdown files, 84 local links).
+  - `go test -count=1 ./...`: Pass across all 15 packages.
+  - Active curriculum bank: Loads cleanly with **117 approved records** (16 baseline + 101 new).
+  - Vitest: 19 test files pass, 100/100 tests pass.
+  - Total remaining across entire 121-question backlog: **20 questions** (7 in Wave 4, 13 in Wave 5).
+
+- **Next Concrete Target (When Resuming)**:
+  - Finish remaining 7 questions of Wave 4:
+    - Row 5.4: `twosample-read-excel-output`
+    - Row 6.2: `regout-compare-models-fit` (completes Row 6.2 at 5/5)
+    - Row 6.4: `mreg-adjusted-r2-weak-predictor`, `mreg-overall-f-vs-individual-t`, `mreg-dummy-variable` (completes Row 6.4 at 6/6)
+    - Row 6.5: `regprob-nonlinearity`, `regprob-autocorrelation`
+
+---
+
+## Dispersed Wave 3 Sprint (All 20 Questions Completed — Bank Hits 104 Questions!) — October 11, 2026 (Windows)
+
+
+Successfully authored, audited, and added all **20 questions** in **Dispersed Wave 3**, expanding the active approved repository from 84 to **104 approved questions** (16 baseline + 88 new), achieving **100% completion of Module 4 (22/22 questions)** and completing Rows 1.1, 4.3, 4.4, 5.1, 5.2, 6.1, and 6.3!
+
+- **Module 4 Completed in Wave 3 (3/3 questions — Module 4 reaches 22/22 milestone!)**:
+  - `curriculum/approved/ci-level-vs-width.json` + review: silicon wafer thickness ($n = 36, SE = 2.0\\ \\mu\\text{m}$), contrasting 90% ($6.58\\ \\mu\\text{m}$), 95% ($7.84\\ \\mu\\text{m}$), and 99% ($10.30\\ \\mu\\text{m}$) intervals, proving that higher confidence requires wider intervals (the precision vs certainty trade-off), and demonstrating that increasing sample size $n$ is the sole way to narrow width without reducing confidence.
+  - `curriculum/approved/ci-plausible-claim.json` + review: cloud latency $[146.6\\text{ ms}, 153.4\\text{ ms}]$, evaluating vendor claim $\\mu_0 = 155.0\\text{ ms}$ (strictly outside, not plausible, rejected at $\\alpha = 0.05$ via duality) vs internal target $\\mu_0 = 150.0\\text{ ms}$ (inside, plausible, fail to reject at $\\alpha = 0.05$).
+  - `curriculum/approved/n-round-up-misconception.json` + review: hospital wait times survey, showing continuous formula $n = 96.04$ must round up to ceiling integer $n = 97$, proving why rounding down to $96$ gives $E = 5.0010 > 5.0\\text{ min}$ violating target tolerance, and establishing the universal ceiling rule. Excel: `=ROUNDUP((1.96*25/5)^2, 0)`.
+
+- **Module 5 Completed in Wave 3 (6/6 questions — Rows 5.1 & 5.2 reach 5/5 each!)**:
+  - `curriculum/approved/hyp-formulate-two-tailed-calibration.json` + review: CNC bushing milling target $\\mu_0 = 2.000\\text{ cm}$, formulating $H_0: \\mu = 2.000$ vs $H_1: \\mu \\ne 2.000$, establishing two-tailed rejection region split $\\alpha/2 = 0.025$ in each tail, and setting the burden of proof.
+  - `curriculum/approved/hyp-formulate-proportion.json` + review: juice bottle preference test $p_0 = 0.40$, directional claim formulating $H_0: p \\le 0.40$ vs $H_1: p > 0.40$, upper right-tailed rejection region, and dispelling confusion between population parameter $p$ and sample statistic $\\hat{p}$.
+  - `curriculum/approved/errors-larger-n-reduces-beta.json` + review: turbine fasteners tensile test, proving increasing $n$ from $25$ to $100$ shrinks $SE$, separating the null and alternative distributions, driving $\\beta$ down from $0.28$ to $< 0.05$ and boosting power $1 - \\beta > 0.95$ at fixed $\\alpha = 0.05$.
+  - `curriculum/approved/errors-identify-after-the-fact.json` + review: retrospective audit of fraud suspension (rejected true $H_0 \\implies$ Type I error / false alarm) vs contaminated vaccine release (failed to reject false $H_0 \\implies$ Type II error / missed defect).
+  - `curriculum/approved/hyp-pvalue-interpretation.json` + review: e-commerce A/B checkout test ($p = 0.030$), establishing the formal frequentist definition $P(\\text{data at least as extreme} \\mid H_0)$, and debunking both the inverse probability fallacy ($P(H_0) = 0.03$) and the chance fallacy.
+  - `curriculum/approved/hyp-alpha-changes-decision.json` + review: clinical blood pressure trial ($p = 0.032$), demonstrating reject $H_0$ at $\\alpha = 0.05$ ($0.032 \\le 0.05$) vs fail to reject at $\\alpha = 0.01$ ($0.032 > 0.01$), and establishing why $\\alpha$ must be specified *a priori* to prevent $p$-hacking.
+
+- **Module 6 Completed in Wave 3 (8/8 questions — Rows 6.1 & 6.3 reach 5/5 each!)**:
+  - `curriculum/approved/reg-extrapolation-warning.json` + review: chemical yield regression ($20^\\circ\\text{C} \\le x \\le 60^\\circ\\text{C}$), critiquing prediction at $x = 120^\\circ\\text{C}$ as severe extrapolation, explaining non-linear curvature and expanding prediction variance.
+  - `curriculum/approved/reg-predict-from-excel-coefficients.json` + review: delivery van maintenance ($n = 24, k = 1$), reading Intercept $b_0 = 20.000$ and Mileage slope $b_1 = 1.200$, model equation $\\hat{y} = 20.0 + 1.2x$, predicting $\\hat{y} = 56.0\\text{ hundred dollars}$ ($\\\\$5{,}600$) at $x = 30.0\\text{k miles}$, and interpreting incremental cost of $\\\\$120$ per $1{,}000$ miles.
+  - `curriculum/approved/regout-significance-f.json` + review: commercial loan default ANOVA ($n = 26, k = 1, F = 16.00$), defining Significance $F = 0.0005$ as the model $p$-value, rejecting $H_0$ at $\\alpha = 0.05$, and linking $F = t^2 = 4^2 = 16$ with identical $p$-values. Excel: `=F.DIST.RT(16, 1, 24)`.
+  - `curriculum/approved/regout-r-from-r2-sign.json` + review: used car depreciation ($n = 11, k = 1, R^2 = 0.640$, slope $b_1 = -2.000 < 0$), deriving $r = -\\sqrt{0.640} = -0.800$, and explaining why $R^2$ is strictly non-negative while $r$ inherits the sign of the slope.
+  - `curriculum/approved/regout-t-squared-equals-f.json` + review: ER nurse staffing regression ($n = 22, k = 1, df = 20$), verifying identity $t_1^2 = 3.000^2 = 9.000 = F$, identical two-tailed $p$-values ($0.0071$), and explaining why this identity is restricted exclusively to single-predictor models ($k = 1$).
+  - `curriculum/approved/regout-compute-slope-ci.json` + review: commercial real estate ($n = 27, k = 1, df = 25$), slope $b_1 = 120.000, s_{b_1} = 15.000$, critical $t_{0.025, 25} = 2.0595$, margin of error $E = 30.893$, $95\\%$ CI $[89.107, 150.893]$ strictly positive, and Excel formula `=120.0 - T.INV.2T(0.05, 25)*15.0`.
+  - `curriculum/approved/mreg-interpret-coefficient-ceteris-paribus.json` + review: residential property model ($n = 35, k = 3$), interpreting commute distance slope $b_2 = -12.0$ as an estimated $\\\\$12{,}000$ price reduction per mile strictly holding square footage and school rating constant (*ceteris paribus*), and explaining omitted variable bias.
+  - `curriculum/approved/regprob-heteroscedasticity.json` + review: corporate R&D vs revenue model ($n = 60$), diagnosing fan-shaped residual pattern as heteroscedasticity (violation of constant error variance), analyzing unbiased point estimates vs biased standard errors, and prescribing log-log transformations or robust standard errors.
+
+- **Module 1 Completed in Wave 3 (3/3 questions — Row 1.1 reaches 5/5!)**:
+  - `curriculum/approved/concept-cross-sectional-vs-time-series.json` + review: retail enterprise BI comparing 50-store Q4 snapshot (cross-sectional) vs single-store 36-month tracking (time-series), analyzing row reordering invariance vs temporal autocorrelation, and matching research questions.
+  - `curriculum/approved/prob-contingency-age-purchase.json` + review: promotional campaign contingency table ($n = 500$), computing marginal $P(B) = 180/500 = 0.360$, joint $P(A_1 \\cap B) = 60/500 = 0.120$, conditional $P(B \\mid A_1) = 60/200 = 0.300$, and proving statistical dependence ($P(B \\mid A_1) \\ne P(B)$).
+  - `curriculum/approved/prob-disjoint-vs-independent.json` + review: checkout payment methods ($P(A) = 0.60, P(B) = 0.30$), proving mathematically that mutually exclusive events ($P(A \\cap B) = 0$) cannot be independent because $0 \\ne P(A)P(B) = 0.180$, and showing conditional probability $P(B \\mid A) = 0 \\ne 0.30$ represents maximum dependence.
+
+- **Verification Status**:
+  - `python scripts/validate_scaffold.py`: Pass (0 errors across 231 JSON files, 33 Markdown files, 84 local links).
+  - `go test -count=1 ./...`: Pass across all 15 packages.
+  - Active curriculum bank: Loads cleanly with **104 approved records** (16 baseline + 88 new).
+  - Vitest: 19 test files pass, 100/100 tests pass.
+
+- **Next Concrete Target: Dispersed Wave 4 (20 Questions)**:
+  - Prerequisite Engines: ENG-TWOSAMPLE (`two_sample_test`), ENG-DESC (`descriptive_stats`), ENG-PMF (`discrete_rv`), ENG-AFFINE (`linear_combination` extension).
+  - Wave 4 items will complete Rows 5.3, 6.2, 6.4, and 1.3!
+
+---
+
+## Dispersed Wave 2 Sprint (All 20 Questions Completed) — October 11, 2026 (Windows)
+
+Successfully authored, reviewed, and validated all **20 questions** in **Dispersed Wave 2**, expanding the active approved question bank from 64 to **84 approved questions** (16 baseline + 68 new) across all modules:
+
+- **Module 6 Completed in Wave 2 (6/6 questions — Rows 6.1 at 3/5, Row 6.2 at 2/5, Row 6.3 at 3/5, Row 6.4 at 2/6)**:
+  - `curriculum/approved/reg-interpret-slope-intercept.json` + review: commercial electricity cost model $\hat{y} = 450 + 38.5x$ ($42^\circ\text{F} \le x \le 94^\circ\text{F}$), interpreting slope as $\$38.50$ per $1^\circ\text{F}$ increase, and critiquing the intercept $\$450$ as mathematical line placement that should not be given physical meaning because $0^\circ\text{F}$ is far outside the observed sample range.
+  - `curriculum/approved/reg-residual-observed-point.json` + review: retail advertising regression ($n = 5$), at Store 3 ($x = 20, y = 60$), predicting $\hat{y} = 17.2 + 2.24(20) = 62.0$, and computing residual $e = y - \hat{y} = 60.0 - 62.0 = -2.0$ (underperformed model benchmark by $\$2,000$).
+  - `curriculum/approved/regout-se-from-sse.json` + review: ANOVA maintenance overhead model ($n = 20, k = 1, SSR = 1024.0, SSE = 288.0, SST = 1312.0$), residual $df_{\text{res}} = 18$, $MSE = 288/18 = 16.0$, standard error of estimate $s_e = \sqrt{16.0} = 4.0$ ($\$4,000$ typical prediction dispersion), and verifying $(b_1/s_{b_1})^2 = 8^2 = 64.0 = F$ consistency.
+  - `curriculum/approved/regout-slope-ci-includes-zero.json` + review: express freight delivery duration regression ($n = 20, k = 1, df = 18$), cargo weight $b_1 = 0.600, s_{b_1} = 0.500$, critical $t_{0.025, 18} \approx 2.1009$, $95\%$ confidence interval $[-0.450, +1.650]$ containing zero, testing duality showing $t = 1.20, p = 0.2457 > 0.05$, and failing to reject $H_0: \beta_1 = 0$ (not statistically significant). Excel: `=T.INV.2T(0.05, 18)`.
+  - `curriculum/approved/regout-slope-ci-interpretation.json` + review: commercial solar power generation ($n = 22, k = 1, df = 20$), sunlight hours $b_1 = 35.000\text{ kWh}, s_{b_1} = 4.000$, $95\%$ confidence interval $[26.656, 43.344]$ strictly positive and excluding zero ($t = 8.75, p < 0.0001$), establishing frequentist parameter interpretation and Excel formula `=35.0 - T.INV.2T(0.05, 20)*4.0`.
+  - `curriculum/approved/mreg-write-equation-predict.json` + review: retail sales volume multiple regression ($n = 30, k = 3, df_{\text{res}} = 26$), model equation $\hat{Y} = 50.0 + 4.2 X_1 - 2.5 X_2 + 0.8 X_3$, point forecast at $X_1 = 10, X_2 = 20, X_3 = 25$ yielding $\hat{Y} = 62.0\text{ hundred units}$ ($6{,}200$ units), and partial slope interpretation under *ceteris paribus*.
+
+- **Module 1 Completed in Wave 2 (3/3 questions — Row 1.1 at 4/5, Row 1.3 at 3/6)**:
+  - `curriculum/approved/concept-sampling-bias-online-poll.json` + review: retail loyalty app voluntary receipt poll ($n = 12{,}000$, $88\%$ in favor), diagnosing voluntary response bias and undercoverage of non-app customers, proving that large sample size cannot cure systematic bias, and prescribing probability sampling.
+  - `curriculum/approved/concept-data-types-business.json` + review: e-commerce vendor data dictionary classifying `Store_Region` (categorical nominal), `Satisfaction_Rating` (categorical ordinal), `Units_Returned` (numerical discrete count, ratio), and `Monthly_Revenue` (numerical continuous monetary flow, ratio).
+  - `curriculum/approved/prob-independence-check.json` + review: cross-channel conversion tracking with marginals $P(A) = 0.40, P(B) = 0.50$, testing multiplication rule $P(A \cap B) = 0.20 = 0.40 \times 0.50$ (Cohort 1 independent with $P(A \mid B) = P(A) = 0.40$) vs Cohort 2 $P(A \cap B) = 0.25 \ne 0.20$ (dependent, positive synergy $P(A \mid B) = 0.50 > 0.40$), and dispelling confusion with mutual exclusivity.
+
+- **Module 2 Completed in Wave 2 (2/2 questions — Row 2.3 completes at 5/5!)**:
+  - `curriculum/approved/binomial-mean-sd-shipments.json` + review: microcontroller receiving inspection ($n = 200, p = 0.02$), computing expected defects $E[X] = \mu = 200 \times 0.02 = 4.0$ units, variance $\sigma^2 = 3.92$, standard deviation $\sigma = \sqrt{3.92} \approx 1.98$ units, avoiding Poisson $\sqrt{np}$ distractor, and interpreting lot-to-lot dispersion. Excel: `=SQRT(200*0.02*(1-0.02))`.
+  - `curriculum/approved/binomial-condition-violated-small-lot.json` + review: aerospace fuel valves lot inspection ($N = 20, M = 4, n = 5$ without replacement), proving violation of independent trials and constant $p$ due to excessive sampling fraction $n/N = 25\% > 5\%$, identifying exact Hypergeometric model ($P(X = 1) = 0.4696$ vs Binomial $0.4096$), and completing Row 2.3 at 5/5 approved questions.
+
+- **Module 4 Completed in Wave 2 (4/4 questions — Rows 4.3 & 4.4 at 4/5 each)**:
+  - `curriculum/approved/ci-mean-t-small-sample-90.json` + review: machine cycle times $n = 10, \bar{x} = 42.3\text{ min}, s = 5.1\text{ min}$, degrees of freedom $df = 9$, $SE = 5.1/\sqrt{10} \approx 1.6128\text{ min}$, critical $t_{0.05, 9} = 1.8331$, margin of error $E = 2.96\text{ min}$, and $90\%$ confidence interval $[39.34, 45.26]\text{ min}$. Excel: `=CONFIDENCE.T(0.10, 5.1, 10)`.
+  - `curriculum/approved/ci-interpretation-statement.json` + review: streaming subscription spending $[\\$45.20, \\$52.80]$, evaluating frequentist interpretation (long-run capture frequency over repeated independent samples) and dispelling the widespread "$P(45.20 \le \mu \le 52.80) = 0.95$" misconception regarding a fixed population parameter.
+  - `curriculum/approved/n-proportion-pilot.json` + review: telecom churn survey with pilot estimate $p^* = 0.20$, target $E = 0.03$ at $95\%$ confidence, unrounded $n = 682.93 \implies$ ceiling integer $n = 683$, saving 385 respondents compared to conservative planning $p^* = 0.50$ ($n = 1{,}068$). Excel: `=ROUNDUP((NORM.S.INV(0.975)^2 * 0.20 * 0.80)/(0.03^2), 0)`.
+  - `curriculum/approved/n-halve-margin-quadruple.json` + review: healthcare wait times survey, proving the inverse-square precision law $n \propto 1/E^2$—halving margin of error ($E/2$) requires quadrupling data from $n = 100$ to $n = 400$, derived from the square-root decay of standard error ($SE = \sigma/\sqrt{n}$).
+
+- **Module 5 Completed in Wave 2 (5/5 questions — Rows 5.1 & 5.2 at 3/5, Row 5.3 at 3/6)**:
+  - `curriculum/approved/hyp-formulate-right-tailed-sales.json` + review: retail endcap display raising average daily sales above baseline $\mu_0 = 50$, formulating $H_0: \mu \le 50$ (or $\mu = 50$) vs directional alternative $H_1: \mu > 50$, and identifying the upper right-tailed rejection region.
+  - `curriculum/approved/hyp-steps-and-conclusion.json` + review: loan origination processing audit ($p = 0.18 > 0.05$), clarifying why we "fail to reject $H_0$" rather than "accept $H_0$ as proven fact," and verifying the standard 5-step hypothesis testing sequence.
+  - `curriculum/approved/errors-which-is-worse.json` + review: contrasting baby formula pathogen testing ($H_0: \text{safe}$ vs $H_1: \text{contaminated}$) with marketing ad testing to show how catastrophic Type II error (shipping contaminated product) drives test power ($1 - \beta \ge 0.99$), larger sample sizes, and adjusted $\alpha$.
+  - `curriculum/approved/errors-alpha-beta-tradeoff.json` + review: cleanroom wafer resistance testing, evaluating the inescapable inverse trade-off where lowering $\alpha$ from $0.05$ to $0.01$ with fixed $n = 50$ increases $\beta$ and lowers power, and confirming that increasing sample size $n$ is the only method to reduce both $\alpha$ and $\beta$ simultaneously.
+  - `curriculum/approved/hyp-proportion-left-tailed.json` + review: vendor switch defect inspection $p_0 = 0.20, n = 200, x = 28 \implies \hat{p} = 0.14$, standard error under the null $SE_0 = \sqrt{0.20(0.80)/200} \approx 0.02828$, test statistic $Z = -2.1213$, left-tailed $p$-value $= 0.01695 \approx 0.0170 < 0.05$, rejecting $H_0$. Excel: `=NORM.S.DIST((0.14 - 0.20)/SQRT(0.20*0.80/200), TRUE)`.
+
+- **Engine Extensions**:
+  - `SetProbabilityFamily`: Registered `"independence_check"` operation and required `p_intersection` validation.
+  - `BinomialFamily`: Extended `ValidateParameters` to admit `operation: "mean_sd"` along with `mean`, `sd`, and `var` validation against theoretical moments ($E[X] = np, \sigma = \sqrt{np(1-p)}$).
+
+- **Verification Status**:
+  - `python scripts/validate_scaffold.py`: Pass (0 errors across 191 JSON files, 33 Markdown files, 84 local links).
+  - `go test -count=1 ./...`: Pass across all 15 packages.
+  - Active curriculum bank: Loads cleanly with **84 approved records** (16 baseline + 68 new).
+  - Vitest: 19 test files pass, 100/100 tests pass.
+
+- **Next Concrete Target: Dispersed Wave 3 (20 Questions)**:
+  - Module 4 (3 questions — completes Module 4 at 22/22): `ci-level-vs-width`, `ci-plausible-claim`, `n-round-up-misconception`
+  - Module 5 (6 questions — completes Rows 5.1 & 5.2 at 5/5): `hyp-formulate-two-tailed-calibration`, `hyp-formulate-proportion`, `errors-larger-n-reduces-beta`, `errors-identify-after-the-fact`, `hyp-pvalue-interpretation`, `hyp-alpha-changes-decision`
+  - Module 6 (8 questions — completes Rows 6.1 & 6.3 at 5/5): `reg-extrapolation-warning`, `reg-predict-from-excel-coefficients`, `regout-significance-f`, `regout-r-from-r2-sign`, `regout-t-squared-equals-f`, `regout-compute-slope-ci`, `mreg-interpret-coefficient-ceteris-paribus`, `regprob-heteroscedasticity`
+  - Module 1 (3 questions — completes Row 1.1 at 5/5): `concept-cross-sectional-vs-time-series`, `prob-contingency-age-purchase`, `prob-disjoint-vs-independent`.
+
+---
+
+Successfully authored, reviewed, and validated all 20 questions in **Dispersed Wave 1**, expanding the active approved question bank from 44 to **64 approved questions** (16 baseline + 48 new):
+
+- **Module 4 (4 questions)**:
+  - `curriculum/approved/ci-mean-z-known-sigma.json` + review: polymer tensile strength $\sigma = 12.0\text{ MPa}, n = 49, \bar{x} = 150.0\text{ MPa}$, standard error $SE = 12/7 \approx 1.7143\text{ MPa}$, critical value $Z^* = 1.960$, margin of error $E = 3.360\text{ MPa}$, and $95\%$ interval $[146.64, 153.36]\text{ MPa}$. Excel: `=CONFIDENCE.NORM(0.05, 12, 49)`.
+  - `curriculum/approved/ci-proportion-recommend.json` + review: customer recommendation survey $x = 132, n = 400 \implies \hat{p} = 0.330$, normality verification $n\hat{p} = 132 \ge 10$ and $n(1-\hat{p}) = 268 \ge 10$, $SE_{\hat{p}} = \sqrt{0.33(0.67)/400} \approx 0.02351$, margin of error $E = 0.0461$ ($4.61\%$), and $95\%$ interval $[0.2839, 0.3761]$ ($28.4\%$ to $37.6\%$).
+  - `curriculum/approved/n-mean-margin-five.json` + review: urgent care wait times $\sigma = 25.0\text{ min}$, target margin $E \le 5.0\text{ min}$ at $95\%$ confidence, continuous bound $(1.95996 \times 25 / 5)^2 \approx 96.0365 \implies$ ceiling integer $n = 97$, proving why rounding down to $96$ gives $E \approx 5.0009 > 5.0$, and demonstrating the quadratic precision law ($2\times$ tighter margin requires $4\times$ data to $n = 385$). Excel: `=ROUNDUP((NORM.S.INV(0.975)*25/5)^2, 0)`.
+  - `curriculum/approved/n-proportion-conservative.json` + review: statewide voter polling with no prior benchmark, conservative $p^* = 0.50$ maximizing $p(1-p) = 0.25$, target $E = 0.04$ at $90\%$ confidence ($Z^* = 1.645$), continuous bound $422.741 \implies$ ceiling integer $n = 423$. Contrasted with prior study $p \approx 0.20$ yielding $n = 271$ (saving 152 respondents). Excel: `=ROUNDUP((NORM.S.INV(0.95)^2)*0.25/(0.04^2), 0)`.
+
+- **Module 5 (4 questions)**:
+  - `curriculum/approved/hyp-formulate-underfill.json` + review: olive oil 16 oz labeled containers with suspected underfill, formulating alternative $H_1: \mu < 16.0\text{ fl oz}$ as the directional research claim carrying burden of proof, status quo null $H_0: \mu = 16.0\text{ fl oz}$ (or $\mu \ge 16.0$), and establishing the left-tailed rejection region.
+  - `curriculum/approved/errors-define-in-context.json` + review: semiconductor quality control ($H_0: \text{conforming lot}$ vs $H_1: \text{defective lot}$), defining Type I error as scrapping a conforming lot (Producer's risk / false alarm) and Type II error as shipping defective chips to automakers (Consumer's risk / missed defect), plus analyzing how reducing $\alpha$ increases $\beta$ for fixed $n$ and why expanding $n$ is required to shrink both risks.
+  - `curriculum/approved/hyp-z-mean-two-tailed.json` + review: beverage bottling line $\mu_0 = 2.00\text{ L}, \sigma = 0.05\text{ L}, n = 36, \bar{x} = 2.02\text{ L}$, $SE = 0.05/6 \approx 0.008333\text{ L}$, standardized test statistic $Z = +2.40$, two-tailed $p$-value $= 2(1 - \Phi(2.40)) = 0.0164$, rejecting $H_0$ at $\alpha = 0.05$ since $0.0164 < 0.05$ (and $|Z| = 2.40 > 1.960$). Excel: `=2*(1 - NORM.S.DIST(2.40, TRUE))`.
+  - `curriculum/approved/hyp-t-mean-right-tailed.json` + review: CRM customer support handling duration $\mu_0 = 50.0\text{ s}, n = 20, \bar{x} = 53.1\text{ s}, s = 6.2\text{ s}$, degrees of freedom $df = 19$, $SE = 6.2/\sqrt{20} \approx 1.3864\text{ s}$, test statistic $t = +2.236$, right-tailed $p$-value $= P(T_{19} \ge 2.236) \approx 0.0188$, rejecting $H_0$ at $\alpha = 0.05$ since $2.236 > t_{0.05, 19} = 1.729$. Excel: `=T.DIST.RT(2.236, 19)`.
+
+- **Module 6 (5 questions)**:
+  - `curriculum/approved/reg-fit-raw-points-price-units.json` + review: 6 empirical $(x, y)$ coordinate pairs across price and units sold ($n = 6$), $\bar{x} = 15.0, \bar{y} = 60.0, SS_{xx} = 70.0, SS_{xy} = -280.0$, OLS slope $b_1 = -4.00$, intercept $b_0 = 120.00$, fitted model $\hat{y} = 120.0 - 4.0x$, point prediction $\hat{y} = 52.0$ units at $x = \$17.00$, and $R^2 = 0.9756$. Excel: `=SLOPE`, `=INTERCEPT`, `=FORECAST.LINEAR`.
+  - `curriculum/approved/regout-r2-from-anova.json` + review: e-commerce ad spend vs revenue regression ($n = 25, k = 1$), ANOVA table $SSR = 450.0, SSE = 150.0, SST = 600.0$, computing $R^2 = 450/600 = 0.750$ ($75.0\%$ variance explained), Multiple $R = \sqrt{0.75} = 0.8660$, verifying $t_1^2 = 69.00 = F = 450 / (150/23)$.
+  - `curriculum/approved/regout-slope-t-pvalue.json` + review: engineer compensation vs experience ($n = 25, k = 1, df = 23$), reading slope $b_1 = 2.400, s_{b_1} = 0.800$, test statistic $t = 2.4 / 0.8 = +3.000$, two-tailed $p$-value $= 0.0064$, rejecting $H_0: \beta_1 = 0$ at $\alpha = 0.05$ ($0.0064 < 0.05$). Excel: `=T.DIST.2T(3.0, 23)`.
+  - `curriculum/approved/mreg-which-predictors-significant.json` + review: retail store revenue multiple regression ($n = 30, k = 3, df = 26$), overall model $SSR = 1200.0, SSE = 400.0, F = 26.00$ ($p < 0.0001$), individual predictors `Floor_Space` ($p = 0.0006 < 0.05$) and `Competitor_Distance` ($p = 0.0384 < 0.05$) significant, `Local_Population` ($p = 0.6213 > 0.05$) not significant, demonstrating model parsimony.
+  - `curriculum/approved/regprob-multicollinearity.json` + review: digital advertising multichannel model diagnosing severe multicollinearity from high $R^2 = 0.88$ and significant overall $F$ ($p < 0.0001$) accompanied by insignificant individual $t$-tests ($p > 0.20$), explaining variance inflation of $s_{b_j}$ and VIF diagnostics.
+
+- **Module 1 (4 questions)**:
+  - `curriculum/approved/concept-descriptive-vs-inferential.json` + review: classifying census audit of all 120 stores as descriptive statistics (zero sampling error) vs 40-store customer dwell time survey as inferential statistics (sample estimation under sampling uncertainty).
+  - `curriculum/approved/concept-parameter-vs-statistic.json` + review: SaaS customer satisfaction survey ($N = 20{,}000$ active users, $n = 500$ sample, $62\%$ satisfied), identifying population, sample, parameter ($p$), statistic ($\hat{p} = 0.62$), and frequentist principle of fixed parameter constant vs random variable sample statistic.
+  - `curriculum/approved/prob-multiplication-independent-suppliers.json` + review: independent suppliers A and B with $P(A) = 0.90, P(B) = 0.85$, special multiplication rule $P(A \cap B) = 0.90 \times 0.85 = 0.765$ ($76.5\%$), and conditional invariance $P(A \mid B) = P(A) = 0.90$.
+  - `curriculum/approved/prob-at-least-one-server-failure.json` + review: 3 independent cloud servers with outage probability $p = 0.05$, applying complement strategy $P(\text{at least one failure}) = 1 - P(\text{zero failures}) = 1 - (0.95)^3 = 1 - 0.857375 = 0.142625$ ($14.26\%$), and debunking the naive addition trap ($0.05 \times 3 = 0.15$).
+
+- **Module 2 (3 questions)**:
+  - `curriculum/approved/choose-binomial-or-poisson.json` + review: evaluating four operational count scenarios to classify fixed-trial counts ($n = 50$ boards, $n = 200$ visitors $\implies$ Binomial) vs continuous-interval occurrence rates ($\lambda = 14$ calls/hr, $1.8$ scratches/sheet $\implies$ Poisson).
+  - `curriculum/approved/binomial-at-least-three-defects.json` + review: sensor batch manufacturing $n = 12, p = 0.15$, cumulative lower sum $P(X \le 2) = P(0) + P(1) + P(2) = 0.1422 + 0.3012 + 0.2924 = 0.7358$, upper tail $P(X \ge 3) = 1 - 0.73582 = 0.2642$ ($26.42\%$), and avoiding off-by-one boundary subtraction. Excel: `=1 - BINOM.DIST(2, 12, 0.15, TRUE)`.
+  - `curriculum/approved/poisson-rate-rescaling-quarter-hour.json` + review: IT help desk call arrivals at $6.0\text{ calls/hr}$, rescaling to 15-minute window $\lambda = 6.0 \times (15/60) = 1.50\text{ calls}$, computing $P(X \le 1) = 2.5 e^{-1.5} \approx 0.5578$ ($55.78\%$), and demonstrating why unscaled $\lambda = 6.0$ underestimates the true probability by $32\times$. Excel: `=POISSON.DIST(1, 1.5, TRUE)`.
+
+- **Engine Extension**:
+  - Formalized `multiplication` operation in `SetProbabilityFamily` (`internal/bank/family.go`) and added `mathengine.Multiplication(pA, pB)` with unit test coverage in `internal/mathengine/setprob_test.go` and `internal/bank/bank_test.go`.
+
+- **Verification**:
+  - `python scripts/validate_scaffold.py` passes with 0 errors across 151 JSON files.
+  - All 15 Go packages pass `go test -count=1 ./...`.
+  - Active curriculum bank loads cleanly with **64 approved templates**.
+  - All 19 Vitest test suites pass (100/100 tests).
+
+**Next concrete task:** Author **Dispersed Wave 2 (20 questions)** in [CONTENT-BACKLOG.md](CONTENT-BACKLOG.md):
+- Module 4 (4 questions): `ci-mean-t-small-sample-90`, `ci-interpretation-statement`, `n-proportion-pilot`, `n-halve-margin-quadruple`
+- Module 5 (5 questions): `hyp-formulate-right-tailed-sales`, `hyp-steps-and-conclusion`, `errors-which-is-worse`, `errors-alpha-beta-tradeoff`, `hyp-proportion-left-tailed`
+- Module 6 (6 questions): `reg-interpret-slope-intercept`, `reg-residual-observed-point`, `regout-se-from-sse`, `regout-slope-ci-includes-zero`, `regout-slope-ci-interpretation`, `mreg-write-equation-predict`
+- Module 1 (3 questions): `concept-sampling-bias-online-poll`, `concept-data-types-business`, `prob-independence-check`
+- Module 2 (2 questions): `binomial-mean-sd-shipments`, `binomial-condition-violated-small-lot` (completes Row 2.3 at 5/5).
+
+---
+
 ## Session Randomization & Curriculum Module Filtering Completed — October 11, 2026 (Windows)
 
 Completed session randomization mechanism, module filtering across all 6 curriculum modules, and interactive controls:

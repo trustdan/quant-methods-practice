@@ -1,0 +1,151 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "regout_r2_from_anova",
+  "version": 1,
+  "status": "active",
+  "family_id": "regression_output",
+  "rule_version": 1,
+  "module_id": "module_6",
+  "title": "Evaluating coefficient of determination from ANOVA regression table",
+  "scenario_markdown": "An e-commerce firm analyzes weekly sales revenue ($Y$, in thousands of dollars) against digital advertising spending ($X$, in thousands of dollars) across $n = 25$ regional marketing territories. An Excel summary output table provides the following ANOVA breakdown: $\\text{Regression Sum of Squares } SSR = 450.0$, $\\text{Residual Sum of Squares } SSE = 150.0$, and $\\text{Total Sum of Squares } SST = 600.0$. The estimated slope is positive ($b_1 = 4.153$). Compute and interpret the coefficient of determination $R^2$.",
+  "parameters": {
+    "n": 25,
+    "k": 1,
+    "ssr": 450.0,
+    "sse": 150.0,
+    "sst": 600.0,
+    "confidence_level": 0.95,
+    "intercept_name": "Intercept",
+    "b0": 15.0,
+    "se_b0": 2.5,
+    "x1_name": "Advertising",
+    "b1": 4.1533119,
+    "se_b1": 0.5
+  },
+  "assumptions": [
+    "ANOVA identity holds: SST = SSR + SSE (600.0 = 450.0 + 150.0)",
+    "Independent random observations across 25 marketing territories",
+    "Linear regression assumptions of homoscedasticity and normality are satisfied"
+  ],
+  "concept_ids": [
+    "regout_r2_computation_anova",
+    "regout_r2_interpretation_variance_explained",
+    "regout_multiple_r_correlation_link"
+  ],
+  "setting_group": "ecommerce_digital_advertising_anova",
+  "source_refs": [
+    "Course Module 6: Regression Analysis",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T22:00:00Z",
+    "notes": "Reviewed derivation: n = 25, k = 1, SSR = 450, SSE = 150, SST = 600. R^2 = 450 / 600 = 0.750 (75.0%). Multiple R = sqrt(0.75) = 0.8660. df_res = 23, MSE = 150/23 = 6.5217, MSR = 450, F = 69.0. t_slope = 4.1533119 / 0.5 = 8.3066, t^2 = 69.0 = F. Consistency verified.",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "r2_computation",
+      "kind": "choice",
+      "prompt_markdown": "Compute the coefficient of determination $R^2 = \\frac{SSR}{SST}$ from the ANOVA sums of squares.",
+      "options": [
+        {
+          "id": "r2_correct",
+          "text_markdown": "$R^2 = 0.750$ ($75.0\\%$), derived as $450.0 / 600.0$ or $1 - (150.0 / 600.0)$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "r2_inverted_ratio",
+          "text_markdown": "$R^2 = 0.250$ ($25.0\\%$), derived as $SSE / SST = 150.0 / 600.0$",
+          "misconception_id": "computed_unexplained_fraction_instead_of_r2",
+          "hint_markdown": "$SSE / SST = 150 / 600 = 0.25$ represents the fraction of unexplained variation; $R^2 = 1 - 0.25 = 0.75$."
+        },
+        {
+          "id": "r2_ssr_over_sse",
+          "text_markdown": "$R^2 = 3.000$, derived as $SSR / SSE = 450.0 / 150.0$",
+          "misconception_id": "divided_ssr_by_sse_instead_of_sst",
+          "hint_markdown": "The denominator for $R^2$ is the Total Sum of Squares $SST$, not residual error $SSE$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "r2_correct"
+      },
+      "evidence_concept_ids": [
+        "regout_r2_computation_anova"
+      ],
+      "explanation_markdown": "The coefficient of determination $R^2$ is the proportion of total variation in $Y$ that is explained by the regression line: $R^2 = \\frac{SSR}{SST} = \\frac{450.0}{600.0} = 0.750$. Equivalently, $R^2 = 1 - \\frac{SSE}{SST} = 1 - \\frac{150.0}{600.0} = 1 - 0.250 = 0.7500$ ($75.0\\%$). Excel displays this in the Regression Statistics section.",
+      "numeric_policy": null
+    },
+    {
+      "id": "r2_interpretation",
+      "kind": "choice",
+      "prompt_markdown": "Which statement correctly interprets this $R^2 = 0.750$ result in a managerial report?",
+      "options": [
+        {
+          "id": "interp_correct",
+          "text_markdown": "$75.0\\%$ of the total variability in weekly sales revenue is explained by the linear relationship with digital advertising spending.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "interp_causal_deterministic",
+          "text_markdown": "Advertising spending causes $75.0\\%$ of sales revenue to be generated directly.",
+          "misconception_id": "confuse_explained_variance_with_causal_sales_percentage",
+          "hint_markdown": "$R^2$ quantifies linear association and statistical variance accounted for; it does not establish deterministic mechanical causality."
+        },
+        {
+          "id": "interp_slope_percentage",
+          "text_markdown": "Sales revenue increases by $75.0\\%$ for every additional thousand dollars spent on advertising.",
+          "misconception_id": "confuse_r2_with_regression_slope_percentage",
+          "hint_markdown": "The rate of change per unit of $X$ is governed by the slope $b_1 = 4.153$, not the goodness-of-fit metric $R^2$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "interp_correct"
+      },
+      "evidence_concept_ids": [
+        "regout_r2_interpretation_variance_explained"
+      ],
+      "explanation_markdown": "$R^2$ is a dimensionless measure ranging between $0$ and $1$ that reflects goodness of fit. An $R^2$ of $0.750$ means that $75.0\\%$ of the territory-to-territory variation in sales is captured by variations in advertising expenditures, leaving $25.0\\%$ to unexplained error or unmodeled factors.",
+      "numeric_policy": null
+    },
+    {
+      "id": "multiple_r_link",
+      "kind": "choice",
+      "prompt_markdown": "What is the value of Multiple $R$ in the regression summary output, and what does it represent?",
+      "options": [
+        {
+          "id": "mult_r_correct",
+          "text_markdown": "Multiple $R = \\sqrt{0.750} \\approx 0.866$: For simple regression with a positive slope, it equals the Pearson correlation coefficient $r = +0.866$.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "mult_r_squared_again",
+          "text_markdown": "Multiple $R = (0.750)^2 = 0.5625$: The square of $R^2$.",
+          "misconception_id": "squared_r2_instead_of_square_root",
+          "hint_markdown": "Multiple R is $\\sqrt{R^2}$, not $(R^2)^2$."
+        },
+        {
+          "id": "mult_r_slope_ratio",
+          "text_markdown": "Multiple $R = 4.153$: It directly equals the regression slope coefficient $b_1$.",
+          "misconception_id": "confused_multiple_r_with_slope",
+          "hint_markdown": "Slope carries units (units of Y per unit of X); correlation and Multiple R are unitless quantities bounded in $[-1, 1]$ and $[0, 1]$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "mult_r_correct"
+      },
+      "evidence_concept_ids": [
+        "regout_multiple_r_correlation_link"
+      ],
+      "explanation_markdown": "In simple linear regression ($k = 1$), Multiple $R$ is the positive square root of $R^2$: $\\sqrt{0.750} \\approx 0.8660$. Because the estimated slope is positive ($b_1 = +4.153$), the Pearson correlation between digital advertising and sales is exactly $r = +0.866$, indicating a strong positive linear relationship.",
+      "numeric_policy": null
+    }
+  ]
+}

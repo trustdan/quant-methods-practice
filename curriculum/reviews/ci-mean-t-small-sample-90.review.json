@@ -1,0 +1,16 @@
+{
+  "template_id": "ci_mean_t_small_sample_90",
+  "status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T22:30:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "reviewed_rules": [1],
+  "checklist": {
+    "math_verified_by_engine": true,
+    "distractor_misconceptions_valid": true,
+    "hints_pedagogically_useful": true,
+    "excel_formulas_checked": true,
+    "no_latex_formatting_regressions": true
+  },
+  "notes": "Verified Student t interval with n = 10, df = 9, x_bar = 42.3, s = 5.1 at 90% confidence. Critical t*(0.05, 9) = 1.8331, SE = 1.6128, E = 2.9564 (rounds to 2.96), CI = [39.34, 45.26]. Excel formula =CONFIDENCE.T(0.10, 5.1, 10). Distractors address common student traps: df=10, z critical value 1.645, 95% critical value, and individual probability misinterpretation."
+}

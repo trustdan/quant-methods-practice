@@ -1,0 +1,140 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "regprob_nonlinearity",
+  "version": 1,
+  "status": "active",
+  "family_id": "concept_check",
+  "rule_version": 1,
+  "module_id": "module_6",
+  "title": "Diagnosing a curved residual pattern",
+  "scenario_markdown": "An analyst fits a straight line to shipping cost versus shipment weight. Ordered by weight, residuals are mostly positive for light parcels, negative for medium parcels, and positive again for heavy parcels. Their vertical spread is roughly constant. This U-shaped pattern persists across many observations.",
+  "parameters": {
+    "topic": "regression_diagnostics"
+  },
+  "assumptions": [
+    "Residuals are observed cost minus fitted cost.",
+    "The pattern is against the predictor, not chronological order.",
+    "Diagnostics suggest model issues; they do not prove a unique replacement model."
+  ],
+  "concept_ids": [
+    "curved_residual_model_form",
+    "curved_residual_direction",
+    "curved_residual_followup"
+  ],
+  "setting_group": "parcel_shipping_curved_residuals",
+  "source_refs": [
+    "docs/COURSE-MAP.md: learner-supplied module objectives, October 11, 2026",
+    "docs/CONTENT-BACKLOG.md: regprob-nonlinearity"
+  ],
+  "approval": {
+    "reviewer": "codex_delegated_final_waves",
+    "reviewed_at": "2026-10-12T04:32:26.275462Z",
+    "delegation_basis": "User explicitly replied on October 11, 2026 (America/Chicago): Yes—delegate review and activate after checks pass. Approval follows successful Go mathematical, bank admission, every-option grading and snapshot checks; assistant semantic review does not claim personal user reading.",
+    "notes": "Assistant reviewed the complete scenario, stage wording, all options, causal hints and worked explanations. Numerical choices are independently bound to Go engine quantities under rule v2; conceptual choices are semantically reviewed. Fixed parameters only; no cosmetic variation claimed as transfer. Stated course conventions remain unconfirmed where applicable. Validated one-to-one concept evidence, rejected ambiguous numeric distractors, and tested every option after snapshot serialization."
+  },
+  "stages": [
+    {
+      "id": "curved_residual_model_form",
+      "kind": "choice",
+      "prompt_markdown": "Which model issue is most directly suggested?",
+      "options": [
+        {
+          "id": "supported",
+          "text_markdown": "The straight-line conditional mean is inadequate; the residual pattern suggests curvature.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "misconception_a",
+          "text_markdown": "The only issue is heteroscedasticity.",
+          "misconception_id": "curved_residual_model_form_a",
+          "hint_markdown": "Heteroscedasticity concerns changing spread; this pattern concerns systematic signs."
+        },
+        {
+          "id": "misconception_b",
+          "text_markdown": "The residuals prove weight and cost are independent.",
+          "misconception_id": "curved_residual_model_form_b",
+          "hint_markdown": "A systematic residual pattern indicates structure left unexplained."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "supported"
+      },
+      "evidence_concept_ids": [
+        "curved_residual_model_form"
+      ],
+      "explanation_markdown": "A correctly specified conditional mean should leave residuals centered near zero across the predictor. The U shape indicates a missing nonlinear component.",
+      "numeric_policy": null
+    },
+    {
+      "id": "curved_residual_direction",
+      "kind": "choice",
+      "prompt_markdown": "What does a positive residual for a heavy parcel mean?",
+      "options": [
+        {
+          "id": "supported",
+          "text_markdown": "Its observed shipping cost exceeds the line's fitted cost.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "misconception_a",
+          "text_markdown": "Its fitted cost exceeds observed cost.",
+          "misconception_id": "curved_residual_direction_a",
+          "hint_markdown": "Use residual = observed minus fitted."
+        },
+        {
+          "id": "misconception_b",
+          "text_markdown": "The parcel necessarily has high leverage.",
+          "misconception_id": "curved_residual_direction_b",
+          "hint_markdown": "Residual magnitude and leverage describe different properties."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "supported"
+      },
+      "evidence_concept_ids": [
+        "curved_residual_direction"
+      ],
+      "explanation_markdown": "$e=y-\\hat y$. Positive e means underprediction of the observed cost. A residual sign alone does not establish leverage or influence.",
+      "numeric_policy": null
+    },
+    {
+      "id": "curved_residual_followup",
+      "kind": "choice",
+      "prompt_markdown": "What is a reasonable next step?",
+      "options": [
+        {
+          "id": "supported",
+          "text_markdown": "Consider a justified nonlinear term or transformation, refit, and check residuals and held-out performance.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "misconception_a",
+          "text_markdown": "Delete all parcels with positive residuals.",
+          "misconception_id": "curved_residual_followup_a",
+          "hint_markdown": "A systematic model issue should not be removed by selecting convenient observations."
+        },
+        {
+          "id": "misconception_b",
+          "text_markdown": "Keep the straight line because a large R-squared guarantees the form is correct.",
+          "misconception_id": "curved_residual_followup_b",
+          "hint_markdown": "R-squared cannot rule out structure remaining in residuals."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "supported"
+      },
+      "evidence_concept_ids": [
+        "curved_residual_followup"
+      ],
+      "explanation_markdown": "A quadratic term or a suitable transformation may represent the curvature, depending on shipping economics. Check the revised diagnostics and prediction performance rather than assuming a particular fix is guaranteed.",
+      "numeric_policy": null
+    }
+  ]
+}

@@ -1,0 +1,143 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "desc_mean_median_outlier",
+  "version": 1,
+  "status": "active",
+  "family_id": "descriptive_stats",
+  "rule_version": 1,
+  "module_id": "module_1",
+  "title": "Mean, median, and outlier resistance in regional store performance",
+  "scenario_markdown": "A regional retail director reviews the monthly net revenue (in thousands of dollars) across $7$ branch locations in the metropolitan district:\n\n$$\\{18,\\ 20,\\ 22,\\ 24,\\ 25,\\ 26,\\ 120\\}$$\n\nSix locations are standard suburban strip mall units, while the seventh is an enormous downtown flagship store generating \\$120,000 in monthly net revenue. Compute the measures of central location and evaluate which metric best characterizes the performance of a typical branch.",
+  "parameters": {
+    "operation": "mean_median",
+    "data": [18.0, 20.0, 22.0, 24.0, 25.0, 26.0, 120.0],
+    "mean": 36.42857,
+    "median": 24.0
+  },
+  "assumptions": [
+    "Dataset contains 7 positive numerical observations",
+    "Data has a single extreme positive outlier at 120",
+    "Sample mean uses n = 7 denominator; median is the 4th ordered value"
+  ],
+  "concept_ids": [
+    "compute_sample_mean",
+    "compute_sample_median",
+    "evaluate_outlier_sensitivity_mean_vs_median"
+  ],
+  "setting_group": "retail_store_revenue_descriptive_measures",
+  "source_refs": [
+    "Course Module 1: Descriptive Measures & Basic Probability",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T23:05:00Z",
+    "notes": "Reviewed descriptive statistics calculation: Mean = 255 / 7 = 36.43k, Median = 24.0k. Identifies extreme right skew pulling mean above 6 of the 7 stores, making median the robust representative measure.",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "compute_mean",
+      "kind": "choice",
+      "prompt_markdown": "What is the sample mean monthly revenue $\\bar{x}$ across all $7$ branch stores?",
+      "options": [
+        {
+          "id": "mean_correct",
+          "text_markdown": "**$\\bar{x} = \\$36.43$ thousand ($\\\\$36{,}429$)**: Calculated as $\\frac{18 + 20 + 22 + 24 + 25 + 26 + 120}{7} = \\frac{255}{7} \\approx 36.429$.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "mean_median_confusion",
+          "text_markdown": "**$\\bar{x} = \\$24.00$ thousand**: The middle number in the ordered list.",
+          "misconception_id": "confused_mean_with_median",
+          "hint_markdown": "The middle value of an ordered list is the median, not the mean. The mean sums all observations and divides by n."
+        },
+        {
+          "id": "mean_n_minus_one_divisor",
+          "text_markdown": "**$\\bar{x} = \\$42.50$ thousand**: Calculated as $\\frac{255}{6}$ using $n - 1$ as the divisor.",
+          "misconception_id": "divided_sum_by_n_minus_one_for_mean",
+          "hint_markdown": "Degrees of freedom n - 1 is used when calculating sample variance, never for the sample mean which divides by total count n."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "mean_correct"
+      },
+      "evidence_concept_ids": [
+        "compute_sample_mean"
+      ],
+      "explanation_markdown": "The arithmetic mean sums all observations and divides by the total sample size $n = 7$:\n\n$$\\bar{x} = \\frac{\\sum x_i}{n} = \\frac{18 + 20 + 22 + 24 + 25 + 26 + 120}{7} = \\frac{255}{7} \\approx 36.4286\\text{ (\\$36,429)}$$\n\nIn Excel: `=AVERAGE(18, 20, 22, 24, 25, 26, 120)`.",
+      "numeric_policy": null
+    },
+    {
+      "id": "compute_median",
+      "kind": "choice",
+      "prompt_markdown": "What is the sample median monthly revenue across the $7$ branches?",
+      "options": [
+        {
+          "id": "median_correct",
+          "text_markdown": "**$\\text{Median} = \\$24.00$ thousand ($\\\\$24{,}000$)**: The 4th observation in the sorted sequence of $7$ values.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "median_midrange",
+          "text_markdown": "**$\\text{Median} = \\$69.00$ thousand**: Calculated as the midrange $\\frac{18 + 120}{2}$.",
+          "misconception_id": "confused_median_with_midrange",
+          "hint_markdown": "The midrange (Min + Max) / 2 is sensitive to extremes; the median is the positional middle value."
+        },
+        {
+          "id": "median_even_average_error",
+          "text_markdown": "**$\\text{Median} = \\$24.50$ thousand**: Average of the 4th and 5th values $\\frac{24 + 25}{2}$.",
+          "misconception_id": "averaged_middle_pair_for_odd_n",
+          "hint_markdown": "When sample size n is odd (n = 7), the median is uniquely the single central observation at position (n + 1)/2 = 4th."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "median_correct"
+      },
+      "evidence_concept_ids": [
+        "compute_sample_median"
+      ],
+      "explanation_markdown": "With $n = 7$ (an odd number), the median is the value at position $(n + 1)/2 = (7 + 1)/2 = 4$ in the sorted array:\n\n$$\\{18,\\ 20,\\ 22,\\ \\mathbf{24},\\ 25,\\ 26,\\ 120\\} \\implies \\text{Median} = 24.0\\text{ (\\$24,000)}$$\n\nIn Excel: `=MEDIAN(18, 20, 22, 24, 25, 26, 120)`.",
+      "numeric_policy": null
+    },
+    {
+      "id": "evaluate_outlier_sensitivity",
+      "kind": "choice",
+      "prompt_markdown": "Which measure should the regional director rely on to describe the revenue of a **typical** store, and why?",
+      "options": [
+        {
+          "id": "sensitivity_correct",
+          "text_markdown": "**The median ($\\\\$24{,}000$)**: It is resistant (robust) to extreme outliers; the mean ($\\\\$36{,}429$) is inflated by the single flagship store so that $6$ of the $7$ branches fall below it.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "sensitivity_always_mean",
+          "text_markdown": "**The mean ($\\\\$36{,}429$)**: The mean is always superior because it incorporates every single numerical value in the calculation.",
+          "misconception_id": "believed_mean_is_always_better_than_median",
+          "hint_markdown": "While the mean uses all values, this very property makes it highly sensitive to extreme skew, rendering it unrepresentative of typical observations."
+        },
+        {
+          "id": "sensitivity_mode_preferred",
+          "text_markdown": "**The mode**: Because only repeated values represent true commercial trends.",
+          "misconception_id": "recommended_mode_for_continuous_financial_data",
+          "hint_markdown": "Here all 7 values are distinct so there is no mode; the median is the standard robust measure of central tendency."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "sensitivity_correct"
+      },
+      "evidence_concept_ids": [
+        "evaluate_outlier_sensitivity_mean_vs_median"
+      ],
+      "explanation_markdown": "The **mean is non-resistant (sensitive to outliers)**: the single extreme observation (\\$120k) pulls the mean up to \\$36.43k, which is higher than $85.7\\%$ ($6$ out of $7$) of the branches. In contrast, the **median is resistant (robust)**: whether the top store made \\$30k or \\$120k or \\$1,000k, the median remains \\$24k, accurately reflecting the central revenue of a typical suburban store.",
+      "numeric_policy": null
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "template_id": "ci_level_vs_width",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T22:30:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "concept_check",
+    "parameters": {
+      "topic": "confidence_intervals",
+      "concept": "confidence_level_vs_width_tradeoff",
+      "objective": "Understand how confidence level determines margin of error and interval width, and evaluate the trade-off between certainty and precision"
+    },
+    "canonical_probability": 0.95,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 250.0,
+      "variance": 4.0,
+      "standard_deviation": 2.0
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "width_ordering", "kind": "choice", "evidence": "ci_width_ordering_by_confidence_level"},
+      {"id": "precision_tradeoff", "kind": "choice", "evidence": "ci_certainty_vs_precision_tradeoff"},
+      {"id": "narrowing_mechanism", "kind": "choice", "evidence": "ci_narrowing_width_via_sample_size"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Reviewed conceptual alignment: Evaluates the trade-off between confidence level and interval width with SE = 2.0 um. Critical values z = 1.645 (90%), 1.960 (95%), 2.576 (99%) produce widths 6.58, 7.84, and 10.30 um. Higher confidence requires wider intervals; increasing sample size n is the only way to narrow width while preserving confidence."
+}

@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "template_id": "drv_expected_cars_sold",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T23:16:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "discrete_rv",
+    "parameters": {
+      "operation": "expected_value",
+      "values": [0.0, 1.0, 2.0, 3.0, 4.0],
+      "probabilities": [0.10, 0.25, 0.35, 0.20, 0.10],
+      "expected_value": 1.95
+    },
+    "canonical_probability": 0.5,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 1.95,
+      "variance": 1.2475,
+      "standard_deviation": 1.116915
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "compute_expected_value", "kind": "choice", "evidence": "compute_expected_value_discrete_rv"},
+      {"id": "identify_excel_formula", "kind": "choice", "evidence": "identify_excel_sumproduct_formula"},
+      {"id": "interpret_expected_value", "kind": "choice", "evidence": "interpret_expected_value_long_run_mean"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Reviewed expectation calculation: E[X] = 0(0.10) + 1(0.25) + 2(0.35) + 3(0.20) + 4(0.10) = 1.95 cars/day. Confirmed Excel SUMPRODUCT implementation and long-run average interpretation."
+}

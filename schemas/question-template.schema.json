@@ -59,6 +59,7 @@
       "required": ["id", "text_markdown", "misconception_id", "hint_markdown"],
       "properties": {
         "id": {"$ref": "#/$defs/id"},
+        "numeric_value": {"type": "number", "description": "Optional rule-v2 calculated-choice value, checked against the Go engine; never a key authority."},
         "text_markdown": {"type": "string", "minLength": 1},
         "misconception_id": {"type": ["string", "null"]},
         "hint_markdown": {"type": ["string", "null"]}
@@ -94,6 +95,7 @@
       "required": ["id", "kind", "prompt_markdown", "options", "expected_answer", "evidence_concept_ids", "explanation_markdown", "numeric_policy"],
       "properties": {
         "id": {"$ref": "#/$defs/id"},
+        "calculation": {"type": "string", "minLength": 1, "description": "Optional rule-v2 engine quantity binding; supported by the runtime fixed-reference families."},
         "kind": {"enum": ["choice", "numeric"]},
         "prompt_markdown": {"type": "string", "minLength": 1},
         "options": {"type": "array", "maxItems": 4, "items": {"$ref": "#/$defs/option"}},

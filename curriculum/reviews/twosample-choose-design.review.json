@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "template_id": "twosample_choose_design",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T23:32:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "concept_check",
+    "parameters": {
+      "topic": "study_design_classification",
+      "concept": "one_sample_vs_independent_vs_paired_tests",
+      "objective": "Classify experimental setups as one-sample, independent two-sample, or paired, and identify the power advantage of repeated measures"
+    },
+    "canonical_probability": 0.5,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 0.0,
+      "variance": 1.0,
+      "standard_deviation": 1.0
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "classify_three_studies", "kind": "choice", "evidence": "classify_one_sample_independent_and_paired_designs"},
+      {"id": "paired_power_advantage", "kind": "choice", "evidence": "explain_power_advantage_of_paired_designs"},
+      {"id": "misclassification_consequence", "kind": "choice", "evidence": "evaluate_consequences_of_misclassifying_paired_data"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Reviewed test design taxonomy: Study 1 = Paired t-test (df = 24), Study 2 = Independent two-sample t-test (df = 58), Study 3 = One-sample t-test (df = 39). Explains how paired differences control for subject heterogeneity to maximize power."
+}

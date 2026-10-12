@@ -1,0 +1,156 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "twosample_read_excel_output",
+  "version": 1,
+  "status": "active",
+  "family_id": "two_sample_test",
+  "rule_version": 2,
+  "module_id": "module_5",
+  "title": "Reading Excel's pooled two-sample t-test output",
+  "scenario_markdown": "A manufacturer compares independent production lines A and B. Each line has 15 randomly sampled cycle times (minutes). The sample means are 78.4 and 72.1; sample variances are 24.5 and 20.2. Assume normal populations with equal variances. Test $H_0:\\mu_A-\\mu_B=0$ against $H_1:\\mu_A-\\mu_B\\ne0$ at $\\alpha=0.05$.\n\nExcel-style output (A minus B):\n\n- Pooled Variance: 22.3500\n- df: 28\n- t Stat: 3.6495\n- P(T<=t) one-tail: 0.0005\n- P(T<=t) two-tail: 0.0011\n- t Critical one-tail: 1.7011\n- t Critical two-tail: 2.0484",
+  "parameters": {
+    "alpha": 0.05,
+    "mean1": 78.4,
+    "mean2": 72.1,
+    "n1": 15,
+    "n2": 15,
+    "operation": "pooled",
+    "var1": 24.5,
+    "var2": 20.2
+  },
+  "assumptions": [
+    "The samples are independent; times within each sample are independent.",
+    "Populations are normal with equal variances; the pooled method is stipulated, not confirmed as the course convention.",
+    "The alternative is two-sided and alpha was chosen before inspecting the data."
+  ],
+  "concept_ids": [
+    "excel_two_tail_selection",
+    "excel_two_tail_critical",
+    "excel_output_test_conclusion"
+  ],
+  "setting_group": "manufacturing_cycle_time_excel",
+  "source_refs": [
+    "docs/COURSE-MAP.md: learner-supplied module objectives, October 11, 2026",
+    "docs/CONTENT-BACKLOG.md: twosample-read-excel-output",
+    "https://support.microsoft.com/en-us/excel/functions/t-test-function"
+  ],
+  "approval": {
+    "reviewer": "codex_delegated_final_waves",
+    "reviewed_at": "2026-10-12T04:32:26.275462Z",
+    "delegation_basis": "User explicitly replied on October 11, 2026 (America/Chicago): Yes—delegate review and activate after checks pass. Approval follows successful Go mathematical, bank admission, every-option grading and snapshot checks; assistant semantic review does not claim personal user reading.",
+    "notes": "Assistant reviewed the complete scenario, stage wording, all options, causal hints and worked explanations. Numerical choices are independently bound to Go engine quantities under rule v2; conceptual choices are semantically reviewed. Fixed parameters only; no cosmetic variation claimed as transfer. Stated course conventions remain unconfirmed where applicable. Validated one-to-one concept evidence, rejected ambiguous numeric distractors, and tested every option after snapshot serialization."
+  },
+  "stages": [
+    {
+      "calculation": "p_two",
+      "id": "excel_two_tail_selection",
+      "kind": "choice",
+      "prompt_markdown": "Which p-value should the two-sided test report? Select the value rounded to four decimal places.",
+      "options": [
+        {
+          "numeric_value": 0.001066349994741708,
+          "id": "supported",
+          "text_markdown": "$0.0011$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "numeric_value": 0.0005,
+          "id": "misconception_a",
+          "text_markdown": "$0.0005$",
+          "misconception_id": "excel_two_tail_selection_a",
+          "hint_markdown": "Do not halve a two-sided p-value."
+        },
+        {
+          "numeric_value": 0.05,
+          "id": "misconception_b",
+          "text_markdown": "$0.0500$",
+          "misconception_id": "excel_two_tail_selection_b",
+          "hint_markdown": "Alpha is the decision threshold, not the observed p-value."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "supported"
+      },
+      "evidence_concept_ids": [
+        "excel_two_tail_selection"
+      ],
+      "explanation_markdown": "Use the two-tail row because the alternative permits either sign. Excel: `=T.DIST.2T(ABS(t),28)` or `=T.TEST(A2:A16,B2:B16,2,2)` on the original data.",
+      "numeric_policy": null
+    },
+    {
+      "calculation": "critical_two",
+      "id": "excel_two_tail_critical",
+      "kind": "choice",
+      "prompt_markdown": "Which positive critical t-value applies to this two-sided test at alpha 0.05? Select the value rounded to four decimal places.",
+      "options": [
+        {
+          "numeric_value": 2.048407141795239,
+          "id": "supported",
+          "text_markdown": "$2.0484$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "numeric_value": 1.7011,
+          "id": "misconception_a",
+          "text_markdown": "$1.7011$",
+          "misconception_id": "excel_two_tail_critical_a",
+          "hint_markdown": "The one-tail cutoff allocates all alpha to one tail."
+        },
+        {
+          "numeric_value": 1.96,
+          "id": "misconception_b",
+          "text_markdown": "$1.9600$",
+          "misconception_id": "excel_two_tail_critical_b",
+          "hint_markdown": "Unknown population variances require a t distribution with df=28."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "supported"
+      },
+      "evidence_concept_ids": [
+        "excel_two_tail_critical"
+      ],
+      "explanation_markdown": "Split alpha between two tails. Excel: `=T.INV.2T(0.05,28)`. Compare the absolute t statistic with this positive cutoff.",
+      "numeric_policy": null
+    },
+    {
+      "id": "excel_output_test_conclusion",
+      "kind": "choice",
+      "prompt_markdown": "What conclusion follows from the correct p-value and critical value?",
+      "options": [
+        {
+          "id": "supported",
+          "text_markdown": "Reject H0; there is evidence that the population mean cycle times differ.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "misconception_a",
+          "text_markdown": "Fail to reject H0 because t Stat exceeds 1.",
+          "misconception_id": "excel_output_test_conclusion_a",
+          "hint_markdown": "Compare p with alpha, or |t| with the two-tail cutoff."
+        },
+        {
+          "id": "misconception_b",
+          "text_markdown": "The two population means differ by exactly 6.3 minutes.",
+          "misconception_id": "excel_output_test_conclusion_b",
+          "hint_markdown": "The observed sample difference estimates an uncertain population difference."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "supported"
+      },
+      "evidence_concept_ids": [
+        "excel_output_test_conclusion"
+      ],
+      "explanation_markdown": "The two-tail p-value is below 0.05 and |t| exceeds the two-tail critical value. Both methods reject the same null. The sample difference is 6.3 minutes; rejection does not establish an exact population difference. The one-tail row is not appropriate for this stated alternative.",
+      "numeric_policy": null
+    }
+  ]
+}

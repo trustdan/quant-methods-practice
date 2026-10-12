@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "template_id": "ci_plausible_claim",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T22:30:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "concept_check",
+    "parameters": {
+      "topic": "confidence_intervals",
+      "concept": "evaluating_plausible_values_and_duality",
+      "objective": "Determine whether hypothesized parameter values are plausible using a confidence interval, and apply duality to two-tailed hypothesis testing"
+    },
+    "canonical_probability": 0.004,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 150.0,
+      "variance": 3.01,
+      "standard_deviation": 1.735
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "evaluate_outside_claim", "kind": "choice", "evidence": "evaluate_claim_outside_confidence_interval"},
+      {"id": "hypothesis_test_duality", "kind": "choice", "evidence": "ci_hypothesis_test_duality_principle"},
+      {"id": "evaluate_inside_claim", "kind": "choice", "evidence": "evaluate_claim_inside_confidence_interval"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Reviewed conceptual alignment: 95% CI is [146.6, 153.4]. Evaluates vendor claim mu = 155.0 ms (outside interval, not plausible, rejected at alpha = 0.05 via duality). Contrasts with target mu = 150.0 ms (inside interval, plausible, not rejected at alpha = 0.05). Clarifies that values outside the CI are incompatible with the sample evidence at the stated confidence level."
+}

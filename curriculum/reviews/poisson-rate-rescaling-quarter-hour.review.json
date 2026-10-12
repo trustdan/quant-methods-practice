@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "template_id": "poisson_rate_rescaling_quarter_hour",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T22:00:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "poisson_pmf",
+    "parameters": {
+      "lambda": 1.5,
+      "k": 1
+    },
+    "canonical_probability": 0.557825,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 1.5,
+      "variance": 1.5,
+      "standard_deviation": 1.224745
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "rate_rescaling", "kind": "choice", "evidence": "poisson_rate_rescaling_proportionality"},
+      {"id": "at_most_one_calculation", "kind": "choice", "evidence": "poisson_at_most_one_calculation"},
+      {"id": "unscaled_error_analysis", "kind": "choice", "evidence": "poisson_unscaled_rate_error_analysis"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Verified mathematically: lambda_hour = 6.0, interval = 15 min = 0.25 hr -> lambda = 1.50. P(X=0) = e^(-1.5) = 0.223130. P(X=1) = 1.5*e^(-1.5) = 0.334695. P(X<=1) = 2.5*e^(-1.5) = 0.557825 (55.78%). Mistaken unscaled lambda=6 yields (1+6)*e^(-6) = 0.017351. Excel: =POISSON.DIST(1, 1.5, TRUE)."
+}

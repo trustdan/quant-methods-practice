@@ -1,0 +1,146 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "desc_sample_sd_delivery_times",
+  "version": 1,
+  "status": "active",
+  "family_id": "descriptive_stats",
+  "rule_version": 1,
+  "module_id": "module_1",
+  "title": "Computing sample standard deviation and applying Bessel's correction",
+  "scenario_markdown": "A logistics operations manager audits a random sample of $n = 6$ urban package delivery times (in minutes) recorded yesterday afternoon:\n\n$$\\{12,\\ 16,\\ 18,\\ 20,\\ 22,\\ 32\\}$$\n\nThe sample mean is $\\bar{x} = \\frac{120}{6} = 20.0\\text{ minutes}$. Calculate the sum of squared deviations, compute the sample standard deviation using degrees of freedom ($n - 1$), and contrast the result with the population standard deviation formula.",
+  "parameters": {
+    "operation": "variance_sd",
+    "data": [12.0, 16.0, 18.0, 20.0, 22.0, 32.0],
+    "mean": 20.0,
+    "sample_variance": 46.4,
+    "sample_sd": 6.81175,
+    "population_variance": 38.66667,
+    "population_sd": 6.21825
+  },
+  "assumptions": [
+    "The 6 observations represent a sample drawn from an ongoing daily delivery process",
+    "Sample variance divides the sum of squared deviations by n - 1 = 5",
+    "Population variance divides by n = 6"
+  ],
+  "concept_ids": [
+    "calculate_sum_of_squared_deviations",
+    "compute_sample_standard_deviation_bessel",
+    "distinguish_stdev_s_vs_stdev_p"
+  ],
+  "setting_group": "logistics_courier_delivery_variability",
+  "source_refs": [
+    "Course Module 1: Descriptive Measures & Basic Probability",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T23:08:00Z",
+    "notes": "Reviewed sample dispersion math: sum of squares = 232.0, sample variance s^2 = 232/5 = 46.4, sample SD s = sqrt(46.4) = 6.81 min. Contrasted with population SD sqrt(232/6) = 6.22 min and verified Excel STDEV.S vs STDEV.P.",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "sum_squared_deviations",
+      "kind": "choice",
+      "prompt_markdown": "What is the sum of squared deviations $\\sum (x_i - \\bar{x})^2$ around the sample mean $\\bar{x} = 20.0$?",
+      "options": [
+        {
+          "id": "ss_correct",
+          "text_markdown": "**$SS = 232.0\\text{ min}^2$**: $(-8)^2 + (-4)^2 + (-2)^2 + 0^2 + 2^2 + 12^2 = 64 + 16 + 4 + 0 + 4 + 144 = 232.0$.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "ss_zero_property",
+          "text_markdown": "**$SS = 0.0\\text{ min}^2$**: Deviations around the mean always cancel out to zero.",
+          "misconception_id": "confused_sum_of_deviations_with_sum_of_squared_deviations",
+          "hint_markdown": "The sum of raw deviations sum(x_i - mean) is zero; the sum of SQUARED deviations squares each term first to measure total spread."
+        },
+        {
+          "id": "ss_sum_of_squares_raw",
+          "text_markdown": "**$SS = 2{,}632.0\\text{ min}^2$**: Computed by summing the raw squared values $\\sum x_i^2$ without centering around the mean.",
+          "misconception_id": "forgot_to_subtract_mean_squared",
+          "hint_markdown": "Deviations must be measured relative to the mean (x_i - 20)^2, not raw x_i^2."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "ss_correct"
+      },
+      "evidence_concept_ids": [
+        "calculate_sum_of_squared_deviations"
+      ],
+      "explanation_markdown": "Subtract the sample mean $\\bar{x} = 20.0$ from each delivery time and square the resulting difference:\n\n- $(12 - 20)^2 = (-8)^2 = 64$\n- $(16 - 20)^2 = (-4)^2 = 16$\n- $(18 - 20)^2 = (-2)^2 = 4$\n- $(20 - 20)^2 = 0^2 = 0$\n- $(22 - 20)^2 = 2^2 = 4$\n- $(32 - 20)^2 = 12^2 = 144$\n\n$$\\sum (x_i - \\bar{x})^2 = 64 + 16 + 4 + 0 + 4 + 144 = 232.0\\text{ min}^2$$\n\nIn Excel: `=DEVSQ(12, 16, 18, 20, 22, 32)`.",
+      "numeric_policy": null
+    },
+    {
+      "id": "compute_sample_sd",
+      "kind": "choice",
+      "prompt_markdown": "Using Bessel's correction ($n - 1$), what is the sample standard deviation $s$ for these $6$ delivery times?",
+      "options": [
+        {
+          "id": "sd_sample_correct",
+          "text_markdown": "**$s = 6.81\\text{ minutes}$**: $s^2 = \\frac{232}{6 - 1} = \\frac{232}{5} = 46.40 \\implies s = \\sqrt{46.40} \\approx 6.812\\text{ min}$.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "sd_population_divisor",
+          "text_markdown": "**$s = 6.22\\text{ minutes}$**: $s^2 = \\frac{232}{6} = 38.67 \\implies s = \\sqrt{38.67} \\approx 6.218\\text{ min}$.",
+          "misconception_id": "used_population_divisor_n_for_sample_data",
+          "hint_markdown": "Dividing by n gives the population standard deviation (sigma); sample standard deviation s requires Bessel's correction (n - 1)."
+        },
+        {
+          "id": "sd_variance_without_sqrt",
+          "text_markdown": "**$s = 46.40\\text{ minutes}$**: The sample variance directly gives the dispersion in original units.",
+          "misconception_id": "forgot_square_root_for_standard_deviation",
+          "hint_markdown": "Variance is expressed in squared units (minutes^2); you must take the square root to obtain standard deviation in minutes."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "sd_sample_correct"
+      },
+      "evidence_concept_ids": [
+        "compute_sample_standard_deviation_bessel"
+      ],
+      "explanation_markdown": "Because the $6$ observations constitute a sample, we apply Bessel's correction ($n - 1 = 5$ degrees of freedom) to avoid underestimating population variance:\n\n$$s^2 = \\frac{\\sum (x_i - \\bar{x})^2}{n - 1} = \\frac{232.0}{5} = 46.40\\text{ min}^2$$\n$$s = \\sqrt{46.40} \\approx 6.8118\\text{ minutes}$$\n\nIn Excel: `=STDEV.S(12, 16, 18, 20, 22, 32)`.",
+      "numeric_policy": null
+    },
+    {
+      "id": "stdev_s_vs_stdev_p",
+      "kind": "choice",
+      "prompt_markdown": "Why does Excel provide both `=STDEV.S` and `=STDEV.P`, and which function must the logistics manager select here?",
+      "options": [
+        {
+          "id": "functions_correct",
+          "text_markdown": "**Use `=STDEV.S`**: The data is a sample of 6 orders from a larger process; dividing by $n - 1$ produces an unbiased estimator of $\\sigma$. `=STDEV.P` divides by $n$ and is reserved strictly for a complete census of the entire population.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "functions_always_p",
+          "text_markdown": "**Use `=STDEV.P`**: Whenever $n < 30$, `=STDEV.P` is required because small samples must use the exact count.",
+          "misconception_id": "believed_stdev_p_is_for_small_samples",
+          "hint_markdown": "STDEV.P is for population census data, not small samples. Samples always use STDEV.S regardless of whether n is large or small."
+        },
+        {
+          "id": "functions_interchangeable",
+          "text_markdown": "Both functions give identical values because sample size cancels out in standard deviation formulas.",
+          "misconception_id": "believed_sample_and_population_sd_are_identical",
+          "hint_markdown": "STDEV.S uses n - 1 in the denominator and is strictly larger than STDEV.P (which uses n)."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "functions_correct"
+      },
+      "evidence_concept_ids": [
+        "distinguish_stdev_s_vs_stdev_p"
+      ],
+      "explanation_markdown": "When estimating variability from a **sample**, deviations are measured relative to the sample mean $\\bar{x}$ rather than the unknown population mean $\\mu$. Because $\\bar{x}$ is calculated from the sample itself, the sum of squared deviations around $\\bar{x}$ is mathematically smaller than around $\\mu$. Dividing by $n$ would systematically underestimate the true variability. Dividing by $n - 1$ (Bessel's correction in `=STDEV.S`) corrects for this bias.",
+      "numeric_policy": null
+    }
+  ]
+}

@@ -1,0 +1,159 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "ci_mean_t_small_sample_90",
+  "version": 1,
+  "status": "active",
+  "family_id": "confidence_interval",
+  "rule_version": 1,
+  "module_id": "module_4",
+  "title": "Small-sample 90% t-confidence interval for machine assembly time",
+  "scenario_markdown": "An industrial engineering department studies the cycle time (in minutes) required to assemble a specialized electronic sensor. A random sample of $n = 10$ assembly runs yields a sample mean of $\\bar{x} = 42.3\\text{ minutes}$ and a sample standard deviation of $s = 5.1\\text{ minutes}$. Historical engineering audits suggest cycle times follow an approximately normal distribution. Construct a $90\\%$ confidence interval for the true population mean assembly cycle time $\\mu$.",
+  "parameters": {
+    "parameter": "mean_t",
+    "point_estimate": 42.3,
+    "s": 5.1,
+    "n": 10,
+    "confidence_level": 0.9
+  },
+  "assumptions": [
+    "Assembly cycle times are approximately normally distributed, satisfying the small-sample normality requirement for the t-distribution",
+    "Population standard deviation sigma is unknown, requiring the Student's t-distribution with df = n - 1 = 9",
+    "Independent random sample of assembly runs"
+  ],
+  "concept_ids": [
+    "ci_t_distribution_degrees_of_freedom",
+    "ci_critical_t_lookup",
+    "ci_mean_t_interval_construction"
+  ],
+  "setting_group": "manufacturing_electronics_assembly",
+  "source_refs": [
+    "Course Module 4: Confidence Intervals",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T22:30:00Z",
+    "notes": "Reviewed derivation: n = 10, df = 9, x_bar = 42.3, s = 5.1, CL = 0.90. SE = 5.1 / sqrt(10) = 1.6128. Critical t*(0.05, 9) = 1.8331. Margin of error E = 1.8331 * 1.6128 = 2.9564 (approx 2.96). CI: [42.3 - 2.96, 42.3 + 2.96] = [39.34, 45.26]. Excel: =CONFIDENCE.T(0.10, 5.1, 10).",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "df_and_se",
+      "kind": "choice",
+      "prompt_markdown": "Determine the degrees of freedom $df$ for the Student's $t$-distribution and calculate the standard error of the sample mean $SE = \\frac{s}{\\sqrt{n}}$.",
+      "options": [
+        {
+          "id": "df_and_se_correct",
+          "text_markdown": "$df = 9$, $SE = 1.613\\text{ minutes}$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "df_n_not_minus_one",
+          "text_markdown": "$df = 10$, $SE = 1.613\\text{ minutes}$",
+          "misconception_id": "degrees_of_freedom_equals_n",
+          "hint_markdown": "For a single-sample $t$-interval, degrees of freedom equal $n - 1 = 10 - 1 = 9$, not $n$."
+        },
+        {
+          "id": "se_no_sqrt_n",
+          "text_markdown": "$df = 9$, $SE = 0.510\\text{ minutes}$",
+          "misconception_id": "divided_by_n_instead_of_sqrt_n",
+          "hint_markdown": "The standard error divides $s$ by $\\sqrt{n} = \\sqrt{10} \\approx 3.162$, not by $n = 10$."
+        },
+        {
+          "id": "se_just_sample_sd",
+          "text_markdown": "$df = 9$, $SE = 5.100\\text{ minutes}$",
+          "misconception_id": "used_sample_sd_as_standard_error",
+          "hint_markdown": "Standard error of the sample mean requires dividing $s = 5.1$ by $\\sqrt{n} = \\sqrt{10}$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "df_and_se_correct"
+      },
+      "explanation_markdown": "For estimating a population mean with unknown $\\sigma$, the degrees of freedom are $df = n - 1 = 10 - 1 = 9$. The estimated standard error of the mean is $SE = \\frac{s}{\\sqrt{n}} = \\frac{5.1}{\\sqrt{10}} \\approx 1.6128\\text{ minutes}$.",
+      "evidence_concept_ids": [
+        "ci_t_distribution_degrees_of_freedom"
+      ]
+    },
+    {
+      "id": "critical_value_and_moe",
+      "kind": "choice",
+      "prompt_markdown": "Find the critical value $t_{0.05, 9}$ for a $90\\%$ confidence level and compute the margin of error $E = t^* \\times SE$.",
+      "options": [
+        {
+          "id": "moe_correct",
+          "text_markdown": "$t^* = 1.833$, $E = 2.96\\text{ minutes}$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "moe_used_z_instead_of_t",
+          "text_markdown": "$t^* = 1.645$, $E = 2.65\\text{ minutes}$",
+          "misconception_id": "used_z_instead_of_t_for_unknown_sigma",
+          "hint_markdown": "Because $\\sigma$ is unknown and $n = 10$ is small, you must use the $t$-distribution ($t_{0.05, 9} = 1.833$), not the standard normal critical value $z = 1.645$."
+        },
+        {
+          "id": "moe_used_df_10",
+          "text_markdown": "$t^* = 1.812$, $E = 2.92\\text{ minutes}$",
+          "misconception_id": "used_n_for_degrees_of_freedom_t_table",
+          "hint_markdown": "With $n = 10$, degrees of freedom are $n - 1 = 9$, giving $t_{0.05, 9} \\approx 1.833$, rather than $t_{0.05, 10} = 1.812$."
+        },
+        {
+          "id": "moe_used_95_cl",
+          "text_markdown": "$t^* = 2.262$, $E = 3.65\\text{ minutes}$",
+          "misconception_id": "used_95_percent_critical_value_for_90",
+          "hint_markdown": "The question specifies $90\\%$ confidence (tail area $\\alpha/2 = 0.05$), so $t_{0.05, 9} = 1.833$, not the $95\\%$ critical value $t_{0.025, 9} = 2.262$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "moe_correct"
+      },
+      "explanation_markdown": "For $90\\%$ confidence, $\\alpha = 0.10$ and each tail holds $\\alpha/2 = 0.05$. In Excel, `=T.INV.2T(0.10, 9)` yields $t^* \\approx 1.8331$. Multiplying by $SE = 1.6128$ gives margin of error $E = 1.8331 \\times 1.6128 \\approx 2.956\\text{ minutes} \\approx 2.96\\text{ minutes}$.",
+      "evidence_concept_ids": [
+        "ci_critical_t_lookup"
+      ]
+    },
+    {
+      "id": "construct_interval",
+      "kind": "choice",
+      "prompt_markdown": "Construct the final $90\\%$ confidence interval $\\bar{x} \\pm E$ and state its statistical interpretation.",
+      "options": [
+        {
+          "id": "ci_correct",
+          "text_markdown": "$[39.34\\text{ min}, 45.26\\text{ min}]$: We are $90\\%$ confident that the true population mean assembly time $\\mu$ falls between $39.34$ and $45.26$ minutes.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "ci_centered_on_s",
+          "text_markdown": "$[2.14\\text{ min}, 8.06\\text{ min}]$: We are $90\\%$ confident that the true standard deviation falls between $2.14$ and $8.06$ minutes.",
+          "misconception_id": "centered_ci_on_sample_sd_instead_of_mean",
+          "hint_markdown": "A confidence interval for $\\mu$ is centered on the sample mean $\\bar{x} = 42.3$, not on $s = 5.1$."
+        },
+        {
+          "id": "ci_used_z_bounds",
+          "text_markdown": "$[39.65\\text{ min}, 44.95\\text{ min}]$: We are $90\\%$ confident that the true population mean assembly time $\\mu$ falls between $39.65$ and $44.95$ minutes.",
+          "misconception_id": "reported_z_interval_for_t_problem",
+          "hint_markdown": "This interval uses the narrower $z$ margin of error ($2.65$); the wider $t$ margin of error ($2.96$) is required when $\\sigma$ is unknown."
+        },
+        {
+          "id": "ci_probability_fallacy",
+          "text_markdown": "$[39.34\\text{ min}, 45.26\\text{ min}]$: There is a $90\\%$ probability that a randomly selected individual assembly run will take between $39.34$ and $45.26$ minutes.",
+          "misconception_id": "confusing_confidence_interval_with_individual_data_dispersion",
+          "hint_markdown": "A confidence interval for $\\mu$ estimates the population mean parameter, not the range containing $90\\%$ of individual assembly runs."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "ci_correct"
+      },
+      "explanation_markdown": "The confidence interval is $\\bar{x} \\pm E = 42.3 \\pm 2.96 = [39.34, 45.26]\\text{ minutes}$. In Excel, the margin of error is directly obtained with `=CONFIDENCE.T(0.10, 5.1, 10)` which returns $2.9564$. We are $90\\%$ confident that the true population mean assembly time $\\mu$ lies within this range.",
+      "evidence_concept_ids": [
+        "ci_mean_t_interval_construction"
+      ]
+    }
+  ]
+}

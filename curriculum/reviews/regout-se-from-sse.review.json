@@ -1,0 +1,16 @@
+{
+  "template_id": "regout_se_from_sse",
+  "status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T22:30:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "reviewed_rules": [1],
+  "checklist": {
+    "math_verified_by_engine": true,
+    "distractor_misconceptions_valid": true,
+    "hints_pedagogically_useful": true,
+    "excel_formulas_checked": true,
+    "no_latex_formatting_regressions": true
+  },
+  "notes": "Verified standard error of the estimate from ANOVA table: n = 20, k = 1, SSR = 1024.0, SSE = 288.0, SST = 1312.0. df_res = 18, MSE = 288.0 / 18 = 16.0. Standard error of estimate s_e = sqrt(16.0) = 4.0 ($4,000). Model satisfies t^2 = 64.0 = F consistency check. Distractors address dividing by n=20, n-1=19, omitting square root, and confusing s_e with R^2 or slope standard error."
+}

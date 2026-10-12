@@ -1,0 +1,146 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "hyp_z_mean_two_tailed",
+  "version": 1,
+  "status": "active",
+  "family_id": "hypothesis_test",
+  "rule_version": 1,
+  "module_id": "module_5",
+  "title": "Two-tailed one-sample Z-test for bottling volume",
+  "scenario_markdown": "A beverage bottling plant operates an automated filling line calibrated to fill containers to a target mean volume of $\\mu = 2.00\\text{ liters}$. Long-term engineering data confirms that the process standard deviation is known to be $\\sigma = 0.05\\text{ liters}$. A quality audit samples $n = 36$ bottles from the morning production shift and measures a sample mean of $\\bar{x} = 2.02\\text{ liters}$. Conduct a two-tailed hypothesis test at significance level $\\alpha = 0.05$ to test whether the line is operating out of calibration ($H_0: \\mu = 2.00$ vs $H_1: \\mu \\ne 2.00$).",
+  "parameters": {
+    "test_type": "mean_z",
+    "null_value": 2.0,
+    "sample_stat": 2.02,
+    "sigma": 0.05,
+    "n": 36,
+    "alpha": 0.05,
+    "tail": "two_tailed"
+  },
+  "assumptions": [
+    "Bottling volumes are approximately normally distributed, and CLT applies since n = 36 >= 30",
+    "The process standard deviation is known (sigma = 0.05 L), justifying the standard normal Z test",
+    "Independent random sample of filled bottles from the production run"
+  ],
+  "concept_ids": [
+    "hyp_z_test_statistic_calculation",
+    "hyp_two_tailed_pvalue_calculation",
+    "hyp_statistical_decision_and_conclusion"
+  ],
+  "setting_group": "beverage_production_bottling_calibration",
+  "source_refs": [
+    "Course Module 5: Hypothesis Testing",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T22:00:00Z",
+    "notes": "Reviewed derivation: null_mu = 2.00, x_bar = 2.02, sigma = 0.05, n = 36. SE = 0.05 / 6 = 0.0083333. Z = (2.02 - 2.00) / 0.0083333 = 2.40. One-tailed tail prob = 0.0081975. Two-tailed p-value = 2 * 0.0081975 = 0.016395 (approx 0.0164). Since p-val < 0.05 and |Z| = 2.40 > 1.960, reject H0. Excel: =2*(1 - NORM.S.DIST(2.40, TRUE)).",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "test_statistic_calc",
+      "kind": "choice",
+      "prompt_markdown": "Calculate the standard error of the mean $SE$ and the standardized test statistic $Z = \\frac{\\bar{x} - \\mu_0}{\\sigma / \\sqrt{n}}$.",
+      "options": [
+        {
+          "id": "z_correct",
+          "text_markdown": "$SE = 0.00833\\text{ L}$, $Z = +2.40$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "z_forgot_sqrt_n",
+          "text_markdown": "$SE = 0.0500\\text{ L}$, $Z = +0.40$",
+          "misconception_id": "omitted_sqrt_n_in_test_statistic",
+          "hint_markdown": "Standard error divides $\\sigma$ by $\\sqrt{n} = \\sqrt{36} = 6$, giving $0.05/6 \\approx 0.00833\\text{ L}$."
+        },
+        {
+          "id": "z_inverted_diff",
+          "text_markdown": "$SE = 0.00833\\text{ L}$, $Z = -2.40$",
+          "misconception_id": "inverted_subtraction_order_in_numerator",
+          "hint_markdown": "The numerator is $\\bar{x} - \\mu_0 = 2.02 - 2.00 = +0.02$, which is positive."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "z_correct"
+      },
+      "evidence_concept_ids": [
+        "hyp_z_test_statistic_calculation"
+      ],
+      "explanation_markdown": "The standard error is $SE = \\frac{\\sigma}{\\sqrt{n}} = \\frac{0.05}{\\sqrt{36}} = \\frac{0.05}{6} \\approx 0.008333\\text{ L}$. The test statistic standardizes the difference between the observed sample mean $\\bar{x} = 2.02$ and hypothesized mean $\\mu_0 = 2.00$: $Z = \\frac{2.02 - 2.00}{0.0083333} = \\frac{0.02}{0.0083333} = +2.40$. The sample mean lies $2.40$ standard errors above the target calibration.",
+      "numeric_policy": null
+    },
+    {
+      "id": "pvalue_calc",
+      "kind": "choice",
+      "prompt_markdown": "Compute the two-tailed $p$-value for this test statistic $Z = +2.40$.",
+      "options": [
+        {
+          "id": "pval_correct",
+          "text_markdown": "$p\\text{-value} = 0.0164$ ($2 \\times 0.0082$)",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "pval_one_tailed",
+          "text_markdown": "$p\\text{-value} = 0.0082$ ($1 - \\Phi(2.40)$)",
+          "misconception_id": "reported_single_tail_for_two_tailed_test",
+          "hint_markdown": "Because the test is two-tailed ($H_1: \\mu \\ne 2.00$), the one-tailed probability must be doubled to account for deviations in either direction."
+        },
+        {
+          "id": "pval_cumulative_cdf",
+          "text_markdown": "$p\\text{-value} = 0.9918$ ($\\Phi(2.40)$)",
+          "misconception_id": "reported_cumulative_cdf_instead_of_tail_prob",
+          "hint_markdown": "$0.9918$ is the area below $Z = 2.40$. Tail area is $1 - 0.9918 = 0.0082$, doubled for two tails."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "pval_correct"
+      },
+      "evidence_concept_ids": [
+        "hyp_two_tailed_pvalue_calculation"
+      ],
+      "explanation_markdown": "For a two-tailed test, the $p$-value measures the probability of observing a test statistic at least as extreme as $|Z| = 2.40$ in either tail: $p\\text{-value} = 2 \\times P(Z \\ge 2.40) = 2 \\times [1 - \\Phi(2.40)] = 2 \\times (1 - 0.99180) = 2 \\times 0.00820 = 0.0164$ (or $1.64\\%$). In Excel: `=2*(1 - NORM.S.DIST(2.40, TRUE))`.",
+      "numeric_policy": null
+    },
+    {
+      "id": "decision_and_conclusion",
+      "kind": "choice",
+      "prompt_markdown": "What is the statistical decision at $\\alpha = 0.05$ and the appropriate conclusion regarding the bottling line?",
+      "options": [
+        {
+          "id": "decision_reject_correct",
+          "text_markdown": "Reject $H_0$ because $p\\text{-value} = 0.0164 < 0.05$ (and $|Z| = 2.40 > 1.960$). There is statistically significant evidence that the bottling line is out of calibration.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "decision_fail_to_reject",
+          "text_markdown": "Fail to reject $H_0$ because $\\bar{x} = 2.02$ is only $0.02\\text{ L}$ above $2.00$, which is practically negligible.",
+          "misconception_id": "confused_practical_magnitude_with_statistical_significance",
+          "hint_markdown": "Statistical decision rules are strictly defined by comparing the p-value to alpha ($p < \\alpha$), which dictates rejecting $H_0$ here."
+        },
+        {
+          "id": "decision_accept_h1",
+          "text_markdown": "Accept $H_0$ because $p\\text{-value} > 0.01$.",
+          "misconception_id": "evaluated_against_wrong_alpha_threshold",
+          "hint_markdown": "The test significance level was set at $\\alpha = 0.05$, not $0.01$. Furthermore, classical testing never 'accepts' $H_0$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "decision_reject_correct"
+      },
+      "evidence_concept_ids": [
+        "hyp_statistical_decision_and_conclusion"
+      ],
+      "explanation_markdown": "Because the $p$-value ($0.0164$) is less than the significance level $\\alpha = 0.05$ (or equivalently, test statistic $|Z| = 2.40$ exceeds the critical value $Z^* = 1.960$), we reject $H_0$. There is statistically significant evidence at the $5\\%$ level to conclude that the filling machine mean volume differs from $2.00\\text{ liters}$, requiring engineering recalibration.",
+      "numeric_policy": null
+    }
+  ]
+}

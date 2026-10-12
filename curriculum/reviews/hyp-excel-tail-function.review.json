@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "template_id": "hyp_excel_tail_function",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T23:30:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "concept_check",
+    "parameters": {
+      "topic": "hypothesis_testing_software_syntax",
+      "concept": "excel_t_distribution_tail_functions",
+      "objective": "Select the proper Excel distribution function based on the directional tail of the alternative hypothesis"
+    },
+    "canonical_probability": 0.5,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 0.0,
+      "variance": 1.0,
+      "standard_deviation": 1.0
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "right_tailed_function", "kind": "choice", "evidence": "select_excel_right_tailed_function"},
+      {"id": "left_tailed_function", "kind": "choice", "evidence": "select_excel_left_tailed_function"},
+      {"id": "two_tailed_function", "kind": "choice", "evidence": "select_excel_two_tailed_function"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Reviewed Excel syntax rules: H1: mu > mu0 uses T.DIST.RT(t, df); H1: mu < mu0 uses T.DIST(t, df, TRUE); H1: mu != mu0 uses T.DIST.2T(ABS(t), df). Clarified ABS requirement for T.DIST.2T. Completes Row 5.3 at 6/6."
+}

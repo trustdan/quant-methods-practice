@@ -1,0 +1,142 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "regprob_heteroscedasticity",
+  "version": 1,
+  "status": "active",
+  "family_id": "concept_check",
+  "rule_version": 1,
+  "module_id": "module_6",
+  "title": "Diagnosing heteroscedasticity in regression residuals and evaluating its consequences",
+  "scenario_markdown": "An industrial economics research team estimates a simple linear regression model predicting annual corporate Research & Development expenditure ($Y$, in millions of dollars) from total corporate annual revenue ($X$, in billions of dollars) across $n = 60$ publicly traded technology firms.\n\nTo check model assumptions, the lead econometrician plots the residuals $e_i = y_i - \\hat{y}_i$ on the vertical axis against the fitted values $\\hat{y}_i$ on the horizontal axis. The diagnostic plot reveals a distinct **fan-shaped (cone-shaped) expanding funnel pattern**: for small firms with low predicted R&D, residuals are tightly clustered near zero ($\\\\pm \\\\$2\\\\text{ million}$), whereas for large enterprise conglomerates with high predicted R&D, residuals disperse wildly over a massive band ($\\\\pm \\\\$150\\\\text{ million}$).\n\nDiagnose the regression assumption violated by this residual pattern, analyze its consequences for statistical inference, and identify appropriate corrective remedies.",
+  "parameters": {
+    "topic": "regression_diagnostics",
+    "concept": "heteroscedasticity_non_constant_variance",
+    "objective": "Identify heteroscedasticity from a fan-shaped residual plot, analyze its impact on standard errors and hypothesis tests, and prescribe remedies"
+  },
+  "assumptions": [
+    "Classical OLS assumption of homoscedasticity states Var(epsilon_i) = sigma^2 (constant variance) for all observations",
+    "A fan-shaped or funnel residual pattern indicates non-constant variance (heteroscedasticity)",
+    "Heteroscedasticity leaves OLS point estimates unbiased but biases standard errors and invalidates hypothesis tests"
+  ],
+  "concept_ids": [
+    "diagnose_heteroscedasticity_from_fan_plot",
+    "evaluate_consequences_of_heteroscedasticity_on_inference",
+    "prescribe_remedies_for_heteroscedasticity"
+  ],
+  "setting_group": "corporate_rd_revenue_heteroscedasticity_diagnostic",
+  "source_refs": [
+    "Course Module 6: Regression Analysis",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T22:30:00Z",
+    "notes": "Reviewed conceptual alignment: Fan-shaped residual plot indicates heteroscedasticity (violation of constant error variance). Point estimates b0, b1 remain unbiased, but standard errors are biased, invalidating t-tests and confidence intervals. Prescribes logarithmic transformation or robust standard errors.",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "diagnose_assumption_violation",
+      "kind": "choice",
+      "prompt_markdown": "What core Ordinary Least Squares (OLS) regression assumption is violated by this fan-shaped residual plot?",
+      "options": [
+        {
+          "id": "violation_heteroscedasticity",
+          "text_markdown": "**Homoscedasticity (constant variance of error terms)**: The presence of non-constant variance (heteroscedasticity) violates the assumption that $\\text{Var}(\\epsilon_i) = \\sigma^2$ across all levels of the predictor.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "violation_multicollinearity",
+          "text_markdown": "**No multicollinearity**: The fan shape proves that the independent variables are perfectly correlated with each other.",
+          "misconception_id": "confused_heteroscedasticity_with_multicollinearity",
+          "hint_markdown": "Multicollinearity involves correlation among multiple predictors; this is a bivariate model with non-constant residual spread."
+        },
+        {
+          "id": "violation_independence_autocorrelation",
+          "text_markdown": "**Autocorrelation of errors**: The expanding spread proves that each firm's expenditure is serially correlated over successive calendar months.",
+          "misconception_id": "confused_heteroscedasticity_with_autocorrelation",
+          "hint_markdown": "Autocorrelation involves temporal correlation across time-ordered data; expanding variance across firm sizes is heteroscedasticity."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "violation_heteroscedasticity"
+      },
+      "evidence_concept_ids": [
+        "diagnose_heteroscedasticity_from_fan_plot"
+      ],
+      "explanation_markdown": "A primary Gauss-Markov assumption of OLS is **homoscedasticity**: the error terms $\\epsilon_i$ must have constant variance $\\sigma^2$ regardless of the value of $X$ or $\\hat{Y}$. When a residual plot displays a fan or funnel shape (variance expanding as the fitted value increases), this assumption is violated, indicating **heteroscedasticity**.",
+      "numeric_policy": null
+    },
+    {
+      "id": "consequences_for_inference",
+      "kind": "choice",
+      "prompt_markdown": "What is the primary statistical consequence of heteroscedasticity on Ordinary Least Squares (OLS) regression estimates?",
+      "options": [
+        {
+          "id": "consequence_biased_standard_errors",
+          "text_markdown": "**OLS slope estimates $b_1$ remain unbiased, but standard errors $s_{b_1}$ are biased and invalid**: Consequently, $t$-statistics, $p$-values, and confidence intervals are unreliable and cannot be trusted.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "consequence_slopes_completely_biased",
+          "text_markdown": "**The estimated slopes $b_0$ and $b_1$ become completely biased and reversed in sign**: The regression line points in the wrong direction.",
+          "misconception_id": "believed_heteroscedasticity_biases_point_estimates",
+          "hint_markdown": "OLS estimators remain unbiased under heteroscedasticity ($E[b_1] = \\beta_1$); the issue is that their calculated standard errors are incorrect."
+        },
+        {
+          "id": "consequence_r_squared_exceeds_one",
+          "text_markdown": "**$R^2$ exceeds $1.00$ mathematically**: The sum of squares identity breaks down.",
+          "misconception_id": "believed_r_squared_exceeds_one_under_heteroscedasticity",
+          "hint_markdown": "$R^2$ remains bounded between $0$ and $1$; the flaw is in inference (significance testing)."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "consequence_biased_standard_errors"
+      },
+      "evidence_concept_ids": [
+        "evaluate_consequences_of_heteroscedasticity_on_inference"
+      ],
+      "explanation_markdown": "Heteroscedasticity does **not** cause bias in the regression coefficients ($b_0$ and $b_1$ remain unbiased point estimates). However, standard OLS formulas for the standard errors $\\text{SE}(b_1)$ assume a single constant variance $\\sigma^2$. When this assumption fails, the standard errors are typically understated, leading to artificially inflated $t$-statistics, falsely tiny $p$-values, and incorrect conclusions about statistical significance.",
+      "numeric_policy": null
+    },
+    {
+      "id": "prescribe_remedies",
+      "kind": "choice",
+      "prompt_markdown": "Which corrective action is the most common and effective remedy for heteroscedasticity when modeling monetary scales like revenue and R&D expenditure?",
+      "options": [
+        {
+          "id": "remedy_log_transformation",
+          "text_markdown": "**Apply a logarithmic transformation**: Transforming variables to $\\ln(Y)$ and $\\ln(X)$ compresses expanding dollar scales and stabilizes error variance, or use heteroscedasticity-robust standard errors (White's correction).",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "remedy_delete_large_firms",
+          "text_markdown": "**Arbitrarily delete all large firms from the dataset**: Drop the 30 largest companies until the residual plot looks flat.",
+          "misconception_id": "advocated_ad_hoc_deletion_of_valid_data",
+          "hint_markdown": "Deleting valid observations creates severe selection bias and destroys sample representativeness."
+        },
+        {
+          "id": "remedy_swap_x_and_y",
+          "text_markdown": "**Swap $X$ and $Y$**: Make R&D expenditure the independent variable and revenue the dependent variable.",
+          "misconception_id": "believed_swapping_axes_cures_heteroscedasticity",
+          "hint_markdown": "Swapping axes changes the direction of conditioning but does not cure non-constant variance."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "remedy_log_transformation"
+      },
+      "evidence_concept_ids": [
+        "prescribe_remedies_for_heteroscedasticity"
+      ],
+      "explanation_markdown": "In economic and financial data, variation is typically proportional to firm size (multiplicative errors). Applying a **log-log transformation** (estimating $\\ln(\\text{R\\&D}) = \\beta_0 + \\beta_1 \\ln(\\text{Revenue}) + \\epsilon$) pulls in extreme values, stabilizes variance across the full range, and allows coefficients to be interpreted as elasticities. Alternatively, analysts use **heteroscedasticity-robust standard errors** (White-Huber sandwich estimators) or Weighted Least Squares (WLS).",
+      "numeric_policy": null
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "template_id": "concept_parameter_vs_statistic",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T22:00:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "concept_check",
+    "parameters": {
+      "topic": "statistical_foundations",
+      "concept": "parameters_versus_statistics",
+      "objective": "Identify and distinguish populations, samples, parameters, and statistics in business surveys"
+    },
+    "canonical_probability": 0.62,
+    "canonical_rational": "31/50",
+    "moments": {
+      "mean": 0.62,
+      "variance": 0.0,
+      "standard_deviation": 0.0
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "population_and_sample", "kind": "choice", "evidence": "identify_population_and_sample"},
+      {"id": "parameter_and_statistic", "kind": "choice", "evidence": "identify_parameter_and_statistic"},
+      {"id": "parameter_fixed_vs_statistic_random", "kind": "choice", "evidence": "parameter_fixed_vs_statistic_random"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Reviewed conceptual alignment: Population = 20,000 subscribers, Sample = 500 respondents, Parameter = true unknown p, Statistic = observed p_hat = 0.620. Stage 3 covers fundamental frequentist principle: parameter is a fixed constant, statistic is a random variable across samples."
+}

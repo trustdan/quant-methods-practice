@@ -1,0 +1,161 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "hyp_proportion_left_tailed",
+  "version": 1,
+  "status": "active",
+  "family_id": "hypothesis_test",
+  "rule_version": 1,
+  "module_id": "module_5",
+  "title": "Left-tailed one-sample Z-test for supplier defect proportion",
+  "scenario_markdown": "A hardware manufacturing plant has historically experienced a defect rate of $p_0 = 0.20$ ($20\\%$) among mechanical switches sourced from a legacy vendor. A new supplier guarantees that its upgraded manufacturing process produces a defect rate strictly lower than $20\\%$. Quality control inspects a random sample of $n = 200$ switches from the trial shipment and discovers $x = 28$ defective units (sample proportion $\\hat{p} = 28/200 = 0.14$). Test at the $\\alpha = 0.05$ significance level whether the defect rate is significantly lower than $0.20$ ($H_0: p = 0.20$ vs $H_1: p < 0.20$).",
+  "parameters": {
+    "test_type": "proportion_z",
+    "null_value": 0.2,
+    "sample_stat": 0.14,
+    "successes": 28,
+    "n": 200,
+    "alpha": 0.05,
+    "tail": "left_tailed"
+  },
+  "assumptions": [
+    "np_0 = 200(0.20) = 40 >= 10 and n(1 - p_0) = 200(0.80) = 160 >= 10, justifying the standard normal Z approximation",
+    "Independent random sample of mechanical switches from the shipment lot",
+    "Standard error for testing is calculated under the null hypothesis using p_0 = 0.20"
+  ],
+  "concept_ids": [
+    "hyp_proportion_standard_error_under_null",
+    "hyp_proportion_z_test_statistic",
+    "hyp_left_tailed_pvalue_and_decision"
+  ],
+  "setting_group": "manufacturing_vendor_quality_inspection",
+  "source_refs": [
+    "Course Module 5: Hypothesis Testing",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T22:30:00Z",
+    "notes": "Reviewed derivation: null_p = 0.20, x = 28, n = 200 -> p_hat = 0.14. SE_0 = sqrt(0.20 * 0.80 / 200) = sqrt(0.0008) = 0.028284. Z = (0.14 - 0.20) / 0.028284 = -2.1213. Left-tailed p-value = NORM.S.DIST(-2.1213, TRUE) = 0.01695 (approx 0.0170). Since p < 0.05 and Z < -1.645, reject H0. Excel: =NORM.S.DIST((0.14 - 0.20)/SQRT(0.20*0.80/200), TRUE).",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "compute_test_statistic",
+      "kind": "choice",
+      "prompt_markdown": "Calculate the standard error under the null hypothesis $SE_0 = \\sqrt{\\frac{p_0(1 - p_0)}{n}}$ and the standardized test statistic $Z = \\frac{\\hat{p} - p_0}{SE_0}$.",
+      "options": [
+        {
+          "id": "z_stat_correct",
+          "text_markdown": "$SE_0 = 0.0283$, $Z = -2.12$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "z_stat_used_sample_p_in_se",
+          "text_markdown": "$SE = 0.0245$, $Z = -2.45$",
+          "misconception_id": "used_sample_proportion_in_hyp_test_se",
+          "hint_markdown": "In hypothesis testing for proportions, the standard error must be evaluated under the null hypothesis using $p_0 = 0.20$, not the sample proportion $\\hat{p} = 0.14$."
+        },
+        {
+          "id": "z_stat_inverted_sign",
+          "text_markdown": "$SE_0 = 0.0283$, $Z = +2.12$",
+          "misconception_id": "inverted_sign_test_statistic",
+          "hint_markdown": "The sample proportion $\\hat{p} = 0.14$ is below the null value $0.20$, so the numerator $\\hat{p} - p_0 = 0.14 - 0.20 = -0.06$ is negative."
+        },
+        {
+          "id": "z_stat_forgot_sqrt",
+          "text_markdown": "$SE_0 = 0.0008$, $Z = -75.00$",
+          "misconception_id": "omitted_square_root_in_proportion_se",
+          "hint_markdown": "Do not forget to take the square root of the variance term $\\frac{0.20 \\times 0.80}{200} = 0.0008$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "z_stat_correct"
+      },
+      "explanation_markdown": "Under the null hypothesis, $p = p_0 = 0.20$. The null standard error is $SE_0 = \\sqrt{\\frac{0.20 \\times 0.80}{200}} = \\sqrt{0.0008} \\approx 0.028284$. The standardized test statistic is: $$Z = \\frac{0.14 - 0.20}{0.028284} = \\frac{-0.06}{0.028284} \\approx -2.1213 \\approx -2.12$$",
+      "evidence_concept_ids": [
+        "hyp_proportion_standard_error_under_null"
+      ]
+    },
+    {
+      "id": "compute_p_value",
+      "kind": "choice",
+      "prompt_markdown": "Calculate the left-tailed $p$-value for $Z = -2.12$.",
+      "options": [
+        {
+          "id": "pval_correct",
+          "text_markdown": "$p\\text{-value} = 0.0170$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "pval_two_tailed",
+          "text_markdown": "$p\\text{-value} = 0.0340$",
+          "misconception_id": "doubled_p_value_for_one_tailed_test",
+          "hint_markdown": "Because $H_1: p < 0.20$ is a one-tailed (left-tailed) test, do not double the tail area."
+        },
+        {
+          "id": "pval_complement",
+          "text_markdown": "$p\\text{-value} = 0.9830$",
+          "misconception_id": "reported_upper_tail_area_for_left_tailed_test",
+          "hint_markdown": "A left-tailed test measures the area to the left: $P(Z \\le -2.12)$, which is the small tail $0.0170$, not $1 - 0.0170$."
+        },
+        {
+          "id": "pval_used_z_stat_directly",
+          "text_markdown": "$p\\text{-value} = 0.0212$",
+          "misconception_id": "confusing_z_statistic_with_p_value",
+          "hint_markdown": "The $p$-value is the probability area from the standard normal CDF, not the $Z$-score itself."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "pval_correct"
+      },
+      "explanation_markdown": "For a left-tailed test, the $p$-value is the lower-tail probability $P(Z \\le -2.1213)$. Using standard normal distribution tables or Excel `=NORM.S.DIST(-2.1213, TRUE)`, we obtain $p = 0.01695 \\approx 0.0170$.",
+      "evidence_concept_ids": [
+        "hyp_proportion_z_test_statistic"
+      ]
+    },
+    {
+      "id": "state_decision_and_conclusion",
+      "kind": "choice",
+      "prompt_markdown": "At the $\\alpha = 0.05$ significance level, state the test decision and managerial conclusion.",
+      "options": [
+        {
+          "id": "dec_reject_correct",
+          "text_markdown": "Reject $H_0$: Because $p = 0.0170 < 0.05$ (and $Z = -2.12 < -1.645$), there is sufficient statistical evidence that the new supplier's defect rate is significantly lower than $20\\%$.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "dec_fail_to_reject",
+          "text_markdown": "Fail to reject $H_0$: Because $p = 0.0170 < 0.05$, the sample result is considered normal random variation.",
+          "misconception_id": "inverted_decision_rule",
+          "hint_markdown": "When $p \\le \\alpha$, the result is statistically significant and we reject $H_0$."
+        },
+        {
+          "id": "dec_accept_null",
+          "text_markdown": "Accept $H_0$: We have proven that the true defect rate is exactly $14\\%$.",
+          "misconception_id": "accepting_null_and_confusing_sample_with_parameter",
+          "hint_markdown": "A sample proportion $\\hat{p} = 0.14$ is a sample estimate, not the population parameter; rejecting $H_0$ supports $H_1$, rather than accepting $H_0$."
+        },
+        {
+          "id": "dec_inconclusive_due_to_sample_size",
+          "text_markdown": "Inconclusive: A sample size of $n = 200$ is too small to make a decision about a proportion.",
+          "misconception_id": "ignoring_success_failure_condition_fulfillment",
+          "hint_markdown": "With $n p_0 = 40 \\ge 10$ and $n(1 - p_0) = 160 \\ge 10$, the normal approximation is fully satisfied and the sample size is ample."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "dec_reject_correct"
+      },
+      "explanation_markdown": "Comparing the $p$-value to the significance level: $p = 0.0170 < 0.05$. Equivalently, the test statistic $Z = -2.12$ falls in the rejection region ($Z \\le -1.645$). We reject $H_0$ and conclude that there is statistically significant evidence that the new supplier's defect rate is below $0.20$.",
+      "evidence_concept_ids": [
+        "hyp_left_tailed_pvalue_and_decision"
+      ]
+    }
+  ]
+}

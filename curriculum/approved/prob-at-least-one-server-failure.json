@@ -1,0 +1,141 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "prob_at_least_one_server_failure",
+  "version": 1,
+  "status": "active",
+  "family_id": "set_probability",
+  "rule_version": 1,
+  "module_id": "module_1",
+  "title": "Complement rule for at-least-one system failure",
+  "scenario_markdown": "A mission-critical enterprise database operates across $3$ independent redundant servers ($k = 3$). During peak transaction volume, each individual server has an outage probability of $p = 0.05$ (meaning it operates reliably with probability $1 - p = 0.95$). Outages across servers occur statistically independently. What is the probability that at least one server experiences an outage during peak hours?",
+  "parameters": {
+    "operation": "complement",
+    "p_a": 0.857375
+  },
+  "assumptions": [
+    "Server outages are mutually independent events: P(Server 1 OK and Server 2 OK and Server 3 OK) = (0.95)^3",
+    "The complement of 'at least one failure' is 'zero failures' (all servers operate successfully)",
+    "Each server has identical marginal outage probability p = 0.05"
+  ],
+  "concept_ids": [
+    "prob_at_least_one_complement_strategy",
+    "prob_all_operating_calculation",
+    "prob_at_least_one_subtraction"
+  ],
+  "setting_group": "cloud_infrastructure_server_redundancy",
+  "source_refs": [
+    "Course Module 1: Descriptive Measures & Basic Probability",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T22:00:00Z",
+    "notes": "Reviewed derivation: p_fail = 0.05, p_ok = 0.95. P(none fail) = 0.95^3 = 0.857375. Complement rule: P(at least one fail) = 1 - 0.857375 = 0.142625 (14.26%). Distractor checks simple addition trap 0.05*3 = 0.15.",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "complement_strategy",
+      "kind": "choice",
+      "prompt_markdown": "Which analytical strategy is the most efficient and mathematically rigorous method to evaluate the probability of 'at least one' failure?",
+      "options": [
+        {
+          "id": "strategy_complement_correct",
+          "text_markdown": "Use the complement rule: $P(\\text{at least one failure}) = 1 - P(\\text{zero failures})$.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "strategy_simple_addition",
+          "text_markdown": "Add the individual failure probabilities together: $P = 0.05 + 0.05 + 0.05 = 0.150$.",
+          "misconception_id": "added_probabilities_of_non_disjoint_events",
+          "hint_markdown": "Simple addition assumes events are mutually exclusive (cannot fail together), which is false for independent servers."
+        },
+        {
+          "id": "strategy_multiply_failures",
+          "text_markdown": "Multiply the failure probabilities: $P = (0.05)^3 = 0.000125$.",
+          "misconception_id": "confused_at_least_one_with_all_failing",
+          "hint_markdown": "$(0.05)^3$ is the probability that *all three* servers fail simultaneously, not that *at least one* fails."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "strategy_complement_correct"
+      },
+      "evidence_concept_ids": [
+        "prob_at_least_one_complement_strategy"
+      ],
+      "explanation_markdown": "Evaluating 'at least one' directly requires calculating and summing mutually exclusive cases (exactly 1 fails, exactly 2 fail, or all 3 fail). The complement rule simplifies this to a single calculation: the only scenario not included in 'at least one' is 'none fail' (zero failures). Thus, $P(\\text{at least one}) = 1 - P(\\text{none})$.",
+      "numeric_policy": null
+    },
+    {
+      "id": "all_operating_calc",
+      "kind": "choice",
+      "prompt_markdown": "Calculate the probability that all $3$ servers operate without failure during the peak period, $P(\\text{zero failures})$.",
+      "options": [
+        {
+          "id": "none_correct",
+          "text_markdown": "$P(\\text{zero failures}) = (0.95)^3 = 0.8574$ ($85.74\\%$)",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "none_subtracted_three_times",
+          "text_markdown": "$P(\\text{zero failures}) = 1 - 3(0.05) = 0.8500$ ($85.00\\%$)",
+          "misconception_id": "linear_subtraction_ignoring_multiplication_rule",
+          "hint_markdown": "Independence requires multiplying success probabilities ($(0.95)^3$), not subtracting linear multiples."
+        },
+        {
+          "id": "none_squared_only",
+          "text_markdown": "$P(\\text{zero failures}) = (0.95)^2 = 0.9025$ ($90.25\\%$)",
+          "misconception_id": "omitted_third_independent_trial",
+          "hint_markdown": "There are 3 independent servers; the exponent must be $3$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "none_correct"
+      },
+      "evidence_concept_ids": [
+        "prob_all_operating_calculation"
+      ],
+      "explanation_markdown": "The probability that any single server does not fail is $1 - 0.05 = 0.95$. By the multiplication rule for independent events, the probability that all $3$ servers stay online simultaneously is $P(\\text{Server 1 OK} \\cap \\text{Server 2 OK} \\cap \\text{Server 3 OK}) = (0.95)^3 = 0.857375$ (approx $85.74\\%$).",
+      "numeric_policy": null
+    },
+    {
+      "id": "at_least_one_calc",
+      "kind": "choice",
+      "prompt_markdown": "Compute the probability that at least one server experiences an outage: $P(\\text{at least one}) = 1 - P(\\text{zero failures})$.",
+      "options": [
+        {
+          "id": "at_least_one_correct",
+          "text_markdown": "$P(\\text{at least one failure}) = 1 - 0.857375 = 0.1426$ ($14.26\\%$)",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "at_least_one_linear_15",
+          "text_markdown": "$P(\\text{at least one failure}) = 0.1500$ ($15.00\\%$)",
+          "misconception_id": "fell_into_naive_addition_trap",
+          "hint_markdown": "Because servers can fail together, simply adding $0.05 + 0.05 + 0.05 = 0.15$ double-counts compound failure states."
+        },
+        {
+          "id": "at_least_one_triple_fail",
+          "text_markdown": "$P(\\text{at least one failure}) = 0.000125$ ($0.0125\\%$)",
+          "misconception_id": "confused_at_least_one_with_all_failing",
+          "hint_markdown": "$0.000125$ is the probability that all three servers crash simultaneously ($(0.05)^3$)."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "at_least_one_correct"
+      },
+      "evidence_concept_ids": [
+        "prob_at_least_one_subtraction"
+      ],
+      "explanation_markdown": "Subtracting the probability of zero failures from $1$ gives $P(\\text{at least one failure}) = 1 - (0.95)^3 = 1 - 0.857375 = 0.142625$, or approximately $14.26\\%$. In Excel: `=1 - (0.95^3)` or `=1 - BINOM.DIST(0, 3, 0.05, FALSE)`.",
+      "numeric_policy": null
+    }
+  ]
+}

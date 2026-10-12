@@ -1,0 +1,146 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "drv_variance_cars_sold",
+  "version": 1,
+  "status": "active",
+  "family_id": "discrete_rv",
+  "rule_version": 1,
+  "module_id": "module_2",
+  "title": "Computing variance and standard deviation of a discrete random variable",
+  "scenario_markdown": "Continuing the analysis of daily vehicle sales $X$ with known expected value $\\mu = E[X] = 1.95$ cars/day:\n\n| Vehicles Sold ($x$) | $0$ | $1$ | $2$ | $3$ | $4$ |\n| :--- | :---: | :---: | :---: | :---: | :---: |\n| **Probability $P(X = x)$** | $0.10$ | $0.25$ | $0.35$ | $0.20$ | $0.10$ |\n\nCompute the second moment $E[X^2]$, evaluate the variance $\\operatorname{Var}(X) = E[X^2] - \\mu^2$, and determine the standard deviation $\\sigma$ measuring daily sales volatility.",
+  "parameters": {
+    "operation": "variance",
+    "values": [0.0, 1.0, 2.0, 3.0, 4.0],
+    "probabilities": [0.10, 0.25, 0.35, 0.20, 0.10],
+    "expected_value": 1.95,
+    "e_x2": 5.05,
+    "variance": 1.2475,
+    "sd": 1.116915
+  },
+  "assumptions": [
+    "Expected value mu = 1.95 has been verified previously",
+    "Variance shortcut formula Var(X) = E[X^2] - (E[X])^2 is algebraically exact",
+    "Standard deviation is the non-negative square root of variance"
+  ],
+  "concept_ids": [
+    "compute_expected_value_of_x_squared",
+    "compute_variance_discrete_rv_shortcut",
+    "compute_standard_deviation_discrete_rv"
+  ],
+  "setting_group": "automotive_dealership_daily_sales_pmf",
+  "source_refs": [
+    "Course Module 2: Discrete Random Variables & Probability Distributions",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T23:18:00Z",
+    "notes": "Reviewed variance math: E[X^2] = 5.05, mu^2 = (1.95)^2 = 3.8025, Var(X) = 5.05 - 3.8025 = 1.2475, SD(X) = sqrt(1.2475) = 1.1169 cars. Tested common distractor forgetting to subtract mu^2.",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "compute_e_x2",
+      "kind": "choice",
+      "prompt_markdown": "What is the expected value of squared sales, $E[X^2] = \\sum x^2 P(X=x)$?",
+      "options": [
+        {
+          "id": "e_x2_correct",
+          "text_markdown": "**$E[X^2] = 5.05$**: $0^2(0.10) + 1^2(0.25) + 2^2(0.35) + 3^2(0.20) + 4^2(0.10) = 0 + 0.25 + 1.40 + 1.80 + 1.60 = 5.05$.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "e_x2_square_mean",
+          "text_markdown": "**$E[X^2] = 3.80$**: Calculated as $(E[X])^2 = 1.95^2 = 3.8025$.",
+          "misconception_id": "confused_e_of_x_squared_with_square_of_e_of_x",
+          "hint_markdown": "E[X^2] is the expected value of X^2; it is not the same as (E[X])^2. In general, E[X^2] >= (E[X])^2 by Jensen's inequality."
+        },
+        {
+          "id": "e_x2_unweighted_sum",
+          "text_markdown": "**$E[X^2] = 30.00$**: Sum of squared values $0 + 1 + 4 + 9 + 16 = 30$.",
+          "misconception_id": "omitted_probability_weights_in_second_moment",
+          "hint_markdown": "Each squared outcome x^2 must be weighted by its respective probability P(X = x)."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "e_x2_correct"
+      },
+      "evidence_concept_ids": [
+        "compute_expected_value_of_x_squared"
+      ],
+      "explanation_markdown": "To compute $E[X^2]$, square each outcome $x$ and multiply by its probability $P(X = x)$:\n\n$$E[X^2] = 0^2(0.10) + 1^2(0.25) + 2^2(0.35) + 3^2(0.20) + 4^2(0.10)$$\n$$E[X^2] = 0 + 0.25 + 1.40 + 1.80 + 1.60 = 5.05$$\n\nIn Excel: `=SUMPRODUCT(A2:A6^2, B2:B6)`.",
+      "numeric_policy": null
+    },
+    {
+      "id": "compute_variance",
+      "kind": "choice",
+      "prompt_markdown": "Using the computational shortcut formula $\\operatorname{Var}(X) = E[X^2] - (E[X])^2$, what is the variance $\\sigma^2$ of daily sales?",
+      "options": [
+        {
+          "id": "var_correct",
+          "text_markdown": "**$\\operatorname{Var}(X) = 1.25\\text{ cars}^2$ ($1.2475$)**: $5.05 - (1.95)^2 = 5.05 - 3.8025 = 1.2475$.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "var_forgot_subtract_mean_sq",
+          "text_markdown": "**$\\operatorname{Var}(X) = 5.05\\text{ cars}^2$**: Equal directly to $E[X^2]$.",
+          "misconception_id": "forgot_to_subtract_mu_squared_from_second_moment",
+          "hint_markdown": "You must subtract mu^2 = 1.95^2 = 3.8025 from E[X^2]. Forgetting this step greatly inflates variance."
+        },
+        {
+          "id": "var_squared_mean_only",
+          "text_markdown": "**$\\operatorname{Var}(X) = 3.80\\text{ cars}^2$**: Equal to $(E[X])^2 = 3.8025$.",
+          "misconception_id": "used_squared_mean_as_variance",
+          "hint_markdown": "Variance measures dispersion around the mean, not the squared mean itself."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "var_correct"
+      },
+      "evidence_concept_ids": [
+        "compute_variance_discrete_rv_shortcut"
+      ],
+      "explanation_markdown": "Applying the shortcut formula for variance:\n\n$$\\operatorname{Var}(X) = \\sigma^2 = E[X^2] - \\mu^2 = 5.05 - 1.95^2 = 5.05 - 3.8025 = 1.2475\\text{ cars}^2$$\n\nThis gives the average squared deviation of daily vehicle sales around the mean $\\mu = 1.95$.",
+      "numeric_policy": null
+    },
+    {
+      "id": "compute_sd",
+      "kind": "choice",
+      "prompt_markdown": "What is the standard deviation $\\sigma$ of daily vehicle sales?",
+      "options": [
+        {
+          "id": "sd_correct",
+          "text_markdown": "**$\\sigma = 1.12\\text{ vehicles}$ ($1.1169$)**: $\\sigma = \\sqrt{\\operatorname{Var}(X)} = \\sqrt{1.2475} \\approx 1.1169\\text{ vehicles}$.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "sd_sqrt_of_e_x2",
+          "text_markdown": "**$\\sigma = 2.25\\text{ vehicles}$**: Calculated as $\\sqrt{E[X^2]} = \\sqrt{5.05} \\approx 2.247$.",
+          "misconception_id": "took_square_root_of_second_moment_instead_of_variance",
+          "hint_markdown": "Standard deviation is the square root of the variance (1.2475), not the square root of E[X^2]."
+        },
+        {
+          "id": "sd_equal_to_variance",
+          "text_markdown": "**$\\sigma = 1.25\\text{ vehicles}$**: Standard deviation and variance are interchangeable numerical values in discrete models.",
+          "misconception_id": "confused_variance_with_standard_deviation_units",
+          "hint_markdown": "Variance is in squared units (cars^2); standard deviation takes the square root so units match original car counts."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "sd_correct"
+      },
+      "evidence_concept_ids": [
+        "compute_standard_deviation_discrete_rv"
+      ],
+      "explanation_markdown": "Standard deviation restores the measure of dispersion to the original measurement units (vehicles):\n\n$$\\sigma = \\sqrt{\\operatorname{Var}(X)} = \\sqrt{1.2475} \\approx 1.1169\\text{ vehicles}$$\n\nIn operational terms, typical daily sales fluctuate by roughly $\\pm 1.12$ vehicles around the expected average of $1.95$ vehicles.",
+      "numeric_policy": null
+    }
+  ]
+}

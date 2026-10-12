@@ -1,0 +1,143 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "prob_independence_check",
+  "version": 1,
+  "status": "active",
+  "family_id": "set_probability",
+  "rule_version": 1,
+  "module_id": "module_1",
+  "title": "Testing statistical independence of marketing channel engagements",
+  "scenario_markdown": "A digital marketing analytics team tracks customer conversion behaviors across two marketing touchpoints:\n\n- Event $A$: A customer interacts with a paid search ad, with marginal probability $P(A) = 0.40$.\n- Event $B$: A customer opens a promotional email campaign, with marginal probability $P(B) = 0.50$.\n\nIn Cohort 1, cross-channel attribution data reveals that the joint probability of engaging with both channels is $P(A \\cap B) = 0.20$. In Cohort 2, tracking across a different segment finds joint probability $P(A \\cap B) = 0.25$. Test whether events $A$ and $B$ are statistically independent in each cohort.",
+  "parameters": {
+    "operation": "independence_check",
+    "p_a": 0.4,
+    "p_b": 0.5,
+    "p_intersection": 0.2
+  },
+  "assumptions": [
+    "Definition of statistical independence: events A and B are independent if and only if P(A cap B) = P(A) * P(B)",
+    "Equivalent conditional definition: P(A | B) = P(A) and P(B | A) = P(B), provided conditioning probabilities are positive",
+    "Fréchet inequality bounds satisfied: max(0, 0.4 + 0.5 - 1) = 0.0 <= 0.20 <= min(0.4, 0.5) = 0.40"
+  ],
+  "concept_ids": [
+    "prob_independence_multiplication_test",
+    "prob_independence_conditional_invariance",
+    "prob_dependence_cohort_contrast"
+  ],
+  "setting_group": "marketing_cross_channel_conversion",
+  "source_refs": [
+    "Course Module 1: Descriptive Measures & Basic Probability",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T22:30:00Z",
+    "notes": "Reviewed derivation: P(A) = 0.40, P(B) = 0.50. Product P(A)*P(B) = 0.20. Cohort 1: P(A cap B) = 0.20 == 0.20, confirming independence and P(A|B) = 0.20/0.50 = 0.40 = P(A). Cohort 2: P(A cap B) = 0.25 != 0.20, confirming dependence and positive association (P(A|B) = 0.50 > 0.40). Dispels confusion between independence and mutual exclusivity.",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "independence_multiplication_test",
+      "kind": "choice",
+      "prompt_markdown": "In **Cohort 1**, are events $A$ and $B$ statistically independent?",
+      "options": [
+        {
+          "id": "indep_yes_multiplication",
+          "text_markdown": "**Yes, they are independent**, because $P(A \\cap B) = 0.20 = P(A) \\times P(B) = 0.40 \\times 0.50$.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "indep_no_overlap_exists",
+          "text_markdown": "**No, they are dependent**, because $P(A \\cap B) = 0.20 > 0$; independent events cannot overlap.",
+          "misconception_id": "confused_independence_with_mutually_exclusive_disjoint_events",
+          "hint_markdown": "Events with zero overlap ($P(A \\cap B) = 0$) are mutually exclusive (disjoint), not independent. Independent events with positive probabilities must have positive joint overlap."
+        },
+        {
+          "id": "indep_no_different_marginals",
+          "text_markdown": "**No, they are dependent**, because $P(A) = 0.40 \\ne P(B) = 0.50$.",
+          "misconception_id": "assumed_independence_requires_equal_marginal_probabilities",
+          "hint_markdown": "Independence does not require events to have equal probabilities; it requires the joint probability to equal the product of marginals."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "indep_yes_multiplication"
+      },
+      "evidence_concept_ids": [
+        "prob_independence_multiplication_test"
+      ],
+      "explanation_markdown": "By definition, two events $A$ and $B$ are statistically independent if and only if $P(A \\cap B) = P(A) \\times P(B)$. Here, $P(A) \\times P(B) = 0.40 \\times 0.50 = 0.20$. Because the observed joint probability is exactly $0.20$, the mathematical condition for independence is strictly satisfied.",
+      "numeric_policy": null
+    },
+    {
+      "id": "conditional_invariance_verification",
+      "kind": "choice",
+      "prompt_markdown": "In Cohort 1, what is the conditional probability $P(A \\mid B)$, and what does it reveal about user behavior?",
+      "options": [
+        {
+          "id": "cond_invariant_correct",
+          "text_markdown": "$P(A \\mid B) = \\frac{0.20}{0.50} = 0.40 = P(A)$; opening an email does not change the likelihood that a customer clicks a search ad.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "cond_inverted_denominator",
+          "text_markdown": "$P(A \\mid B) = \\frac{0.20}{0.40} = 0.50$; the probability increases because the user opened the email.",
+          "misconception_id": "inverted_conditioning_event_in_conditional_probability",
+          "hint_markdown": "The definition of conditional probability is $P(A \\mid B) = \\frac{P(A \\cap B)}{P(B)}$, so the denominator must be $P(B) = 0.50$, not $P(A)$."
+        },
+        {
+          "id": "cond_difference_subtraction",
+          "text_markdown": "$P(A \\mid B) = P(B) - P(A) = 0.50 - 0.40 = 0.10$.",
+          "misconception_id": "subtracted_marginals_instead_of_ratio_formula",
+          "hint_markdown": "Conditional probability is a ratio $\\frac{P(A \\cap B)}{P(B)}$, never a difference of marginal probabilities."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "cond_invariant_correct"
+      },
+      "evidence_concept_ids": [
+        "prob_independence_conditional_invariance"
+      ],
+      "explanation_markdown": "The conditional probability formula is $P(A \\mid B) = \\frac{P(A \\cap B)}{P(B)} = \\frac{0.20}{0.50} = 0.40$. Notice that $P(A \\mid B) = 0.40 = P(A)$. This confirms the fundamental intuitive meaning of independence: knowing that event $B$ occurred provides zero information about event $A$, leaving its probability unchanged at $0.40$.",
+      "numeric_policy": null
+    },
+    {
+      "id": "contrast_cohort2_dependence",
+      "kind": "choice",
+      "prompt_markdown": "Now consider **Cohort 2**, where tracking reveals $P(A \\cap B) = 0.25$. Are events $A$ and $B$ independent in Cohort 2?",
+      "options": [
+        {
+          "id": "cohort2_dependent_positive",
+          "text_markdown": "**No, they are dependent (positively associated)**, because $P(A \\cap B) = 0.25 \\ne P(A) \\times P(B) = 0.20$, and $P(A \\mid B) = \\frac{0.25}{0.50} = 0.50 > 0.40$.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "cohort2_still_independent",
+          "text_markdown": "**Yes, they are still independent**, because $0.25$ is close to $0.20$ and both events occur frequently.",
+          "misconception_id": "assumed_approximate_overlap_satisfies_exact_independence",
+          "hint_markdown": "Theoretical independence requires exact equality $P(A \\cap B) = P(A) \\times P(B)$; $0.25 \\ne 0.20$ proves mathematical dependence."
+        },
+        {
+          "id": "cohort2_mutually_exclusive",
+          "text_markdown": "**They are mutually exclusive**, because their joint probability increased to $0.25$.",
+          "misconception_id": "confused_higher_joint_probability_with_mutual_exclusivity",
+          "hint_markdown": "Mutually exclusive events cannot occur together ($P(A \\cap B) = 0$); having $P(A \\cap B) = 0.25$ is the opposite of mutually exclusive."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "cohort2_dependent_positive"
+      },
+      "evidence_concept_ids": [
+        "prob_dependence_cohort_contrast"
+      ],
+      "explanation_markdown": "In Cohort 2, the expected product under independence is $P(A) \\times P(B) = 0.40 \\times 0.50 = 0.20$. Because the actual joint probability is $P(A \\cap B) = 0.25 \\ne 0.20$, events $A$ and $B$ are **dependent**. Specifically, $P(A \\mid B) = \\frac{0.25}{0.50} = 0.50 > P(A) = 0.40$, demonstrating positive channel synergy: customers who open emails are more likely to also click search ads.",
+      "numeric_policy": null
+    }
+  ]
+}

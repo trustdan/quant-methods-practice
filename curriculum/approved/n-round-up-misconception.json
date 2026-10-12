@@ -1,0 +1,142 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "n_round_up_misconception",
+  "version": 1,
+  "status": "active",
+  "family_id": "concept_check",
+  "rule_version": 1,
+  "module_id": "module_4",
+  "title": "Sample size determination and the strict ceiling rounding rule",
+  "scenario_markdown": "A hospital patient advocacy director is designing a survey to estimate mean patient satisfaction wait time. The target margin of error is $E \\le 5.0\\text{ minutes}$ at $95\\%$ confidence ($z^* = 1.95996 \\approx 1.960$), with historical standard deviation $\\sigma = 25.0\\text{ minutes}$.\n\nThe standard sample size formula yields:\n\n$$n = \\left(\\frac{z^* \\sigma}{E}\\right)^2 = \\left(\\frac{1.960 \\times 25.0}{5.0}\\right)^2 = (9.80)^2 = 96.04$$\n\nA junior research assistant proposes rounding $96.04$ down to $n = 96$ using conventional arithmetic rounding, arguing that *'0.04 is less than 0.50, so rounding down introduces negligible error.'* Evaluate this proposal and determine the correct sample size.",
+  "parameters": {
+    "topic": "sample_size_determination",
+    "concept": "ceiling_rounding_rule_for_sample_size",
+    "objective": "Understand why statistical sample size planning strictly requires the ceiling function (rounding up), and analyze the precision penalty of rounding down"
+  },
+  "assumptions": [
+    "Target maximum margin of error E <= 5.0 minutes at 95% confidence (z* = 1.95996)",
+    "Continuous sample size formula yields n = 96.04 respondents",
+    "Sample size must be an integer; any sample size n < 96.04 results in E > 5.0 minutes"
+  ],
+  "concept_ids": [
+    "identify_ceiling_rounding_rule",
+    "analyze_margin_of_error_violation_from_rounding_down",
+    "generalize_sample_size_ceiling_principle"
+  ],
+  "setting_group": "hospital_wait_time_sample_size_rounding",
+  "source_refs": [
+    "Course Module 4: Sampling Distributions & Confidence Intervals",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T22:30:00Z",
+    "notes": "Reviewed conceptual alignment: Continuous formula n = (1.96*25/5)^2 = 96.04. Demonstrates that n = 96 yields E = 1.96*(25/sqrt(96)) = 5.0010 > 5.000, violating the maximum error constraint. Proves that any fractional remainder requires ceiling rounding up to n = 97. Excel formula: =ROUNDUP((1.96*25/5)^2, 0).",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "correct_integer_determination",
+      "kind": "choice",
+      "prompt_markdown": "What is the correct minimum integer sample size that guarantees the margin of error does not exceed $5.0\\text{ minutes}$?",
+      "options": [
+        {
+          "id": "round_up_to_97",
+          "text_markdown": "**$n = 97$**: Sample size must always be rounded up to the next integer (using the ceiling function $\\lceil 96.04 \\rceil = 97$), regardless of the size of the decimal remainder.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "conventional_round_down_to_96",
+          "text_markdown": "**$n = 96$**: Standard arithmetic rounding rules apply; because $.04 < .50$, $96.04$ rounds to $96$.",
+          "misconception_id": "applied_conventional_arithmetic_rounding_to_sample_size",
+          "hint_markdown": "In sample size planning, conventional rounding rules do not apply because $n$ is a minimum lower bound constraint ($n \\ge 96.04$)."
+        },
+        {
+          "id": "approximate_to_100",
+          "text_markdown": "**$n = 100$**: Sample sizes should always be rounded up to the nearest multiple of ten for convenience.",
+          "misconception_id": "believed_sample_size_must_round_to_nearest_ten",
+          "hint_markdown": "While rounding to $100$ is safe, the mathematical minimum required sample size is $97$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "round_up_to_97"
+      },
+      "evidence_concept_ids": [
+        "identify_ceiling_rounding_rule"
+      ],
+      "explanation_markdown": "Sample size formulas establish an **inequality constraint**: $n \\ge \\left(\\frac{z^* \\sigma}{E}\\right)^2 = 96.04$. Because $n$ must be an integer and cannot be less than $96.04$, we must apply the ceiling function: $n = \\lceil 96.04 \\rceil = 97$. In Excel, this is calculated using `=ROUNDUP((1.96*25/5)^2, 0)`.",
+      "numeric_policy": null
+    },
+    {
+      "id": "rounding_down_consequence",
+      "kind": "choice",
+      "prompt_markdown": "What happens to the margin of error if the researcher collects data from only $n = 96$ patients instead of $n = 97$?",
+      "options": [
+        {
+          "id": "margin_exceeds_threshold",
+          "text_markdown": "**The margin of error exceeds $5.0\\text{ minutes}$**: With $n = 96$, $E = 1.960 \\times \\frac{25.0}{\\sqrt{96}} \\approx 5.0010\\text{ minutes} > 5.0000\\text{ minutes}$, violating the project specification.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "margin_remains_exact",
+          "text_markdown": "**The margin of error remains exactly $5.0\\text{ minutes}$**: The $0.04$ remainder is absorbed by normal sampling variance with zero effect on the margin.",
+          "misconception_id": "believed_fractional_part_has_zero_effect_on_moe",
+          "hint_markdown": "Every reduction in $n$ strictly increases standard error $SE = \\sigma/\\sqrt{n}$, which directly increases margin of error $E$."
+        },
+        {
+          "id": "confidence_level_drops_to_zero",
+          "text_markdown": "**The confidence level collapses from $95\\%$ to $50\\%$**: Dropping one observation invalidates the normal distribution assumption entirely.",
+          "misconception_id": "believed_one_missing_observation_destroys_confidence_level",
+          "hint_markdown": "The normality assumption holds ($n = 96 > 30$); the issue is simply that the margin of error slightly exceeds the agreed maximum tolerance."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "margin_exceeds_threshold"
+      },
+      "evidence_concept_ids": [
+        "analyze_margin_of_error_violation_from_rounding_down"
+      ],
+      "explanation_markdown": "The specification requires $E \\le 5.0000\\text{ minutes}$. If $n = 96$, then $SE = 25.0 / \\sqrt{96} \\approx 2.55155$, producing $E = 1.960 \\times 2.55155 = 5.00104\\text{ minutes}$. Because $5.0010 > 5.0$, the precision requirement is violated. Rounding up to $n = 97$ yields $E = 1.960 \\times \\frac{25.0}{\\sqrt{97}} \\approx 4.975\\text{ minutes} \\le 5.0$, satisfying the requirement.",
+      "numeric_policy": null
+    },
+    {
+      "id": "general_ceiling_principle",
+      "kind": "choice",
+      "prompt_markdown": "Which principle governs sample size determination across all parameter estimation problems (both means and proportions)?",
+      "options": [
+        {
+          "id": "principle_always_round_up",
+          "text_markdown": "**Always round up (ceiling)**: Any fractional value in a sample size calculation—even $0.01$—must be rounded up to the next integer to ensure the resulting margin of error is at or below the target threshold.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "principle_round_to_nearest_integer",
+          "text_markdown": "**Use standard rounding rules**: Round down if the fractional part is below $.50$, and round up only if it is $.50$ or greater.",
+          "misconception_id": "confused_general_rounding_with_sample_size_ceiling_rule",
+          "hint_markdown": "Sample size is an upper bound on error ($E \\le E_{\\text{target}}$), which strictly translates to a lower bound on $n$ ($n \\ge n_{\\text{formula}}$)."
+        },
+        {
+          "id": "principle_round_down_for_proportions_only",
+          "text_markdown": "**Round up for means, but round down for proportions**: Proportions are bounded between $0$ and $1$, so fractional respondents are discarded.",
+          "misconception_id": "believed_proportions_use_different_rounding_rules",
+          "hint_markdown": "The ceiling rule applies equally to proportions: $n = \\lceil z^2 p(1-p)/E^2 \\rceil$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "principle_always_round_up"
+      },
+      "evidence_concept_ids": [
+        "generalize_sample_size_ceiling_principle"
+      ],
+      "explanation_markdown": "In statistics, sample size calculations are **bound constraints**: the goal is to guarantee that the margin of error does not exceed $E$. Because error decreases as $n$ increases, any $n$ smaller than the exact continuous value yields an error greater than $E$. Therefore, the rule for required sample size is **always round up to the next integer** ($\\\\lceil n \\\\rceil$).",
+      "numeric_policy": null
+    }
+  ]
+}

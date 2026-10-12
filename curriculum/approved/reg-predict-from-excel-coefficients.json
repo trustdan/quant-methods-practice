@@ -1,0 +1,151 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "reg_predict_from_excel_coefficients",
+  "version": 1,
+  "status": "active",
+  "family_id": "regression_output",
+  "rule_version": 1,
+  "module_id": "module_6",
+  "title": "Extracting regression coefficients from Excel output and computing point predictions",
+  "scenario_markdown": "A fleet logistics company analyzes annual maintenance costs ($Y$, in hundreds of dollars) for delivery vans based on annual odometer mileage ($X$, in thousands of miles). An analyst fits a simple linear regression across $n = 24$ vans ($k = 1$, residual $df = 22$) using Excel's Data Analysis toolpak. The output summary reports:\n\n| | Coefficients | Standard Error | t Stat | P-value |\n|---|---|---|---|---|\n| **Intercept** | $20.000$ | $4.000$ | $5.000$ | $0.0001$ |\n| **Mileage** | $1.200$ | $0.200$ | $6.000$ | $< 0.0001$ |\n\nExtract the estimated regression equation $\\hat{y} = b_0 + b_1 x$, interpret the coefficients, and compute the point prediction $\\hat{y}$ for a delivery van with an annual mileage of $x = 30.0\\text{ thousand miles}$ ($30{,}000\\text{ miles}$).",
+  "parameters": {
+    "n": 24,
+    "k": 1,
+    "ssr": 360.0,
+    "sse": 220.0,
+    "sst": 580.0,
+    "confidence_level": 0.95,
+    "intercept_name": "Intercept",
+    "b0": 20.0,
+    "se_b0": 4.0,
+    "x1_name": "Mileage",
+    "b1": 1.2,
+    "se_b1": 0.2
+  },
+  "assumptions": [
+    "Simple linear regression model Y = beta0 + beta1*X + epsilon with normal, homoscedastic errors",
+    "Estimated OLS regression equation is y_hat = b0 + b1*x",
+    "Target prediction at x = 30.0 thousand miles falls within the observed data domain"
+  ],
+  "concept_ids": [
+    "extract_regression_equation_from_table",
+    "calculate_point_prediction_from_equation",
+    "interpret_intercept_and_slope_in_units"
+  ],
+  "setting_group": "fleet_van_mileage_maintenance_cost",
+  "source_refs": [
+    "Course Module 6: Regression Analysis",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T22:30:00Z",
+    "notes": "Reviewed derivation: Intercept b0 = 20.00, Slope b1 = 1.20. Model equation: y_hat = 20.0 + 1.20x. At x = 30.0, y_hat = 20.0 + 1.20(30.0) = 20.0 + 36.0 = 56.0 hundred dollars ($5,600). Slope interpretation: maintenance increases by $120 per 1,000 miles. Consistency: t1 = 1.2/0.2 = 6.0, F = 36.0 = t1^2. Excel: =20.0 + 1.2*30 or =FORECAST.LINEAR(30, ...).",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "write_regression_equation",
+      "kind": "choice",
+      "prompt_markdown": "From the Excel regression table, what is the fitted OLS regression prediction equation?",
+      "options": [
+        {
+          "id": "equation_correct",
+          "text_markdown": "$$\\hat{y} = 20.000 + 1.200x$$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "equation_inverted",
+          "text_markdown": "$$\\hat{y} = 1.200 + 20.000x$$",
+          "misconception_id": "swapped_intercept_and_slope_coefficients",
+          "hint_markdown": "The Intercept row gives $b_0 = 20.000$, and the Mileage row gives slope $b_1 = 1.200$."
+        },
+        {
+          "id": "equation_using_standard_errors",
+          "text_markdown": "$$\\hat{y} = 4.000 + 0.200x$$",
+          "misconception_id": "used_standard_errors_as_regression_coefficients",
+          "hint_markdown": "The coefficients are read from the 'Coefficients' column, not the 'Standard Error' column."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "equation_correct"
+      },
+      "evidence_concept_ids": [
+        "extract_regression_equation_from_table"
+      ],
+      "explanation_markdown": "The sample regression model is $\\hat{y} = b_0 + b_1 x$. From the 'Coefficients' column of the output table, the row labeled 'Intercept' gives $b_0 = 20.000$, and the row labeled 'Mileage' gives $b_1 = 1.200$. Thus, the prediction equation is $\\hat{y} = 20.000 + 1.200x$.",
+      "numeric_policy": null
+    },
+    {
+      "id": "compute_point_prediction",
+      "kind": "choice",
+      "prompt_markdown": "What is the predicted annual maintenance cost $\\hat{y}$ for a van driven $x = 30.0\\text{ thousand miles}$?",
+      "options": [
+        {
+          "id": "pred_correct_56",
+          "text_markdown": "**$56.000\\text{ hundred dollars}$ ($\\\\$5{,}600$)**: Computed as $\\hat{y} = 20.000 + 1.200(30.0) = 20.0 + 36.0 = 56.0$.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "pred_slope_only",
+          "text_markdown": "**$36.000\\text{ hundred dollars}$ ($\\\\$3{,}600$)**: Omitting the intercept term ($1.200 \\times 30.0$).",
+          "misconception_id": "omitted_intercept_in_prediction_calculation",
+          "hint_markdown": "The prediction equation must include the intercept base cost $b_0 = 20.000$."
+        },
+        {
+          "id": "pred_raw_miles_miscalculation",
+          "text_markdown": "**$36{,}020.0\\text{ hundred dollars}$**: Multiplying slope by $30{,}000$ raw miles instead of $30.0$ thousand miles.",
+          "misconception_id": "inconsistent_predictor_units_in_prediction",
+          "hint_markdown": "Because $X$ was measured in thousands of miles, $30{,}000\\text{ miles}$ corresponds to $x = 30.0$ in model units."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "pred_correct_56"
+      },
+      "evidence_concept_ids": [
+        "calculate_point_prediction_from_equation"
+      ],
+      "explanation_markdown": "Substituting $x = 30.0$ into the estimated equation yields $\\hat{y} = 20.000 + 1.200(30.0) = 20.000 + 36.000 = 56.000\\text{ hundred dollars}$, which translates to $\\\\$5{,}600$. In Excel, this can be computed directly as `=20.0 + 1.2*30` or via `=FORECAST.LINEAR(30, known_y's, known_x's)`.",
+      "numeric_policy": null
+    },
+    {
+      "id": "interpret_slope_units",
+      "kind": "choice",
+      "prompt_markdown": "What is the practical business interpretation of the slope coefficient $b_1 = 1.200$?",
+      "options": [
+        {
+          "id": "slope_per_thousand_miles",
+          "text_markdown": "Each additional $1{,}000\\text{ miles}$ ($1.0$ unit of $X$) driven is associated with an estimated increase in annual maintenance cost of $1.200\\text{ hundred dollars}$ ($\\\\$120.00$).",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "slope_per_single_mile",
+          "text_markdown": "Each single additional mile driven increases annual maintenance cost by $\\\\$120.00$.",
+          "misconception_id": "misinterpreted_predictor_unit_scale_as_single_unit",
+          "hint_markdown": "The variable $X$ is scaled in thousands of miles, so $1$ unit of $X$ represents $1{,}000$ miles, not $1$ mile."
+        },
+        {
+          "id": "slope_is_correlation",
+          "text_markdown": "The correlation coefficient between mileage and maintenance is $r = 1.200$.",
+          "misconception_id": "confused_regression_slope_with_correlation_coefficient",
+          "hint_markdown": "Correlation $r$ is bounded between $-1$ and $+1$; slope $b_1$ reflects the rate of change in units of $Y$ per unit of $X$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "slope_per_thousand_miles"
+      },
+      "evidence_concept_ids": [
+        "interpret_intercept_and_slope_in_units"
+      ],
+      "explanation_markdown": "The slope $b_1 = \\frac{\\Delta Y}{\\Delta X}$ indicates that for every 1-unit increase in $X$ ($1{,}000$ miles), estimated mean $Y$ increases by $1.200$ units ($1.200$ hundred dollars = $\\\\$120.00$). This corresponds to an incremental maintenance rate of $\\\\$0.12$ per vehicle mile.",
+      "numeric_policy": null
+    }
+  ]
+}

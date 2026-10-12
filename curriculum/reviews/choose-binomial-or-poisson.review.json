@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "template_id": "choose_binomial_or_poisson",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T22:00:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "concept_check",
+    "parameters": {
+      "topic": "discrete_distributions",
+      "concept": "choosing_binomial_versus_poisson",
+      "objective": "Distinguish between Binomial (fixed n trials) and Poisson (rate over continuous interval) models"
+    },
+    "canonical_probability": 1.0,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 0.0,
+      "variance": 0.0,
+      "standard_deviation": 0.0
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "classify_fixed_trials", "kind": "choice", "evidence": "binomial_model_characteristics"},
+      {"id": "classify_continuous_interval", "kind": "choice", "evidence": "poisson_model_characteristics"},
+      {"id": "distinguish_fixed_vs_continuous", "kind": "choice", "evidence": "distinguish_fixed_trials_vs_continuous_continuum"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Reviewed conceptual alignment: Scenarios 1 & 3 are Binomial (fixed discrete trials, upper bound n); Scenarios 2 & 4 are Poisson (occurrences along continuous continuum of time/area). Stage 3 highlights the essential distinguishing criteria between fixed trials and exposure rate."
+}

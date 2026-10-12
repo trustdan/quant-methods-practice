@@ -32,6 +32,7 @@ test.beforeAll(async () => { tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'qu
 test.afterAll(async () => { await stop(); fs.rmSync(tempDir, { recursive: true, force: true }); });
 
 const reference = JSON.parse(fs.readFileSync(path.join(root, 'curriculum/approved/binomial-fair-coin-exactly-two.json'), 'utf8'));
+
 async function fillReference(page: Page, numeric: string) {
   const article = page.getByRole('article', { name: reference.title, exact: true });
   for (const stage of reference.stages) {
@@ -119,4 +120,53 @@ test('CSV case requires semantic review, saves data and distinguishes observed a
   await page.getByRole('button', { name: 'Worksheets', exact: true }).click();
   await expect(observed.getByLabel('Numeric answer (observed value)')).toHaveValue('2/5');
   await expect(page.getByText(/Saved status: completed. Supported reviewed-case/)).toBeVisible();
+});
+
+test('final Wave 4/5 questions render and grade all sixty stages offline', async ({ page, context }) => {
+  test.setTimeout(90000);
+  await stop(); url = await start();
+  const externalRequests: string[] = [];
+  await context.route('**/*', route => {
+    if (route.request().url().startsWith('http://127.0.0.1:')) return route.continue();
+    externalRequests.push(route.request().url()); return route.abort();
+  });
+  const questions = fs.readdirSync(path.join(root, 'curriculum/approved'))
+    .filter(name => name.endsWith('.json'))
+    .map(name => JSON.parse(fs.readFileSync(path.join(root, 'curriculum/approved', name), 'utf8')))
+    .filter(question => question.approval?.reviewer === 'codex_delegated_final_waves');
+  expect(questions).toHaveLength(20);
+  await page.goto(url);
+  await expect(page.getByText(/Loopback Server Active.*Auth/)).toBeVisible();
+  await page.getByRole('button', { name: 'Worksheets', exact: true }).click();
+  const workspace = page.getByRole('region', { name: 'Worksheets', exact: true });
+  await expect(workspace.getByRole('heading', { name: 'Full solutions & dataset cases' })).toBeVisible();
+  await workspace.locator('label').filter({ hasText: /^Worksheet type/ }).locator('select').selectOption('full_solution');
+  let stageCount = 0;
+  for (const question of questions) {
+    await workspace.locator('label').filter({ hasText: /^Approved question/ }).locator('select').selectOption(question.id);
+    await page.getByRole('button', { name: 'Create worksheet', exact: true }).click();
+    const article = workspace.getByRole('article', { name: question.title, exact: true });
+    await expect(article).toBeVisible();
+    await expect(article.locator('fieldset')).toHaveCount(question.stages.length);
+    for (const stage of question.stages) {
+      const field = article.locator('fieldset').filter({ has: page.locator('legend', { hasText: stage.id.replaceAll('_', ' ') }) });
+      await field.locator(`input[value="${stage.expected_answer.option_id}"]`).check();
+      stageCount++;
+    }
+    if (question.rule_version === 2) await expect(article.locator('mjx-container').first()).toBeVisible();
+    await page.getByRole('button', { name: 'Submit full solution', exact: true }).click();
+    await expect(page.getByText('Worksheet completed. Your submission and review are saved.')).toBeVisible();
+    await expect(article.locator('mjx-merror, [data-mjx-error]')).toHaveCount(0);
+    const saved = await (await page.request.get(new URL('/api/worksheets', url).href)).json();
+    const record = saved.find((item: { questions: { template_id: string }[] }) => item.questions.some(q => q.template_id === question.id));
+    expect(record).toBeDefined();
+    expect(record.items.every((item: { attempts: { is_correct: boolean }[] }) => item.attempts.length === 1 && item.attempts[0].is_correct)).toBeTruthy();
+    if (question.id === 'lincomb_portfolio_correlated' || question.id === 'desc_quartiles_iqr_fences') {
+      await page.setViewportSize({ width: 375, height: 812 });
+      expect(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 2)).toBeFalsy();
+      await page.setViewportSize({ width: 1280, height: 900 });
+    }
+  }
+  expect(stageCount).toBe(60);
+  expect(externalRequests).toEqual([]);
 });

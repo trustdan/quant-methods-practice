@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "template_id": "binomial_condition_violated_small_lot",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T22:30:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "concept_check",
+    "parameters": {
+      "topic": "binomial_assumptions_and_limits",
+      "concept": "sampling_without_replacement_hypergeometric",
+      "objective": "Identify violation of trial independence and constant success probability when sampling finite populations without replacement"
+    },
+    "canonical_probability": 0.4696,
+    "canonical_rational": "7280/15504",
+    "moments": {
+      "mean": 1.0,
+      "variance": 0.631579,
+      "standard_deviation": 0.794719
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "condition_violated_identification", "kind": "choice", "evidence": "binomial_independence_condition_violation"},
+      {"id": "exact_distribution_model", "kind": "choice", "evidence": "hypergeometric_exact_model_identification"},
+      {"id": "sampling_fraction_threshold_rule", "kind": "choice", "evidence": "finite_sampling_fraction_threshold_rule"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Reviewed conceptual alignment: n = 5 from N = 20 with M = 4 without replacement violates independent trials and constant p = 0.20. Sampling fraction n/N = 25% > 5% threshold. Exact model is Hypergeometric: P(X=1) = C(4,1)*C(16,4)/C(20,5) = 7280/15504 = 0.46956, while Binomial gives C(5,1)*(0.2)^1*(0.8)^4 = 0.4096 (underestimates by 6.0 percentage points). Excel: =HYPGEOM.DIST(1, 5, 4, 20, FALSE)."
+}

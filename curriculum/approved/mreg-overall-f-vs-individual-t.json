@@ -1,0 +1,177 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "mreg_overall_f_vs_individual_t",
+  "version": 1,
+  "status": "active",
+  "family_id": "regression_output",
+  "rule_version": 2,
+  "module_id": "module_6",
+  "title": "A significant model need not have every significant predictor",
+  "scenario_markdown": "A chain models monthly sales with three predictors across 40 independent stores. ANOVA gives SSR=900, SSE=300, regression df=3 and residual df=36. Coefficient / standard-error pairs are advertising 4/1, store size 2/0.5, and sign age 0.2/1. Use alpha=0.05 for the overall F test and two-sided individual t tests.",
+  "parameters": {
+    "model": {
+      "confidence_level": 0.95,
+      "intercept": {
+        "coeff": 20,
+        "name": "Intercept",
+        "std_err": 2
+      },
+      "k": 3,
+      "n": 40,
+      "predictors": [
+        {
+          "coeff": 4,
+          "name": "Advertising",
+          "std_err": 1
+        },
+        {
+          "coeff": 2,
+          "name": "StoreSize",
+          "std_err": 0.5
+        },
+        {
+          "coeff": 0.2,
+          "name": "SignAge",
+          "std_err": 1
+        }
+      ],
+      "sse": 300,
+      "ssr": 900
+    },
+    "operation": "model"
+  },
+  "assumptions": [
+    "The model includes an intercept and three slopes.",
+    "Errors are independent, normal and have constant variance for the stated inference.",
+    "Each coefficient test holds the other included predictors constant."
+  ],
+  "concept_ids": [
+    "overall_f_computation",
+    "individual_sign_age_pvalue",
+    "overall_vs_individual_hypotheses"
+  ],
+  "setting_group": "chain_sales_joint_vs_partial_tests",
+  "source_refs": [
+    "docs/COURSE-MAP.md: learner-supplied module objectives, October 11, 2026",
+    "docs/CONTENT-BACKLOG.md: mreg-overall-f-vs-individual-t"
+  ],
+  "approval": {
+    "reviewer": "codex_delegated_final_waves",
+    "reviewed_at": "2026-10-12T04:32:26.275462Z",
+    "delegation_basis": "User explicitly replied on October 11, 2026 (America/Chicago): Yes—delegate review and activate after checks pass. Approval follows successful Go mathematical, bank admission, every-option grading and snapshot checks; assistant semantic review does not claim personal user reading.",
+    "notes": "Assistant reviewed the complete scenario, stage wording, all options, causal hints and worked explanations. Numerical choices are independently bound to Go engine quantities under rule v2; conceptual choices are semantically reviewed. Fixed parameters only; no cosmetic variation claimed as transfer. Stated course conventions remain unconfirmed where applicable. Validated one-to-one concept evidence, rejected ambiguous numeric distractors, and tested every option after snapshot serialization."
+  },
+  "stages": [
+    {
+      "calculation": "f",
+      "id": "overall_f_computation",
+      "kind": "choice",
+      "prompt_markdown": "What is the overall F statistic? Select the value rounded to four decimal places.",
+      "options": [
+        {
+          "numeric_value": 36,
+          "id": "supported",
+          "text_markdown": "$36.0000$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "numeric_value": 3,
+          "id": "misconception_a",
+          "text_markdown": "$3.0000$",
+          "misconception_id": "overall_f_computation_a",
+          "hint_markdown": "SSR/SSE is not F; first divide by their degrees of freedom."
+        },
+        {
+          "numeric_value": 108,
+          "id": "misconception_b",
+          "text_markdown": "$108.0000$",
+          "misconception_id": "overall_f_computation_b",
+          "hint_markdown": "Divide SSR by regression df as well as SSE by residual df."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "supported"
+      },
+      "evidence_concept_ids": [
+        "overall_f_computation"
+      ],
+      "explanation_markdown": "$F=(900/3)/(300/36)=36$. Excel: `=F.DIST.RT(36,3,36)` gives Significance F, below 0.05.",
+      "numeric_policy": null
+    },
+    {
+      "calculation": "p3",
+      "id": "individual_sign_age_pvalue",
+      "kind": "choice",
+      "prompt_markdown": "What is the two-sided p-value for sign age? Select the value rounded to four decimal places.",
+      "options": [
+        {
+          "numeric_value": 0.8426060923051543,
+          "id": "supported",
+          "text_markdown": "$0.8426$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "numeric_value": 0.2,
+          "id": "misconception_a",
+          "text_markdown": "$0.2000$",
+          "misconception_id": "individual_sign_age_pvalue_a",
+          "hint_markdown": "The t statistic is not its p-value."
+        },
+        {
+          "numeric_value": 0.05,
+          "id": "misconception_b",
+          "text_markdown": "$0.0500$",
+          "misconception_id": "individual_sign_age_pvalue_b",
+          "hint_markdown": "Alpha is chosen in advance; calculate the observed p-value."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "supported"
+      },
+      "evidence_concept_ids": [
+        "individual_sign_age_pvalue"
+      ],
+      "explanation_markdown": "$t=0.2/1=0.2$ with df=36. Excel: `=T.DIST.2T(ABS(0.2),36)`. This p-value exceeds 0.05.",
+      "numeric_policy": null
+    },
+    {
+      "id": "overall_vs_individual_hypotheses",
+      "kind": "choice",
+      "prompt_markdown": "How should the overall and sign-age tests be reported?",
+      "options": [
+        {
+          "id": "supported",
+          "text_markdown": "Reject the joint null that all three slopes are zero; do not reject the individual null for sign age conditional on the other predictors.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "misconception_a",
+          "text_markdown": "A significant F test proves all three slopes are nonzero.",
+          "misconception_id": "overall_vs_individual_hypotheses_a",
+          "hint_markdown": "The overall alternative says at least one slope is nonzero."
+        },
+        {
+          "id": "misconception_b",
+          "text_markdown": "The nonsignificant sign-age test invalidates the significant overall F test.",
+          "misconception_id": "overall_vs_individual_hypotheses_b",
+          "hint_markdown": "The tests concern different null hypotheses."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "supported"
+      },
+      "evidence_concept_ids": [
+        "overall_vs_individual_hypotheses"
+      ],
+      "explanation_markdown": "Overall F tests $H_0:\\beta_1=\\beta_2=\\beta_3=0$ against at least one nonzero slope. The sign-age t test asks only about its partial coefficient. Sign age can be nonsignificant while advertising and store size make the model significant.",
+      "numeric_policy": null
+    }
+  ]
+}

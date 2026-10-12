@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "template_id": "hyp_formulate_proportion",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T22:30:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "concept_check",
+    "parameters": {
+      "topic": "hypothesis_formulation",
+      "concept": "one_tailed_proportion_hypothesis_testing",
+      "objective": "Formulate one-tailed null and alternative hypotheses for a population proportion based on a directional business claim"
+    },
+    "canonical_probability": 0.4,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 0.4,
+      "variance": 0.24,
+      "standard_deviation": 0.4899
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "formulate_proportion_hypotheses", "kind": "choice", "evidence": "formulate_right_tailed_proportion_hypotheses"},
+      {"id": "rejection_tail_direction", "kind": "choice", "evidence": "identify_upper_tail_rejection_direction"},
+      {"id": "parameter_vs_statistic_notation", "kind": "choice", "evidence": "distinguish_parameter_from_sample_statistic_in_hypotheses"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Reviewed conceptual alignment: Benchmark p0 = 0.40. Directional claim 'more than 40%' defines right-tailed alternative H1: p > 0.40 vs null H0: p <= 0.40 (or p = 0.40). Clarifies that hypotheses are formulated about population parameter p, not sample statistic p_hat."
+}

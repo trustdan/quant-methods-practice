@@ -1,0 +1,142 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "ci_plausible_claim",
+  "version": 1,
+  "status": "active",
+  "family_id": "concept_check",
+  "rule_version": 1,
+  "module_id": "module_4",
+  "title": "Evaluating plausible claims and duality with hypothesis testing",
+  "scenario_markdown": "A cloud infrastructure engineering team benchmarks API query response times. Based on a random sample of $n = 49$ transactions, they construct a $95\\%$ confidence interval for the true mean latency $\\mu$ (in milliseconds):\n\n$$[146.6\\text{ ms}, \\; 153.4\\text{ ms}]$$\n\n$$\\text{Sample statistics: } \\bar{x} = 150.0\\text{ ms}, \\quad SE = 1.735\\text{ ms}, \\quad E = 3.4\\text{ ms}$$\n\nA third-party service provider claims that their software architecture guarantees a mean latency benchmark of $\\mu = 155.0\\text{ ms}$, while an internal systems architect proposes an alternative target of $\\mu = 150.0\\text{ ms}$. Evaluate these claims using the confidence interval and the duality principle between confidence intervals and two-tailed hypothesis testing at $\\alpha = 0.05$.",
+  "parameters": {
+    "topic": "confidence_intervals",
+    "concept": "evaluating_plausible_values_and_duality",
+    "objective": "Determine whether hypothesized parameter values are plausible using a confidence interval, and apply duality to two-tailed hypothesis testing"
+  },
+  "assumptions": [
+    "95% confidence interval for population mean mu is [146.6, 153.4] ms based on random sample of n = 49",
+    "A parameter value inside a (1 - alpha) confidence interval is statistically plausible and would not be rejected by a two-tailed test at significance level alpha",
+    "A parameter value outside a (1 - alpha) confidence interval is not plausible and would be rejected by a two-tailed test at significance level alpha"
+  ],
+  "concept_ids": [
+    "evaluate_claim_outside_confidence_interval",
+    "ci_hypothesis_test_duality_principle",
+    "evaluate_claim_inside_confidence_interval"
+  ],
+  "setting_group": "cloud_infrastructure_latency_benchmark",
+  "source_refs": [
+    "Course Module 4: Sampling Distributions & Confidence Intervals",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T22:30:00Z",
+    "notes": "Reviewed conceptual alignment: 95% CI is [146.6, 153.4]. Evaluates vendor claim mu = 155.0 ms (outside interval, not plausible, rejected at alpha = 0.05 via duality). Contrasts with target mu = 150.0 ms (inside interval, plausible, not rejected at alpha = 0.05). Clarifies that values outside the CI are incompatible with the sample evidence at the stated confidence level.",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "evaluate_outside_claim",
+      "kind": "choice",
+      "prompt_markdown": "Based on the $95\\%$ confidence interval $[146.6\\text{ ms}, 153.4\\text{ ms}]$, is the provider's claim that the true mean latency is $\\mu = 155.0\\text{ ms}$ plausible?",
+      "options": [
+        {
+          "id": "claim_not_plausible",
+          "text_markdown": "**No, it is not plausible**: Because $155.0\\text{ ms}$ falls strictly outside the $95\\%$ confidence interval, it is not a plausible value for the population mean $\\mu$ at the $5\\%$ significance level.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "claim_plausible_close_enough",
+          "text_markdown": "**Yes, it is plausible**: Since $155.0\\text{ ms}$ is only $1.6\\text{ ms}$ above the upper bound $153.4\\text{ ms}$, any value within $5\\text{ ms}$ of the interval boundary is considered plausible.",
+          "misconception_id": "believed_values_just_outside_ci_are_plausible",
+          "hint_markdown": "A confidence interval provides the exact mathematical boundary of plausible parameter values at the chosen confidence level; values strictly outside the bounds are not plausible."
+        },
+        {
+          "id": "claim_uncertain_need_census",
+          "text_markdown": "**Cannot be determined**: A confidence interval can only test whether the sample mean $\\bar{x} = 150.0\\text{ ms}$ is plausible, not an external population benchmark.",
+          "misconception_id": "confused_confidence_interval_target_parameter",
+          "hint_markdown": "The confidence interval estimates the unknown population mean $\\mu$; comparing an external claim $\\mu_0$ against the interval directly assesses its plausibility."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "claim_not_plausible"
+      },
+      "evidence_concept_ids": [
+        "evaluate_claim_outside_confidence_interval"
+      ],
+      "explanation_markdown": "A $(1-\\alpha)\\%$ confidence interval represents the range of **plausible values** for the population parameter $\\mu$ supported by the sample data. Because $\\mu = 155.0\\text{ ms} > 153.4\\text{ ms}$, it falls outside the interval. The sample data provides sufficient evidence to conclude that the true mean latency is different from (specifically, lower than) $155.0\\text{ ms}$.",
+      "numeric_policy": null
+    },
+    {
+      "id": "hypothesis_test_duality",
+      "kind": "choice",
+      "prompt_markdown": "If the engineering team conducted a formal two-tailed hypothesis test $H_0: \\mu = 155.0\\text{ ms}$ versus $H_1: \\mu \\ne 155.0\\text{ ms}$ at significance level $\\alpha = 0.05$ using this same sample, what would be the result?",
+      "options": [
+        {
+          "id": "duality_reject_null",
+          "text_markdown": "**Reject $H_0$ ($p < 0.05$)**: By duality, any null value falling outside a $95\\%$ confidence interval will be rejected by a two-tailed test at $\\alpha = 0.05$.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "duality_fail_to_reject",
+          "text_markdown": "**Fail to reject $H_0$ ($p \\ge 0.05$)**: Confidence intervals and hypothesis tests often disagree, so falling outside the interval does not guarantee rejection.",
+          "misconception_id": "believed_ci_and_two_tailed_tests_can_conflict",
+          "hint_markdown": "Under identical standard error and normality assumptions, a $(1-\\alpha)$ confidence interval and a two-tailed hypothesis test at level $\\alpha$ are mathematically dual and always reach the identical conclusion."
+        },
+        {
+          "id": "duality_accept_alternative_as_exact",
+          "text_markdown": "**Accept $H_1$ and conclude $\\mu = 150.0\\text{ ms}$ exactly**: Rejecting $H_0$ proves that the true mean is exactly equal to the sample mean $\\bar{x}$.",
+          "misconception_id": "believed_rejecting_null_proves_sample_mean_is_exact_parameter",
+          "hint_markdown": "Rejecting $H_0: \\mu = 155.0$ only establishes that $\\mu \\ne 155.0$; it does not prove the population mean equals the point estimate $\\bar{x}$ exactly."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "duality_reject_null"
+      },
+      "evidence_concept_ids": [
+        "ci_hypothesis_test_duality_principle"
+      ],
+      "explanation_markdown": "By the **duality principle**, a two-tailed hypothesis test at significance level $\\alpha$ rejects $H_0: \\mu = \\mu_0$ if and only if $\\mu_0$ lies outside the corresponding $(1-\\alpha)$ confidence interval. Here, $Z = \\frac{150.0 - 155.0}{1.735} = -2.88$. Since $|Z| = 2.88 > 1.960$ (and $p = 0.0040 < 0.05$), the test rejects $H_0$.",
+      "numeric_policy": null
+    },
+    {
+      "id": "evaluate_inside_claim",
+      "kind": "choice",
+      "prompt_markdown": "For the internal architect's proposal that the true mean latency is $\\mu = 150.0\\text{ ms}$, what conclusion does the confidence interval support?",
+      "options": [
+        {
+          "id": "inside_plausible_fail_to_reject",
+          "text_markdown": "**Plausible (Fail to reject $H_0: \\mu = 150.0$)**: Because $150.0\\text{ ms}$ lies inside $[146.6, 153.4]$, it is a plausible parameter value consistent with the sample data at $\\alpha = 0.05$.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "inside_proves_exactly_150",
+          "text_markdown": "**Proven definitively**: Because $150.0\\text{ ms}$ equals the sample mean $\\bar{x}$, it is proven to be the only possible true value of $\\mu$.",
+          "misconception_id": "believed_point_estimate_is_sole_possible_parameter_value",
+          "hint_markdown": "Every point inside $[146.6, 153.4]$ (e.g., $148.0, 152.0$) is plausible; the interval does not prove that $\\mu$ is exactly $150.0$."
+        },
+        {
+          "id": "inside_reject_because_not_boundary",
+          "text_markdown": "**Rejected**: Only values located precisely on the interval endpoints are plausible.",
+          "misconception_id": "confused_interval_interior_with_rejection_region",
+          "hint_markdown": "The entire interior of the confidence interval consists of plausible values that would not be rejected."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "inside_plausible_fail_to_reject"
+      },
+      "evidence_concept_ids": [
+        "evaluate_claim_inside_confidence_interval"
+      ],
+      "explanation_markdown": "Any value located **inside** the $(1-\\alpha)\\%$ confidence interval represents a plausible value for $\\mu$. If we tested $H_0: \\mu = 150.0\\text{ ms}$, the test statistic would be $Z = \\frac{150.0 - 150.0}{1.735} = 0.00$, yielding $p = 1.00 > 0.05$. We would fail to reject $H_0$. Thus, $\\mu = 150.0\\text{ ms}$ is fully compatible with the sample data.",
+      "numeric_policy": null
+    }
+  ]
+}

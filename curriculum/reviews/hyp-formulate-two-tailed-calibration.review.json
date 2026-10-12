@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "template_id": "hyp_formulate_two_tailed_calibration",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T22:30:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "concept_check",
+    "parameters": {
+      "topic": "hypothesis_formulation",
+      "concept": "two_tailed_hypothesis_testing",
+      "objective": "Formulate two-tailed null and alternative hypotheses for detecting parameter departure in either direction"
+    },
+    "canonical_probability": 0.05,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 2.0,
+      "variance": 0.0,
+      "standard_deviation": 0.0
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "formulate_hypotheses", "kind": "choice", "evidence": "formulate_two_tailed_null_and_alt"},
+      {"id": "rejection_region_split", "kind": "choice", "evidence": "identify_two_tailed_rejection_region"},
+      {"id": "burden_of_proof", "kind": "choice", "evidence": "establish_burden_of_proof_direction"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Reviewed conceptual alignment: Calibrated target mu0 = 2.000 cm. Formulates two-tailed test H0: mu = 2.000 vs H1: mu != 2.000 because both undersized and oversized parts are defective. Rejection region split into two tails of alpha/2. Burden of proof is on H1 to establish drift."
+}

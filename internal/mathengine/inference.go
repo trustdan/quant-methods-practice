@@ -150,7 +150,6 @@ func (s *SamplingDistributionProportion) ProbabilityAbove(pHat float64) float64 
 	return StandardNormal().Survival(z)
 }
 
-
 // ConfidenceIntervalResult encapsulates the computed interval, critical value, margin of error, and derivation.
 type ConfidenceIntervalResult struct {
 	Parameter       string   `json:"parameter"` // "mean_z", "mean_t", "proportion"

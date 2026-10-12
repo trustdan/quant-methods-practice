@@ -1,0 +1,142 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "concept_descriptive_vs_inferential",
+  "version": 1,
+  "status": "active",
+  "family_id": "concept_check",
+  "rule_version": 1,
+  "module_id": "module_1",
+  "title": "Distinguishing descriptive from inferential statistics in retail analytics",
+  "scenario_markdown": "A national retail apparel chain evaluates two different analytics projects:\n- **Project A (Chain-wide financial audit)**: The finance department aggregates total revenue, calculates the exact mean gross margin, and creates visual bar charts across all $120$ operating company stores for the past fiscal year using the verified corporate enterprise ledger.\n- **Project B (Customer shopping experience study)**: The operations team randomly selects $40$ of the $120$ stores, records customer dwell time (minutes spent shopping) for $25$ shoppers at each sampled location, and computes a $95\\%$ confidence interval to estimate the chain-wide average shopping duration.",
+  "parameters": {
+    "topic": "statistical_foundations",
+    "concept": "descriptive_versus_inferential_statistics",
+    "objective": "Classify business analytics tasks as descriptive or inferential statistics"
+  },
+  "assumptions": [
+    "Project A examines a complete census of all 120 operating locations with complete transaction data",
+    "Project B draws an empirical sample to make broader generalizations about the entire chain",
+    "Classifications follow standard introductory business statistics definitions"
+  ],
+  "concept_ids": [
+    "descriptive_statistics_census_definition",
+    "inferential_statistics_sample_generalization",
+    "uncertainty_and_sampling_error_distinction"
+  ],
+  "setting_group": "retail_executive_analytics_classification",
+  "source_refs": [
+    "Course Module 1: Descriptive Measures & Basic Probability",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T22:00:00Z",
+    "notes": "Reviewed conceptual definitions: Project A is descriptive statistics (census aggregation); Project B is inferential statistics (sample estimation under uncertainty). Stage 3 covers presence vs absence of sampling error.",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "classify_project_a",
+      "kind": "choice",
+      "prompt_markdown": "How should Project A (the financial audit of all $120$ stores) be classified, and why?",
+      "options": [
+        {
+          "id": "proj_a_descriptive_correct",
+          "text_markdown": "Descriptive statistics: It organizes, summarizes, and presents characteristics of a complete population (census) without estimating unknown parameters.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "proj_a_inferential",
+          "text_markdown": "Inferential statistics: Because it involves calculating mathematical averages and totals across multiple stores.",
+          "misconception_id": "believed_any_numerical_computation_is_inferential",
+          "hint_markdown": "Computing a mean is descriptive when it summarizes complete data. Inferential statistics specifically refers to generalizing from a sample to an unseen population."
+        },
+        {
+          "id": "proj_a_predictive",
+          "text_markdown": "Predictive modeling: Because past financial data will be reviewed by company executives.",
+          "misconception_id": "confused_historical_summary_with_predictive_model",
+          "hint_markdown": "Summarizing historical fiscal records describes what already occurred; it does not fit a forecasting model."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "proj_a_descriptive_correct"
+      },
+      "evidence_concept_ids": [
+        "descriptive_statistics_census_definition"
+      ],
+      "explanation_markdown": "Project A represents descriptive statistics. It deals with numerical and graphical methods designed to summarize, organize, and simplify an existing, complete dataset. Because all $120$ stores are measured, the metrics calculated (mean margin, total revenue) are exact population parameters of that fiscal year, not sample estimates.",
+      "numeric_policy": null
+    },
+    {
+      "id": "classify_project_b",
+      "kind": "choice",
+      "prompt_markdown": "How should Project B (the customer dwell time study) be classified, and why?",
+      "options": [
+        {
+          "id": "proj_b_inferential_correct",
+          "text_markdown": "Inferential statistics: It uses data from a subset (sample) of stores to draw conclusions and estimate an unknown parameter for the broader population.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "proj_b_descriptive",
+          "text_markdown": "Descriptive statistics: Because it calculates a sample average dwell time across the observed shoppers.",
+          "misconception_id": "failed_to_recognize_generalization_intent",
+          "hint_markdown": "While sample means are descriptive of the sample, constructing a confidence interval to estimate the entire chain's mean is the hallmark of inferential statistics."
+        },
+        {
+          "id": "proj_b_census",
+          "text_markdown": "A census: Because $40$ stores is a substantial fraction of the total $120$ store chain.",
+          "misconception_id": "confused_large_sample_with_census",
+          "hint_markdown": "A census requires measuring $100\\%$ of the population. Measuring a $40$-store subset is a sample."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "proj_b_inferential_correct"
+      },
+      "evidence_concept_ids": [
+        "inferential_statistics_sample_generalization"
+      ],
+      "explanation_markdown": "Project B represents inferential statistics. It collects empirical evidence from a sample ($40$ stores) in order to make inferences, test claims, or estimate properties of the larger population (the entire chain-wide customer base). The $95\\%$ confidence interval quantifies the uncertainty inherent in generalizing from a sample to the unobserved population.",
+      "numeric_policy": null
+    },
+    {
+      "id": "uncertainty_distinction",
+      "kind": "choice",
+      "prompt_markdown": "Which statement correctly describes how sampling error and statistical uncertainty apply to Project A versus Project B?",
+      "options": [
+        {
+          "id": "error_distinction_correct",
+          "text_markdown": "Project A has zero sampling error because it measures the entire population; Project B inherently involves sampling error, which is formally quantified by the confidence interval.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "error_both_have_sampling_error",
+          "text_markdown": "Both projects have equal sampling error because financial ledgers can contain accounting discrepancies.",
+          "misconception_id": "confused_measurement_clerical_error_with_sampling_error",
+          "hint_markdown": "Sampling error arises solely from observing a subset instead of the whole population. Measuring all $120$ stores eliminates sampling error entirely."
+        },
+        {
+          "id": "error_neither_has_sampling_error",
+          "text_markdown": "Neither project has sampling error because $n = 40$ satisfies the Central Limit Theorem ($n \\ge 30$).",
+          "misconception_id": "believed_clt_eliminates_sampling_error",
+          "hint_markdown": "The CLT ensures the sampling distribution is approximately normal, but sampling error remains positive for any sample ($n < N$)."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "error_distinction_correct"
+      },
+      "evidence_concept_ids": [
+        "uncertainty_and_sampling_error_distinction"
+      ],
+      "explanation_markdown": "Sampling error occurs when a sample statistic differs from the population parameter solely because of chance variation in which units were selected. Because Project A inspects the complete census ($120$ of $120$), its sampling error is strictly zero. In contrast, Project B inspects only a sample, meaning its sample mean will fluctuate across samples; inferential methods explicitly model and bound this sampling error.",
+      "numeric_policy": null
+    }
+  ]
+}

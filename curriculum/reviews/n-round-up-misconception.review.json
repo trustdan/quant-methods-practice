@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "template_id": "n_round_up_misconception",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T22:30:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "concept_check",
+    "parameters": {
+      "topic": "sample_size_determination",
+      "concept": "ceiling_rounding_rule_for_sample_size",
+      "objective": "Understand why statistical sample size planning strictly requires the ceiling function (rounding up), and analyze the precision penalty of rounding down"
+    },
+    "canonical_probability": 0.05,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 96.04,
+      "variance": 0.0,
+      "standard_deviation": 0.0
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "correct_integer_determination", "kind": "choice", "evidence": "identify_ceiling_rounding_rule"},
+      {"id": "rounding_down_consequence", "kind": "choice", "evidence": "analyze_margin_of_error_violation_from_rounding_down"},
+      {"id": "general_ceiling_principle", "kind": "choice", "evidence": "generalize_sample_size_ceiling_principle"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Reviewed conceptual alignment: Continuous formula n = (1.96*25/5)^2 = 96.04. Demonstrates that n = 96 yields E = 1.96*(25/sqrt(96)) = 5.0010 > 5.000, violating the maximum error constraint. Proves that any fractional remainder requires ceiling rounding up to n = 97. Excel formula: =ROUNDUP((1.96*25/5)^2, 0)."
+}

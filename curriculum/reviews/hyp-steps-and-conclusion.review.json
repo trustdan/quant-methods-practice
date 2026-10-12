@@ -1,0 +1,16 @@
+{
+  "template_id": "hyp_steps_and_conclusion",
+  "status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T22:30:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "reviewed_rules": [1],
+  "checklist": {
+    "math_verified_by_engine": true,
+    "distractor_misconceptions_valid": true,
+    "hints_pedagogically_useful": true,
+    "excel_formulas_checked": true,
+    "no_latex_formatting_regressions": true
+  },
+  "notes": "Reviewed conceptual question on the decision rule and proper phrasing of conclusions. Emphasizes why we 'fail to reject H0' rather than 'accept H0 as proven truth', and verifies the 5-step testing workflow sequence."
+}

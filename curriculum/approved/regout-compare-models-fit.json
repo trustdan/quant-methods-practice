@@ -1,0 +1,191 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "regout_compare_models_fit",
+  "version": 1,
+  "status": "active",
+  "family_id": "regression_output",
+  "rule_version": 2,
+  "module_id": "module_6",
+  "title": "Comparing residual error and adjusted R-squared",
+  "scenario_markdown": "A retailer fits two models to the same 30 stores, with weekly revenue measured in thousands of dollars. Both use an intercept and the same response values (SST=1400). Model A uses floor area (k=1, SSR=840, SSE=560). Model B adds staffing (k=2, SSR=980, SSE=420). Compare their in-sample fit after accounting for predictor count.",
+  "parameters": {
+    "model": {
+      "confidence_level": 0.95,
+      "intercept": {
+        "coeff": 20,
+        "name": "Intercept",
+        "std_err": 2
+      },
+      "k": 1,
+      "n": 30,
+      "predictors": [
+        {
+          "coeff": 6.4807406984,
+          "name": "FloorArea",
+          "std_err": 1
+        }
+      ],
+      "sse": 560,
+      "ssr": 840
+    },
+    "model_b": {
+      "confidence_level": 0.95,
+      "intercept": {
+        "coeff": 20,
+        "name": "Intercept",
+        "std_err": 2
+      },
+      "k": 2,
+      "n": 30,
+      "predictors": [
+        {
+          "coeff": 5,
+          "name": "FloorArea",
+          "std_err": 1
+        },
+        {
+          "coeff": 2,
+          "name": "Staff",
+          "std_err": 0.7
+        }
+      ],
+      "sse": 420,
+      "ssr": 980
+    },
+    "operation": "compare_models"
+  },
+  "assumptions": [
+    "Both models use the same stores, response units and intercept convention.",
+    "Residual standard error uses n-k-1 degrees of freedom.",
+    "Fit summaries alone do not establish causation or future prediction quality."
+  ],
+  "concept_ids": [
+    "compare_model_a_residual_error",
+    "compare_model_b_adjusted_fit",
+    "compare_fit_with_prediction_limit"
+  ],
+  "setting_group": "retail_model_fit_same_stores",
+  "source_refs": [
+    "docs/COURSE-MAP.md: learner-supplied module objectives, October 11, 2026",
+    "docs/CONTENT-BACKLOG.md: regout-compare-models-fit"
+  ],
+  "approval": {
+    "reviewer": "codex_delegated_final_waves",
+    "reviewed_at": "2026-10-12T04:32:26.275462Z",
+    "delegation_basis": "User explicitly replied on October 11, 2026 (America/Chicago): Yes—delegate review and activate after checks pass. Approval follows successful Go mathematical, bank admission, every-option grading and snapshot checks; assistant semantic review does not claim personal user reading.",
+    "notes": "Assistant reviewed the complete scenario, stage wording, all options, causal hints and worked explanations. Numerical choices are independently bound to Go engine quantities under rule v2; conceptual choices are semantically reviewed. Fixed parameters only; no cosmetic variation claimed as transfer. Stated course conventions remain unconfirmed where applicable. Validated one-to-one concept evidence, rejected ambiguous numeric distractors, and tested every option after snapshot serialization."
+  },
+  "stages": [
+    {
+      "calculation": "se",
+      "id": "compare_model_a_residual_error",
+      "kind": "choice",
+      "prompt_markdown": "What is Model A's residual standard error, in thousands of dollars? Select the value rounded to four decimal places.",
+      "options": [
+        {
+          "numeric_value": 4.47213595499958,
+          "id": "supported",
+          "text_markdown": "$4.4721$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "numeric_value": 4.3205,
+          "id": "misconception_a",
+          "text_markdown": "$4.3205$",
+          "misconception_id": "compare_model_a_residual_error_a",
+          "hint_markdown": "Use residual df n-k-1, not n."
+        },
+        {
+          "numeric_value": 20,
+          "id": "misconception_b",
+          "text_markdown": "$20.0000$",
+          "misconception_id": "compare_model_a_residual_error_b",
+          "hint_markdown": "MSE is in squared response units; take its square root."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "supported"
+      },
+      "evidence_concept_ids": [
+        "compare_model_a_residual_error"
+      ],
+      "explanation_markdown": "$s_e=\\sqrt{560/(30-1-1)}=\\sqrt{20}$. Excel: `=SQRT(560/28)`. It measures residual dispersion in the response units.",
+      "numeric_policy": null
+    },
+    {
+      "calculation": "adjusted_r2_b",
+      "id": "compare_model_b_adjusted_fit",
+      "kind": "choice",
+      "prompt_markdown": "What is Model B's adjusted R-squared (a proportion)? Select the value rounded to four decimal places.",
+      "options": [
+        {
+          "numeric_value": 0.6777777777777778,
+          "id": "supported",
+          "text_markdown": "$0.6778$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "numeric_value": 0.7,
+          "id": "misconception_a",
+          "text_markdown": "$0.7000$",
+          "misconception_id": "compare_model_b_adjusted_fit_a",
+          "hint_markdown": "Ordinary R-squared does not penalize predictor count."
+        },
+        {
+          "numeric_value": 0.3,
+          "id": "misconception_b",
+          "text_markdown": "$0.3000$",
+          "misconception_id": "compare_model_b_adjusted_fit_b",
+          "hint_markdown": "SSE/SST is unexplained variation before adjustment."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "supported"
+      },
+      "evidence_concept_ids": [
+        "compare_model_b_adjusted_fit"
+      ],
+      "explanation_markdown": "$\\bar R_B^2=1-(420/27)/(1400/29)$. Excel: `=1-(420/27)/(1400/29)`.",
+      "numeric_policy": null
+    },
+    {
+      "id": "compare_fit_with_prediction_limit",
+      "kind": "choice",
+      "prompt_markdown": "Which fit comparison is supported?",
+      "options": [
+        {
+          "id": "supported",
+          "text_markdown": "B has lower residual standard error and higher adjusted R-squared; validate future prediction separately.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "misconception_a",
+          "text_markdown": "A must fit better because it has fewer predictors.",
+          "misconception_id": "compare_fit_with_prediction_limit_a",
+          "hint_markdown": "Simplicity matters through the penalty, but compare the actual adjusted metrics."
+        },
+        {
+          "id": "misconception_b",
+          "text_markdown": "B is guaranteed to predict every future store more accurately.",
+          "misconception_id": "compare_fit_with_prediction_limit_b",
+          "hint_markdown": "In-sample fit does not guarantee generalization."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "supported"
+      },
+      "evidence_concept_ids": [
+        "compare_fit_with_prediction_limit"
+      ],
+      "explanation_markdown": "A has adjusted R-squared 0.5857 and residual SE 4.4721; B has adjusted R-squared 0.6778 and residual SE 3.9441. These favor B for these fit criteria. Held-out performance and subject knowledge still matter.",
+      "numeric_policy": null
+    }
+  ]
+}

@@ -1,0 +1,142 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "hyp_pvalue_interpretation",
+  "version": 1,
+  "status": "active",
+  "family_id": "concept_check",
+  "rule_version": 1,
+  "module_id": "module_5",
+  "title": "Rigorous frequentist interpretation of p-values and debunking common fallacies",
+  "scenario_markdown": "A data science team runs an A/B test comparing an experimental checkout redesign against the baseline layout on an e-commerce website. Testing the null hypothesis of no difference in mean transaction conversion ($H_0: \\mu_{\\text{new}} = \\mu_{\\text{base}}$ vs. $H_1: \\mu_{\\text{new}} \\ne \\mu_{\\text{base}}$), the sample yields a test statistic with a two-tailed $p$-value of $0.030$ ($3.0\\%$).\n\nA product manager reviews the dashboard and writes in an executive summary: *'The p-value of 0.030 proves that there is only a 3% probability that the null hypothesis is true, and a 97% probability that our redesign increased sales.'* Evaluate the accuracy of this interpretation and articulate the rigorous frequentist definition of a $p$-value.",
+  "parameters": {
+    "topic": "hypothesis_testing_p_values",
+    "concept": "p_value_frequentist_interpretation_and_misconceptions",
+    "objective": "State the precise frequentist definition of a p-value and debunk the inverse probability and chance fallacies"
+  },
+  "assumptions": [
+    "Two-tailed hypothesis test conducted on independent random sample data",
+    "Test statistic yields exact p-value of 0.030",
+    "Null hypothesis H0 is assumed to be true when calculating the p-value"
+  ],
+  "concept_ids": [
+    "define_p_value_frequentist_conditional",
+    "debunk_inverse_probability_null_is_true_fallacy",
+    "debunk_p_value_chance_fallacy"
+  ],
+  "setting_group": "ecommerce_ab_testing_p_value_interpretation",
+  "source_refs": [
+    "Course Module 5: Hypothesis Testing",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T22:30:00Z",
+    "notes": "Reviewed conceptual alignment: Evaluates p-value = 0.030. Establishes the correct conditional definition P(data at least as extreme | H0 is true). Debunks the pervasive inverse probability fallacy P(H0 is true | data) = 0.03 and the chance fallacy.",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "p_value_definition",
+      "kind": "choice",
+      "prompt_markdown": "What is the correct definition of a $p$-value equal to $0.030$ in this A/B testing experiment?",
+      "options": [
+        {
+          "id": "def_conditional_data_given_null",
+          "text_markdown": "**$P(\\text{test statistic at least as extreme as observed} \\mid H_0 \\text{ is true}) = 0.030$**: Assuming the checkout redesign has zero true effect, the probability of obtaining sample results at least as extreme as those observed is $3.0\\%$.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "def_null_probability_given_data",
+          "text_markdown": "**$P(H_0 \\text{ is true} \\mid \\text{observed data}) = 0.030$**: There is a $3.0\\%$ probability that the redesign has zero true effect on conversion.",
+          "misconception_id": "confused_p_value_with_posterior_probability_of_null",
+          "hint_markdown": "The $p$-value calculates the probability of the *data* assuming $H_0$ is true, not the probability that $H_0$ itself is true."
+        },
+        {
+          "id": "def_alternative_probability",
+          "text_markdown": "**$P(H_1 \\text{ is true}) = 0.970$**: There is a $97.0\\%$ probability that the alternative hypothesis has been proven correct.",
+          "misconception_id": "believed_one_minus_p_value_is_probability_alternative_is_true",
+          "hint_markdown": "In frequentist statistics, hypotheses do not have probabilities; $1 - p$ is not the probability that $H_1$ is true."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "def_conditional_data_given_null"
+      },
+      "evidence_concept_ids": [
+        "define_p_value_frequentist_conditional"
+      ],
+      "explanation_markdown": "The formal frequentist definition of a $p$-value is: **the probability of obtaining a test statistic at least as extreme as the observed sample value, assuming that the null hypothesis is true**. It is a conditional probability about the **sample data given the hypothesis** ($P(\\text{Data} \\mid H_0)$), not about the hypothesis given the data ($P(H_0 \\mid \\text{Data})$).",
+      "numeric_policy": null
+    },
+    {
+      "id": "debunk_inverse_probability",
+      "kind": "choice",
+      "prompt_markdown": "Why is the product manager's claim that *'there is a 3% probability that the null hypothesis is true'* fundamentally flawed?",
+      "options": [
+        {
+          "id": "flaw_hypotheses_not_random_variables",
+          "text_markdown": "**In frequentist statistics, population parameters and hypotheses are fixed constants, not random variables**: $H_0$ is either true or false in reality; it does not possess a probability distribution.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "flaw_probability_is_exactly_zero",
+          "text_markdown": "**The probability is actually $0.000\\%$**: Any $p$-value below $0.05$ automatically sets the probability of $H_0$ to zero.",
+          "misconception_id": "believed_rejection_implies_zero_null_probability",
+          "hint_markdown": "Rejecting a null hypothesis does not mean the null had a $0\\%$ probability; hypotheses do not have frequentist probabilities at all."
+        },
+        {
+          "id": "flaw_must_multiply_by_sample_size",
+          "text_markdown": "**The $3\\%$ must be multiplied by sample size $n$**: The actual probability of the null is $0.03 \\times n$.",
+          "misconception_id": "believed_p_value_multiplies_by_n",
+          "hint_markdown": "Sample size is already incorporated inside the test statistic and $p$-value calculation."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "flaw_hypotheses_not_random_variables"
+      },
+      "evidence_concept_ids": [
+        "debunk_inverse_probability_null_is_true_fallacy"
+      ],
+      "explanation_markdown": "Confusing $P(\\text{Data} \\mid H_0)$ with $P(H_0 \\mid \\text{Data})$ is the classic **inverse probability fallacy**. In frequentist inference, a hypothesis is a fixed statement of fact about the physical population: either the redesign increases conversion or it does not. Because hypotheses are not random variables, we cannot assign them probabilities like $P(H_0) = 0.03$. (Computing $P(H_0 \\mid \\text{Data})$ requires Bayesian inference with prior distributions).",
+      "numeric_policy": null
+    },
+    {
+      "id": "debunk_chance_fallacy",
+      "kind": "choice",
+      "prompt_markdown": "Another analyst claims that *'p = 0.030 means there is a 3% chance the experimental results were caused by random chance alone'*. How should this claim be evaluated?",
+      "options": [
+        {
+          "id": "chance_claim_incorrect_fallacy",
+          "text_markdown": "**Incorrect**: The $p$-value was calculated *under the explicit mathematical premise that chance was the sole operative mechanism* (the null hypothesis); it cannot be the probability that the premise itself is true.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "chance_claim_correct",
+          "text_markdown": "**Correct**: That is the standard definition taught in business analytics.",
+          "misconception_id": "believed_chance_alone_definition_is_valid",
+          "hint_markdown": "This is a widespread colloquial misconception; because $H_0$ assumes $100\\%$ chance, $p$ measures tail extremity under that model, not the probability of chance."
+        },
+        {
+          "id": "chance_claim_applies_only_to_z_tests",
+          "text_markdown": "**Applies only to $Z$-tests, not $t$-tests**: For $t$-tests, degrees of freedom eliminate all chance.",
+          "misconception_id": "confused_distribution_type_with_p_value_logic",
+          "hint_markdown": "The definition of a $p$-value is identical across all statistical distribution tests ($Z$, $t$, $F$, $\\chi^2$)."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "chance_claim_incorrect_fallacy"
+      },
+      "evidence_concept_ids": [
+        "debunk_p_value_chance_fallacy"
+      ],
+      "explanation_markdown": "This is the **chance fallacy**. When computing a $p$-value, the statistician starts by assuming that random sampling chance is operating at $100\\%$ probability (the null model). The $p$-value simply measures how unusual the observed data would be if random chance were the only factor. Stating that '$p$ is the probability that results were due to chance' is circular and statistically invalid.",
+      "numeric_policy": null
+    }
+  ]
+}

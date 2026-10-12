@@ -31,6 +31,10 @@ Simulation is illustration, never the canonical grade. Seed simulations and show
 
 ## Later methods
 
+Rule-v2 fixed-reference calculation choices (final Waves 4/5) are evaluated by `CurriculumCalculations`. Answer quantities are derived from input-only parameters; a `calculation` binding selects the quantity. Exactly one `numeric_value` choice must round to the canonical four-decimal display, and the label must match its supplied numeric value. This is a versioned multiple-choice presentation rule, not a change to existing numeric-input tolerance policies. Unknown inputs/operations/quantities, nonfinite results, duplicate PMF support, invalid probability mass and ambiguous numerical choices are rejected.
+
+Inclusive sample quantiles interpolate at zero-based position `(n-1)*p` in a sorted copy, matching `QUARTILE.INC`; they do not silently substitute an exclusive or median-of-halves convention. Paired tests compute after-minus-before differences from the original arrays, with `df=n-1`. Independent-mean exercises stipulate equal population variances and use pooled residual degrees of freedom `n1+n2-2`. Signed left/right p-values are distinct: a right-sided alternative with a negative statistic has p greater than 0.5. The test suite verifies this using the exact Cauchy case `df=1, t=-1`, giving left/right/two-sided probabilities `0.25/0.75/0.5`. Two-proportion tests use pooled null expected success/failure counts of at least ten in each group. Model comparisons use the same response observations, units and total sum of squares; in-sample fit is not a guarantee of future prediction.
+
 For continuous families record whether endpoints matter, density versus probability, CDF/quantile conventions, scale versus rate, and units. For CIs/tests record population/sample status, sample versus population SD, df, one/two-tail policy, paired design, null/alternative direction and critical-value method. Regression records intercept, residual sign, units, df, estimator and assumptions. Implement only course-grounded methods with reviewed fixtures.
 
 ## Required fixtures

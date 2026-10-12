@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "template_id": "regout_t_squared_equals_f",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T22:30:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "regression_output",
+    "parameters": {
+      "n": 22,
+      "k": 1,
+      "ssr": 90.0,
+      "sse": 200.0,
+      "sst": 290.0,
+      "confidence_level": 0.95,
+      "intercept_name": "Intercept",
+      "b0": 15.0,
+      "se_b0": 3.0,
+      "x1_name": "Nurse_Staffing",
+      "b1": 1.5,
+      "se_b1": 0.5
+    },
+    "canonical_probability": 0.0071,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 1.5,
+      "variance": 0.25,
+      "standard_deviation": 0.5
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "verify_identity_calculation", "kind": "choice", "evidence": "verify_t_squared_equals_f_identity"},
+      {"id": "equivalence_of_p_values", "kind": "choice", "evidence": "equivalence_of_t_and_f_p_values"},
+      {"id": "restriction_to_single_predictor", "kind": "choice", "evidence": "explain_restriction_of_identity_to_single_predictor"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Reviewed derivation: n = 22, k = 1, df = 20. Slope t = 1.50 / 0.50 = 3.000. t^2 = 3.0^2 = 9.000 = F. ANOVA: SSR = 90, SSE = 200, MSE = 10, F = 90/10 = 9.000. Both tests yield p = 0.00707. Demonstrates that this identity holds only for simple regression (k = 1) because for multiple regression (k > 1), F tests all k predictors jointly while t tests individual partial slopes."
+}

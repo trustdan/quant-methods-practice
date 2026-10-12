@@ -1,0 +1,170 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "mreg_write_equation_predict",
+  "version": 1,
+  "status": "active",
+  "family_id": "regression_output",
+  "rule_version": 1,
+  "module_id": "module_6",
+  "title": "Multiple regression prediction equation and point forecast",
+  "scenario_markdown": "A retail merchandise analytics team fits a multiple linear regression model predicting weekly store sales volume ($Y$, in hundreds of units) using $k = 3$ operational predictors across $n = 30$ department stores:\n\n- $X_1$: Digital Advertising Spend (`Ad_Spend`, in thousands of dollars)\n- $X_2$: Average Unit Price (`Price`, in dollars)\n- $X_3$: Sales Floor Space (`Store_Size`, in thousands of square feet)\n\nThe Excel regression output table displays the following coefficient estimates and standard errors ($df_{\\text{res}} = 26$):\n\n| Predictor | Coefficients | Standard Error | $t$ Stat | $p$-value |\n| :--- | :--- | :--- | :--- | :--- |\n| **Intercept** | $50.000$ | $8.000$ | $6.250$ | $< 0.0001$ |\n| **Ad_Spend ($X_1$)** | $+4.200$ | $1.000$ | $+4.200$ | $0.0003$ |\n| **Price ($X_2$)** | $-2.500$ | $0.500$ | $-5.000$ | $< 0.0001$ |\n| **Store_Size ($X_3$)** | $+0.800$ | $0.200$ | $+4.000$ | $0.0005$ |\n\nWrite the sample regression equation, compute a point prediction, and interpret the partial regression coefficient for `Price`.",
+  "parameters": {
+    "n": 30,
+    "k": 3,
+    "ssr": 780.0,
+    "sse": 260.0,
+    "sst": 1040.0,
+    "confidence_level": 0.95,
+    "intercept_name": "Intercept",
+    "b0": 50.0,
+    "se_b0": 8.0,
+    "x1_name": "Ad_Spend",
+    "b1": 4.2,
+    "se_b1": 1.0,
+    "x2_name": "Price",
+    "b2": -2.5,
+    "se_b2": 0.5,
+    "x3_name": "Store_Size",
+    "b3": 0.8,
+    "se_b3": 0.2
+  },
+  "assumptions": [
+    "Multiple linear regression model Y = beta0 + beta1*X1 + beta2*X2 + beta3*X3 + epsilon",
+    "Residual degrees of freedom df = n - k - 1 = 30 - 3 - 1 = 26",
+    "Absence of severe multicollinearity among predictors Ad_Spend, Price, and Store_Size",
+    "Ceteris paribus condition: partial regression coefficients evaluate the relationship holding other predictors constant"
+  ],
+  "concept_ids": [
+    "mreg_equation_formulation",
+    "mreg_point_prediction_evaluation",
+    "mreg_partial_slope_ceteris_paribus_interpretation"
+  ],
+  "setting_group": "retail_store_sales_multiregression",
+  "source_refs": [
+    "Course Module 6: Regression Analysis",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T22:30:00Z",
+    "notes": "Reviewed derivation: k = 3, n = 30, df_res = 26. Equation: y_hat = 50.0 + 4.2*X1 - 2.5*X2 + 0.8*X3. Point forecast at X1 = 10, X2 = 20, X3 = 25: y_hat = 50.0 + 4.2(10) - 2.5(20) + 0.8(25) = 50 + 42 - 50 + 20 = 62.0 hundred units (6,200 units). b2 = -2.5 means holding Ad_Spend and Store_Size fixed, each $1 price increase is associated with a 2.5 hundred unit drop in expected weekly sales. SSR = 780, SSE = 260, SST = 1040, R^2 = 0.75, F = 26.0.",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "write_regression_equation",
+      "kind": "choice",
+      "prompt_markdown": "Which option correctly states the estimated multiple linear regression equation $\\hat{Y}$?",
+      "options": [
+        {
+          "id": "eq_correct",
+          "text_markdown": "$\\hat{Y} = 50.0 + 4.2 X_1 - 2.5 X_2 + 0.8 X_3$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "eq_sign_error_price",
+          "text_markdown": "$\\hat{Y} = 50.0 + 4.2 X_1 + 2.5 X_2 + 0.8 X_3$",
+          "misconception_id": "inverted_negative_regression_coefficient_sign",
+          "hint_markdown": "The coefficient for `Price` is negative ($-2.500$), indicating an inverse relationship with sales volume."
+        },
+        {
+          "id": "eq_omitted_intercept",
+          "text_markdown": "$\\hat{Y} = 4.2 X_1 - 2.5 X_2 + 0.8 X_3$",
+          "misconception_id": "omitted_intercept_from_regression_equation",
+          "hint_markdown": "The regression equation must include the estimated constant term $b_0 = 50.0$."
+        },
+        {
+          "id": "eq_included_error_term",
+          "text_markdown": "$\\hat{Y} = 50.0 + 4.2 X_1 - 2.5 X_2 + 0.8 X_3 + \\epsilon$",
+          "misconception_id": "included_random_error_term_in_predicted_value_equation",
+          "hint_markdown": "Predicted values $\\hat{Y}$ represent the fitted line/hyperplane and do not include the random residual term $\\epsilon$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "eq_correct"
+      },
+      "evidence_concept_ids": [
+        "mreg_equation_formulation"
+      ],
+      "explanation_markdown": "The fitted multiple regression equation takes the form $\\hat{Y} = b_0 + b_1 X_1 + b_2 X_2 + b_3 X_3$. Substituting the estimated coefficients directly from the output table yields $\\hat{Y} = 50.0 + 4.2 X_1 - 2.5 X_2 + 0.8 X_3$. Notice that the negative coefficient on unit price reflects the downward-sloping demand curve.",
+      "numeric_policy": null
+    },
+    {
+      "id": "point_prediction",
+      "kind": "choice",
+      "prompt_markdown": "Predict the expected weekly sales volume $\\hat{Y}$ (in hundreds of units) for a store with digital ad spend $X_1 = 10.0$ ($10k), average unit price $X_2 = 20.0$ ($20.00), and floor space $X_3 = 25.0$ (25k sq ft).",
+      "options": [
+        {
+          "id": "pred_correct",
+          "text_markdown": "$\\hat{Y} = 62.0\\text{ hundred units}$ ($6{,}200\\text{ units}$)",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "pred_sign_mistake",
+          "text_markdown": "$\\hat{Y} = 162.0\\text{ hundred units}$ ($16{,}200\\text{ units}$)",
+          "misconception_id": "added_instead_of_subtracted_negative_coefficient_term",
+          "hint_markdown": "Remember to subtract $2.5 \\times 20.0 = 50.0$, rather than adding it."
+        },
+        {
+          "id": "pred_omitted_intercept",
+          "text_markdown": "$\\hat{Y} = 12.0\\text{ hundred units}$ ($1{,}200\\text{ units}$)",
+          "misconception_id": "omitted_intercept_in_prediction_calculation",
+          "hint_markdown": "Do not forget to add the base intercept $b_0 = 50.0$."
+        },
+        {
+          "id": "pred_unscaled_inputs",
+          "text_markdown": "$\\hat{Y} = 52.5\\text{ hundred units}$ ($5{,}250\\text{ units}$)",
+          "misconception_id": "added_coefficients_without_multiplying_by_predictor_values",
+          "hint_markdown": "Each slope coefficient must be multiplied by its corresponding predictor value before summing."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "pred_correct"
+      },
+      "evidence_concept_ids": [
+        "mreg_point_prediction_evaluation"
+      ],
+      "explanation_markdown": "Substitute the predictor values into the equation:\n$$\\hat{Y} = 50.0 + 4.2(10.0) - 2.5(20.0) + 0.8(25.0) = 50.0 + 42.0 - 50.0 + 20.0 = 62.0$$\nThus, the estimated weekly sales volume is $62.0$ hundred units ($6{,}200$ units).",
+      "numeric_policy": null
+    },
+    {
+      "id": "partial_slope_interpretation",
+      "kind": "choice",
+      "prompt_markdown": "Which statement correctly interprets the partial regression coefficient $b_2 = -2.500$ for `Price`?",
+      "options": [
+        {
+          "id": "ceteris_paribus_correct",
+          "text_markdown": "Holding digital ad spend and store floor space constant (*ceteris paribus*), each additional $\\$1.00$ increase in unit price is associated with an estimated decrease of $2.5$ hundred units ($250$ units) in mean weekly sales.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "ignored_other_predictors",
+          "text_markdown": "Whenever price increases by $\\$1.00$, weekly sales drop by $250$ units regardless of changes in advertising or store size.",
+          "misconception_id": "failed_to_state_ceteris_paribus_condition_in_multiple_regression",
+          "hint_markdown": "In multiple regression, each coefficient describes the effect holding all other model predictors constant (*ceteris paribus*)."
+        },
+        {
+          "id": "causal_guarantee",
+          "text_markdown": "Increasing unit price by $\\$1.00$ causes each individual customer to reduce their purchases by exactly $2.5$ units.",
+          "misconception_id": "ecological_fallacy_and_causal_overstatement",
+          "hint_markdown": "Multiple regression coefficients describe average store-level associations under observational data, not individual customer causal guarantees."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "ceteris_paribus_correct"
+      },
+      "evidence_concept_ids": [
+        "mreg_partial_slope_ceteris_paribus_interpretation"
+      ],
+      "explanation_markdown": "In multiple linear regression, each slope $b_j$ represents a partial regression coefficient. It measures the estimated change in the mean response $\\hat{Y}$ per one-unit increase in $X_j$, **holding all other predictors constant** (*ceteris paribus*). Thus, holding advertising spend and store space constant, each additional $\\$1.00$ in price is associated with a $2.5$ hundred unit ($250$ unit) drop in expected weekly sales.",
+      "numeric_policy": null
+    }
+  ]
+}

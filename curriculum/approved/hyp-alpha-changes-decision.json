@@ -1,0 +1,142 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "hyp_alpha_changes_decision",
+  "version": 1,
+  "status": "active",
+  "family_id": "concept_check",
+  "rule_version": 1,
+  "module_id": "module_5",
+  "title": "Significance level alpha and decision sensitivity at borderline p-values",
+  "scenario_markdown": "A pharmaceutical analytics unit evaluates the efficacy of an alternative formulation designed to reduce blood pressure. Testing the null hypothesis of no improvement ($H_0: \\mu_{\\text{diff}} = 0$ vs. $H_1: \\mu_{\\text{diff}} > 0$), a clinical sample of $n = 50$ patients produces a standardized test statistic with a $p$-value of:\n\n$$p\\text{-value} = 0.032$$\n\nThe regulatory affairs committee debates the clinical protocol. The marketing team advocates adopting a standard industry significance level of $\\alpha = 0.05$, whereas the conservative clinical safety board recommends $\\alpha = 0.01$. Evaluate the statistical decision under each threshold and analyze the requirement for setting $\\alpha$ *a priori*.",
+  "parameters": {
+    "topic": "hypothesis_testing_decisions",
+    "concept": "significance_level_alpha_threshold_and_p_value_comparison",
+    "objective": "Compare hypothesis test decisions across different alpha levels for a borderline p-value, and explain why alpha must be set prior to data collection"
+  },
+  "assumptions": [
+    "One-tailed clinical trial yielding p-value = 0.032",
+    "Decision rule: reject H0 if p-value <= alpha; fail to reject H0 if p-value > alpha",
+    "Significance level alpha represents the predetermined maximum acceptable risk of a Type I error"
+  ],
+  "concept_ids": [
+    "evaluate_decision_at_alpha_005",
+    "evaluate_decision_at_alpha_001",
+    "importance_of_a_priori_alpha_specification"
+  ],
+  "setting_group": "pharmaceutical_clinical_trial_alpha_sensitivity",
+  "source_refs": [
+    "Course Module 5: Hypothesis Testing",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T22:30:00Z",
+    "notes": "Reviewed conceptual alignment: Sample yields p = 0.032. At alpha = 0.05, p <= alpha => reject H0 (statistically significant). At alpha = 0.01, p > alpha => fail to reject H0 (not statistically significant). Explains why alpha must be specified prior to testing to prevent post-hoc significance shopping (p-hacking).",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "decision_at_alpha_005",
+      "kind": "choice",
+      "prompt_markdown": "At significance level $\\alpha = 0.05$, what is the statistical conclusion for $p = 0.032$?",
+      "options": [
+        {
+          "id": "decision_reject_at_005",
+          "text_markdown": "**Reject $H_0$**: Because $p = 0.032 \\le 0.05$, the sample result provides statistically significant evidence at the $5\\%$ level to conclude the new formulation is effective.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "decision_fail_at_005",
+          "text_markdown": "**Fail to reject $H_0$**: A $p$-value must be strictly less than $0.01$ to reject any null hypothesis.",
+          "misconception_id": "believed_rejection_requires_p_below_001",
+          "hint_markdown": "The rejection criterion is $p \\le \\alpha$; since $\\alpha = 0.05$ and $0.032 \\le 0.05$, $H_0$ is rejected."
+        },
+        {
+          "id": "decision_inconclusive_at_005",
+          "text_markdown": "**Inconclusive**: Whenever a $p$-value falls between $0.01$ and $0.05$, the test is automatically declared void.",
+          "misconception_id": "believed_intermediate_p_values_are_void",
+          "hint_markdown": "The decision rule is binary: compare $p$ against the chosen threshold $\\alpha$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "decision_reject_at_005"
+      },
+      "evidence_concept_ids": [
+        "evaluate_decision_at_alpha_005"
+      ],
+      "explanation_markdown": "The standard decision rule states: **reject $H_0$ if $p\\text{-value} \\le \\alpha$**. With $\\alpha = 0.05$, because $0.032 \\le 0.05$, the observed data would occur only $3.2\\%$ of the time under the null hypothesis, which falls below our $5\\%$ risk threshold. Therefore, we **reject $H_0$** at the $\\alpha = 0.05$ significance level.",
+      "numeric_policy": null
+    },
+    {
+      "id": "decision_at_alpha_001",
+      "kind": "choice",
+      "prompt_markdown": "At significance level $\\alpha = 0.01$, what is the statistical conclusion for the exact same sample data ($p = 0.032$)?",
+      "options": [
+        {
+          "id": "decision_fail_at_001",
+          "text_markdown": "**Fail to reject $H_0$**: Because $p = 0.032 > 0.01$, the sample evidence is insufficient to reject the null hypothesis at the more stringent $1\\%$ significance level.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "decision_reject_at_001",
+          "text_markdown": "**Reject $H_0$**: Because $H_0$ was already rejected at $\\alpha = 0.05$, it is automatically rejected at $\\alpha = 0.01$.",
+          "misconception_id": "believed_rejection_at_larger_alpha_implies_rejection_at_smaller_alpha",
+          "hint_markdown": "Rejection at $\\alpha = 0.05$ does *not* imply rejection at the more stringent $\\alpha = 0.01$; here $0.032 > 0.01$."
+        },
+        {
+          "id": "decision_accept_null_as_true",
+          "text_markdown": "**Accept $H_0$ as proven fact**: Failing to reject at $\\alpha = 0.01$ proves that the formulation has zero medical effect.",
+          "misconception_id": "believed_failing_to_reject_proves_null",
+          "hint_markdown": "Failing to reject simply means evidence did not meet the stringent $1\\%$ standard; it never proves the null hypothesis is true."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "decision_fail_at_001"
+      },
+      "evidence_concept_ids": [
+        "evaluate_decision_at_alpha_001"
+      ],
+      "explanation_markdown": "Under the more conservative threshold $\\alpha = 0.01$, we require stronger evidence before rejecting the null (evidence so extreme it occurs less than $1\\%$ of the time under $H_0$). Because $p = 0.032 > 0.01$, we **fail to reject $H_0$**. The sample data does not meet the $1\\%$ threshold for statistical significance.",
+      "numeric_policy": null
+    },
+    {
+      "id": "a_priori_specification",
+      "kind": "choice",
+      "prompt_markdown": "Why do scientific standards and regulatory bodies strictly mandate that significance level $\\alpha$ must be specified *before* data collection rather than after seeing the $p$-value?",
+      "options": [
+        {
+          "id": "a_priori_prevents_p_hacking",
+          "text_markdown": "**To prevent post-hoc threshold manipulation ($p$-hacking)**: Selecting $\\alpha$ after observing the $p$-value allows researchers to manipulate the decision to fit a desired outcome, destroying the nominal control of Type I error rates.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "a_priori_formula_requires_it_for_mean",
+          "text_markdown": "**Software algorithms crash**: Statistical packages like Excel cannot calculate a sample mean unless $\\alpha$ is input into the spreadsheet first.",
+          "misconception_id": "confused_software_operation_with_methodological_integrity",
+          "hint_markdown": "Software calculates sample statistics and $p$-values independently of $\\alpha$; the constraint is a matter of scientific integrity."
+        },
+        {
+          "id": "a_priori_guarantees_power_is_one",
+          "text_markdown": "**Pre-specifying $\\alpha$ guarantees that statistical power is $100\\%$**: Setting $\\alpha$ in advance drives $\\beta$ to zero.",
+          "misconception_id": "believed_pre_specification_guarantees_perfect_power",
+          "hint_markdown": "Power depends on sample size, effect size, and variance; pre-specifying $\\alpha$ ensures unbiased error control, not perfect power."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "a_priori_prevents_p_hacking"
+      },
+      "evidence_concept_ids": [
+        "importance_of_a_priori_alpha_specification"
+      ],
+      "explanation_markdown": "In rigorous frequentist hypothesis testing, $\\alpha$ represents the **tolerable rate of false alarms (Type I error)** agreed upon by researchers before seeing the data. If a researcher inspects a sample with $p = 0.032$ and selectively decides to use $\\alpha = 0.05$ (to claim success) or $\\alpha = 0.01$ (to dismiss the finding), the nominal Type I error rate is corrupted. Pre-registering $\\alpha$ prevents confirmation bias and preserves scientific validity.",
+      "numeric_policy": null
+    }
+  ]
+}

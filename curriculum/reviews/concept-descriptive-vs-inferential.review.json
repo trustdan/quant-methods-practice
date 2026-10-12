@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "template_id": "concept_descriptive_vs_inferential",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T22:00:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "concept_check",
+    "parameters": {
+      "topic": "statistical_foundations",
+      "concept": "descriptive_versus_inferential_statistics",
+      "objective": "Classify business analytics tasks as descriptive or inferential statistics"
+    },
+    "canonical_probability": 1.0,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 120.0,
+      "variance": 0.0,
+      "standard_deviation": 0.0
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "classify_project_a", "kind": "choice", "evidence": "descriptive_statistics_census_definition"},
+      {"id": "classify_project_b", "kind": "choice", "evidence": "inferential_statistics_sample_generalization"},
+      {"id": "uncertainty_distinction", "kind": "choice", "evidence": "uncertainty_and_sampling_error_distinction"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Reviewed conceptual alignment: Project A is descriptive statistics (census aggregation of 120 stores); Project B is inferential statistics (generalizing sample dwell times with CI). Stage 3 rigorously covers sampling error presence vs absence."
+}

@@ -1,0 +1,209 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "twosample_paired_training",
+  "version": 1,
+  "status": "active",
+  "family_id": "two_sample_test",
+  "rule_version": 2,
+  "module_id": "module_5",
+  "title": "Paired differences in sales before and after training",
+  "scenario_markdown": "Eight randomly sampled sales reps have before sales (units/week) 40, 42, 45, 39, 50, 48, 43, 46 and corresponding after sales 42, 46, 48, 44, 51, 52, 45, 49. Each position is the same rep. Define d=after-before. At alpha=0.05, test H0: mean difference=0 against H1: mean difference>0. Without an untreated randomized control group, this comparison alone does not establish training causation.",
+  "parameters": {
+    "after": [
+      42,
+      46,
+      48,
+      44,
+      51,
+      52,
+      45,
+      49
+    ],
+    "alpha": 0.05,
+    "before": [
+      40,
+      42,
+      45,
+      39,
+      50,
+      48,
+      43,
+      46
+    ],
+    "operation": "paired"
+  },
+  "assumptions": [
+    "Differences from distinct reps are independent and approximately normally distributed for the small-sample t method.",
+    "The alternative is right-sided for d=after-before, specified before seeing results.",
+    "Pairing is by rep; the two measurement arrays are not independent samples."
+  ],
+  "concept_ids": [
+    "paired_training_mean_difference",
+    "paired_training_t_statistic",
+    "paired_training_directional_pvalue",
+    "paired_training_evidence_limit"
+  ],
+  "setting_group": "paired_sales_reps_training",
+  "source_refs": [
+    "docs/COURSE-MAP.md: learner-supplied module objectives, October 11, 2026",
+    "docs/CONTENT-BACKLOG.md: twosample-paired-training",
+    "https://support.microsoft.com/en-us/excel/functions/t-test-function"
+  ],
+  "approval": {
+    "reviewer": "codex_delegated_final_waves",
+    "reviewed_at": "2026-10-12T04:32:26.275462Z",
+    "delegation_basis": "User explicitly replied on October 11, 2026 (America/Chicago): Yes—delegate review and activate after checks pass. Approval follows successful Go mathematical, bank admission, every-option grading and snapshot checks; assistant semantic review does not claim personal user reading.",
+    "notes": "Assistant reviewed the complete scenario, stage wording, all options, causal hints and worked explanations. Numerical choices are independently bound to Go engine quantities under rule v2; conceptual choices are semantically reviewed. Fixed parameters only; no cosmetic variation claimed as transfer. Stated course conventions remain unconfirmed where applicable. Validated one-to-one concept evidence, rejected ambiguous numeric distractors, and tested every option after snapshot serialization."
+  },
+  "stages": [
+    {
+      "calculation": "mean_diff",
+      "id": "paired_training_mean_difference",
+      "kind": "choice",
+      "prompt_markdown": "What is the mean after-minus-before difference in units per week? Select the value rounded to four decimal places.",
+      "options": [
+        {
+          "numeric_value": 3,
+          "id": "supported",
+          "text_markdown": "$3.0000$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "numeric_value": -3,
+          "id": "misconception_a",
+          "text_markdown": "$-3.0000$",
+          "misconception_id": "paired_training_mean_difference_a",
+          "hint_markdown": "The stated difference is after minus before."
+        },
+        {
+          "numeric_value": 24,
+          "id": "misconception_b",
+          "text_markdown": "$24.0000$",
+          "misconception_id": "paired_training_mean_difference_b",
+          "hint_markdown": "24 is the sum of eight differences; divide by eight."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "supported"
+      },
+      "evidence_concept_ids": [
+        "paired_training_mean_difference"
+      ],
+      "explanation_markdown": "Differences are 2,4,3,5,1,4,2,3. Their sum is 24, so mean difference is 3. Excel: subtract before from after in a helper column and use `=AVERAGE(C2:C9)`.",
+      "numeric_policy": null
+    },
+    {
+      "calculation": "t",
+      "id": "paired_training_t_statistic",
+      "kind": "choice",
+      "prompt_markdown": "What is the paired t statistic for the zero-difference null? Select the value rounded to four decimal places.",
+      "options": [
+        {
+          "numeric_value": 6.480740698407861,
+          "id": "supported",
+          "text_markdown": "$6.4807$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "numeric_value": 2.2912878475,
+          "id": "misconception_a",
+          "text_markdown": "$2.2913$",
+          "misconception_id": "paired_training_t_statistic_a",
+          "hint_markdown": "Divide SD by sqrt(8) to get the standard error of the mean difference."
+        },
+        {
+          "numeric_value": -6.4807406984,
+          "id": "misconception_b",
+          "text_markdown": "$-6.4807$",
+          "misconception_id": "paired_training_t_statistic_b",
+          "hint_markdown": "The positive mean difference gives a positive statistic."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "supported"
+      },
+      "evidence_concept_ids": [
+        "paired_training_t_statistic"
+      ],
+      "explanation_markdown": "Squared deviations of differences from 3 sum to 12; $s_d^2=12/7$. Thus $t=3/\\sqrt{(12/7)/8}=\\sqrt{42}=6.4807$, df=7. Excel: `=AVERAGE(C2:C9)/(STDEV.S(C2:C9)/SQRT(COUNT(C2:C9)))`.",
+      "numeric_policy": null
+    },
+    {
+      "calculation": "p_right",
+      "id": "paired_training_directional_pvalue",
+      "kind": "choice",
+      "prompt_markdown": "What is the p-value for the stated right-sided alternative? Select the value rounded to four decimal places.",
+      "options": [
+        {
+          "numeric_value": 0.0001701236084038078,
+          "id": "supported",
+          "text_markdown": "$0.0002$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "numeric_value": 0.9998,
+          "id": "misconception_a",
+          "text_markdown": "$0.9998$",
+          "misconception_id": "paired_training_directional_pvalue_a",
+          "hint_markdown": "Use the right tail because H1 specifies a positive mean difference."
+        },
+        {
+          "numeric_value": 0.05,
+          "id": "misconception_b",
+          "text_markdown": "$0.0500$",
+          "misconception_id": "paired_training_directional_pvalue_b",
+          "hint_markdown": "Alpha is not the observed p-value."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "supported"
+      },
+      "evidence_concept_ids": [
+        "paired_training_directional_pvalue"
+      ],
+      "explanation_markdown": "Use the signed t statistic in `=T.DIST.RT(t,7)`. Here the observed sign agrees with H1, so the one-tail probability equals half the two-sided p-value. This halving shortcut would be wrong for a right-sided alternative with a negative observed t.",
+      "numeric_policy": null
+    },
+    {
+      "id": "paired_training_evidence_limit",
+      "kind": "choice",
+      "prompt_markdown": "What conclusion is supported?",
+      "options": [
+        {
+          "id": "supported",
+          "text_markdown": "Reject the zero-difference null; mean after sales are higher under the model, but the before/after design alone does not prove training caused the increase.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "misconception_a",
+          "text_markdown": "Treat the 16 measurements as independent observations with df=14.",
+          "misconception_id": "paired_training_evidence_limit_a",
+          "hint_markdown": "There are eight independent differences, giving df=7."
+        },
+        {
+          "id": "misconception_b",
+          "text_markdown": "The small p-value proves all reps improve and the training is the sole cause.",
+          "misconception_id": "paired_training_evidence_limit_b",
+          "hint_markdown": "A population mean comparison neither guarantees every individual outcome nor eliminates time confounding."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "supported"
+      },
+      "evidence_concept_ids": [
+        "paired_training_evidence_limit"
+      ],
+      "explanation_markdown": "The right-sided p-value is below 0.05. Pairing removes between-person levels from the difference, while temporal changes and other causes can still confound attribution.",
+      "numeric_policy": null
+    }
+  ]
+}

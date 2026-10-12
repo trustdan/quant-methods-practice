@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "template_id": "regprob_multicollinearity",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T22:00:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "concept_check",
+    "parameters": {
+      "topic": "regression_diagnostics",
+      "concept": "multicollinearity_symptoms_and_remedies",
+      "objective": "Diagnose multicollinearity from high overall fit and insignificant individual slopes"
+    },
+    "canonical_probability": 1.0,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 0.88,
+      "variance": 0.0,
+      "standard_deviation": 0.0
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "diagnose_symptom", "kind": "choice", "evidence": "multicollinearity_symptom_identification"},
+      {"id": "underlying_mechanics", "kind": "choice", "evidence": "multicollinearity_mechanics_inflated_se"},
+      {"id": "remedies_and_detection", "kind": "choice", "evidence": "multicollinearity_detection_remedies"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Reviewed conceptual alignment: Classic multicollinearity signature with R^2 = 0.88, significant F (p < 0.0001), but individual t-tests insignificant. Covers variance inflation standard error mechanics and VIF diagnostic remedies."
+}

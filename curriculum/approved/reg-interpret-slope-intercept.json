@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "reg_interpret_slope_intercept",
+  "version": 1,
+  "status": "active",
+  "family_id": "concept_check",
+  "rule_version": 1,
+  "module_id": "module_6",
+  "title": "Interpreting slope and intercept in a commercial electricity cost model",
+  "scenario_markdown": "A facilities management team analyzes monthly electricity costs ($y$, in dollars) for commercial office buildings as a function of the average monthly outdoor temperature ($x$, in degrees Fahrenheit). The observed temperatures in the sample data ranged from $42^\\circ\\text{F}$ to $94^\\circ\\text{F}$. Using ordinary least squares regression, the fitted equation is:\n\n$$\\hat{y} = 450 + 38.5 x$$",
+  "parameters": {
+    "topic": "regression_coefficients",
+    "concept": "slope_interpretation_and_intercept_extrapolation",
+    "objective": "Interpret slope in units of y per x and evaluate hazards of intercept extrapolation"
+  },
+  "assumptions": [
+    "Linear relationship holds across the observed temperature domain [42 F, 94 F]",
+    "Dependent variable y is in dollars; independent variable x is in degrees Fahrenheit"
+  ],
+  "concept_ids": [
+    "reg_slope_interpretation_in_context",
+    "reg_intercept_extrapolation_warning"
+  ],
+  "setting_group": "commercial_facilities_energy_costs",
+  "source_refs": [
+    "Course Module 6: Simple Linear Regression",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T22:30:00Z",
+    "notes": "Reviewed conceptual question on regression slope and intercept interpretation. Highlights unit-rate interpretation of slope (dollars per degree F) and explains why the intercept is a mathematical baseline that should not be given literal business meaning when x = 0 is far outside the observed data range.",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "interpret_slope_coefficient",
+      "kind": "choice",
+      "prompt_markdown": "Which statement provides the correct managerial interpretation of the slope coefficient $b_1 = 38.5$?",
+      "options": [
+        {
+          "id": "slope_correct",
+          "text_markdown": "For each $1^\\circ\\text{F}$ increase in average outdoor temperature, the estimated monthly electricity cost increases by $\\$38.50$.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "slope_swapped_variables",
+          "text_markdown": "For each $\\$1.00$ increase in monthly electricity cost, the outdoor temperature increases by $38.5^\\circ\\text{F}$.",
+          "misconception_id": "swapped_independent_and_dependent_variables",
+          "hint_markdown": "Slope is $\\Delta y / \\Delta x$: the change in the dependent response variable ($y$, dollars) per unit change in the explanatory predictor ($x$, degrees Fahrenheit)."
+        },
+        {
+          "id": "slope_total_cost",
+          "text_markdown": "At any given temperature, electricity cost is exactly $\\$38.50$ per building.",
+          "misconception_id": "confusing_slope_with_fixed_total_value",
+          "hint_markdown": "The slope is a rate of change per unit of $x$, not the total bill."
+        },
+        {
+          "id": "slope_deterministic_causation",
+          "text_markdown": "Increasing outdoor temperature by $1^\\circ\\text{F}$ causes every individual building's bill to rise by exactly $\\$38.50$ without exception.",
+          "misconception_id": "deterministic_and_causal_misconception_in_regression",
+          "hint_markdown": "Regression estimates the average (expected) change in $y$, not a deterministic guarantee for every individual observation."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "slope_correct"
+      },
+      "explanation_markdown": "The slope $b_1 = 38.5$ represents the estimated change in the mean response variable ($y$, electricity cost in dollars) associated with a 1-unit increase in the predictor ($x$, outdoor temperature in $^\\circ\\text{F}$). On average, each additional degree Fahrenheit is associated with an estimated $\\$38.50$ increase in monthly electric expense.",
+      "evidence_concept_ids": [
+        "reg_slope_interpretation_in_context"
+      ]
+    },
+    {
+      "id": "interpret_intercept_coefficient",
+      "kind": "choice",
+      "prompt_markdown": "How should facility managers interpret the intercept $b_0 = 450$ in this model?",
+      "options": [
+        {
+          "id": "intercept_extrapolation_correct",
+          "text_markdown": "The intercept is the mathematical value $\\hat{y} = \\$450$ when $x = 0^\\circ\\text{F}$, but it has no practical business meaning because $0^\\circ\\text{F}$ is far outside the observed sample range ($42^\\circ\\text{F}$ to $94^\\circ\\text{F}$).",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "intercept_guaranteed_base",
+          "text_markdown": "The intercept represents the guaranteed fixed baseline utility cost that every building pays even if the building is completely vacant.",
+          "misconception_id": "validating_extrapolated_intercept",
+          "hint_markdown": "Interpreting $b_0$ as a true physical fixed cost is hazardous when $x = 0$ was never observed in the data."
+        },
+        {
+          "id": "intercept_average_bill",
+          "text_markdown": "The intercept is the average monthly electricity bill across all sampled buildings.",
+          "misconception_id": "confusing_intercept_with_sample_mean_y",
+          "hint_markdown": "The sample mean $\\bar{y}$ is located at $\\bar{x}$, whereas the intercept $b_0$ is evaluated at $x = 0$."
+        },
+        {
+          "id": "intercept_standard_error",
+          "text_markdown": "The intercept represents the standard error of the regression estimate.",
+          "misconception_id": "confusing_intercept_with_standard_error",
+          "hint_markdown": "The intercept is the constant term $b_0$, not a measure of residual variability $s_e$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "intercept_extrapolation_correct"
+      },
+      "explanation_markdown": "The regression intercept $b_0 = 450$ anchors the fitted line at $x = 0^\\circ\\text{F}$. However, because the observed sample data spans $42^\\circ\\text{F}$ to $94^\\circ\\text{F}$, interpreting $\\hat{y}$ at $0^\\circ\\text{F}$ represents extrapolation. In winter, heating systems (often natural gas or heat pumps) have entirely different cost curves. Thus, $b_0$ serves as a mathematical constant to position the line rather than a meaningful prediction at freezing temperatures.",
+      "evidence_concept_ids": [
+        "reg_intercept_extrapolation_warning"
+      ]
+    }
+  ]
+}

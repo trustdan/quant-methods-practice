@@ -1,0 +1,142 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "hyp_formulate_proportion",
+  "version": 1,
+  "status": "active",
+  "family_id": "concept_check",
+  "rule_version": 1,
+  "module_id": "module_5",
+  "title": "Formulating directional hypothesis test for a population proportion",
+  "scenario_markdown": "A consumer packaged goods company is evaluating a new ergonomic bottle design for its flagship fruit juice line. Historically, market benchmark studies established that $40\\%$ ($p_0 = 0.40$) of consumers preferred the brand's packaging over top competitors.\n\nThe commercial executive team states: *'We will only invest $2.5 million to retool our bottling lines if consumer research demonstrates that more than 40% of consumers prefer this new packaging.'* A market research agency conducts a blind taste-and-handling study with $n = 500$ consumers. Formulate the statistical hypotheses, identify the tail direction, and establish the decision rule.",
+  "parameters": {
+    "topic": "hypothesis_formulation",
+    "concept": "one_tailed_proportion_hypothesis_testing",
+    "objective": "Formulate one-tailed null and alternative hypotheses for a population proportion based on a directional business claim"
+  },
+  "assumptions": [
+    "Baseline historical preference proportion p0 = 0.40",
+    "Executive investment threshold requires proving that p > 0.40",
+    "The research claim 'more than 40%' carries the burden of proof and belongs in the alternative hypothesis H1"
+  ],
+  "concept_ids": [
+    "formulate_right_tailed_proportion_hypotheses",
+    "identify_upper_tail_rejection_direction",
+    "distinguish_parameter_from_sample_statistic_in_hypotheses"
+  ],
+  "setting_group": "consumer_packaging_preference_study",
+  "source_refs": [
+    "Course Module 5: Hypothesis Testing",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T22:30:00Z",
+    "notes": "Reviewed conceptual alignment: Benchmark p0 = 0.40. Directional claim 'more than 40%' defines right-tailed alternative H1: p > 0.40 vs null H0: p <= 0.40 (or p = 0.40). Clarifies that hypotheses are formulated about population parameter p, not sample statistic p_hat.",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "formulate_proportion_hypotheses",
+      "kind": "choice",
+      "prompt_markdown": "Which pair of hypotheses correctly formulates the company's decision problem?",
+      "options": [
+        {
+          "id": "hyp_right_tailed_correct",
+          "text_markdown": "$$H_0: p \\le 0.40 \\quad (\\text{or } p = 0.40) \\quad \\text{vs.} \\quad H_1: p > 0.40$$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "hyp_left_tailed",
+          "text_markdown": "$$H_0: p \\ge 0.40 \\quad \\text{vs.} \\quad H_1: p < 0.40$$",
+          "misconception_id": "inverted_rejection_tail_direction",
+          "hint_markdown": "The research claim is that preference is *greater than* $40\\%$, which corresponds to an upper (right) tail test, not a lower tail."
+        },
+        {
+          "id": "hyp_two_tailed",
+          "text_markdown": "$$H_0: p = 0.40 \\quad \\text{vs.} \\quad H_1: p \\ne 0.40$$",
+          "misconception_id": "selected_non_directional_test_for_directional_claim",
+          "hint_markdown": "Management will only invest if preference has increased above $40\\%$; a two-tailed test would improperly trigger on a decrease in preference."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "hyp_right_tailed_correct"
+      },
+      "evidence_concept_ids": [
+        "formulate_right_tailed_proportion_hypotheses"
+      ],
+      "explanation_markdown": "The investment decision is directional: management requires proof that the proportion exceeds $40\\%$. The research claim that carries the burden of proof is placed in the alternative hypothesis: $H_1: p > 0.40$. The null hypothesis represents the status quo that the new bottle does not increase preference: $H_0: p \\le 0.40$ (or $H_0: p = 0.40$).",
+      "numeric_policy": null
+    },
+    {
+      "id": "rejection_tail_direction",
+      "kind": "choice",
+      "prompt_markdown": "Where is the rejection region located for this test, and what type of sample results provide evidence to reject $H_0$?",
+      "options": [
+        {
+          "id": "rejection_upper_tail",
+          "text_markdown": "**Right (upper) tail**: Rejection occurs only when the sample proportion $\\hat{p}$ is substantially larger than $0.40$, yielding a large positive standardized test statistic $Z > Z_\\alpha$.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "rejection_lower_tail",
+          "text_markdown": "**Left (lower) tail**: Rejection occurs when the sample proportion is substantially smaller than $0.40$, yielding a large negative $Z < -Z_\\alpha$.",
+          "misconception_id": "confused_upper_tail_with_lower_tail",
+          "hint_markdown": "Values below $0.40$ support the null hypothesis ($p \\le 0.40$); only values above $0.40$ provide evidence for $H_1: p > 0.40$."
+        },
+        {
+          "id": "rejection_center",
+          "text_markdown": "**Center of the distribution**: Rejection occurs whenever the sample proportion is close to $0.40$.",
+          "misconception_id": "confused_center_with_tail_rejection_region",
+          "hint_markdown": "The center of the distribution corresponds to the null value where $H_0$ is retained."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "rejection_upper_tail"
+      },
+      "evidence_concept_ids": [
+        "identify_upper_tail_rejection_direction"
+      ],
+      "explanation_markdown": "Because the inequality in the alternative hypothesis points to the right ($p > 0.40$), this is an **upper (right-tailed) test**. All of the significance level $\\alpha$ is placed in the right tail. Only sample proportions $\\hat{p}$ substantially greater than $0.40$ produce a test statistic $Z = \\frac{\\hat{p} - 0.40}{\\sqrt{0.40(0.60)/n}} > Z_\\alpha$ that justifies rejecting $H_0$.",
+      "numeric_policy": null
+    },
+    {
+      "id": "parameter_vs_statistic_notation",
+      "kind": "choice",
+      "prompt_markdown": "Why would writing the hypotheses as *'$H_0: \\hat{p} = 0.40$ vs. $H_1: \\hat{p} > 0.40$'* be a fundamental statistical error?",
+      "options": [
+        {
+          "id": "hypotheses_about_population_not_sample",
+          "text_markdown": "**Hypotheses are statements about unknown population parameters, not sample statistics**: $\\hat{p}$ is a known sample value computed directly from the data, whereas hypothesis testing evaluates the unknown population parameter $p$.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "hat_notation_means_variance",
+          "text_markdown": "**$\\hat{p}$ is the symbol for sample variance, not proportion**: One cannot test variance using a proportion test.",
+          "misconception_id": "confused_hat_notation_with_sample_variance",
+          "hint_markdown": "$\\hat{p}$ is the sample proportion; hypotheses must be written about the population parameter $p$."
+        },
+        {
+          "id": "notation_does_not_matter",
+          "text_markdown": "**It is not an error**: Modern statistics treats $p$ and $\\hat{p}$ as completely interchangeable.",
+          "misconception_id": "believed_parameter_and_statistic_are_interchangeable",
+          "hint_markdown": "Conflating sample statistics with population parameters is a major conceptual error in inferential statistics."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "hypotheses_about_population_not_sample"
+      },
+      "evidence_concept_ids": [
+        "distinguish_parameter_from_sample_statistic_in_hypotheses"
+      ],
+      "explanation_markdown": "A core foundation of statistical inference is that **hypotheses are always formulated about population parameters** ($p$ or $\\mu$), never about sample statistics ($\\hat{p}$ or $\\bar{x}$). We do not hypothesize about $\\hat{p}$ because we observe it directly without uncertainty. Hypothesis tests use the known sample statistic $\\hat{p}$ to make an inference about the unknown population parameter $p$.",
+      "numeric_policy": null
+    }
+  ]
+}

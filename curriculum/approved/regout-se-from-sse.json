@@ -1,0 +1,165 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "regout_se_from_sse",
+  "version": 1,
+  "status": "active",
+  "family_id": "regression_output",
+  "rule_version": 1,
+  "module_id": "module_6",
+  "title": "Computing the standard error of the estimate from ANOVA residual sum of squares",
+  "scenario_markdown": "A manufacturing cost analyst estimates weekly overhead maintenance expense ($Y$, in thousands of dollars) from total direct machine operating hours ($X$, in hundreds of hours) across $n = 20$ manufacturing facilities. The Excel regression summary output ANOVA table reports:\n\n| ANOVA Source | $df$ | $SS$ | $MS$ | $F$ |\n| :--- | :--- | :--- | :--- | :--- |\n| Regression | $1$ | $1{,}024.0$ | $1{,}024.0$ | $64.0$ |\n| Residual | $18$ | $288.0$ | ? | |\n| Total | $19$ | $1{,}312.0$ | | |\n\nCoefficients: Intercept $b_0 = 15.0$ ($SE = 2.5$), Direct Labor Hours $b_1 = 3.20$ ($SE = 0.40$). Calculate the mean squared error ($MSE$), the standard error of the regression estimate ($s_e$), and interpret $s_e$ in business terms.",
+  "parameters": {
+    "n": 20,
+    "k": 1,
+    "ssr": 1024.0,
+    "sse": 288.0,
+    "sst": 1312.0,
+    "confidence_level": 0.95,
+    "b0": 15.0,
+    "se_b0": 2.5,
+    "b1": 3.2,
+    "se_b1": 0.4,
+    "x1_name": "DirectLaborHours"
+  },
+  "assumptions": [
+    "Simple linear regression model with k = 1 predictor and sample size n = 20",
+    "Residual degrees of freedom df_residual = n - 2 = 18",
+    "Standard error of estimate s_e = sqrt(MSE) is expressed in the units of Y (thousands of dollars)"
+  ],
+  "concept_ids": [
+    "reg_anova_table_mse_calculation",
+    "reg_standard_error_of_estimate_formula",
+    "reg_standard_error_interpretation_units_of_y"
+  ],
+  "setting_group": "manufacturing_cost_overhead_regression",
+  "source_refs": [
+    "Course Module 6: Regression Analysis",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T22:30:00Z",
+    "notes": "Reviewed derivation: n = 20, k = 1, SSR = 1024.0, SSE = 288.0, SST = 1312.0. df_res = 20 - 2 = 18. MSE = 288.0 / 18 = 16.0. Standard error of estimate s_e = sqrt(16.0) = 4.0 ($4,000). Consistency check: F = 1024/16 = 64.0; t_slope = 3.2/0.4 = 8.0 -> t^2 = 64.0 == F exactly. Excel: =SQRT(288/18).",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "compute_mse",
+      "kind": "choice",
+      "prompt_markdown": "Determine the residual degrees of freedom and compute the mean squared error ($MSE = \\frac{SSE}{n - 2}$).",
+      "options": [
+        {
+          "id": "mse_correct",
+          "text_markdown": "$df_{\\text{res}} = 18$, $MSE = 16.0$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "mse_divide_by_n",
+          "text_markdown": "$df_{\\text{res}} = 20$, $MSE = 14.4$",
+          "misconception_id": "divided_by_n_instead_of_residual_df",
+          "hint_markdown": "In simple linear regression, two parameters ($b_0$ and $b_1$) are estimated from the data, so residual degrees of freedom are $n - 2 = 20 - 2 = 18$, not $n = 20$."
+        },
+        {
+          "id": "mse_divide_by_n_minus_one",
+          "text_markdown": "$df_{\\text{res}} = 19$, $MSE = 15.16$",
+          "misconception_id": "divided_by_total_df_n_minus_one",
+          "hint_markdown": "$19$ is the total degrees of freedom ($n - 1$); the residual row has $n - k - 1 = 18$ degrees of freedom."
+        },
+        {
+          "id": "mse_divide_by_ssr",
+          "text_markdown": "$df_{\\text{res}} = 18$, $MSE = 0.281$",
+          "misconception_id": "inverted_ratio_divided_by_ssr",
+          "hint_markdown": "Mean squared error is the residual sum of squares divided by residual degrees of freedom: $288.0 / 18 = 16.0$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "mse_correct"
+      },
+      "explanation_markdown": "In a simple linear regression ($k = 1$), the residual degrees of freedom are $df_{\\text{res}} = n - k - 1 = 20 - 1 - 1 = 18$. The mean squared error is: $$MSE = \\frac{SSE}{df_{\\text{res}}} = \\frac{288.0}{18} = 16.0$$",
+      "evidence_concept_ids": [
+        "reg_anova_table_mse_calculation"
+      ]
+    },
+    {
+      "id": "compute_standard_error_est",
+      "kind": "choice",
+      "prompt_markdown": "Compute the standard error of the estimate $s_e = \\sqrt{MSE}$.",
+      "options": [
+        {
+          "id": "se_correct",
+          "text_markdown": "$s_e = 4.0\\text{ (\\$4,000)}$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "se_forgot_sqrt",
+          "text_markdown": "$s_e = 16.0\\text{ (\\$16,000)}$",
+          "misconception_id": "reported_mse_as_standard_error_without_square_root",
+          "hint_markdown": "The standard error of the estimate is the square root of $MSE$: $\\sqrt{16.0} = 4.0$."
+        },
+        {
+          "id": "se_from_total_ss",
+          "text_markdown": "$s_e = 8.31\\text{ (\\$8,310)}$",
+          "misconception_id": "computed_standard_deviation_of_y_instead_of_residuals",
+          "hint_markdown": "$s_e$ evaluates unexplained residual variance ($SSE / 18$), not total sample variance ($SST / 19$)."
+        },
+        {
+          "id": "se_percentage",
+          "text_markdown": "$s_e = 78.05\\%$",
+          "misconception_id": "confusing_standard_error_with_r_squared",
+          "hint_markdown": "$78.05\\%$ is $R^2 = SSR / SST$; $s_e$ is an absolute dispersion metric in the original units of $y$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "se_correct"
+      },
+      "explanation_markdown": "The standard error of the estimate (often called the standard error of the regression, or $s_e$) is: $$s_e = \\sqrt{MSE} = \\sqrt{16.0} = 4.0\\text{ (thousands of dollars, or } \\$4{,}000\\text{)}$$",
+      "evidence_concept_ids": [
+        "reg_standard_error_of_estimate_formula"
+      ]
+    },
+    {
+      "id": "interpret_se_context",
+      "kind": "choice",
+      "prompt_markdown": "How should managers interpret the numerical value $s_e = 4.0$ in decision-making?",
+      "options": [
+        {
+          "id": "interp_se_correct",
+          "text_markdown": "Observed weekly overhead costs deviate from model predictions by roughly $\\$4,000$ on average.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "interp_se_slope_dispersion",
+          "text_markdown": "The estimated slope changes by $\\$4,000$ across different samples.",
+          "misconception_id": "confusing_se_of_estimate_with_se_of_slope",
+          "hint_markdown": "The standard error of the slope is $s_{b_1} = 0.40$; $s_e = 4.0$ measures typical prediction error around the regression line."
+        },
+        {
+          "id": "interp_se_maximum_error",
+          "text_markdown": "The maximum possible prediction error the model can ever make is exactly $\\$4,000$.",
+          "misconception_id": "confusing_standard_error_with_maximum_bounded_error",
+          "hint_markdown": "$s_e$ is a standard deviation of residuals, not an absolute upper bound on individual residuals."
+        },
+        {
+          "id": "interp_se_proportion_variance",
+          "text_markdown": "The model explains $4\\%$ of the variation in weekly overhead costs.",
+          "misconception_id": "confusing_se_with_coefficient_of_determination",
+          "hint_markdown": "Explained variance is measured by $R^2 = 78.05\\%$, not $s_e$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "interp_se_correct"
+      },
+      "explanation_markdown": "The standard error of the regression $s_e = \\$4{,}000$ provides an intuitive gauge of model accuracy. It represents the approximate standard deviation of the residuals\u2014meaning observed weekly maintenance costs typically fall within about $\\pm \\$4{,}000$ of the fitted regression line.",
+      "evidence_concept_ids": [
+        "reg_standard_error_interpretation_units_of_y"
+      ]
+    }
+  ]
+}

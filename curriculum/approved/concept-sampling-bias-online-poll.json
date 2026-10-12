@@ -1,0 +1,142 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "concept_sampling_bias_online_poll",
+  "version": 1,
+  "status": "active",
+  "family_id": "concept_check",
+  "rule_version": 1,
+  "module_id": "module_1",
+  "title": "Sampling bias and voluntary response in mobile app polls",
+  "scenario_markdown": "A retail coffee chain with millions of annual customers posts an optional, voluntary poll on its mobile loyalty rewards app: *'Do you support eliminating printed paper receipts in favor of digital-only receipts?'* Over three days, $12{,}000$ app users choose to respond, with $88\\%$ answering 'Yes' and $12\\%$ answering 'No'. Based on these results, the marketing director asserts to executive management: *'88% of our entire customer base prefers digital-only receipts, so we can immediately eliminate paper receipt printers across all store locations.'* Analyze the validity of this conclusion and diagnose the sampling methodology.",
+  "parameters": {
+    "topic": "statistical_sampling_methods",
+    "concept": "sampling_bias_voluntary_response",
+    "objective": "Identify voluntary response bias, selection bias, and undercoverage in non-probability convenience samples"
+  },
+  "assumptions": [
+    "Target population is the complete customer base of all retail coffee chain patrons (both app users and non-app users)",
+    "Sample consists solely of self-selected respondents among users of the mobile loyalty application",
+    "Voluntary response sampling violates probability sampling assumptions and introduces systemic selection bias"
+  ],
+  "concept_ids": [
+    "identify_voluntary_response_bias",
+    "critique_unjustified_population_generalization",
+    "probability_sampling_design_remedy"
+  ],
+  "setting_group": "customer_loyalty_app_voluntary_poll",
+  "source_refs": [
+    "Course Module 1: Descriptive Measures & Basic Probability",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T22:30:00Z",
+    "notes": "Reviewed conceptual alignment: Evaluates voluntary response bias, undercoverage of non-app users, and the classic large-sample fallacy (a large biased sample does not cure bias). Contrasts non-probability convenience poll with valid probability sampling.",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "bias_source_identification",
+      "kind": "choice",
+      "prompt_markdown": "What is the primary statistical flaw in the marketing director's data collection method?",
+      "options": [
+        {
+          "id": "bias_voluntary_and_undercoverage",
+          "text_markdown": "**Voluntary response bias and undercoverage**: Respondents self-selected to participate, and non-app customers (cash buyers, walk-ins, and non-smartphone users) were systematically excluded.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "bias_sample_size_insufficient",
+          "text_markdown": "**Inadequate sample size**: A sample of $12{,}000$ respondents is far too small to calculate any statistical estimates.",
+          "misconception_id": "believed_sample_size_of_12000_is_too_small",
+          "hint_markdown": "A sample of $12{,}000$ is mathematically very large; the issue is systematic bias in how respondents were selected, not sample size."
+        },
+        {
+          "id": "bias_binary_question_format",
+          "text_markdown": "**Question formatting error**: A survey cannot validly ask a binary Yes/No question without offering a five-point Likert scale.",
+          "misconception_id": "confused_question_scale_with_sampling_methodology",
+          "hint_markdown": "Binary questions are completely standard in polling; the defect is non-probability self-selection."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "bias_voluntary_and_undercoverage"
+      },
+      "evidence_concept_ids": [
+        "identify_voluntary_response_bias"
+      ],
+      "explanation_markdown": "The poll suffers from **voluntary response bias** and **undercoverage**. App users with strong opinions self-selected to respond, while loyalty app users as a whole are systematically more tech-savvy than the broader customer population. Customers without smartphones, cash purchasers, or infrequent walk-in shoppers had zero probability of inclusion.",
+      "numeric_policy": null
+    },
+    {
+      "id": "unjustified_generalization_critique",
+      "kind": "choice",
+      "prompt_markdown": "Why is the marketing director's claim that *'a large sample of 12,000 respondents eliminates any statistical error'* invalid?",
+      "options": [
+        {
+          "id": "generalization_large_n_cannot_cure_bias",
+          "text_markdown": "Increasing sample size narrows random sampling variance, but it does **not** reduce or eliminate systematic selection bias.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "generalization_clt_always_cures_bias",
+          "text_markdown": "By the Central Limit Theorem, any sample larger than $n = 30$ automatically guarantees that the sample mean equals the true population parameter.",
+          "misconception_id": "believed_clt_cures_sampling_bias",
+          "hint_markdown": "The Central Limit Theorem describes the sampling distribution of random samples; it cannot correct data collected via a biased sampling mechanism."
+        },
+        {
+          "id": "generalization_need_census_only",
+          "text_markdown": "No survey can ever generalize to a population unless every single customer in the entire country is interviewed (a complete census).",
+          "misconception_id": "believed_only_a_census_can_yield_valid_inferences",
+          "hint_markdown": "Proper probability sampling can yield highly accurate population inferences with modest sample sizes (e.g., $n = 1{,}000$), provided the sampling mechanism is unbiased."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "generalization_large_n_cannot_cure_bias"
+      },
+      "evidence_concept_ids": [
+        "critique_unjustified_population_generalization"
+      ],
+      "explanation_markdown": "A fundamental rule of statistical inference is that **sample size cannot compensate for bias**. If a sampling method systematically selects individuals who favor digital solutions, surveying $12{,}000$ or even $1{,}000{,}000$ of them simply provides a highly precise estimate of a biased subgroup. The standard error shrinks, but the estimate remains centered on the wrong value.",
+      "numeric_policy": null
+    },
+    {
+      "id": "remedy_survey_design",
+      "kind": "choice",
+      "prompt_markdown": "Which research methodology would enable the retailer to make valid statistical inferences about receipt preferences across all store customers?",
+      "options": [
+        {
+          "id": "design_probability_sampling",
+          "text_markdown": "Conducting a probability sampling design (e.g., stratified or systematic sampling across diverse store transactions, times of day, and payment methods) where every customer has a known non-zero selection probability.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "design_social_media_poll",
+          "text_markdown": "Posting the identical poll on the company's Instagram and TikTok channels to gather an additional $50{,}000$ voluntary votes.",
+          "misconception_id": "confused_more_social_media_with_unbiased_probability_sampling",
+          "hint_markdown": "Social media polls are also voluntary convenience samples and compound the same selection bias."
+        },
+        {
+          "id": "design_ask_store_managers",
+          "text_markdown": "Interviewing only the five highest-grossing flagship store managers and taking their personal opinion as customer consensus.",
+          "misconception_id": "confused_expert_convenience_sample_with_customer_probability_sample",
+          "hint_markdown": "Manager impressions are anecdotal convenience data, not a representative customer probability sample."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "design_probability_sampling"
+      },
+      "evidence_concept_ids": [
+        "probability_sampling_design_remedy"
+      ],
+      "explanation_markdown": "Valid statistical inference requires a **probability sampling design**—such as stratified random sampling across geographic store tiers, peak/off-peak hours, and cash/card/app payment types. Each customer in the target population must have a known, non-zero probability of being selected, ensuring the sample reflects the true demographic and behavioral mix of the customer base.",
+      "numeric_policy": null
+    }
+  ]
+}

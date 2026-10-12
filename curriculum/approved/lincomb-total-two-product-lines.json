@@ -1,0 +1,149 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "lincomb_total_two_product_lines",
+  "version": 1,
+  "status": "active",
+  "family_id": "linear_combination",
+  "rule_version": 1,
+  "module_id": "module_2",
+  "title": "Sum of independent random variables: total revenue and the root-sum-of-squares rule",
+  "scenario_markdown": "A consumer packaged goods enterprise markets two distinct product categories with independent daily customer demand:\n\n- **Product Line A**: Expected daily revenue $E[X_A] = \\$12{,}000$, standard deviation $\\operatorname{SD}(X_A) = \\$1{,}500$ (variance $\\operatorname{Var}(X_A) = 2{,}250{,}000$).\n- **Product Line B**: Expected daily revenue $E[X_B] = \\$8{,}000$, standard deviation $\\operatorname{SD}(X_B) = \\$2{,}000$ (variance $\\operatorname{Var}(X_B) = 4{,}000{,}000$).\n\nTotal daily revenue is $T = X_A + X_B$. Assuming revenues are statistically independent, compute expected total revenue, determine total revenue variance, and evaluate total standard deviation to disprove the naive addition of standard deviations.",
+  "parameters": {
+    "operation": "sum_independent",
+    "mean_x": 12000.0,
+    "sd_x": 1500.0,
+    "var_x": 2250000.0,
+    "mean_y": 8000.0,
+    "sd_y": 2000.0,
+    "var_y": 4000000.0,
+    "mean": 20000.0,
+    "var": 6250000.0,
+    "sd": 2500.0
+  },
+  "assumptions": [
+    "Product Line A and Line B revenues are statistically independent (Cov(XA, XB) = 0)",
+    "Line expectations add directly: E[XA + XB] = E[XA] + E[XB]",
+    "Under independence, variances add: Var(XA + XB) = Var(XA) + Var(XB)"
+  ],
+  "concept_ids": [
+    "compute_sum_of_expected_values",
+    "compute_sum_of_independent_variances",
+    "apply_root_sum_of_squares_for_sd"
+  ],
+  "setting_group": "cpg_independent_product_lines_revenue",
+  "source_refs": [
+    "Course Module 2: Discrete Random Variables & Probability Distributions",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T23:25:00Z",
+    "notes": "Reviewed sum of independent variables: E[T] = $20,000. Var(T) = 2.25M + 4.0M = 6.25M. SD(T) = sqrt(6.25M) = $2,500. Exposes the common fallacy of adding standard deviations directly ($3,500).",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "compute_total_expected_revenue",
+      "kind": "choice",
+      "prompt_markdown": "What is the expected total daily revenue from both product lines, $E[T] = E[X_A + X_B]$?",
+      "options": [
+        {
+          "id": "e_total_correct",
+          "text_markdown": "**$E[T] = \\$20{,}000$**: $E[X_A + X_B] = E[X_A] + E[X_B] = 12{,}000 + 8{,}000 = 20{,}000$.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "e_total_average",
+          "text_markdown": "**$E[T] = \\$10{,}000$**: Average of the two line expectations $\\frac{12{,}000 + 8{,}000}{2} = 10{,}000$.",
+          "misconception_id": "averaged_expectations_instead_of_summing_total",
+          "hint_markdown": "Total revenue is the sum of both lines, not their average."
+        },
+        {
+          "id": "e_total_product",
+          "text_markdown": "**$E[T] = \\$96{,}000{,}000$**: Product of the two revenues $12{,}000 \\times 8{,}000$.",
+          "misconception_id": "multiplied_expectations_for_sum_variable",
+          "hint_markdown": "T is the sum of revenues XA + XB; do not multiply."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "e_total_correct"
+      },
+      "evidence_concept_ids": [
+        "compute_sum_of_expected_values"
+      ],
+      "explanation_markdown": "The expectation of a sum is always the sum of the individual expectations, whether the variables are independent or not:\n\n$$E[T] = E[X_A + X_B] = E[X_A] + E[X_B] = \\$12{,}000 + \\$8{,}000 = \\$20{,}000$$",
+      "numeric_policy": null
+    },
+    {
+      "id": "compute_total_variance",
+      "kind": "choice",
+      "prompt_markdown": "Assuming independence, what is the variance of total daily revenue, $\\operatorname{Var}(T)$?",
+      "options": [
+        {
+          "id": "var_total_correct",
+          "text_markdown": "**$\\operatorname{Var}(T) = 6{,}250{,}000\\text{ dollars}^2$**: Because $X_A$ and $X_B$ are independent, $\\operatorname{Var}(X_A + X_B) = \\operatorname{Var}(X_A) + \\operatorname{Var}(X_B) = 2{,}250{,}000 + 4{,}000{,}000 = 6{,}250{,}000$.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "var_total_square_of_sd_sum",
+          "text_markdown": "**$\\operatorname{Var}(T) = 12{,}250{,}000\\text{ dollars}^2$**: Calculated as $(1{,}500 + 2{,}000)^2 = 3{,}500^2 = 12{,}250{,}000$.",
+          "misconception_id": "squared_the_sum_of_standard_deviations",
+          "hint_markdown": "You cannot add standard deviations first and square the result; this falsely creates a cross-term 2*sdA*sdB that assumes perfect correlation."
+        },
+        {
+          "id": "var_total_difference",
+          "text_markdown": "**$\\operatorname{Var}(T) = 1{,}750{,}000\\text{ dollars}^2$**: Calculated as $4{,}000{,}000 - 2{,}250{,}000$.",
+          "misconception_id": "subtracted_variances_for_sum_variable",
+          "hint_markdown": "Total revenue combines variation; variances add together."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "var_total_correct"
+      },
+      "evidence_concept_ids": [
+        "compute_sum_of_independent_variances"
+      ],
+      "explanation_markdown": "For **independent** random variables (where $\\operatorname{Cov}(X_A, X_B) = 0$):\n\n$$\\operatorname{Var}(X_A + X_B) = \\operatorname{Var}(X_A) + \\operatorname{Var}(X_B)$$\n$$\\operatorname{Var}(T) = 2{,}250{,}000 + 4{,}000{,}000 = 6{,}250{,}000\\text{ dollars}^2$$",
+      "numeric_policy": null
+    },
+    {
+      "id": "apply_rss_standard_deviation",
+      "kind": "choice",
+      "prompt_markdown": "What is the standard deviation of total revenue $\\operatorname{SD}(T)$, and why is it **not** equal to $\\$1{,}500 + \\$2{,}000 = \\$3{,}500$?",
+      "options": [
+        {
+          "id": "sd_rss_correct",
+          "text_markdown": "**$\\operatorname{SD}(T) = \\$2{,}500$**: $\\operatorname{SD}(T) = \\sqrt{\\operatorname{Var}(T)} = \\sqrt{6{,}250{,}000} = \\$2{,}500$. Standard deviations **cannot be added linearly**; because fluctuations in Line A and Line B partially offset each other (diversification), total volatility $\\$2{,}500$ is strictly less than the naive sum $\\$3{,}500$.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "sd_naive_sum",
+          "text_markdown": "**$\\operatorname{SD}(T) = \\$3{,}500$**: The standard deviation of a sum is always the sum of the individual standard deviations ($1{,}500 + 2{,}000 = 3{,}500$).",
+          "misconception_id": "linearly_added_standard_deviations",
+          "hint_markdown": "Standard deviations only add linearly if variables have perfect correlation (rho = 1). Under independence, SD = sqrt(sdA^2 + sdB^2)."
+        },
+        {
+          "id": "sd_average_sd",
+          "text_markdown": "**$\\operatorname{SD}(T) = \\$1{,}750$**: The average of the two standard deviations $\\frac{1{,}500 + 2{,}000}{2}$.",
+          "misconception_id": "averaged_standard_deviations_for_sum",
+          "hint_markdown": "Summing revenues increases total dollar risk; the standard deviation is sqrt(1500^2 + 2000^2) = $2,500."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "sd_rss_correct"
+      },
+      "evidence_concept_ids": [
+        "apply_root_sum_of_squares_for_sd"
+      ],
+      "explanation_markdown": "Standard deviations add in **quadrature (root-sum-of-squares)**, not linearly:\n\n$$\\operatorname{SD}(T) = \\sqrt{\\operatorname{Var}(X_A) + \\operatorname{Var}(X_B)} = \\sqrt{1{,}500^2 + 2{,}000^2} = \\sqrt{2{,}250{,}000 + 4{,}000{,}000} = \\sqrt{6{,}250{,}000} = 2{,}500\\text{ dollars}$$\n\n**Fundamental Principle**: Linearly adding standard deviations ($1{,}500 + 2{,}000 = 3{,}500$) assumes that on every day Line A is high, Line B is simultaneously high ($\\rho = +1$). Because they are independent, strong days in Line A frequently coincide with average or weaker days in Line B, dampening overall portfolio volatility to \\$2,500.",
+      "numeric_policy": null
+    }
+  ]
+}

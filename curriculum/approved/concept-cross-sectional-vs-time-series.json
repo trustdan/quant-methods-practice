@@ -1,0 +1,142 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "concept_cross_sectional_vs_time_series",
+  "version": 1,
+  "status": "active",
+  "family_id": "concept_check",
+  "rule_version": 1,
+  "module_id": "module_1",
+  "title": "Distinguishing cross-sectional and time-series data structures in business analytics",
+  "scenario_markdown": "A national retail enterprise operates an executive business intelligence portal that delivers data feeds to executive decision makers:\n\n- **Dataset A (Store Network Snapshot)**: Total sales revenue, customer foot traffic, and average basket size recorded across all $50$ regional branch stores for the fourth quarter (Q4) of 2025.\n- **Dataset B (Flagship Performance History)**: Monthly sales revenue, marketing spend, and inventory turnover recorded for the single flagship Chicago downtown store over $36$ consecutive months from January 2023 through December 2025.\n\nClassify the structure of each dataset, analyze their defining dimensional characteristics, and determine valid business research questions appropriate for each data type.",
+  "parameters": {
+    "topic": "data_structures_in_business",
+    "concept": "cross_sectional_vs_time_series_data",
+    "objective": "Classify data as cross-sectional or time-series, distinguish their temporal dimensions, and match appropriate analytical inquiries to each structure"
+  },
+  "assumptions": [
+    "Dataset A records multiple entities at a single fixed time period (Q4 2025)",
+    "Dataset B records a single entity over multiple successive chronological time intervals (36 consecutive months)",
+    "Classification depends on whether variation is observed across entities or across time"
+  ],
+  "concept_ids": [
+    "classify_cross_sectional_and_time_series_data",
+    "distinguish_entity_vs_temporal_dimensions",
+    "match_analytical_questions_to_data_structure"
+  ],
+  "setting_group": "retail_enterprise_bi_data_taxonomy",
+  "source_refs": [
+    "Course Module 1: Descriptive Measures & Basic Probability",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T22:30:00Z",
+    "notes": "Reviewed conceptual alignment: Classifies Dataset A as cross-sectional (multiple entities at one point in time) and Dataset B as time-series (single entity tracked over sequential time). Matches comparative benchmarking to cross-sectional and trend/seasonality forecasting to time-series.",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "classify_datasets",
+      "kind": "choice",
+      "prompt_markdown": "How should **Dataset A** and **Dataset B** be classified according to statistical data structure?",
+      "options": [
+        {
+          "id": "classify_correct",
+          "text_markdown": "**Dataset A is cross-sectional data; Dataset B is time-series data**: Dataset A observes multiple different entities at a single point in time, whereas Dataset B tracks a single entity across successive chronological time periods.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "classify_inverted",
+          "text_markdown": "**Dataset A is time-series data; Dataset B is cross-sectional data**: Having 50 stores means 50 different times, while monthly data represents cross-sections of months.",
+          "misconception_id": "inverted_cross_sectional_and_time_series_definitions",
+          "hint_markdown": "Cross-sectional data captures multiple subjects at one time slice; time-series data tracks the same subject chronologically over time."
+        },
+        {
+          "id": "classify_both_time_series",
+          "text_markdown": "**Both are time-series data**: Any dataset that mentions a year (such as 2025) is automatically classified as time-series.",
+          "misconception_id": "believed_any_calendar_reference_makes_data_time_series",
+          "hint_markdown": "A calendar label that acts as a single fixed observation window (e.g. Q4 2025 across 50 stores) is cross-sectional."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "classify_correct"
+      },
+      "evidence_concept_ids": [
+        "classify_cross_sectional_and_time_series_data"
+      ],
+      "explanation_markdown": "**Cross-sectional data** consists of observations on multiple subjects (individuals, firms, stores, regions) collected at the same point in time (or over the same single time interval, such as Q4 2025). **Time-series data** consists of observations on a single subject collected at sequential, regularly spaced chronological intervals over time (e.g. monthly sales across 36 consecutive months).",
+      "numeric_policy": null
+    },
+    {
+      "id": "dimension_distinction",
+      "kind": "choice",
+      "prompt_markdown": "What is the primary structural dimension differentiating cross-sectional analysis from time-series analysis?",
+      "options": [
+        {
+          "id": "dimension_spatial_vs_temporal_ordering",
+          "text_markdown": "**Variation across entities versus chronological ordering across time**: In cross-sectional data, the sequencing of rows is arbitrary (reordering stores does not change the information), whereas in time-series data, chronological ordering is fundamental because observations are temporally dependent.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "dimension_sample_size_requirement",
+          "text_markdown": "**Number of rows**: Datasets with more than 30 rows are time-series, while datasets with fewer than 30 rows are cross-sectional.",
+          "misconception_id": "confused_sample_size_with_data_structure_type",
+          "hint_markdown": "The number of observations does not define the structure; the nature of the variation (cross-entity vs chronological) does."
+        },
+        {
+          "id": "dimension_quantitative_vs_qualitative",
+          "text_markdown": "**Variable type**: Cross-sectional data can only contain text labels, while time-series data contains numbers.",
+          "misconception_id": "confused_variable_scale_with_dataset_structure",
+          "hint_markdown": "Both cross-sectional and time-series datasets routinely measure quantitative numerical metrics like sales and cost."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "dimension_spatial_vs_temporal_ordering"
+      },
+      "evidence_concept_ids": [
+        "distinguish_entity_vs_temporal_dimensions"
+      ],
+      "explanation_markdown": "In cross-sectional data, the ordering of the rows conveys no statistical meaning—alphabetizing or randomizing the 50 stores leaves summary measures unchanged. In contrast, in time-series data, **chronological ordering is essential**: month $t$ is followed by month $t+1$, and past values directly influence future values through trends, seasonality, and serial correlation (autocorrelation).",
+      "numeric_policy": null
+    },
+    {
+      "id": "match_analytical_questions",
+      "kind": "choice",
+      "prompt_markdown": "Which analytical question is appropriate for **Dataset A** (cross-sectional) versus **Dataset B** (time-series)?",
+      "options": [
+        {
+          "id": "match_correct",
+          "text_markdown": "**Dataset A**: *'Which store tiers and geographic regions generated the highest sales dispersion during Q4 2025?'*<br>**Dataset B**: *'What is the seasonal holiday spike and projected sales trajectory for the Chicago store over the next 6 months?'*",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "match_reversed",
+          "text_markdown": "**Dataset A**: *'Did sales at the Chicago store grow from 2023 to 2025?'*<br>**Dataset B**: *'Which of the 50 stores had the lowest basket size?'*",
+          "misconception_id": "matched_analytical_questions_to_wrong_data_types",
+          "hint_markdown": "Dataset A has 50 stores at one time (can compare stores); Dataset B has one store over 36 months (can track multi-year growth)."
+        },
+        {
+          "id": "match_impossible_for_both",
+          "text_markdown": "Neither dataset can answer any business questions without merging them into a national census.",
+          "misconception_id": "believed_observational_data_cannot_answer_business_questions",
+          "hint_markdown": "Both datasets are standard business intelligence configurations that answer distinct managerial questions."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "match_correct"
+      },
+      "evidence_concept_ids": [
+        "match_analytical_questions_to_data_structure"
+      ],
+      "explanation_markdown": "Cross-sectional data (Dataset A) is suited for **comparative benchmarking, subgroup differences, and cross-entity variance** at a fixed point in time. Time-series data (Dataset B) is suited for **trend analysis, seasonal decomposition, cyclical patterns, and chronological forecasting** into future periods.",
+      "numeric_policy": null
+    }
+  ]
+}

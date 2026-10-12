@@ -1,0 +1,147 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "prob_two_plant_defect_tree",
+  "version": 1,
+  "status": "active",
+  "family_id": "set_probability",
+  "rule_version": 1,
+  "module_id": "module_1",
+  "title": "Two-stage probability tree and Bayes' theorem in supplier quality assurance",
+  "scenario_markdown": "An automotive electronics manufacturer receives microcontroller chips from two dedicated fabrication plants:\n\n- **Plant 1 ($B_1$)**: Produces $60\\%$ of all chips ($P(B_1) = 0.60$) with an audited defect rate of $2.0\\%$ ($P(D \\mid B_1) = 0.02$).\n- **Plant 2 ($B_2$)**: Produces the remaining $40\\%$ of chips ($P(B_2) = 0.40$) with an audited defect rate of $5.0\\%$ ($P(D \\mid B_2) = 0.05$).\n\nIncoming chips are pooled into an assembly bin. A quality engineer inspects a randomly selected chip and discovers it is defective ($D$). Apply the Law of Total Probability and Bayes' Theorem to determine overall defect prevalence and trace the posterior root-cause probability.",
+  "parameters": {
+    "operation": "bayes",
+    "p_b1": 0.6,
+    "p_b2": 0.4,
+    "cond_a_given_b1": 0.02,
+    "cond_a_given_b2": 0.05,
+    "target_partition": 2,
+    "p_total": 0.032,
+    "posterior": 0.625
+  },
+  "assumptions": [
+    "Plants B1 and B2 form a mutually exclusive and exhaustive partition of total supply",
+    "Defect occurrence depends conditionally on the manufacturing plant",
+    "Bayes' theorem updates the prior P(B2) = 0.40 using evidence of defect D"
+  ],
+  "concept_ids": [
+    "compute_total_probability_two_stage_tree",
+    "apply_bayes_theorem_posterior_probability",
+    "interpret_prior_to_posterior_shift"
+  ],
+  "setting_group": "automotive_microcontroller_quality_assurance",
+  "source_refs": [
+    "Course Module 1: Descriptive Measures & Basic Probability",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T23:12:00Z",
+    "notes": "Reviewed probability tree: Total defect P(D) = 0.60(0.02) + 0.40(0.05) = 0.032 (3.2%). Posterior P(B2 | D) = 0.020 / 0.032 = 0.625 (62.5%). Confirms prior P(B2) = 0.40 shifts up to 0.625 due to elevated defect rate. Completes Row 1.3 at 6/6.",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "compute_total_probability",
+      "kind": "choice",
+      "prompt_markdown": "What is the unconditional probability $P(D)$ that a randomly selected chip from the combined bin is defective?",
+      "options": [
+        {
+          "id": "total_prob_correct",
+          "text_markdown": "**$P(D) = 0.0320$ ($3.20\\%$)**: $P(D) = (0.60)(0.02) + (0.40)(0.05) = 0.0120 + 0.0200 = 0.0320$.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "total_prob_simple_average",
+          "text_markdown": "**$P(D) = 0.0350$ ($3.50\\%$)**: Calculated as the unweighted average $\\frac{0.02 + 0.05}{2}$.",
+          "misconception_id": "averaged_rates_without_volume_weights",
+          "hint_markdown": "Defect rates must be weighted by the respective production volumes (60% and 40%), not averaged with equal 50/50 weights."
+        },
+        {
+          "id": "total_prob_sum_of_rates",
+          "text_markdown": "**$P(D) = 0.0700$ ($7.00\\%$)**: Calculated by adding the two defect rates $0.02 + 0.05$.",
+          "misconception_id": "added_conditional_probabilities_directly",
+          "hint_markdown": "Adding defect rates directly creates an invalid rate; conditional probabilities must be multiplied by prior branch probabilities."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "total_prob_correct"
+      },
+      "evidence_concept_ids": [
+        "compute_total_probability_two_stage_tree"
+      ],
+      "explanation_markdown": "By the **Law of Total Probability**, the overall defect rate is the sum of joint probabilities across both mutually exclusive supplier branches:\n\n$$P(D) = P(B_1 \\cap D) + P(B_2 \\cap D) = P(B_1)P(D \\mid B_1) + P(B_2)P(D \\mid B_2)$$\n$$P(D) = (0.60)(0.02) + (0.40)(0.05) = 0.0120 + 0.0200 = 0.0320\\text{ (3.20\\%)}$$\n\nIn Excel: `=(0.60*0.02) + (0.40*0.05)`.",
+      "numeric_policy": null
+    },
+    {
+      "id": "compute_bayes_posterior",
+      "kind": "choice",
+      "prompt_markdown": "Given that the sampled chip is confirmed to be defective ($D$), what is the posterior probability $P(B_2 \\mid D)$ that it came from **Plant 2**?",
+      "options": [
+        {
+          "id": "bayes_correct",
+          "text_markdown": "**$P(B_2 \\mid D) = 0.6250$ ($62.50\\%$)**: $P(B_2 \\mid D) = \\frac{P(B_2 \\cap D)}{P(D)} = \\frac{0.40 \\times 0.05}{0.0320} = \\frac{0.0200}{0.0320} = 0.6250$.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "bayes_unconditioned_prior",
+          "text_markdown": "**$P(B_2 \\mid D) = 0.4000$ ($40.00\\%$)**: Knowing the chip is defective does not alter the fact that Plant 2 manufactures 40% of all chips.",
+          "misconception_id": "confused_posterior_probability_with_prior_base_rate",
+          "hint_markdown": "Finding a defect provides new evidence; because Plant 2 has a much higher defect rate, it represents a disproportionate share of defective items."
+        },
+        {
+          "id": "bayes_inverse_fallacy",
+          "text_markdown": "**$P(B_2 \\mid D) = 0.0500$ ($5.00\\%$)**: The probability is simply the defect rate of Plant 2.",
+          "misconception_id": "confused_p_a_given_b_with_p_b_given_a",
+          "hint_markdown": "P(D | B2) = 0.05 is the probability of a defect given Plant 2. Bayes' theorem inverts this to find P(B2 | D)."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "bayes_correct"
+      },
+      "evidence_concept_ids": [
+        "apply_bayes_theorem_posterior_probability"
+      ],
+      "explanation_markdown": "Applying **Bayes' Theorem**:\n\n$$P(B_2 \\mid D) = \\frac{P(B_2) P(D \\mid B_2)}{P(D)} = \\frac{0.40 \\times 0.05}{0.0320} = \\frac{0.0200}{0.0320} = 0.6250\\text{ (62.50\\%)}$$\n\nIn Excel: `=(0.40*0.05)/0.0320`.",
+      "numeric_policy": null
+    },
+    {
+      "id": "interpret_prior_to_posterior",
+      "kind": "choice",
+      "prompt_markdown": "How does observing a defect revise the probability that the component originated from Plant 2, and why?",
+      "options": [
+        {
+          "id": "shift_correct",
+          "text_markdown": "**The probability rises from $40.0\\%$ (prior) to $62.5\\%$ (posterior)**: Because Plant 2's defect rate is $2.5\\times$ higher ($5.0\\%$ vs $2.0\\%$), Plant 2 produces a majority ($62.5\\%$) of all defective units despite manufacturing only a minority ($40.0\\%$) of total volume.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "shift_decreases",
+          "text_markdown": "**The probability falls**: Because Plant 1 makes more chips (60%), Plant 1 must be responsible for most defects.",
+          "misconception_id": "believed_higher_volume_dominates_higher_defect_rate",
+          "hint_markdown": "Plant 1's volume (60%) produces 0.60 * 0.02 = 1.2% defects, whereas Plant 2's 40% volume produces 0.40 * 0.05 = 2.0% defects."
+        },
+        {
+          "id": "shift_unrelated",
+          "text_markdown": "Defect status and manufacturing plant are statistically independent.",
+          "misconception_id": "assumed_independence_despite_unequal_defect_rates",
+          "hint_markdown": "Because P(D | B1) != P(D | B2) (2% != 5%), defect occurrence and plant origin are statistically dependent."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "shift_correct"
+      },
+      "evidence_concept_ids": [
+        "interpret_prior_to_posterior_shift"
+      ],
+      "explanation_markdown": "Before testing, the **prior probability** that any chip came from Plant 2 is $P(B_2) = 0.40$ ($40\\%$). Observing the defect constitutes diagnostic evidence: out of every $1{,}000$ chips, Plant 1 produces $12$ defects ($600 \\times 0.02$) while Plant 2 produces $20$ defects ($400 \\times 0.05$), yielding $32$ defects in total. The share of defects generated by Plant 2 is $20 / 32 = 62.5\\%$, driving the **posterior probability** up from $40.0\\%$ to $62.5\\%$.",
+      "numeric_policy": null
+    }
+  ]
+}

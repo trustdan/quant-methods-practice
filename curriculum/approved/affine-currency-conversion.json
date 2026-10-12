@@ -1,0 +1,148 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "affine_currency_conversion",
+  "version": 1,
+  "status": "active",
+  "family_id": "linear_combination",
+  "rule_version": 1,
+  "module_id": "module_2",
+  "title": "Scaling random variables: currency conversion, mean, and quadratic variance scaling",
+  "scenario_markdown": "A multinational corporation's European branch incurs monthly operating expenses denominated in euros ($X$). Over the past financial year, monthly euro expenses have an expected value of $E[X] = 40{,}000\\text{ EUR}$ and a standard deviation of $\\operatorname{SD}(X) = 5{,}000\\text{ EUR}$ (variance $\\operatorname{Var}(X) = 25{,}000{,}000\\text{ EUR}^2$).\n\nFor consolidated corporate financial statements, the finance director converts euro expenses into US dollars ($Y$) using a fixed translation rate of $a = 1.10\\text{ USD per EUR}$ ($Y = 1.10 X$).\n\nCompute the expected expense in USD, calculate the standard deviation in USD, and analyze how scaling by $a$ alters the variance of the translated distribution.",
+  "parameters": {
+    "operation": "affine",
+    "a": 1.10,
+    "c": 0.0,
+    "mean_x": 40000.0,
+    "sd_x": 5000.0,
+    "var_x": 25000000.0,
+    "mean": 44000.0,
+    "sd": 5500.0,
+    "var": 30250000.0
+  },
+  "assumptions": [
+    "Translation factor a = 1.10 is a positive constant scalar",
+    "E[aX] = a * E[X]",
+    "SD(aX) = a * SD(X) and Var(aX) = a^2 * Var(X)"
+  ],
+  "concept_ids": [
+    "scale_expected_value_by_constant",
+    "scale_standard_deviation_linearly",
+    "scale_variance_quadratically"
+  ],
+  "setting_group": "corporate_financial_consolidation_fx",
+  "source_refs": [
+    "Course Module 2: Discrete Random Variables & Probability Distributions",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T23:22:00Z",
+    "notes": "Reviewed scalar transformation: E[1.10X] = 1.10 * 40k = $44,000. SD = 1.10 * 5k = $5,500. Var = 1.10^2 * 25M = 1.21 * 25M = 30,250,000 dollars^2. Contrasts linear SD scaling with quadratic variance scaling.",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "compute_usd_expected_expense",
+      "kind": "choice",
+      "prompt_markdown": "What is the expected monthly operating expense translated into US dollars, $E[Y]$?",
+      "options": [
+        {
+          "id": "e_usd_correct",
+          "text_markdown": "**$E[Y] = \\$44{,}000$**: $E[1.10 X] = 1.10 \\cdot E[X] = 1.10 \\times 40{,}000 = 44{,}000$.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "e_usd_divided",
+          "text_markdown": "**$E[Y] = \\$36{,}364$**: Calculated as $\\frac{40{,}000}{1.10}$.",
+          "misconception_id": "divided_by_exchange_rate_instead_of_multiplied",
+          "hint_markdown": "Since 1 EUR = 1.10 USD, expenses in dollars must be larger than in euros; multiply by 1.10."
+        },
+        {
+          "id": "e_usd_unaltered",
+          "text_markdown": "**$E[Y] = \\$40{,}000$**: Currency conversion does not change expected values.",
+          "misconception_id": "believed_expected_value_is_currency_invariant",
+          "hint_markdown": "Changing measurement units scales expectation by the conversion multiplier a."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "e_usd_correct"
+      },
+      "evidence_concept_ids": [
+        "scale_expected_value_by_constant"
+      ],
+      "explanation_markdown": "By linearity of expectation, multiplying a random variable by constant $a = 1.10$ scales the expected value by $a$:\n\n$$E[Y] = E[1.10 X] = 1.10 \\times E[X] = 1.10 \\times 40{,}000 = \\$44{,}000\\text{ USD}$$",
+      "numeric_policy": null
+    },
+    {
+      "id": "compute_usd_sd",
+      "kind": "choice",
+      "prompt_markdown": "What is the standard deviation of monthly operating expenses in US dollars, $\\operatorname{SD}(Y)$?",
+      "options": [
+        {
+          "id": "sd_usd_correct",
+          "text_markdown": "**$\\operatorname{SD}(Y) = \\$5{,}500$**: $\\operatorname{SD}(1.10 X) = 1.10 \\cdot \\operatorname{SD}(X) = 1.10 \\times 5{,}000 = 5{,}500$.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "sd_usd_squared_scale",
+          "text_markdown": "**$\\operatorname{SD}(Y) = \\$6{,}050$**: Calculated as $1.10^2 \\times 5{,}000 = 1.21 \\times 5{,}000 = 6{,}050$.",
+          "misconception_id": "multiplied_standard_deviation_by_a_squared",
+          "hint_markdown": "Standard deviation scales linearly by |a| = 1.10; it is variance that scales by a^2."
+        },
+        {
+          "id": "sd_usd_unscaled",
+          "text_markdown": "**$\\operatorname{SD}(Y) = \\$5{,}000$**: Volatility is a percentage metric that does not change across currencies.",
+          "misconception_id": "assumed_standard_deviation_is_unitless",
+          "hint_markdown": "Standard deviation is expressed in dollars and must scale by the exchange rate $1.10/EUR."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "sd_usd_correct"
+      },
+      "evidence_concept_ids": [
+        "scale_standard_deviation_linearly"
+      ],
+      "explanation_markdown": "The standard deviation of $aX$ scales linearly by $|a|$:\n\n$$\\operatorname{SD}(Y) = \\operatorname{SD}(1.10 X) = |1.10| \\times \\operatorname{SD}(X) = 1.10 \\times 5{,}000 = \\$5{,}500\\text{ USD}$$",
+      "numeric_policy": null
+    },
+    {
+      "id": "analyze_variance_scaling",
+      "kind": "choice",
+      "prompt_markdown": "What is the variance in US dollars $\\operatorname{Var}(Y)$, and by what factor did it increase relative to $\\operatorname{Var}(X)$?",
+      "options": [
+        {
+          "id": "var_scaling_correct",
+          "text_markdown": "**$\\operatorname{Var}(Y) = 30{,}250{,}000\\text{ dollars}^2$, scaling by $a^2 = 1.21\\times$**: Because variance measures squared deviations, multiplying $X$ by $1.10$ scales variance by $1.10^2 = 1.21$. Thus $1.21 \\times 25{,}000{,}000 = 30{,}250{,}000$.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "var_scaling_linear",
+          "text_markdown": "**$\\operatorname{Var}(Y) = 27{,}500{,}000\\text{ dollars}^2$, scaling by $a = 1.10\\times$**: Variance scales by the same factor of $1.10$ as the mean and standard deviation.",
+          "misconception_id": "assumed_variance_scales_linearly_with_a",
+          "hint_markdown": "Variance is expressed in squared units (USD^2) and therefore scales by a^2 = 1.10^2 = 1.21, not 1.10."
+        },
+        {
+          "id": "var_scaling_same_as_sd",
+          "text_markdown": "**$\\operatorname{Var}(Y) = 5{,}500\\text{ dollars}^2$**: Equal directly to the standard deviation.",
+          "misconception_id": "confused_variance_with_standard_deviation_value",
+          "hint_markdown": "Variance is the square of standard deviation: 5,500^2 = 30,250,000."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "var_scaling_correct"
+      },
+      "evidence_concept_ids": [
+        "scale_variance_quadratically"
+      ],
+      "explanation_markdown": "Because variance is computed from squared deviations, multiplying $X$ by $a$ pulls all squared terms apart by $a^2$:\n\n$$\\operatorname{Var}(Y) = \\operatorname{Var}(1.10 X) = 1.10^2 \\times \\operatorname{Var}(X) = 1.21 \\times 25{,}000{,}000 = 30{,}250{,}000\\text{ dollars}^2$$\n\nVerifying with standard deviation: $5{,}500^2 = 30{,}250{,}000$. Notice that while mean and standard deviation increased by $10\\%$, variance increased by $21\\%$ ($1.21\\times$).",
+      "numeric_policy": null
+    }
+  ]
+}

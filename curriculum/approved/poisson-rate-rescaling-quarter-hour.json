@@ -1,0 +1,141 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "poisson_rate_rescaling_quarter_hour",
+  "version": 1,
+  "status": "active",
+  "family_id": "poisson_pmf",
+  "rule_version": 1,
+  "module_id": "module_2",
+  "title": "Poisson rate parameter rescaling for quarter-hour queue",
+  "scenario_markdown": "An enterprise IT help desk receives incoming support calls according to a Poisson process at an average rate of $6.0\\text{ calls per hour}$. A dispatch manager wants to determine the probability of receiving at most $1$ call ($X \\le 1$) during an upcoming $15\\text{-minute}$ supervisor shift transition. Rescale the rate parameter $\\lambda$ to the $15\\text{-minute}$ interval and compute $P(X \\le 1)$.",
+  "parameters": {
+    "lambda": 1.5,
+    "k": 1
+  },
+  "assumptions": [
+    "Calls arrive according to a stationary Poisson process with rate lambda proportional to interval length",
+    "Arrivals in non-overlapping time intervals are statistically independent",
+    "The 15-minute observation window represents 15/60 = 0.25 hours, requiring lambda = 6.0 * 0.25 = 1.50 calls"
+  ],
+  "concept_ids": [
+    "poisson_rate_rescaling_proportionality",
+    "poisson_at_most_one_calculation",
+    "poisson_unscaled_rate_error_analysis"
+  ],
+  "setting_group": "it_helpdesk_call_arrivals_rescaling",
+  "source_refs": [
+    "Course Module 2: Discrete Random Variables & Probability Distributions",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T22:00:00Z",
+    "notes": "Reviewed derivation: lambda_hour = 6.0. 15 min = 0.25 hr -> lambda_15 = 1.50. P(X=0) = e^(-1.5) = 0.22313. P(X=1) = 1.5 * e^(-1.5) = 0.33470. P(X<=1) = 2.5 * e^(-1.5) = 0.55783 (55.78%). Unscaled lambda=6 gives 7*e^(-6) = 0.01735. Excel: =POISSON.DIST(1, 1.5, TRUE).",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "rate_rescaling",
+      "kind": "choice",
+      "prompt_markdown": "How must the rate parameter $\\lambda$ be adjusted to match the $15\\text{-minute}$ shift transition interval?",
+      "options": [
+        {
+          "id": "rate_rescaled_correct",
+          "text_markdown": "Multiply by the time fraction: $\\lambda = 6.0\\text{ calls/hour} \\times \\frac{15}{60}\\text{ hours} = 1.50\\text{ calls}$.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "rate_unscaled_six",
+          "text_markdown": "Keep $\\lambda = 6.0$ because the fundamental arrival intensity of the queue is constant.",
+          "misconception_id": "failed_to_scale_poisson_rate_with_interval_length",
+          "hint_markdown": "The Poisson parameter $\\lambda$ represents the expected count *in the specific interval of interest*; changing from 60 minutes to 15 minutes reduces expected arrivals by $4\\times$."
+        },
+        {
+          "id": "rate_multiplied_by_fifteen",
+          "text_markdown": "Multiply by minutes: $\\lambda = 6.0 \\times 15 = 90.0\\text{ calls}$.",
+          "misconception_id": "multiplied_by_minutes_without_unit_conversion",
+          "hint_markdown": "Because the original rate is per *hour*, you must express 15 minutes as $15/60 = 0.25$ hours."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "rate_rescaled_correct"
+      },
+      "evidence_concept_ids": [
+        "poisson_rate_rescaling_proportionality"
+      ],
+      "explanation_markdown": "A defining property of a Poisson process is that the mean arrival rate scales directly with the length of the time interval. Because the observation window is $15$ minutes out of a $60\\text{-minute}$ hour, the fraction of an hour is $t = \\frac{15}{60} = 0.25$. Therefore, the expected number of calls in $15$ minutes is $\\lambda = 6.0 \\times 0.25 = 1.50\\text{ calls}$.",
+      "numeric_policy": null
+    },
+    {
+      "id": "at_most_one_calculation",
+      "kind": "choice",
+      "prompt_markdown": "Calculate $P(X \\le 1) = P(X = 0) + P(X = 1)$ using the rescaled rate $\\lambda = 1.50$.",
+      "options": [
+        {
+          "id": "calc_correct",
+          "text_markdown": "$P(X \\le 1) = 0.5578$ ($55.78\\%$), calculated as $e^{-1.5} + 1.5 e^{-1.5} = 2.5 e^{-1.5}$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "calc_point_one_only",
+          "text_markdown": "$P(X \\le 1) = 0.3347$ ($33.47\\%$), the probability of exactly $1$ call ($P(X = 1)$)",
+          "misconception_id": "computed_exact_point_instead_of_at_most_one",
+          "hint_markdown": "'At most 1' includes both $0$ calls and $1$ call ($P(0) + P(1)$)."
+        },
+        {
+          "id": "calc_zero_calls_only",
+          "text_markdown": "$P(X \\le 1) = 0.2231$ ($22.31\\%$), the probability of zero calls ($P(X = 0)$)",
+          "misconception_id": "omitted_one_call_from_cumulative_sum",
+          "hint_markdown": "Do not omit $X = 1$; sum $P(0) + P(1) = 0.2231 + 0.3347 = 0.5578$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "calc_correct"
+      },
+      "evidence_concept_ids": [
+        "poisson_at_most_one_calculation"
+      ],
+      "explanation_markdown": "For $\\lambda = 1.50$:\n- $P(X = 0) = \\frac{e^{-1.5}(1.5)^0}{0!} = e^{-1.5} \\approx 0.223130$\n- $P(X = 1) = \\frac{e^{-1.5}(1.5)^1}{1!} = 1.5 e^{-1.5} \\approx 0.334695$\nSumming both outcomes yields $P(X \\le 1) = 0.223130 + 0.334695 = 0.557825 \\approx 0.5578$ ($55.78\\%$). In Excel: `=POISSON.DIST(1, 1.5, TRUE)`.",
+      "numeric_policy": null
+    },
+    {
+      "id": "unscaled_error_analysis",
+      "kind": "choice",
+      "prompt_markdown": "What mathematical error occurs if an analyst mistakenly inputs the unscaled hourly rate $\\lambda = 6.0$ into `=POISSON.DIST(1, 6.0, TRUE)`?",
+      "options": [
+        {
+          "id": "error_unscaled_correct",
+          "text_markdown": "It evaluates the probability of $\\le 1$ call over an entire $60\\text{-minute}$ hour ($7 e^{-6} \\approx 0.0174$), severely underestimating the $15\\text{-minute}$ probability by a factor of $32\\times$.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "error_unscaled_excel_fails",
+          "text_markdown": "Excel returns a `#NUM!` error because $\\lambda$ must be less than $5.0$.",
+          "misconception_id": "believed_excel_rejects_large_lambda",
+          "hint_markdown": "Excel computes POISSON.DIST for any valid positive lambda; it will not return an error, but it will compute the wrong probability."
+        },
+        {
+          "id": "error_unscaled_overestimates",
+          "text_markdown": "It overestimates the probability because $\\lambda = 6.0$ is larger than $1.5$.",
+          "misconception_id": "believed_larger_lambda_increases_probability_of_small_counts",
+          "hint_markdown": "A higher arrival rate shifts probability mass toward larger counts, making small counts ($0$ or $1$) far less likely."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "error_unscaled_correct"
+      },
+      "evidence_concept_ids": [
+        "poisson_unscaled_rate_error_analysis"
+      ],
+      "explanation_markdown": "Failing to rescale $\\lambda$ assumes the test interval is a full 60 minutes. With $\\lambda = 6.0$, receiving $\\le 1$ call has probability $(1 + 6)e^{-6} = 7(0.002479) \\approx 0.0174$ ($1.74\\%$). Because 6 calls/hour is a relatively heavy flow, receiving $\\le 1$ call in a full hour is rare ($1.7\\%$), whereas in a short 15-minute window it is common ($55.8\\%$). Rescaling to the exact interval is essential.",
+      "numeric_policy": null
+    }
+  ]
+}

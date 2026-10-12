@@ -1,0 +1,16 @@
+{
+  "template_id": "ci_interpretation_statement",
+  "status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T22:30:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "reviewed_rules": [1],
+  "checklist": {
+    "math_verified_by_engine": true,
+    "distractor_misconceptions_valid": true,
+    "hints_pedagogically_useful": true,
+    "excel_formulas_checked": true,
+    "no_latex_formatting_regressions": true
+  },
+  "notes": "Reviewed conceptual question on confidence interval interpretation. Evaluates the frequentist definition of confidence (long-run capture rate) and dispels the '95% probability mu is in this specific interval' and individual dispersion misconceptions."
+}

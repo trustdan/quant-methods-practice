@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "template_id": "reg_predict_from_excel_coefficients",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T22:30:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "regression_output",
+    "parameters": {
+      "n": 24,
+      "k": 1,
+      "ssr": 360.0,
+      "sse": 220.0,
+      "sst": 580.0,
+      "confidence_level": 0.95,
+      "intercept_name": "Intercept",
+      "b0": 20.0,
+      "se_b0": 4.0,
+      "x1_name": "Mileage",
+      "b1": 1.2,
+      "se_b1": 0.2
+    },
+    "canonical_probability": 0.0001,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 56.0,
+      "variance": 10.0,
+      "standard_deviation": 3.162
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "write_regression_equation", "kind": "choice", "evidence": "extract_regression_equation_from_table"},
+      {"id": "compute_point_prediction", "kind": "choice", "evidence": "calculate_point_prediction_from_equation"},
+      {"id": "interpret_slope_units", "kind": "choice", "evidence": "interpret_intercept_and_slope_in_units"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Reviewed derivation: Intercept b0 = 20.00, Slope b1 = 1.20. Model equation: y_hat = 20.0 + 1.20x. At x = 30.0, y_hat = 20.0 + 1.20(30.0) = 20.0 + 36.0 = 56.0 hundred dollars ($5,600). Slope interpretation: maintenance increases by $120 per 1,000 miles. Consistency: t1 = 1.2/0.2 = 6.0, F = 36.0 = t1^2. Excel: =20.0 + 1.2*30 or =FORECAST.LINEAR(30, ...)."
+}

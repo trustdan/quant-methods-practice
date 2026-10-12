@@ -1,0 +1,142 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "concept_parameter_vs_statistic",
+  "version": 1,
+  "status": "active",
+  "family_id": "concept_check",
+  "rule_version": 1,
+  "module_id": "module_1",
+  "title": "Distinguishing parameters from statistics in customer surveys",
+  "scenario_markdown": "A cloud software-as-a-service (SaaS) company has $N = 20{,}000$ active paid enterprise subscribers. To evaluate user satisfaction, the customer success team randomly selects and surveys $n = 500$ subscribers. Exactly $310$ of the surveyed users ($62.0\\%$) report being 'highly satisfied' with platform performance. Identify and distinguish the population, sample, parameter, and statistic in this scenario.",
+  "parameters": {
+    "topic": "statistical_foundations",
+    "concept": "parameters_versus_statistics",
+    "objective": "Identify and distinguish populations, samples, parameters, and statistics in business surveys"
+  },
+  "assumptions": [
+    "The target population consists of all 20,000 active paid enterprise subscribers",
+    "The sample of 500 subscribers was selected via simple random sampling",
+    "Standard statistical notation: N and p represent population entities; n and p_hat represent sample entities"
+  ],
+  "concept_ids": [
+    "identify_population_and_sample",
+    "identify_parameter_and_statistic",
+    "parameter_fixed_vs_statistic_random"
+  ],
+  "setting_group": "saas_customer_satisfaction_survey",
+  "source_refs": [
+    "Course Module 1: Descriptive Measures & Basic Probability",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T22:00:00Z",
+    "notes": "Reviewed conceptual alignment: Population = all 20,000 subscribers; Sample = 500 surveyed subscribers; Parameter = true unknown p; Statistic = observed p_hat = 0.62. Distinguishes fixed parameter constant vs random variable sample statistic.",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "population_and_sample",
+      "kind": "choice",
+      "prompt_markdown": "Which pairing correctly identifies the **population** and the **sample** in this study?",
+      "options": [
+        {
+          "id": "pop_sample_correct",
+          "text_markdown": "**Population**: All $20{,}000$ active enterprise subscribers.\n**Sample**: The $500$ subscribers randomly selected for the survey.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "pop_sample_swapped",
+          "text_markdown": "**Population**: The $500$ respondents.\n**Sample**: The $310$ satisfied respondents.",
+          "misconception_id": "swapped_population_and_sample_tiers",
+          "hint_markdown": "The population is the complete group about whom conclusions are sought ($20{,}000$), while the sample is the observed subset ($500$)."
+        },
+        {
+          "id": "pop_sample_internet_users",
+          "text_markdown": "**Population**: All global software users worldwide.\n**Sample**: All $20{,}000$ active company subscribers.",
+          "misconception_id": "extended_population_beyond_target_domain",
+          "hint_markdown": "The company is studying its own customer base of $20{,}000$ active subscribers, which forms the defined target population."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "pop_sample_correct"
+      },
+      "evidence_concept_ids": [
+        "identify_population_and_sample"
+      ],
+      "explanation_markdown": "The population comprises the entire collection of individuals or entities about which information is desired—here, all $N = 20{,}000$ active paid enterprise subscribers. The sample is the specific, observed subset selected from that population to provide sample data ($n = 500$).",
+      "numeric_policy": null
+    },
+    {
+      "id": "parameter_and_statistic",
+      "kind": "choice",
+      "prompt_markdown": "Which pairing correctly identifies the **parameter** and the **statistic** in this scenario?",
+      "options": [
+        {
+          "id": "param_stat_correct",
+          "text_markdown": "**Parameter**: The true proportion $p$ of all $20{,}000$ subscribers who are satisfied (unknown).\n**Statistic**: The sample proportion $\\hat{p} = 0.620$ ($62.0\\%$) computed from the $500$ surveyed users.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "param_stat_swapped",
+          "text_markdown": "**Parameter**: $62.0\\%$ ($310/500$).\n**Statistic**: The unknown overall satisfaction rate across the company.",
+          "misconception_id": "swapped_parameter_and_statistic_terms",
+          "hint_markdown": "A mnemonic to remember: **P**arameters describe **P**opulations; **S**tatistics describe **S**amples. $62\\%$ was computed from the sample, making it a statistic."
+        },
+        {
+          "id": "param_stat_counts",
+          "text_markdown": "**Parameter**: $n = 500$.\n**Statistic**: $N = 20{,}000$.",
+          "misconception_id": "confused_sample_sizes_with_parameters_and_statistics",
+          "hint_markdown": "$N$ and $n$ are sample/population sizes, not the summary measures of interest (satisfaction proportions)."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "param_stat_correct"
+      },
+      "evidence_concept_ids": [
+        "identify_parameter_and_statistic"
+      ],
+      "explanation_markdown": "A **parameter** is a numerical characteristic of the entire population (the true satisfaction proportion $p$), which is fixed but unobserved unless a complete census is conducted. A **statistic** is a numerical summary computed from sample observations—here, the sample proportion $\\hat{p} = \\frac{310}{500} = 0.620$.",
+      "numeric_policy": null
+    },
+    {
+      "id": "parameter_fixed_vs_statistic_random",
+      "kind": "choice",
+      "prompt_markdown": "In classical statistics, which fundamental mathematical distinction separates the population parameter $p$ from the sample statistic $\\hat{p}$?",
+      "options": [
+        {
+          "id": "distinction_correct",
+          "text_markdown": "The parameter $p$ is a fixed (non-random) constant, while the sample statistic $\\hat{p}$ is a random variable whose value varies across different samples.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "distinction_both_random",
+          "text_markdown": "Both $p$ and $\\hat{p}$ are random variables that follow standard normal distributions.",
+          "misconception_id": "believed_population_parameter_is_a_random_variable",
+          "hint_markdown": "In frequentist statistics, the true population parameter is fixed at a single constant value. Only sample statistics vary randomly due to sampling."
+        },
+        {
+          "id": "distinction_statistic_fixed",
+          "text_markdown": "The statistic $\\hat{p}$ is a fixed universal constant, whereas the parameter $p$ fluctuates from month to month.",
+          "misconception_id": "inverted_fixed_constant_and_random_variable",
+          "hint_markdown": "Once computed from a specific sample, $\\hat{p}$ is a known number, but conceptually it is a random variable because selecting another sample of 500 would yield a different number."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "distinction_correct"
+      },
+      "evidence_concept_ids": [
+        "parameter_fixed_vs_statistic_random"
+      ],
+      "explanation_markdown": "In classical frequentist statistics, the population parameter ($p$) is a fixed, unchanging constant representing the objective reality of the customer base at the time of the survey. The sample statistic ($\\hat{p}$), by contrast, is a random variable possessing a sampling distribution: if another independent random sample of $500$ customers were polled, $\\hat{p}$ would take a slightly different numerical value due to sampling variability.",
+      "numeric_policy": null
+    }
+  ]
+}

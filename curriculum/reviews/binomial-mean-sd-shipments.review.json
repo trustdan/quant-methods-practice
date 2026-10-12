@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "template_id": "binomial_mean_sd_shipments",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T22:30:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "binomial_pmf",
+    "parameters": {
+      "operation": "mean_sd",
+      "n": 200,
+      "p": 0.02,
+      "mean": 4.0,
+      "sd": 1.979898987322333,
+      "var": 3.92
+    },
+    "canonical_probability": 0.02,
+    "canonical_rational": "1/50",
+    "moments": {
+      "mean": 4.0,
+      "variance": 3.92,
+      "standard_deviation": 1.979898987322333
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "expected_value_calculation", "kind": "choice", "evidence": "binomial_expected_value_calculation"},
+      {"id": "standard_deviation_calculation", "kind": "choice", "evidence": "binomial_standard_deviation_calculation"},
+      {"id": "moments_interpretation", "kind": "choice", "evidence": "binomial_moments_operational_interpretation"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Verified mathematically: n = 200, p = 0.02. E[X] = 200 * 0.02 = 4.0. Var(X) = 200 * 0.02 * 0.98 = 3.92. SD(X) = sqrt(3.92) = 1.979899 approx 1.98. Distractor audit: 2.0 (omits 1-p), 3.92 (variance), 40 (decimal conversion error). Excel: =200*0.02, =SQRT(200*0.02*(1-0.02))."
+}

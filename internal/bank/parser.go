@@ -97,6 +97,9 @@ func ValidateTemplate(tmpl *domain.QuestionTemplate, reg *Registry) error {
 	if err := fam.ValidateParameters(tmpl.RuleVersion, tmpl.Parameters); err != nil {
 		return fmt.Errorf("parameter validation failed: %w", err)
 	}
+	if err := validateCalculations(tmpl); err != nil {
+		return fmt.Errorf("calculation validation failed: %w", err)
+	}
 
 	if tv, ok := fam.(TemplateValidator); ok {
 		if err := tv.ValidateTemplate(tmpl); err != nil {

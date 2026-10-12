@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "template_id": "regout_significance_f",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T22:30:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "regression_output",
+    "parameters": {
+      "n": 26,
+      "k": 1,
+      "ssr": 200.0,
+      "sse": 300.0,
+      "sst": 500.0,
+      "confidence_level": 0.95,
+      "intercept_name": "Intercept",
+      "b0": 10.0,
+      "se_b0": 2.0,
+      "x1_name": "DSCR",
+      "b1": 2.0,
+      "se_b1": 0.5
+    },
+    "canonical_probability": 0.0005,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 2.0,
+      "variance": 0.25,
+      "standard_deviation": 0.5
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "meaning_of_significance_f", "kind": "choice", "evidence": "define_significance_f_as_anova_p_value"},
+      {"id": "overall_significance_decision", "kind": "choice", "evidence": "evaluate_overall_model_significance_decision"},
+      {"id": "f_test_link_to_t_test", "kind": "choice", "evidence": "link_f_test_to_t_test_in_simple_regression"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Reviewed derivation: n = 26, k = 1, df_res = 24. ANOVA: SSR = 200, SSE = 300, SST = 500. MSR = 200, MSE = 12.50, F = 16.00. Significance F = F.DIST.RT(16, 1, 24) = 0.00052. Because 0.0005 <= 0.05, reject H0; model has significant explanatory power. In simple regression (k=1), t^2 = 4^2 = 16 = F, and Significance F equals the two-tailed slope p-value."
+}

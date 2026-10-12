@@ -1,0 +1,16 @@
+{
+  "template_id": "errors_which_is_worse",
+  "status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T22:30:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "reviewed_rules": [1],
+  "checklist": {
+    "math_verified_by_engine": true,
+    "distractor_misconceptions_valid": true,
+    "hints_pedagogically_useful": true,
+    "excel_formulas_checked": true,
+    "no_latex_formatting_regressions": true
+  },
+  "notes": "Reviewed conceptual question on the cost asymmetry between Type I and Type II errors. Contrasts food pathogen detection with marketing ad testing to show how the severity of Type II error drives sample size and power requirements."
+}

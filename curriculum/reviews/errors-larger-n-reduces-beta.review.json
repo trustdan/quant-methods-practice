@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "template_id": "errors_larger_n_reduces_beta",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T22:30:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "concept_check",
+    "parameters": {
+      "topic": "hypothesis_testing_errors",
+      "concept": "sample_size_reduces_beta_and_increases_power",
+      "objective": "Explain how increasing sample size reduces Type II error probability beta and increases test power while holding alpha constant"
+    },
+    "canonical_probability": 0.05,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 500.0,
+      "variance": 0.0,
+      "standard_deviation": 0.0
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "effect_of_increasing_n", "kind": "choice", "evidence": "increasing_n_reduces_beta_at_fixed_alpha"},
+      {"id": "sampling_distribution_mechanism", "kind": "choice", "evidence": "sampling_distribution_narrowing_mechanism"},
+      {"id": "breaking_tradeoff", "kind": "choice", "evidence": "breaking_the_alpha_beta_tradeoff_via_sample_size"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Reviewed conceptual alignment: At fixed alpha = 0.05, increasing n from 25 to 100 shrinks SE by half, separating the null and alternative sampling distributions. This drives beta down from 0.28 to < 0.05 and boosts power (1 - beta) from 0.72 to > 0.95. Proves that increasing sample size is the only way to reduce beta without inflating alpha."
+}

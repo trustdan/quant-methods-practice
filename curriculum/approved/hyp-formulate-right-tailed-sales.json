@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "hyp_formulate_right_tailed_sales",
+  "version": 1,
+  "status": "active",
+  "family_id": "concept_check",
+  "rule_version": 1,
+  "module_id": "module_5",
+  "title": "Formulating a right-tailed hypothesis test for promotional sales lift",
+  "scenario_markdown": "A nationwide retail supermarket chain tests an interactive digital promotional display in its gourmet coffee aisle. Historically, stores using standard shelf placement have averaged $\\mu = 50\\text{ bags}$ of coffee sold per day. The merchandising VP claims that installing the digital display significantly increases average daily sales and should be rolled out chain-wide.",
+  "parameters": {
+    "topic": "hypothesis_testing_formulation",
+    "concept": "right_tailed_promotional_lift",
+    "objective": "Formulate directional right-tailed null and alternative hypotheses for sales increase"
+  },
+  "assumptions": [
+    "The population parameter of interest is the long-term true mean daily unit sales mu under the digital display condition",
+    "Historical baseline without the display is established at 50 bags per day"
+  ],
+  "concept_ids": [
+    "hyp_formulating_null_and_alternative",
+    "hyp_directional_right_tailed_test"
+  ],
+  "setting_group": "retail_merchandising_promotional_display",
+  "source_refs": [
+    "Course Module 5: Hypothesis Testing",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T22:30:00Z",
+    "notes": "Reviewed hypothesis formulation for directional claim: H0: mu <= 50 (or mu = 50) vs H1: mu > 50. Addresses common errors: swapping null and alternative, stating hypotheses about the sample statistic x_bar, and using a two-tailed formulation for a one-directional claim.",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "formulate_hypotheses",
+      "kind": "choice",
+      "prompt_markdown": "Which pair of null ($H_0$) and alternative ($H_1$) hypotheses correctly states the test of the VP's claim that the digital display increases average daily sales?",
+      "options": [
+        {
+          "id": "hyp_correct",
+          "text_markdown": "$H_0: \\mu \\le 50\\text{ bags}$ vs $H_1: \\mu > 50\\text{ bags}$ (or $H_0: \\mu = 50$ vs $H_1: \\mu > 50$)",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "hyp_swapped",
+          "text_markdown": "$H_0: \\mu > 50\\text{ bags}$ vs $H_1: \\mu \\le 50\\text{ bags}$",
+          "misconception_id": "swapped_null_and_alternative_hypotheses",
+          "hint_markdown": "The alternative hypothesis $H_1$ always carries the research claim of an effect or increase. The null hypothesis $H_0$ maintains the status quo."
+        },
+        {
+          "id": "hyp_sample_stats",
+          "text_markdown": "$H_0: \\bar{x} = 50\\text{ bags}$ vs $H_1: \\bar{x} > 50\\text{ bags}$",
+          "misconception_id": "hypotheses_stated_in_terms_of_sample_statistic",
+          "hint_markdown": "Hypotheses are always statements about unknown population parameters (such as $\\mu$), never about sample statistics (such as $\\bar{x}$) which are known directly from the data."
+        },
+        {
+          "id": "hyp_two_tailed",
+          "text_markdown": "$H_0: \\mu = 50\\text{ bags}$ vs $H_1: \\mu \\ne 50\\text{ bags}$",
+          "misconception_id": "used_two_tailed_for_directional_claim",
+          "hint_markdown": "The VP's claim is explicitly directional (\"increases sales\"), which requires a one-tailed (right-tailed) alternative $\\mu > 50$, not a two-tailed test."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "hyp_correct"
+      },
+      "explanation_markdown": "The claim being tested is that the display produces an increase in average daily sales above the historical baseline of $50$. In hypothesis testing, the claim to be demonstrated with empirical evidence is placed in the alternative hypothesis: $H_1: \\mu > 50$. The null hypothesis represents the status quo of no increase: $H_0: \\mu \\le 50$ (often written simply as $H_0: \\mu = 50$).",
+      "evidence_concept_ids": [
+        "hyp_formulating_null_and_alternative"
+      ]
+    },
+    {
+      "id": "rejection_region_direction",
+      "kind": "choice",
+      "prompt_markdown": "In which direction does the rejection region lie, and what sample evidence would lead to rejecting $H_0$?",
+      "options": [
+        {
+          "id": "rej_right_tail_correct",
+          "text_markdown": "Right tail: $H_0$ will be rejected only if the sample mean $\\bar{x}$ is substantially greater than $50$, producing a sufficiently large positive test statistic ($Z$ or $t$).",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "rej_left_tail",
+          "text_markdown": "Left tail: $H_0$ will be rejected only if the sample mean $\\bar{x}$ is substantially lower than $50$.",
+          "misconception_id": "inverted_tail_direction_in_hypothesis_test",
+          "hint_markdown": "Because $H_1: \\mu > 50$, evidence in favor of the alternative lies exclusively in the upper (right) tail of the sampling distribution."
+        },
+        {
+          "id": "rej_both_tails",
+          "text_markdown": "Both tails: $H_0$ will be rejected if the sample mean is either much larger or much smaller than $50$.",
+          "misconception_id": "split_alpha_into_both_tails_for_directional_test",
+          "hint_markdown": "A right-tailed test places the entire significance level $\\alpha$ in the upper tail; an unusually low sample mean provides no evidence of a sales increase."
+        },
+        {
+          "id": "rej_any_difference",
+          "text_markdown": "$H_0$ is rejected whenever $\\bar{x} > 50$, regardless of the magnitude of the difference or sample size.",
+          "misconception_id": "confusing_sample_difference_with_statistical_significance",
+          "hint_markdown": "A sample mean slightly above $50$ (such as $50.2$) may easily occur due to random sampling variability; rejection requires exceeding the critical value threshold."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "rej_right_tail_correct"
+      },
+      "explanation_markdown": "The inequality in $H_1: \\mu > 50$ points to the right. Consequently, all critical area $\\alpha$ is placed in the upper (right) tail. Only sample means sufficiently higher than $50$ that yield a test statistic beyond the critical value (or a $p$-value $< \\alpha$) justify rejecting $H_0$ and endorsing the marketing rollout.",
+      "evidence_concept_ids": [
+        "hyp_directional_right_tailed_test"
+      ]
+    }
+  ]
+}

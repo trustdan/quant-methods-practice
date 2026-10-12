@@ -1,0 +1,142 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "regprob_multicollinearity",
+  "version": 1,
+  "status": "active",
+  "family_id": "concept_check",
+  "rule_version": 1,
+  "module_id": "module_6",
+  "title": "Diagnosing multicollinearity in multiple regression",
+  "scenario_markdown": "A corporate marketing team estimates product sales using four digital advertising channels: Social Media Ads ($X_1$), Paid Search Ads ($X_2$), Video Streaming Ads ($X_3$), and Influencer Promotions ($X_4$). The fitted multiple regression model achieves an outstanding coefficient of determination $R^2 = 0.88$ and a highly significant overall model $F$-test ($p < 0.0001$). However, upon inspecting the coefficients table, analysts find that none of the four individual predictor $t$-statistics are statistically significant at $\\alpha = 0.05$ (all individual $p$-values exceed $0.20$).",
+  "parameters": {
+    "topic": "regression_diagnostics",
+    "concept": "multicollinearity_symptoms_and_remedies",
+    "objective": "Diagnose multicollinearity from high overall fit and insignificant individual slopes"
+  },
+  "assumptions": [
+    "Sample data was collected across market territories with concurrent multichannel campaigns",
+    "Multiple regression equation exhibits strong overall explanatory power (high R-squared and significant F-statistic)",
+    "Severe linear correlation exists among explanatory variables"
+  ],
+  "concept_ids": [
+    "multicollinearity_symptom_identification",
+    "multicollinearity_mechanics_inflated_se",
+    "multicollinearity_detection_remedies"
+  ],
+  "setting_group": "marketing_multichannel_advertising_diagnostics",
+  "source_refs": [
+    "Course Module 6: Regression Analysis",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T22:00:00Z",
+    "notes": "Reviewed conceptual alignment: Classic multicollinearity signature (high R^2, significant F, but insignificant individual t-tests). Stage 2 explains inflated SE mechanism; Stage 3 covers VIF thresholds and remediation.",
+    "delegation_basis": "Stage 20 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "diagnose_symptom",
+      "kind": "choice",
+      "prompt_markdown": "Which regression violation or modeling issue is directly signaled by this combination of a high $R^2$, significant overall $F$-test, and non-significant individual $t$-tests?",
+      "options": [
+        {
+          "id": "diag_multicollinearity_correct",
+          "text_markdown": "Severe multicollinearity (high mutual correlation among predictor variables).",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "diag_heteroscedasticity",
+          "text_markdown": "Heteroscedasticity (non-constant variance of error terms across levels of $X$).",
+          "misconception_id": "confused_multicollinearity_with_heteroscedasticity",
+          "hint_markdown": "Heteroscedasticity concerns the spread of residual errors, not correlation among explanatory predictors."
+        },
+        {
+          "id": "diag_underfitting",
+          "text_markdown": "Model underfitting (too few predictors included in the model).",
+          "misconception_id": "confused_redundancy_with_underfitting",
+          "hint_markdown": "An $R^2$ of $0.88$ indicates strong explanatory power; the problem is redundant overlapping information, not missing predictors."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "diag_multicollinearity_correct"
+      },
+      "evidence_concept_ids": [
+        "multicollinearity_symptom_identification"
+      ],
+      "explanation_markdown": "The classic textbook hallmark of severe multicollinearity is a multiple regression model where the overall model is highly significant ($R^2 = 0.88$, $F\\text{-statistic } p < 0.0001$), yet individual predictors have large $p$-values and insignificant $t$-tests. The predictors are so strongly correlated with one another that the model easily predicts $Y$ collectively, but cannot isolate which specific channel is driving the effect.",
+      "numeric_policy": null
+    },
+    {
+      "id": "underlying_mechanics",
+      "kind": "choice",
+      "prompt_markdown": "What mathematical mechanism causes individual $t$-tests to become non-significant in the presence of strong multicollinearity?",
+      "options": [
+        {
+          "id": "mech_inflated_se_correct",
+          "text_markdown": "High correlation among predictors inflates the standard errors of the slope coefficients ($s_{b_j}$), driving the $t$-statistics ($b_j / s_{b_j}$) toward zero.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "mech_biases_coefficients_zero",
+          "text_markdown": "Multicollinearity mathematically forces the OLS slope estimates $b_j$ to equal zero.",
+          "misconception_id": "believed_multicollinearity_biases_point_estimates",
+          "hint_markdown": "OLS estimators remain unbiased in the presence of multicollinearity, but their sampling variances and standard errors become extremely large."
+        },
+        {
+          "id": "mech_reduces_df",
+          "text_markdown": "Multicollinearity reduces the residual degrees of freedom to zero.",
+          "misconception_id": "confused_collinearity_with_loss_of_degrees_of_freedom",
+          "hint_markdown": "Degrees of freedom are $n - k - 1$; collinearity does not change the mathematical count of degrees of freedom unless two variables are perfectly identical."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "mech_inflated_se_correct"
+      },
+      "evidence_concept_ids": [
+        "multicollinearity_mechanics_inflated_se"
+      ],
+      "explanation_markdown": "When predictors share substantial linear overlap, it becomes difficult for the OLS algorithm to disentangle their individual effects holding the others constant. This instability inflates the variance and standard error $s_{b_j}$ of each estimated coefficient (variance inflation). Because $t = b_j / s_{b_j}$, the inflated denominator dramatically depresses $t$-values and increases $p$-values, obscuring true underlying relationships.",
+      "numeric_policy": null
+    },
+    {
+      "id": "remedies_and_detection",
+      "kind": "choice",
+      "prompt_markdown": "How should analysts verify multicollinearity, and what is a recommended practical remedy?",
+      "options": [
+        {
+          "id": "remedy_vif_drop_var_correct",
+          "text_markdown": "Examine Variance Inflation Factors (VIF > 5 or 10); remedy by dropping redundant correlated channels or creating an aggregate composite index.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "remedy_square_y",
+          "text_markdown": "Square the dependent variable $Y$ to linearize the error terms.",
+          "misconception_id": "applied_variable_transformation_for_collinearity",
+          "hint_markdown": "Transforming Y addresses non-linearity or non-constant variance, not correlation among X predictors."
+        },
+        {
+          "id": "remedy_add_more_collinear",
+          "text_markdown": "Add two additional digital advertising channels to average out the correlation.",
+          "misconception_id": "believed_adding_more_predictors_solves_collinearity",
+          "hint_markdown": "Adding more correlated predictors worsens multicollinearity, increasing standard errors even further."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "remedy_vif_drop_var_correct"
+      },
+      "evidence_concept_ids": [
+        "multicollinearity_detection_remedies"
+      ],
+      "explanation_markdown": "Multicollinearity is diagnosed by inspecting pairwise correlation matrices and computing Variance Inflation Factors (VIF), where $\\text{VIF} > 5$ (or $> 10$) signals severe inflation. Practical remedies include dropping one or more redundant variables, combining highly correlated channels into an aggregate index (e.g. Total Digital Ad Spend), or collecting additional data across markets where spending across channels was varied independently.",
+      "numeric_policy": null
+    }
+  ]
+}

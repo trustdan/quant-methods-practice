@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "template_id": "hyp_alpha_changes_decision",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T22:30:00Z",
+  "delegation_basis": "Stage 20 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "concept_check",
+    "parameters": {
+      "topic": "hypothesis_testing_decisions",
+      "concept": "significance_level_alpha_threshold_and_p_value_comparison",
+      "objective": "Compare hypothesis test decisions across different alpha levels for a borderline p-value, and explain why alpha must be set prior to data collection"
+    },
+    "canonical_probability": 0.032,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 0.0,
+      "variance": 1.0,
+      "standard_deviation": 1.0
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "decision_at_alpha_005", "kind": "choice", "evidence": "evaluate_decision_at_alpha_005"},
+      {"id": "decision_at_alpha_001", "kind": "choice", "evidence": "evaluate_decision_at_alpha_001"},
+      {"id": "a_priori_specification", "kind": "choice", "evidence": "importance_of_a_priori_alpha_specification"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Reviewed conceptual alignment: Sample yields p = 0.032. At alpha = 0.05, p <= alpha => reject H0 (statistically significant). At alpha = 0.01, p > alpha => fail to reject H0 (not statistically significant). Explains why alpha must be specified prior to testing to prevent post-hoc significance shopping (p-hacking)."
+}
