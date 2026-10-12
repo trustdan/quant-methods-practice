@@ -31,12 +31,12 @@ Experience the full capabilities of **Quant Methods Practice** in this 720p 60&n
 
 <div align="center">
 
-<video src="recordings/quant_methods_demo_tour.mp4" width="100%" controls="controls" muted="muted" playsinline style="border-radius: 8px; border: 1px solid #30363d; box-shadow: 0 8px 24px rgba(0,0,0,0.25);">
-  <a href="recordings/quant_methods_demo_tour.mp4">▶️ Click here to watch or download the recording (quant_methods_demo_tour.mp4)</a>
+<video src="https://github.com/user-attachments/assets/75d48397-11a8-4c0a-9f0f-ccaf5236716c" width="100%" controls="controls" muted="muted" playsinline style="border-radius: 8px; border: 1px solid #30363d; box-shadow: 0 8px 24px rgba(0,0,0,0.25);">
+  <a href="https://github.com/user-attachments/assets/75d48397-11a8-4c0a-9f0f-ccaf5236716c">▶️ Click here to watch or download the recording (quant_methods_demo_tour.mp4)</a>
 </video>
 
 <p align="center">
-  <sub><strong>Walkthrough Recording:</strong> <code>recordings/quant_methods_demo_tour.mp4</code> (1280×720 @ 60 FPS, 11.9 MB)</sub>
+  <sub><strong>Walkthrough Recording:</strong> <a href="https://github.com/user-attachments/assets/75d48397-11a8-4c0a-9f0f-ccaf5236716c"><code>quant_methods_demo_tour.mp4</code></a> (1280×720 @ 60 FPS, 6.7 MB)</sub>
 </p>
 
 </div>
