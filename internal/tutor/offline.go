@@ -153,9 +153,22 @@ func (t *OfflineTutor) generateContent(req TutorRequest) string {
 		return t.generateExplanation(req)
 	case ActionFollowUp:
 		return t.generateFollowUp(req)
+	case ActionChat:
+		return t.generateChat(req)
 	default:
 		return t.generateExplanation(req)
 	}
+}
+
+func (t *OfflineTutor) generateChat(req TutorRequest) string {
+	if !req.StageResolved {
+		prompt := req.CustomPrompt
+		if prompt == "" {
+			prompt = "How should I approach this step?"
+		}
+		return fmt.Sprintf("### Socratic Guidance (Offline)\n\nRegarding: *%s*\n\nTo reason through this stage:\n1. **Identify the Given Quantities**: Note the parameters and units provided in the scenario.\n2. **Check Model Assumptions**: Are observations independent? Is the trial count fixed?\n3. **Intermediate Steps**: Calculate any required combinations or standard errors before computing the final probability or test statistic.\n\nTry testing your intermediate calculation in the answer input!", prompt)
+	}
+	return t.generateExplanation(req)
 }
 
 func (t *OfflineTutor) generateHint(req TutorRequest) string {

@@ -1,13 +1,21 @@
 import React from 'react';
 import { DrillRecap } from '../../types/practice';
 import { MathMarkdown } from '../../components/MathMarkdown';
+import { WorkedSoftwareCallBox } from '../reference/WorkedSoftwareCallBox';
 
 interface DrillRecapViewProps {
   recap: DrillRecap;
+  templateId?: string;
+  parameters?: Record<string, unknown>;
   onRestart: () => void;
 }
 
-export const DrillRecapView: React.FC<DrillRecapViewProps> = ({ recap, onRestart }) => {
+export const DrillRecapView: React.FC<DrillRecapViewProps> = ({
+  recap,
+  templateId,
+  parameters,
+  onRestart,
+}) => {
   const deriv = recap.canonical_derivation;
 
   return (
@@ -92,6 +100,23 @@ export const DrillRecapView: React.FC<DrillRecapViewProps> = ({ recap, onRestart
           </div>
         </div>
       )}
+
+      {/* Worked Software Verification Card */}
+      <div className="card">
+        <div className="card-header">
+          <h3 className="card-title">Worked Software Verification (Excel &amp; R)</h3>
+          <span className="badge badge-emerald">Software Reproduction</span>
+        </div>
+        <p style={{ margin: '0 0 0.5rem 0', fontSize: '0.88rem', color: 'var(--text-muted)' }}>
+          Exact numerical function call producing the canonical mathematical answer in Microsoft Excel and R / RStudio:
+        </p>
+        <WorkedSoftwareCallBox
+          lookup={{ template_id: templateId, title: recap.title }}
+          parameters={parameters ?? (deriv ? { n: deriv.n, p: deriv.p, k: deriv.k } : undefined)}
+          expectedAnswer={deriv?.canonical_probability}
+          allowSideBySide={true}
+        />
+      </div>
 
       {/* Seven Stages Detailed Review Cards */}
       <div className="card">

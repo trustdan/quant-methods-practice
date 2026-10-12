@@ -42,6 +42,7 @@ type Config struct {
 	WorksheetStore    WorksheetStore
 	ExamStore         ExamStore
 	ArcadeStore       ArcadeStore
+	TutorThreadStore  TutorThreadStore
 }
 
 type Server struct {
@@ -54,6 +55,7 @@ type Server struct {
 	bank              *bank.Bank
 	sessionManager    *drill.SessionManager
 	noteStore         NoteStore
+	tutorThreadStore  TutorThreadStore
 	tutorManager      *tutor.TutorManager
 	vault             auth.Vault
 	providerManager   *providers.ProviderManager
@@ -127,7 +129,7 @@ func NewServer(cfg Config) (*Server, error) {
 	}
 
 	// Register external providers in tutorManager
-	for _, route := range []string{auth.RouteAnthropic, auth.RouteGemini, auth.RouteOpenAI, auth.RouteChatGPT} {
+	for _, route := range []string{auth.RouteLocal, auth.RouteAnthropic, auth.RouteGemini, auth.RouteOpenAI, auth.RouteChatGPT} {
 		if svc, err := providerManager.GetProvider(route); err == nil && svc != nil {
 			tutorManager.RegisterProvider(svc)
 		}
@@ -142,6 +144,11 @@ func NewServer(cfg Config) (*Server, error) {
 		tutorManager:    tutorManager,
 		vault:           vault,
 		providerManager: providerManager,
+	}
+
+	s.tutorThreadStore = cfg.TutorThreadStore
+	if s.tutorThreadStore == nil && cfg.Store != nil {
+		s.tutorThreadStore, _ = cfg.Store.(TutorThreadStore)
 	}
 
 	s.candidateStore = cfg.CandidateStore
@@ -206,6 +213,8 @@ func NewServer(cfg Config) (*Server, error) {
 	mux.HandleFunc("/api/practice/sessions/", s.handlePracticeSessionByID)
 	mux.HandleFunc("/api/tutor/requests", s.handleTutorRequests)
 	mux.HandleFunc("/api/tutor/requests/", s.handleTutorRequestByID)
+	mux.HandleFunc("/api/tutor/threads", s.handleTutorThreads)
+	mux.HandleFunc("/api/tutor/threads/", s.handleTutorThreads)
 	mux.HandleFunc("/api/candidates", s.handleCandidates)
 	mux.HandleFunc("/api/candidates/", s.handleCandidates)
 	mux.HandleFunc("/api/worksheets", s.handleWorksheets)

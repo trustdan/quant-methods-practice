@@ -62,4 +62,18 @@ describe('Worksheets recovery', () => {
     await waitFor(() => expect(screen.getByRole('button', { name: 'Create worksheet' })).toBeEnabled());
     expect(screen.queryByRole('heading', { name: 'Stale completion' })).toBeNull();
   });
+
+  it('renders software tool drawer inside saved worksheet questions', async () => {
+    const validRecord: Worksheet = {
+      ...record,
+      questions: [{ ...record.questions[0], template_id: 'binomial_fair_coin_exactly_two', title: 'Exactly two heads in four tosses' }],
+    };
+    vi.stubGlobal('fetch', vi.fn((url: string) => {
+      return Promise.resolve(response(url === '/api/bank' ? [{ id: 'binomial_fair_coin_exactly_two', title: 'Exactly two heads in four tosses' }] : [validRecord]));
+    }));
+    render(<Worksheets active launchMode="full_solution" />);
+    const trigger = await screen.findByRole('button', { name: /Software Syntax Guide/i });
+    expect(trigger).toBeInTheDocument();
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+  });
 });

@@ -46,7 +46,7 @@ for TARGET in "${TARGETS[@]}"; do
 
     echo "  --> Compiling $GOOS/$GOARCH..."
     CGO_ENABLED=0 GOOS="$GOOS" GOARCH="$GOARCH" go build \
-        -ldflags="-s -w" \
+        -ldflags="-s -w -X main.version=${VERSION}" \
         -o "$PKG_DIR/$BIN_NAME" \
         ./cmd/quant-practice
 

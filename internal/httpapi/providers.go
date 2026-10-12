@@ -136,6 +136,50 @@ func (s *Server) handleProviders(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// /api/providers/local/endpoint
+	if route == auth.RouteLocal && len(parts) >= 2 && parts[1] == "endpoint" {
+		if r.Method == http.MethodGet {
+			w.Header().Set("Content-Type", "application/json")
+			_ = json.NewEncoder(w).Encode(map[string]string{
+				"endpoint": s.providerManager.GetLocalEndpoint(),
+			})
+			return
+		}
+		if r.Method == http.MethodPost {
+			var dto struct {
+				Endpoint string `json:"endpoint"`
+			}
+			if err := json.NewDecoder(r.Body).Decode(&dto); err != nil {
+				http.Error(w, "invalid request body", http.StatusBadRequest)
+				return
+			}
+			if err := s.providerManager.SetLocalEndpoint(dto.Endpoint); err != nil {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+			// Save in settings if store available
+			if s.config.Store != nil {
+				ctx := r.Context()
+				prefMap := make(map[string]any)
+				if raw, err := s.config.Store.GetSettings(ctx, "user_preferences"); err == nil && raw != "" {
+					_ = json.Unmarshal([]byte(raw), &prefMap)
+				}
+				prefMap["local_llm_endpoint"] = s.providerManager.GetLocalEndpoint()
+				if prefBytes, err := json.Marshal(prefMap); err == nil {
+					_ = s.config.Store.SaveSettings(ctx, "user_preferences", string(prefBytes))
+				}
+			}
+			w.Header().Set("Content-Type", "application/json")
+			_ = json.NewEncoder(w).Encode(map[string]string{
+				"status":   "ok",
+				"endpoint": s.providerManager.GetLocalEndpoint(),
+			})
+			return
+		}
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
 	// /api/providers/{route}/credentials
 	if len(parts) >= 2 && parts[1] == "credentials" {
 		if r.Method != http.MethodPost {

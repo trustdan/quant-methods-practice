@@ -44,7 +44,7 @@ func TestProvidersEndpoints(t *testing.T) {
 		t.Fatalf("failed to decode response: %v", err)
 	}
 
-	if listResp.ActiveRoute != auth.RouteOffline || len(listResp.Providers) != 5 {
+	if listResp.ActiveRoute != auth.RouteOffline || len(listResp.Providers) != 6 {
 		t.Fatalf("unexpected providers list response: %+v", listResp)
 	}
 
@@ -145,5 +145,48 @@ func TestProvidersEndpoints(t *testing.T) {
 	}
 	if bSt.MaxRequestsPerSession != 20 {
 		t.Fatalf("expected 20 max requests, got %d", bSt.MaxRequestsPerSession)
+	}
+
+	// 7. GET /api/providers/local/endpoint
+	req = httptest.NewRequest(http.MethodGet, "/api/providers/local/endpoint", nil)
+	req.Host = "127.0.0.1"
+	rec = httptest.NewRecorder()
+	handler.ServeHTTP(rec, req)
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200 getting local endpoint, got %d", rec.Code)
+	}
+	var epResp map[string]string
+	if err := json.NewDecoder(rec.Body).Decode(&epResp); err != nil {
+		t.Fatalf("failed to decode endpoint response: %v", err)
+	}
+	if epResp["endpoint"] != "http://localhost:1234" {
+		t.Fatalf("expected default endpoint http://localhost:1234, got %s", epResp["endpoint"])
+	}
+
+	// 8. POST /api/providers/local/endpoint with Ollama port
+	ollamaBody, _ := json.Marshal(map[string]string{"endpoint": "http://localhost:11434"})
+	req = httptest.NewRequest(http.MethodPost, "/api/providers/local/endpoint", bytes.NewReader(ollamaBody))
+	req.Host = "127.0.0.1"
+	req.Header.Set("Origin", "http://127.0.0.1")
+	req.Header.Set("Content-Type", "application/json")
+	rec = httptest.NewRecorder()
+	handler.ServeHTTP(rec, req)
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200 setting local endpoint, got %d", rec.Code)
+	}
+	if pm.GetLocalEndpoint() != "http://localhost:11434" {
+		t.Fatalf("expected endpoint updated to http://localhost:11434, got %s", pm.GetLocalEndpoint())
+	}
+
+	// 9. POST /api/providers/local/endpoint with non-loopback external address must FAIL
+	externalBody, _ := json.Marshal(map[string]string{"endpoint": "http://api.external.com:1234"})
+	req = httptest.NewRequest(http.MethodPost, "/api/providers/local/endpoint", bytes.NewReader(externalBody))
+	req.Host = "127.0.0.1"
+	req.Header.Set("Origin", "http://127.0.0.1")
+	req.Header.Set("Content-Type", "application/json")
+	rec = httptest.NewRecorder()
+	handler.ServeHTTP(rec, req)
+	if rec.Code != http.StatusBadRequest {
+		t.Fatalf("expected 400 rejecting non-loopback endpoint, got %d", rec.Code)
 	}
 }

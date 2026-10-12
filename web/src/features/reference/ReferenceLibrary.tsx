@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { MathMarkdown } from '../../components/MathMarkdown';
+import { SoftwareCheatsheetCatalog } from './SoftwareCheatsheetCatalog';
 
 export interface ReferenceEntry {
   id: string;
@@ -332,6 +333,7 @@ interface ReferenceLibraryProps {
 }
 
 export const ReferenceLibrary: React.FC<ReferenceLibraryProps> = ({ onClose }) => {
+  const [activeSection, setActiveSection] = useState<'concepts' | 'software'>('concepts');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -359,7 +361,7 @@ export const ReferenceLibrary: React.FC<ReferenceLibraryProps> = ({ onClose }) =
         <div>
           <h2 style={{ fontSize: '1.4rem', fontWeight: 700, margin: 0 }}>Reference Library</h2>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: '0.2rem 0 0 0' }}>
-            Authoritative course definitions, axioms, distributions, and moment properties. 100% offline.
+            Authoritative course definitions, axioms, distributions, and software cheatsheets. 100% offline.
           </p>
         </div>
         {onClose && (
@@ -369,7 +371,59 @@ export const ReferenceLibrary: React.FC<ReferenceLibraryProps> = ({ onClose }) =
         )}
       </div>
 
-      {/* Search and Category Filters */}
+      {/* Top-Level Section Tab Switcher */}
+      <div
+        role="tablist"
+        aria-label="Reference Library Sections"
+        style={{
+          display: 'flex',
+          gap: '0.5rem',
+          borderBottom: '1px solid var(--border-subtle)',
+          paddingBottom: '0.5rem',
+        }}
+      >
+        <button
+          type="button"
+          role="tab"
+          id="tab-ref-concepts"
+          aria-selected={activeSection === 'concepts'}
+          aria-controls="panel-ref-concepts"
+          className={`btn ${activeSection === 'concepts' ? 'btn-primary' : 'btn-outline'}`}
+          onClick={() => setActiveSection('concepts')}
+          style={{ fontSize: '0.9rem', padding: '0.45rem 0.9rem' }}
+        >
+          📖 Mathematical Concepts &amp; Formulas
+        </button>
+        <button
+          type="button"
+          role="tab"
+          id="tab-ref-software"
+          aria-selected={activeSection === 'software'}
+          aria-controls="panel-ref-software"
+          className={`btn ${activeSection === 'software' ? 'btn-primary' : 'btn-outline'}`}
+          onClick={() => setActiveSection('software')}
+          style={{ fontSize: '0.9rem', padding: '0.45rem 0.9rem' }}
+        >
+          💻 Software Cheatsheet (Excel &amp; R)
+        </button>
+      </div>
+
+      {/* Software Cheatsheet View */}
+      {activeSection === 'software' && (
+        <div role="tabpanel" id="panel-ref-software" aria-labelledby="tab-ref-software">
+          <SoftwareCheatsheetCatalog />
+        </div>
+      )}
+
+      {/* Mathematical Concepts View */}
+      {activeSection === 'concepts' && (
+        <div
+          role="tabpanel"
+          id="panel-ref-concepts"
+          aria-labelledby="tab-ref-concepts"
+          style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}
+        >
+          {/* Search and Category Filters */}
       <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
         <input
           type="search"
@@ -512,6 +566,8 @@ export const ReferenceLibrary: React.FC<ReferenceLibraryProps> = ({ onClose }) =
           })
         )}
       </div>
+        </div>
+      )}
     </div>
   );
 };

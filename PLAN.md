@@ -1,6 +1,6 @@
 # Staged implementation plan
 
-Stage 00 through Stage 17 are **complete within their recorded scope** (Stage 12: binomial exactly-k candidates; Stage 13: approved-bank structured full solutions and four-toss CSV cases; Stage 14: timed/untimed assessment, aid withholding, restart survival, evaluation reports and history; Stage 15: continuous distributions and math visuals; Stage 16: sampling distributions & CLT, confidence intervals, hypothesis testing, simple linear regression, student-t math engine, 4 new approved templates, 4 visual lab explorers, and Excel formula reconciliation; Stage 17: Quant Flight space arcade first playable, 60Hz fixed-step simulation, parallax starfield, vector interceptor, attract autopilot, manual takeover, pause, skip, and reduced motion). Stage 11's live gate combines user-run sign-in/inference on October 5 and macOS sign-in/sign-out on October 9, 2026; the inference model was not recorded. Each stage needs implementation, relevant tests and a HANDOFF entry. Never mark a gate passed because source files exist. Stages are ordered for a working offline tutor before advanced features.
+Stage 00 through Stage 19 are **complete within their recorded scope** (Stage 12: binomial exactly-k candidates; Stage 13: approved-bank structured full solutions and four-toss CSV cases; Stage 14: timed/untimed assessment, aid withholding, restart survival, evaluation reports and history; Stage 15: continuous distributions and math visuals; Stage 16: sampling distributions & CLT, confidence intervals, hypothesis testing, simple linear regression, student-t math engine, 4 new approved templates, 4 visual lab explorers, and Excel formula reconciliation; Stage 17: Quant Flight space arcade first playable, 60Hz fixed-step simulation, parallax starfield, vector interceptor, attract autopilot, manual takeover, pause, skip, and reduced motion; Stage 18: Quant Flight arcade complete parity, autofire, smart bombs, dual health with passive recharge, heavy hazards and fragment splitting, four cosmic sectors with hyper-drive warp transitions, durable high score persistence and 3-letter initials Hall of Fame leaderboard; Stage 19: multi-platform release hardening, embedded curriculum bank, diagnostics doctor, arcade leaderboard and data export CLI flags, release launchers, automated SHA-256 checksums, and isolated sandbox verification suite). Stage 11's live gate combines user-run sign-in/inference on October 5 and macOS sign-in/sign-out on October 9, 2026; the inference model was not recorded. Each stage needs implementation, relevant tests and a HANDOFF entry. Never mark a gate passed because source files exist. Stages are ordered for a working offline tutor before advanced features.
 
 | Stage | Work | Required exit evidence |
 |---|---|---|
@@ -22,8 +22,8 @@ Stage 00 through Stage 17 are **complete within their recorded scope** (Stage 12
 | 15 Continuous distributions and math visuals [COMPLETE] | Course-grounded continuous families (normal, uniform, exponential), exact Go PDF/CDF/quantile evaluation, accessible SVG graphics with hatching/patterns, spreadsheet reconciliation formulas, Module 3 approved questions and Visuals Lab explorer. | Continuous event evaluation $P(X = c) = 0$; 68-95-99.7 empirical rule, symmetry and survival bounds tested; exact visual curves and shaded regions reconcile with engine and Excel formulas; accessible SVGs with patterns, screen-reader text alternatives and keyboard navigation; 14 Playwright E2E tests and full suite pass. |
 | 16 Sampling, CI, testing and regression [COMPLETE] | Course-grounded later modules, simulations, confidence coverage, hypothesis choices/tails, regression/residuals. Implement one reviewed family at a time. | Population/sample and dependence distinctions preserved; Student's $t$ incomplete beta and Halley/Cornish-Fisher quantiles tested against tables; sampling distribution with FPC, mean/proportion CI coverage simulation, 1-sample $z/t$ hypothesis tests and OLS regression evaluated; association is not causation invariant enforced; 4 approved templates and 4 visual lab explorers pass E2E browser tests and full verification. |
 | 17 Arcade first playable [COMPLETE] | Canvas fixed-step engine, original starfield/ship, attract/manual/skip, held-key steering+fire, pause, reduced motion. | Immediate skip at every state; keyup/blur safe; game cleanup leaves drills responsive; seeded simulation and browser smoke. |
-| 18 Arcade complete parity | Autofire/bombs, acceleration, dual health, heavy hazards/fragments, four sectors/continuation, high scores/initials and leaderboard/title transition. | Scores persist; demo ineligible; simultaneous input works; deterministic collisions/bombs/transitions; small screen/reduced-motion behavior. |
-| 19 Release hardening | Windows/macOS/Linux binaries with embedded UI/bank/fonts, launchers, backup/export, checksums, license notices, diagnostics/docs. | Extracted packages run offline natively, no Go/Node required; no personal data/secrets shipped; full release test matrix recorded. |
+| 18 Arcade complete parity [COMPLETE] | Autofire/bombs, acceleration, dual health, heavy hazards/fragments, four sectors/continuation, high scores/initials and leaderboard/title transition. | Scores persist; demo ineligible; simultaneous input works; deterministic collisions/bombs/transitions; small screen/reduced-motion behavior. |
+| 19 Release hardening [COMPLETE] | Windows/macOS/Linux binaries with embedded UI/bank/fonts, launchers, backup/export, checksums, license notices, diagnostics/docs. | Extracted packages run offline natively, no Go/Node required; no personal data/secrets shipped; full release test matrix recorded. |
 | 20 Content quality and ongoing breadth | Review transfer groups, distractions, amount/event bounds, candidate quality, course alignment and bank breadth in small batches. | Coverage/repetition review before count increases; every new family has reviewed rules/tests; empirical learning claims remain separate. Objective-by-objective work is tracked in [docs/CONTENT-BACKLOG.md](docs/CONTENT-BACKLOG.md). |
 
 ## Priorities and dependencies
@@ -40,17 +40,20 @@ No fixed deadline is promised. Each stage may use several reviewable changes. En
 
 Four explicit enhancements are prioritized across the roadmap:
 
-1. **Relevant Excel formulas in answer explanations**:
-   - Provide standard spreadsheet equivalents in engine derivations, drill recaps, stage explanations, reference library cards, and AI tutor prompts (e.g. `=BINOM.DIST(k, n, p, FALSE/TRUE)`, `=POISSON.DIST(...)`, `=COMBIN(n, k)`, `=NORM.DIST(...)`).
-   - Connects analytical math derivations with standard course spreadsheet tools; integrates with Stage 03/04 math engine expansions and Stage 13 casework.
-2. **Interactive multi-turn AI tutor chat**:
-   - Conversational thread persistence in SQLite (`tutor_threads` and `tutor_messages` tables), streaming SSE deltas across ongoing threads, sliding-window token management, and budget tracking.
-   - Strict pedagogical system prompt guardrails preventing answer leakage on unresolved active stages.
+1. **Relevant Excel functions & R (RStudio) code tooling [COMPLETE]**:
+   - Provide standard spreadsheet and R equivalents in engine derivations, drill recaps, stage explanations, reference library cards, and interactive problem drawers.
+   - Delivered across all 5 phases: generic canonical syntax during problem solving, exact parameter substitution in post-submission explanations, standalone cheatsheet catalog with export, and exam guardrails.
+   - Phased plan and recipe architecture: [docs/SOFTWARE-TOOLING-PLAN.md](docs/SOFTWARE-TOOLING-PLAN.md).
+2. **Interactive multi-turn AI tutor chat [COMPLETE]**:
+   - Conversational thread persistence in SQLite (`tutor_threads` and `tutor_messages` tables), streaming SSE deltas across ongoing threads (`/api/tutor/threads/{id}/messages/{msgId}/events`), sliding-window token management, and budget tracking.
+   - Strict pedagogical system prompt guardrails preventing answer and formula leakage on unresolved active stages.
    - Dual save capability: save complete chat transcripts or individual selected AI responses to the personal note library.
+   - Dual-mode frontend interface in `AITutorPanel` seamlessly toggling between Quick Guidance and Interactive Chat.
 3. **ChatGPT plan sign-in (Stage 11 [COMPLETE])**:
    - Official OpenAI local/open-source token-sharing OAuth integration with PKCE (`S256`), dynamic client registration, state/nonce validation, loopback redirect (`http://localhost:<port>/auth/callback`), token refresh/revocation, account/workspace selection, and isolated Responses route.
-4. **Local offline LLM provider (LM Studio / Ollama)**:
-   - Loopback OpenAI-compatible adapter (`http://localhost:1234/v1` or configurable host/port).
-   - Auto-discovery of loaded local models via `GET /v1/models`.
-   - Zero internet calls, zero API billing, complete privacy, enabling true offline generative tutoring and chat.
+4. **Local offline LLM provider (LM Studio / Ollama) [COMPLETE]**:
+   - Loopback OpenAI-compatible adapter (`LocalLLMAdapter`) strictly bound to loopback addresses (`localhost`, `127.0.0.1`, `::1`) at configurable ports (default `1234` for LM Studio, `11434` for Ollama).
+   - Auto-discovery and dynamic probing of loaded local models via `GET /v1/models`.
+   - Zero internet network calls, zero API billing, complete privacy, enabling true offline generative tutoring and chat.
+   - UI configuration tab in `ProviderSettings` with model probing and active provider switching.
 

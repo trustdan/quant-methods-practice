@@ -612,6 +612,13 @@ export const App: React.FC = () => {
             setActiveTab('worksheets');
           }
           break;
+        case 'TOGGLE_SOFTWARE_DRAWER':
+          if (!isFieldActive) {
+            e.preventDefault();
+            window.dispatchEvent(new CustomEvent('toggle-software-drawer'));
+          }
+          break;
+
         case 'VIEW_REFERENCE':
           if (!isFieldActive) {
             e.preventDefault();
@@ -1211,6 +1218,7 @@ export const App: React.FC = () => {
         instanceTitle={session.title}
         topic={session.stages[session.current_stage_index]?.label || 'Probability'}
         concepts={[session.template_id]}
+        stageResolved={session.stages[session.current_stage_index]?.status === 'completed'}
       />
     </>
   );

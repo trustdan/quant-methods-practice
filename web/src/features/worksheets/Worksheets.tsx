@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { MathMarkdown } from '../../components/MathMarkdown';
+import { SoftwareToolDrawer } from '../reference/SoftwareToolDrawer';
 import type { AnswerMap, CasePreview, Worksheet } from './types';
 
 export type WorksheetMode = 'full_solution' | 'dataset';
@@ -181,6 +182,7 @@ export const Worksheets: React.FC<{ active: boolean; launchMode: WorksheetMode }
         {record.questions.map(question => <article key={question.id} aria-label={question.title}>
           <h3>{question.title}</h3><MathMarkdown content={question.scenario_markdown} />
           <ul>{question.assumptions?.map(assumption => <li key={assumption}>{assumption}</li>)}</ul>
+          <SoftwareToolDrawer templateId={question.template_id} title={question.title} />
           {record.items.filter(item => item.question_id === question.id).map((item, index) => <fieldset key={item.key} disabled={busy || uncertain || item.status === 'completed'}>
             <legend>{index + 1}. {item.stage_id.replaceAll('_', ' ')}</legend>
             <MathMarkdown content={item.prompt_markdown} />

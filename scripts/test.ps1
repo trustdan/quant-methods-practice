@@ -55,4 +55,7 @@ try {
     Pop-Location
 }
 
+Write-Host "==> Verifying multi-platform release packaging and isolated sandbox..." -ForegroundColor Cyan
+Invoke-Checked "release verification" { powershell -ExecutionPolicy Bypass -File "$rootDir\scripts\verify_release.ps1" }
+
 Write-Host "==> All verification checks PASSED!" -ForegroundColor Green

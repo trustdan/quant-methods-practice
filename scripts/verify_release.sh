@@ -78,15 +78,19 @@ cd "$SANDBOX"
 echo "    Running offline doctor & diagnostics..."
 DIAG_OUTPUT=$(./quant-practice -data-dir "$SANDBOX/data" -diagnostics)
 echo "$DIAG_OUTPUT" | grep "ALL SYSTEMS HEALTHY"
-echo "$DIAG_OUTPUT" | grep "21 approved question templates validated offline"
+echo "$DIAG_OUTPUT" | grep "137 approved question templates validated offline"
 echo "$DIAG_OUTPUT" | grep "Active Bank Resolution" | grep "embedded assets"
 
 # List bank check
-echo "    Verifying 21 curriculum questions from embedded assets..."
+echo "    Verifying 137 curriculum questions from embedded assets..."
 BANK_OUTPUT=$(./quant-practice -list-bank)
-echo "$BANK_OUTPUT" | grep "Approved Curriculum Bank (embedded assets): 21 questions"
+echo "$BANK_OUTPUT" | grep "Approved Curriculum Bank (embedded assets): 137 questions"
 echo "$BANK_OUTPUT" | grep "binomial_fair_coin_exactly_two"
 echo "$BANK_OUTPUT" | grep "regression_sales_advertising"
+
+# High scores check
+echo "    Verifying arcade leaderboard offline..."
+./quant-practice -data-dir "$SANDBOX/data" -high-scores | grep "HALL OF FAME"
 
 # Math engine derivation check
 echo "    Verifying analytical math engine offline..."

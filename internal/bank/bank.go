@@ -2,7 +2,9 @@ package bank
 
 import (
 	"fmt"
+	"io/fs"
 	"os"
+	"path"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -119,6 +121,50 @@ func LoadActiveBank(dir string, reg *Registry) (*Bank, error) {
 		tmpl, err := ValidateTemplateFile(filePath, reg)
 		if err != nil {
 			return nil, fmt.Errorf("failed to validate %s: %w", entry.Name(), err)
+		}
+
+		if tmpl.Status != domain.StatusActive {
+			return nil, fmt.Errorf("active bank only admits approved active records; file %s has status %q", entry.Name(), tmpl.Status)
+		}
+
+		if _, exists := b.Get(tmpl.ID); exists {
+			return nil, fmt.Errorf("duplicate template id %q in active bank (found in %s)", tmpl.ID, entry.Name())
+		}
+
+		b.Add(tmpl)
+	}
+
+	return b, nil
+}
+
+// LoadActiveBankFS loads all approved templates from an fs.FS.
+// It fails if any template has unapproved/draft/retired status, unknown fields, or invalid schemas.
+func LoadActiveBankFS(fsys fs.FS, dir string, reg *Registry) (*Bank, error) {
+	b := NewBank()
+
+	entries, err := fs.ReadDir(fsys, dir)
+	if err != nil {
+		return nil, fmt.Errorf("reading active bank fs directory %q: %w", dir, err)
+	}
+
+	for _, entry := range entries {
+		if entry.IsDir() || !strings.HasSuffix(entry.Name(), ".json") {
+			continue
+		}
+
+		filePath := path.Join(dir, entry.Name())
+		data, err := fs.ReadFile(fsys, filePath)
+		if err != nil {
+			return nil, fmt.Errorf("reading template %s: %w", filePath, err)
+		}
+
+		tmpl, err := StrictDecodeTemplate(data)
+		if err != nil {
+			return nil, fmt.Errorf("decoding %s: %w", filePath, err)
+		}
+
+		if err := ValidateTemplate(tmpl, reg); err != nil {
+			return nil, fmt.Errorf("validating %s: %w", filePath, err)
 		}
 
 		if tmpl.Status != domain.StatusActive {

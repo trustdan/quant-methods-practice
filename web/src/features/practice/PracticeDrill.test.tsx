@@ -238,9 +238,33 @@ describe('PracticeDrill Component', () => {
 
     expect(screen.getByText('Drill Completed')).toBeInTheDocument();
     expect(screen.getByText('Canonical Mathematical Derivation')).toBeInTheDocument();
+    expect(screen.getByText('Worked Software Verification (Excel & R)')).toBeInTheDocument();
     expect(screen.getByText('7 / 7')).toBeInTheDocument();
     expect(screen.getByText('6')).toBeInTheDocument();
     expect(screen.getByText(/Stage 1: Target/)).toBeInTheDocument();
+  });
+
+  it('renders worked software call when a stage is completed', () => {
+    const onSend = vi.fn();
+    const onNav = vi.fn();
+    const onReset = vi.fn();
+
+    const stageDoneSession: PublicSessionView = JSON.parse(JSON.stringify(DEFAULT_BINOMIAL_SESSION));
+    stageDoneSession.stages[0].status = 'completed';
+    stageDoneSession.stages[0].last_feedback = 'Correct: X is the count of successes.';
+
+    render(
+      <PracticeDrill
+        session={stageDoneSession}
+        onSendCommand={onSend}
+        onNavigateStage={onNav}
+        onResetDrill={onReset}
+      />
+    );
+
+    expect(screen.getByText(/Mathematical Explanation:/)).toBeInTheDocument();
+    expect(screen.getByText(/Worked Software Call/)).toBeInTheDocument();
+    expect(screen.getByText(/=BINOM\.DIST\(2, 4, 0\.5, FALSE\)/)).toBeInTheDocument();
   });
 
   it('preserves unsent answer draft when navigating between stages', () => {
@@ -342,5 +366,35 @@ describe('PracticeDrill Component', () => {
     // Press 'k' to move selection up
     fireEvent.keyDown(window, { key: 'k' });
     expect(screen.getByText('Option selected')).toBeInTheDocument();
+  });
+
+  it('renders software tool drawer and toggles open/closed with u key', () => {
+    const onSend = vi.fn();
+    const onNav = vi.fn();
+    const onReset = vi.fn();
+
+    render(
+      <PracticeDrill
+        session={DEFAULT_BINOMIAL_SESSION}
+        onSendCommand={onSend}
+        onNavigateStage={onNav}
+        onResetDrill={onReset}
+      />
+    );
+
+    // Software drawer trigger is present
+    const trigger = screen.getByRole('button', { name: /Software Syntax Guide/i });
+    expect(trigger).toBeInTheDocument();
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+
+    // Press 'u' key to toggle open
+    fireEvent.keyDown(window, { key: 'u' });
+    expect(trigger).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByTestId('software-syntax-code')).toBeInTheDocument();
+
+    // Press 'u' key again to toggle closed
+    fireEvent.keyDown(window, { key: 'u' });
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.queryByTestId('software-syntax-code')).not.toBeInTheDocument();
   });
 });

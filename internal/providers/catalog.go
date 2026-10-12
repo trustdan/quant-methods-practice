@@ -49,6 +49,22 @@ func (c *CatalogCache) initDefaults() {
 		FetchedAt: now,
 	}
 
+	// Local offline LLM default
+	c.entries[auth.RouteLocal] = CatalogEntry{
+		Models: []ModelInfo{
+			{
+				ID:                "local-model",
+				Name:              "Local Offline LLM",
+				Provider:          auth.RouteLocal,
+				SupportsStreaming: true,
+				ContextWindow:     8192,
+				Description:       "OpenAI-compatible local offline LLM (LM Studio / Ollama on loopback).",
+				IsDefault:         true,
+			},
+		},
+		FetchedAt: now,
+	}
+
 	// Anthropic defaults
 	c.entries[auth.RouteAnthropic] = CatalogEntry{
 		Models: []ModelInfo{

@@ -153,6 +153,7 @@ describe('Quant Flight Arcade simulation', () => {
       hazards: [
         {
           id: 20,
+          kind: 'standard' as const,
           x: 210,
           y: 200,
           vx: -100,
@@ -201,6 +202,7 @@ describe('Quant Flight Arcade simulation', () => {
       hazards: [
         {
           id: 20,
+          kind: 'standard' as const,
           x: 210,
           y: 200,
           vx: -100,
@@ -261,6 +263,7 @@ describe('Quant Flight Arcade simulation', () => {
       hazards: [
         {
           id: 20,
+          kind: 'standard' as const,
           x: 205,
           y: 200,
           vx: -100,
@@ -287,4 +290,303 @@ describe('Quant Flight Arcade simulation', () => {
     expect(nextState.screenShake).toBe(0);
     expect(nextState.ship.shields).toBeLessThan(100);
   });
+
+  it('detonates smart bomb, creating shockwave, expending stock, and setting cooldown', () => {
+    const rng = createRng(301);
+    const initial = createInitialState(301, 'manual');
+    expect(initial.ship.bombs).toBe(3);
+
+    const nextState = step(
+      initial,
+      { up: false, down: false, left: false, right: false, fire: false, bomb: true },
+      FIXED_DT,
+      rng
+    );
+
+    expect(nextState.ship.bombs).toBe(2);
+    expect(nextState.ship.bombCooldown).toBeGreaterThan(0);
+    expect(nextState.shockwaves.length).toBe(1);
+    expect(nextState.shockwaves[0].x).toBe(initial.ship.x);
+    expect(nextState.shockwaves[0].y).toBe(initial.ship.y);
+  });
+
+  it('clears hazards and awards points when smart bomb shockwave expands', () => {
+    const rng = createRng(302);
+    const initial = createInitialState(302, 'manual');
+
+    const stateWithBomb = {
+      ...initial,
+      shockwaves: [
+        {
+          id: 99,
+          x: 200,
+          y: 200,
+          radius: 100,
+          maxRadius: 300,
+          duration: 0.4,
+          maxDuration: 0.5,
+          damage: 5,
+          active: true,
+        },
+      ],
+      hazards: [
+        {
+          id: 50,
+          kind: 'standard' as const,
+          x: 230,
+          y: 200,
+          vx: -50,
+          vy: 0,
+          radius: 18,
+          hp: 1,
+          maxHp: 1,
+          label: 'Spurious Correlation',
+          points: 100,
+          active: true,
+        },
+      ],
+    };
+
+    const nextState = step(
+      stateWithBomb,
+      { up: false, down: false, left: false, right: false, fire: false },
+      FIXED_DT,
+      rng
+    );
+
+    expect(nextState.score).toBe(100);
+    expect(nextState.targetsDestroyed).toBe(1);
+    expect(nextState.hazards.length).toBe(0);
+  });
+
+  it('implements dual health: shields absorb first, then hull takes remaining damage', () => {
+    const rng = createRng(303);
+    const initial = createInitialState(303, 'manual');
+    // Set ship with low shields
+    const weakened = {
+      ...initial,
+      ship: {
+        ...initial.ship,
+        x: 200,
+        y: 200,
+        shields: 10,
+        maxShields: 100,
+        hull: 100,
+        maxHull: 100,
+        invulnerableTimer: 0,
+        shieldRechargeTimer: 2.0,
+      },
+      hazards: [
+        {
+          id: 60,
+          kind: 'standard' as const,
+          x: 205,
+          y: 200,
+          vx: -80,
+          vy: 0,
+          radius: 18,
+          hp: 1,
+          maxHp: 1,
+          label: 'Selection Bias',
+          points: 100,
+          active: true,
+        },
+      ],
+    };
+
+    const nextState = step(
+      weakened,
+      { up: false, down: false, left: false, right: false, fire: false },
+      FIXED_DT,
+      rng
+    );
+
+    // Standard damage is 24: 10 absorbed by shield, 14 taken by hull
+    expect(nextState.ship.shields).toBe(0);
+    expect(nextState.ship.hull).toBe(86);
+    expect(nextState.gameOver).toBe(false);
+  });
+
+  it('triggers game over when hull reaches zero', () => {
+    const rng = createRng(304);
+    const initial = createInitialState(304, 'manual');
+    const criticalShip = {
+      ...initial,
+      ship: {
+        ...initial.ship,
+        x: 200,
+        y: 200,
+        shields: 0,
+        hull: 15,
+        invulnerableTimer: 0,
+      },
+      hazards: [
+        {
+          id: 70,
+          kind: 'standard' as const,
+          x: 205,
+          y: 200,
+          vx: -80,
+          vy: 0,
+          radius: 18,
+          hp: 1,
+          maxHp: 1,
+          label: 'Selection Bias',
+          points: 100,
+          active: true,
+        },
+      ],
+    };
+
+    const nextState = step(
+      criticalShip,
+      { up: false, down: false, left: false, right: false, fire: false },
+      FIXED_DT,
+      rng
+    );
+
+    expect(nextState.ship.hull).toBe(0);
+    expect(nextState.gameOver).toBe(true);
+  });
+
+  it('splits heavy hazards into fragments when destroyed', () => {
+    const rng = createRng(305);
+    const initial = createInitialState(305, 'manual');
+
+    // Heavy hazard with 1 HP left hit by projectile
+    const stateWithHeavy = {
+      ...initial,
+      projectiles: [
+        {
+          id: 11,
+          x: 200,
+          y: 200,
+          vx: PROJECTILE_SPEED,
+          vy: 0,
+          radius: 4,
+          active: true,
+        },
+      ],
+      hazards: [
+        {
+          id: 80,
+          kind: 'heavy' as const,
+          x: 215,
+          y: 200,
+          vx: -90,
+          vy: 0,
+          radius: 26,
+          hp: 1,
+          maxHp: 3,
+          label: 'Collider Bias',
+          points: 250,
+          active: true,
+        },
+      ],
+    };
+
+    const nextState = step(
+      stateWithHeavy,
+      { up: false, down: false, left: false, right: false, fire: false },
+      FIXED_DT,
+      rng
+    );
+
+    expect(nextState.score).toBe(250);
+    expect(nextState.targetsDestroyed).toBe(1);
+    // Should have spawned 2 fragments
+    const fragments = nextState.hazards.filter((h) => h.kind === 'fragment');
+    expect(fragments.length).toBe(2);
+    expect(fragments[0].points).toBe(75);
+    expect(fragments[0].radius).toBe(13);
+  });
+
+  it('triggers sector warp, replenishes bombs and shields, and awards bonus on sector completion', () => {
+    const rng = createRng(306);
+    const initial = createInitialState(306, 'manual');
+
+    // State at threshold of sector 1 completion (target is 10)
+    const atSectorThreshold = {
+      ...initial,
+      sector: 1,
+      sectorProgress: 9,
+      sectorTarget: 10,
+      score: 900,
+      ship: {
+        ...initial.ship,
+        shields: 50,
+        bombs: 2,
+      },
+      projectiles: [
+        {
+          id: 15,
+          x: 300,
+          y: 200,
+          vx: PROJECTILE_SPEED,
+          vy: 0,
+          radius: 4,
+          active: true,
+        },
+      ],
+      hazards: [
+        {
+          id: 95,
+          kind: 'standard' as const,
+          x: 310,
+          y: 200,
+          vx: -80,
+          vy: 0,
+          radius: 18,
+          hp: 1,
+          maxHp: 1,
+          label: 'Confounding',
+          points: 100,
+          active: true,
+        },
+      ],
+    };
+
+    const nextState = step(
+      atSectorThreshold,
+      { up: false, down: false, left: false, right: false, fire: false },
+      FIXED_DT,
+      rng
+    );
+
+    // Hazard points (100) + Sector 1 clear bonus (1000) = 900 + 100 + 1000 = 2000
+    expect(nextState.score).toBe(2000);
+    expect(nextState.sector).toBe(2);
+    expect(nextState.sectorProgress).toBe(0);
+    expect(nextState.warpTimer).toBeGreaterThan(0);
+    expect(nextState.ship.shields).toBe(100); // Fully restored
+    expect(nextState.ship.bombs).toBe(3); // Replenished +1 bomb
+  });
+
+  it('gradually recharges shields when unhit for the recharge delay', () => {
+    const rng = createRng(307);
+    const initial = createInitialState(307, 'manual');
+
+    let state = {
+      ...initial,
+      ship: {
+        ...initial.ship,
+        shields: 50,
+        maxShields: 100,
+        shieldRechargeTimer: 0, // Delay elapsed
+      },
+    };
+
+    // Step several times without any collisions
+    for (let i = 0; i < 30; i++) {
+      state = step(
+        state,
+        { up: false, down: false, left: false, right: false, fire: false },
+        FIXED_DT,
+        rng
+      );
+    }
+
+    expect(state.ship.shields).toBeGreaterThan(50);
+  });
 });
+

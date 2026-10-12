@@ -84,6 +84,12 @@ func BuildUserPrompt(req tutor.TutorRequest) string {
 				sb.WriteString("Please provide further explanation on this problem.")
 			}
 		}
+	case tutor.ActionChat:
+		if req.CustomPrompt != "" {
+			sb.WriteString(fmt.Sprintf("Learner's question / message: %s\n", req.CustomPrompt))
+		} else {
+			sb.WriteString("How should I approach this problem?\n")
+		}
 	default:
 		sb.WriteString("Please explain the reasoning behind this step.")
 	}
@@ -91,10 +97,18 @@ func BuildUserPrompt(req tutor.TutorRequest) string {
 	return sb.String()
 }
 
-// RequestSystemPrompt keeps candidate authoring separate from learner tutoring.
+// RequestSystemPrompt keeps candidate authoring separate from learner tutoring,
+// and enforces strict pedagogical guardrails for unresolved practice stages during multi-turn chats.
 func RequestSystemPrompt(req tutor.TutorRequest) string {
 	if req.Action == tutor.ActionCandidate {
 		return "You propose introductory probability scenarios. Return one JSON object with exactly family_id, n, p, k, title, scenario_markdown, success_label. All wording is untrusted and requires human approval. Never supply answer keys or approval metadata."
+	}
+	if req.Action == tutor.ActionChat {
+		base := BuildSystemPrompt()
+		if !req.StageResolved {
+			return base + "\n\nCRITICAL PEDAGOGICAL GUARDRAIL:\nThe learner is actively working on an UNRESOLVED stage of this problem and has NOT yet submitted the correct answer.\nYou MUST NEVER reveal the final numerical answer, the complete formula computation, or the multiple-choice option letter/key.\nInstead, guide them Socratically: ask what step or formula they have considered, clarify key definitions or model assumptions (e.g. independence, replacement), point out common misconceptions, or provide a parallel analogy with different numbers."
+		}
+		return base + "\n\nPEDAGOGICAL NOTE:\nThe learner has already completed or resolved this stage. You may provide full step-by-step mathematical derivations, exact numerical solutions, and equivalent spreadsheet formulas (e.g. =BINOM.DIST, =NORM.DIST) as requested."
 	}
 	return BuildSystemPrompt()
 }

@@ -43,4 +43,25 @@ describe('ReferenceLibrary', () => {
 
     expect(screen.getByText(/Common Exam Pitfalls & Misconceptions/)).toBeInTheDocument();
   });
+
+  it('switches to Software Cheatsheet tab and displays Excel & R recipes', () => {
+    render(<ReferenceLibrary />);
+
+    const softwareTab = screen.getByRole('tab', { name: /Software Cheatsheet/ });
+    fireEvent.click(softwareTab);
+
+    expect(screen.getByText(/Statistical Software Cheatsheet \(Excel & R\)/)).toBeInTheDocument();
+    expect(screen.getByText(/Complete reference catalog of all 50 canonical statistical software recipes/)).toBeInTheDocument();
+
+    // Verify search in cheatsheet
+    const searchInput = screen.getByPlaceholderText(/Search Excel & R functions/);
+    fireEvent.change(searchInput, { target: { value: 'BINOM.DIST' } });
+
+    expect(screen.getAllByText(/BINOM\.DIST/).length).toBeGreaterThan(0);
+
+    // Verify display mode toggle
+    const excelOnlyBtn = screen.getByRole('button', { name: /Excel Only/ });
+    fireEvent.click(excelOnlyBtn);
+    expect(screen.queryByText(/🔷 R:/)).not.toBeInTheDocument();
+  });
 });

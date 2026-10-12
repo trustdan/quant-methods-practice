@@ -103,6 +103,7 @@ describe('keymap navigation', () => {
     expect(resolveKeyCommand(new KeyboardEvent('keydown', { key: 'E', shiftKey: true }), context)).toBe('VIEW_EXAM');
     expect(resolveKeyCommand(new KeyboardEvent('keydown', { key: 'A', shiftKey: true }), context)).toBe('VIEW_ARCADE');
     expect(resolveKeyCommand(new KeyboardEvent('keydown', { key: 'L', shiftKey: false }), context)).toBe('VIEW_LEADERBOARD');
+    expect(resolveKeyCommand(new KeyboardEvent('keydown', { key: 'u' }), context)).toBe('TOGGLE_SOFTWARE_DRAWER');
   });
 
   it('does not hijack typing when focus is inside an editable field', () => {

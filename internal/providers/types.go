@@ -34,6 +34,7 @@ type ProviderSummary struct {
 	// always knows which account is charged.
 	Billing      string `json:"billing"`
 	AccountLabel string `json:"account_label,omitempty"`
+	Endpoint     string `json:"endpoint,omitempty"`
 }
 
 // BudgetStatus describes session request and token expenditure vs caps.

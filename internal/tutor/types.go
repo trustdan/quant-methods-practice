@@ -15,7 +15,14 @@ const (
 	ActionHint      TutorAction = "hint"
 	ActionExplain   TutorAction = "explain"
 	ActionFollowUp  TutorAction = "follow_up"
+	ActionChat      TutorAction = "chat"
 )
+
+// ChatMessage represents a single message turn in a multi-turn conversation.
+type ChatMessage struct {
+	Role    string `json:"role"` // "user", "assistant", "system"
+	Content string `json:"content"`
+}
 
 // FollowUpKind categorizes specific drill-down follow-up inquiries.
 type FollowUpKind string
@@ -36,9 +43,12 @@ type TutorRequest struct {
 	SessionID       string                   `json:"session_id"`
 	InstanceID      string                   `json:"instance_id"`
 	StageID         string                   `json:"stage_id"`
+	ThreadID        string                   `json:"thread_id,omitempty"`
+	StageResolved   bool                     `json:"stage_resolved,omitempty"`
 	Action          TutorAction              `json:"action"`
 	FollowUpKind    FollowUpKind             `json:"follow_up_kind,omitempty"`
 	CustomPrompt    string                   `json:"custom_prompt,omitempty"`
+	History         []ChatMessage            `json:"history,omitempty"`
 	Provider        string                   `json:"provider,omitempty"`
 	Instance        *domain.QuestionInstance `json:"instance,omitempty"`
 	Stage           *domain.StageInstance    `json:"stage,omitempty"`

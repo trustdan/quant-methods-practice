@@ -57,4 +57,34 @@ describe('ArcadeGame Component', () => {
     fireEvent.click(toggle);
     expect(toggle.checked).toBe(true);
   });
+
+  it('opens and closes Hall of Fame leaderboard overlay', () => {
+    render(<ArcadeGame onExit={vi.fn()} />);
+
+    const hallOfFameBtn = screen.getByRole('button', { name: /Hall of Fame/i });
+    expect(hallOfFameBtn).toBeInTheDocument();
+
+    fireEvent.click(hallOfFameBtn);
+    expect(screen.getByText(/TOP PILOT HALL OF FAME/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Launch New Flight/i })).toBeInTheDocument();
+
+    // Close overlay
+    const closeBtn = screen.getByRole('button', { name: /Close/i });
+    fireEvent.click(closeBtn);
+    expect(screen.queryByText(/TOP PILOT HALL OF FAME/i)).not.toBeInTheDocument();
+  });
+
+  it('resets and launches new flight from leaderboard modal', () => {
+    render(<ArcadeGame onExit={vi.fn()} initialMode="attract" />);
+
+    // Open Hall of Fame
+    fireEvent.click(screen.getByRole('button', { name: /Hall of Fame/i }));
+    expect(screen.getByText(/TOP PILOT HALL OF FAME/i)).toBeInTheDocument();
+
+    // Click Launch New Flight
+    fireEvent.click(screen.getByRole('button', { name: /Launch New Flight/i }));
+    expect(screen.queryByText(/TOP PILOT HALL OF FAME/i)).not.toBeInTheDocument();
+    expect(screen.getByText(/🎮 Manual Flight/i)).toBeInTheDocument();
+  });
 });
+

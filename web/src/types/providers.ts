@@ -1,7 +1,7 @@
-export type ProviderRoute = 'offline' | 'anthropic' | 'gemini' | 'openai' | 'chatgpt';
+export type ProviderRoute = 'offline' | 'local' | 'anthropic' | 'gemini' | 'openai' | 'chatgpt';
 
-/** Which account pays: none (offline), API usage billing, or a ChatGPT plan subscription. */
-export type BillingRoute = 'none' | 'api_usage' | 'chatgpt_plan';
+/** Which account pays: none (offline), local_offline, API usage billing, or a ChatGPT plan subscription. */
+export type BillingRoute = 'none' | 'local_offline' | 'api_usage' | 'chatgpt_plan';
 
 export interface ProviderSummaryDTO {
   route: ProviderRoute;
@@ -16,6 +16,7 @@ export interface ProviderSummaryDTO {
   auth_kind?: 'none' | 'api_key' | 'oauth';
   billing?: BillingRoute;
   account_label?: string;
+  endpoint?: string;
 }
 
 export interface ModelInfoDTO {
@@ -82,6 +83,7 @@ export interface ChatGPTSignOutDTO {
 
 export const BILLING_LABELS: Record<BillingRoute, string> = {
   none: 'No billing (offline)',
+  local_offline: 'Local offline LLM (Free, no network)',
   api_usage: 'API usage billing',
   chatgpt_plan: 'ChatGPT plan usage',
 };

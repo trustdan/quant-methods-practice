@@ -8,6 +8,7 @@ import (
 // Supported provider routes
 const (
 	RouteOffline   = "offline"
+	RouteLocal     = "local"
 	RouteAnthropic = "anthropic"
 	RouteGemini    = "gemini"
 	RouteOpenAI    = "openai"

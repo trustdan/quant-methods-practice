@@ -1,4 +1,26 @@
-export type TutorAction = 'hint' | 'explain' | 'follow_up';
+export type TutorAction = 'hint' | 'explain' | 'follow_up' | 'chat';
+
+export interface TutorChatMessageDTO {
+  id: string;
+  thread_id: string;
+  role: 'user' | 'assistant' | 'system';
+  content: string;
+  fallback_label?: string;
+  created_at: string;
+}
+
+export interface TutorThreadDTO {
+  id: string;
+  session_id?: string;
+  instance_id: string;
+  stage_id: string;
+  provider: string;
+  model: string;
+  title: string;
+  messages?: TutorChatMessageDTO[];
+  created_at: string;
+  updated_at: string;
+}
 
 export type FollowUpKind =
   | 'explain_differently'

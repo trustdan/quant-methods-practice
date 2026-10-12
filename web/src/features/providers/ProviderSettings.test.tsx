@@ -46,6 +46,16 @@ describe('ProviderSettings Component', () => {
         models_count: 3,
         requires_key: true,
       },
+      {
+        route: 'local',
+        name: 'Local LLM (LM Studio / Ollama)',
+        configured: true,
+        active: false,
+        active_model: 'llama-3.2-3b-instruct',
+        source: 'none',
+        models_count: 2,
+        requires_key: false,
+      },
     ],
     active_route: 'offline',
     active_model: 'offline-curriculum',
@@ -77,6 +87,22 @@ describe('ProviderSettings Component', () => {
         supports_streaming: true,
         context_window: 2097152,
         description: 'Deep reasoning model',
+      },
+    ],
+    is_stale: false,
+  };
+
+  const mockLocalModelsResponse = {
+    route: 'local',
+    models: [
+      {
+        id: 'llama-3.2-3b-instruct',
+        name: 'Llama 3.2 3B Instruct',
+        provider: 'local',
+        supports_streaming: true,
+        context_window: 8192,
+        description: 'Local loopback model',
+        is_default: true,
       },
     ],
     is_stale: false,
@@ -115,6 +141,25 @@ describe('ProviderSettings Component', () => {
         return Promise.resolve({
           ok: true,
           json: () => Promise.resolve(mockGeminiModelsResponse),
+        });
+      }
+      if (url.includes('/api/providers/local/models')) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve(mockLocalModelsResponse),
+        });
+      }
+      if (url.includes('/api/providers/local/endpoint')) {
+        if (opts?.method === 'POST') {
+          const body = JSON.parse((opts.body as string) || '{}');
+          return Promise.resolve({
+            ok: true,
+            json: () => Promise.resolve({ status: 'ok', endpoint: body.endpoint || 'http://localhost:1234' }),
+          });
+        }
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ endpoint: 'http://localhost:1234' }),
         });
       }
       if (url === '/api/providers/active') {
@@ -160,6 +205,7 @@ describe('ProviderSettings Component', () => {
       expect(screen.getByText('Anthropic Claude')).toBeInTheDocument();
       expect(screen.getByText('OpenAI API')).toBeInTheDocument();
       expect(screen.getByText('ChatGPT Plan')).toBeInTheDocument();
+      expect(screen.getByText('Local Offline LLM')).toBeInTheDocument();
     });
 
     expect(screen.getByText('ACTIVE')).toBeInTheDocument();
@@ -230,6 +276,84 @@ describe('ProviderSettings Component', () => {
     await waitFor(() => {
       expect(screen.getByText(/Session AI request budget reset/)).toBeInTheDocument();
       expect(screen.getByText(/0 \/ 20 requests used/)).toBeInTheDocument();
+    });
+  });
+
+  it('renders Local Offline LLM tab with loopback zero-cost privacy notice', async () => {
+    render(<ProviderSettings />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Local Offline LLM')).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByText('Local Offline LLM'));
+
+    await waitFor(() => {
+      expect(screen.getAllByText(/Offline Privacy Guarantee/i).length).toBeGreaterThan(0);
+      expect(screen.getAllByText(/Local Server Endpoint/i).length).toBeGreaterThan(0);
+      expect(screen.getAllByText(/Probe \/ Refresh Local Models/i).length).toBeGreaterThan(0);
+    });
+  });
+
+  it('renders LM Studio and Ollama setup guides with interactive guide tabs', async () => {
+    render(<ProviderSettings />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Local Offline LLM')).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByText('Local Offline LLM'));
+
+    // Check default guide tab (LM Studio)
+    await waitFor(() => {
+      expect(screen.getByText(/How to set up and run with LM Studio/i)).toBeInTheDocument();
+      expect(screen.getByText(/Llama-3.1-8B-Instruct-GGUF/i)).toBeInTheDocument();
+    });
+
+    // Switch to Ollama guide tab
+    fireEvent.click(screen.getByText(/🦙 Ollama Setup Guide/i));
+    await waitFor(() => {
+      expect(screen.getByText(/How to set up and run with Ollama/i)).toBeInTheDocument();
+      expect(screen.getByText(/ollama run llama3.1/i)).toBeInTheDocument();
+    });
+
+    // Switch to FAQ tab
+    fireEvent.click(screen.getByText(/❓ Troubleshooting & FAQ/i));
+    await waitFor(() => {
+      expect(screen.getByText(/Why does probing say "cannot connect to local LLM server"\?/i)).toBeInTheDocument();
+      expect(screen.getByText(/Why does probing say "no loaded models found"\?/i)).toBeInTheDocument();
+    });
+  });
+
+  it('supports switching local endpoint between LM Studio and Ollama presets and custom port', async () => {
+    render(<ProviderSettings />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Local Offline LLM')).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByText('Local Offline LLM'));
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: 'LM Studio (:1234)' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Ollama (:11434)' })).toBeInTheDocument();
+    });
+
+    const endpointInput = screen.getByLabelText('Local server endpoint URL') as HTMLInputElement;
+    expect(endpointInput.value).toBe('http://localhost:1234');
+
+    // Click Ollama preset
+    fireEvent.click(screen.getByRole('button', { name: 'Ollama (:11434)' }));
+    await waitFor(() => {
+      expect(endpointInput.value).toBe('http://localhost:11434');
+      expect(screen.getByText(/Local LLM loopback endpoint updated to http:\/\/localhost:11434/i)).toBeInTheDocument();
+    });
+
+    // Click LM Studio preset
+    fireEvent.click(screen.getByRole('button', { name: 'LM Studio (:1234)' }));
+    await waitFor(() => {
+      expect(endpointInput.value).toBe('http://localhost:1234');
+      expect(screen.getByText(/Local LLM loopback endpoint updated to http:\/\/localhost:1234/i)).toBeInTheDocument();
     });
   });
 });

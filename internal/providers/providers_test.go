@@ -277,8 +277,8 @@ func TestProviderManagerCoordination(t *testing.T) {
 
 	// Summaries
 	summaries := pm.GetSummaries()
-	if len(summaries) != 5 {
-		t.Fatalf("expected 5 summaries, got %d", len(summaries))
+	if len(summaries) != 6 {
+		t.Fatalf("expected 6 summaries, got %d", len(summaries))
 	}
 
 	var offlineSum *ProviderSummary

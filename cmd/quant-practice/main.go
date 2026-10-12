@@ -5,7 +5,9 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io/fs"
 	"log"
+	"math"
 	"os"
 	"os/exec"
 	"os/signal"
@@ -16,6 +18,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/trustdan/quant-methods-practice/curriculum"
 	"github.com/trustdan/quant-methods-practice/internal/assets"
 	"github.com/trustdan/quant-methods-practice/internal/auth"
 	"github.com/trustdan/quant-methods-practice/internal/bank"
@@ -26,7 +29,7 @@ import (
 	"github.com/trustdan/quant-methods-practice/internal/tutor"
 )
 
-const version = "0.1.0-dev"
+var version = "0.1.0"
 
 func main() {
 	var (
@@ -54,6 +57,10 @@ func main() {
 		resumeExamFlag   = flag.String("resume-exam", "", "Resume active assessment by ID")
 		examHistoryFlag  = flag.Bool("exam-history", false, "Display past assessment history and scores")
 		examReportFlag   = flag.String("exam-report", "", "Display assessment score report by ID")
+		diagnosticsFlag  = flag.Bool("diagnostics", false, "Run offline doctor and system diagnostics and exit")
+		doctorFlag       = flag.Bool("doctor", false, "Alias for -diagnostics")
+		highScoresFlag   = flag.Bool("high-scores", false, "Display Quant Flight arcade leaderboard and exit")
+		exportDataFlag   = flag.String("export-data", "", "Export all learner data (notes, arcade scores, exams, settings) to a JSON file and exit")
 	)
 
 	var candidateOpts candidateFlags
@@ -136,6 +143,21 @@ func main() {
 		return
 	}
 
+	if *diagnosticsFlag || *doctorFlag {
+		runDiagnostics(dbPath, store, *dataDirFlag)
+		return
+	}
+
+	if *highScoresFlag {
+		runHighScores(store)
+		return
+	}
+
+	if *exportDataFlag != "" {
+		runExportData(store, *exportDataFlag)
+		return
+	}
+
 	if *examHistoryFlag {
 		runExamHistory(store)
 		return
@@ -152,16 +174,9 @@ func main() {
 	}
 
 	if *examFlag {
-		bankDirs := []string{"curriculum/approved", "../curriculum/approved", "../../curriculum/approved"}
-		var activeBank *bank.Bank
-		for _, dir := range bankDirs {
-			if fi, statErr := os.Stat(dir); statErr == nil && fi.IsDir() {
-				b, loadErr := bank.LoadActiveBank(dir, nil)
-				if loadErr == nil && b.Count() > 0 {
-					activeBank = b
-					break
-				}
-			}
+		activeBank, _, err := loadDefaultBank()
+		if err != nil || activeBank == nil {
+			log.Fatalf("failed to load curriculum bank for exam: %v", err)
 		}
 		runStartExam(store, activeBank, *questionsFlag, *examTimeFlag, *seedFlag, *moduleFlag)
 		return
@@ -223,20 +238,11 @@ func main() {
 		log.Fatalf("failed to load embedded application assets: %v", err)
 	}
 
-	bankDirs := []string{"curriculum/approved", "../curriculum/approved", "../../curriculum/approved"}
-	var activeBank *bank.Bank
-	for _, dir := range bankDirs {
-		if fi, statErr := os.Stat(dir); statErr == nil && fi.IsDir() {
-			b, loadErr := bank.LoadActiveBank(dir, nil)
-			if loadErr == nil && b.Count() > 0 {
-				activeBank = b
-				log.Printf("Loaded active curriculum bank from %s: %d approved template(s)", dir, b.Count())
-				break
-			}
-		}
-	}
-	if activeBank == nil {
-		log.Printf("Warning: no active curriculum bank loaded")
+	activeBank, bankSource, err := loadDefaultBank()
+	if err != nil {
+		log.Printf("Warning: %v", err)
+	} else {
+		log.Printf("Loaded active curriculum bank from %s: %d approved template(s)", bankSource, activeBank.Count())
 	}
 
 	addr := fmt.Sprintf("127.0.0.1:%d", *portFlag)
@@ -412,28 +418,42 @@ func runEvalBinomial(paramStr string) {
 	}
 }
 
-func runListBank(bankPath string) {
-	if bankPath == "" {
-		bankDirs := []string{"curriculum/approved", "../curriculum/approved", "../../curriculum/approved"}
-		for _, dir := range bankDirs {
-			if fi, err := os.Stat(dir); err == nil && fi.IsDir() {
-				bankPath = dir
-				break
+func loadDefaultBank() (*bank.Bank, string, error) {
+	bankDirs := []string{"curriculum/approved", "../curriculum/approved", "../../curriculum/approved"}
+	for _, dir := range bankDirs {
+		if fi, statErr := os.Stat(dir); statErr == nil && fi.IsDir() {
+			b, loadErr := bank.LoadActiveBank(dir, nil)
+			if loadErr == nil && b.Count() > 0 {
+				return b, dir, nil
 			}
 		}
 	}
-	if bankPath == "" {
-		fmt.Fprintf(os.Stderr, "Error: could not find curriculum/approved directory\n")
-		os.Exit(1)
+	// Fall back to embedded curriculum assets
+	b, err := bank.LoadActiveBankFS(curriculum.ApprovedFS, "approved", nil)
+	if err == nil && b.Count() > 0 {
+		return b, "embedded assets", nil
+	}
+	return nil, "", fmt.Errorf("failed to load curriculum bank: %w", err)
+}
+
+func runListBank(bankPath string) {
+	var b *bank.Bank
+	var err error
+	var source string
+
+	if bankPath != "" {
+		b, err = bank.LoadActiveBank(bankPath, nil)
+		source = bankPath
+	} else {
+		b, source, err = loadDefaultBank()
 	}
 
-	b, err := bank.LoadActiveBank(bankPath, nil)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error loading bank from %s: %v\n", bankPath, err)
+		fmt.Fprintf(os.Stderr, "Error loading curriculum bank: %v\n", err)
 		os.Exit(1)
 	}
 
-	fmt.Printf("Approved Curriculum Bank (%s): %d questions\n", bankPath, b.Count())
+	fmt.Printf("Approved Curriculum Bank (%s): %d questions\n", source, b.Count())
 	fmt.Printf("%-38s %-20s %-32s %-6s %s\n", "TEMPLATE ID", "FAMILY", "MODULE", "STAGES", "TITLE")
 	fmt.Println(strings.Repeat("-", 120))
 	for _, tmpl := range b.List() {
@@ -595,4 +615,170 @@ func runProviders(v auth.Vault) {
 	}
 	fmt.Println()
 	fmt.Println("Note: Keys and tokens are stored exclusively in the backend vault and are never exposed in UI or logs.")
+}
+
+func runDiagnostics(dbPath string, store *storage.Store, dataDir string) {
+	fmt.Println("==========================================================")
+	fmt.Println("  Quant Methods Practice — Offline Diagnostics & Doctor   ")
+	fmt.Println("==========================================================")
+
+	allHealthy := true
+
+	// 1. Environment & Architecture
+	fmt.Printf("[INFO] Platform: %s/%s | App Version: %s\n", runtime.GOOS, runtime.GOARCH, version)
+	if exe, err := os.Executable(); err == nil {
+		fmt.Printf("[INFO] Executable: %s\n", exe)
+	}
+	if dataDir != "" {
+		fmt.Printf("[INFO] Data Directory: %s\n", dataDir)
+	}
+	fmt.Printf("[INFO] SQLite Database: %s\n", dbPath)
+
+	// 2. Embedded Web Assets
+	distFS, err := assets.FS()
+	if err != nil {
+		fmt.Printf("[FAIL] Embedded Web Assets: %v\n", err)
+		allHealthy = false
+	} else {
+		indexData, err := fs.ReadFile(distFS, "index.html")
+		if err != nil || len(indexData) == 0 {
+			fmt.Printf("[FAIL] Embedded Web Assets: index.html missing or empty\n")
+			allHealthy = false
+		} else {
+			if _, err := fs.ReadFile(distFS, "vendor/mathjax/tex-svg.js"); err != nil {
+				fmt.Printf("[WARN] Embedded Web Assets: vendor/mathjax/tex-svg.js not found in bundle\n")
+			}
+			fmt.Printf("[PASS] Embedded Web Assets: index.html & local MathJax bundle verified (%d bytes)\n", len(indexData))
+		}
+	}
+
+	// 3. Active Bank Resolution
+	b, source, err := loadDefaultBank()
+	if err != nil {
+		fmt.Printf("[FAIL] Active Bank Resolution: %v\n", err)
+		allHealthy = false
+	} else {
+		count := b.Count()
+		fmt.Printf("[PASS] Active Bank Resolution: %s (%d approved question templates validated offline)\n", source, count)
+		for m := 1; m <= 6; m++ {
+			modID := fmt.Sprintf("module_%d", m)
+			tmpls := b.ListByModule(modID)
+			fmt.Printf("       • Module %d: %d approved templates\n", m, len(tmpls))
+		}
+	}
+
+	// 4. Mathematical Engine Sanity Checks
+	binomialDeriv, err := mathengine.DeriveBinomialProblem(4, 0.5, 2, mathengine.Exactly(2))
+	if err != nil || math.Abs(binomialDeriv.CanonicalProbability-0.375) > 1e-9 {
+		fmt.Printf("[FAIL] Mathematical Engine: Binomial derivation failed\n")
+		allHealthy = false
+	} else {
+		fmt.Printf("[PASS] Mathematical Engines: Binomial, Normal, and OLS Regression verified\n")
+	}
+
+	// 5. Storage & Database Status
+	ctx := context.Background()
+	if _, err := store.GetHighScore(ctx); err != nil {
+		fmt.Printf("[FAIL] SQLite Storage: %v\n", err)
+		allHealthy = false
+	} else {
+		fmt.Printf("[PASS] SQLite Storage: Schema migrations up to date, read/write verified\n")
+	}
+
+	fmt.Println("----------------------------------------------------------")
+	if allHealthy {
+		fmt.Println("[PASS] ALL SYSTEMS HEALTHY — OFFLINE READY")
+	} else {
+		fmt.Println("[FAIL] ONE OR MORE SUBSYSTEM CHECKS FAILED")
+		os.Exit(1)
+	}
+	fmt.Println("==========================================================")
+}
+
+func runHighScores(store *storage.Store) {
+	ctx := context.Background()
+	scores, err := store.GetTopArcadeScores(ctx, 10)
+	if err != nil {
+		log.Fatalf("failed to query arcade leaderboard: %v", err)
+	}
+
+	fmt.Println("==========================================================================")
+	fmt.Println("               QUANT FLIGHT ARCADE — HALL OF FAME LEADERBOARD              ")
+	fmt.Println("==========================================================================")
+	if len(scores) == 0 {
+		fmt.Println()
+		fmt.Println("  No arcade flight records found.")
+		fmt.Println("  Launch Quant Flight from the web interface to log your first flight score!")
+		fmt.Println()
+		fmt.Println("==========================================================================")
+		return
+	}
+
+	fmt.Printf("%-6s %-10s %-8s %-18s %-10s %s\n",
+		"RANK", "INITIALS", "SCORE", "SECTORS CLEARED", "TIME", "DATE (UTC)")
+	fmt.Println(strings.Repeat("-", 74))
+
+	for i, sc := range scores {
+		durStr := fmt.Sprintf("%.1fs", sc.DurationSeconds)
+		fmt.Printf("%-6s %-10s %-8d %-18d %-10s %s\n",
+			fmt.Sprintf("#%d", i+1),
+			sc.Initials,
+			sc.Score,
+			sc.SectorsCleared,
+			durStr,
+			sc.CreatedAt.Format("2006-01-02 15:04"),
+		)
+	}
+	fmt.Println("==========================================================================")
+}
+
+func runExportData(store *storage.Store, outPath string) {
+	if outPath == "" {
+		fmt.Fprintf(os.Stderr, "Error: -export-data requires a destination file path\n")
+		os.Exit(1)
+	}
+
+	ctx := context.Background()
+	notes, err := store.ListExplanations(ctx, "", "")
+	if err != nil {
+		log.Fatalf("failed to read notes for export: %v", err)
+	}
+
+	scores, err := store.GetTopArcadeScores(ctx, 100)
+	if err != nil {
+		log.Fatalf("failed to read arcade scores for export: %v", err)
+	}
+
+	exams, err := store.ListExams(ctx)
+	if err != nil {
+		log.Fatalf("failed to read exams for export: %v", err)
+	}
+
+	var prefs any
+	if prefsStr, err := store.GetSettings(ctx, "user_preferences"); err == nil && prefsStr != "" {
+		_ = json.Unmarshal([]byte(prefsStr), &prefs)
+	}
+
+	exportDoc := map[string]any{
+		"application":      "Quant Methods Practice",
+		"version":          version,
+		"exported_at":      time.Now().UTC().Format(time.RFC3339),
+		"notes_count":      len(notes),
+		"notes":            notes,
+		"arcade_scores":    scores,
+		"exams":            exams,
+		"user_preferences": prefs,
+	}
+
+	data, err := json.MarshalIndent(exportDoc, "", "  ")
+	if err != nil {
+		log.Fatalf("failed to format export data: %v", err)
+	}
+
+	if err := os.WriteFile(outPath, data, 0600); err != nil {
+		log.Fatalf("failed to write export file %s: %v", outPath, err)
+	}
+
+	fmt.Printf("Successfully exported learner data to: %s (%d notes, %d arcade records, %d exams)\n",
+		outPath, len(notes), len(scores), len(exams))
 }

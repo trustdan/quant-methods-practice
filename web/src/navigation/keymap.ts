@@ -26,6 +26,7 @@ export type NavigationCommand =
   // Assistance & guidance
   | 'HINT'
   | 'HELP'
+  | 'TOGGLE_SOFTWARE_DRAWER'
   // View shortcuts
   | 'VIEW_MASTERY'
   | 'VIEW_SAVED_NOTES'
@@ -284,6 +285,8 @@ export function resolveKeyCommand(event: KeyboardEvent, context: KeyContext): Na
       return 'VIEW_LEADERBOARD';
     case 'A':
       return 'VIEW_ARCADE';
+    case 'u':
+      return 'TOGGLE_SOFTWARE_DRAWER';
 
     default:
       return null;

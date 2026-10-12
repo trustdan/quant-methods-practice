@@ -180,6 +180,9 @@ describe('Exams Feature UI', () => {
       expect(screen.getByText('Part 1')).toBeInTheDocument();
     });
 
+    // Active exam must withhold software drawer
+    expect(screen.getByText(/Withheld in Timed Assessment/)).toBeInTheDocument();
+
     // Select Binomial option radio button
     const radio = screen.getByDisplayValue('opt_binom');
     fireEvent.click(radio);
@@ -193,11 +196,12 @@ describe('Exams Feature UI', () => {
     });
     fireEvent.click(screen.getByRole('button', { name: 'Yes, Submit Assessment' }));
 
-    // Report should now be displayed
+    // Report should now be displayed with worked software call unlocked
     await waitFor(() => {
       expect(screen.getByText('100.0%')).toBeInTheDocument();
       expect(screen.getByText('Detailed Question Review')).toBeInTheDocument();
       expect(screen.getByText('Download Markdown Report')).toBeInTheDocument();
+      expect(screen.getByText(/Worked Software Call/)).toBeInTheDocument();
     });
   });
 
@@ -223,6 +227,9 @@ describe('Exams Feature UI', () => {
     expect(screen.queryByText(/explanation/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/expected/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/solution/i)).not.toBeInTheDocument();
+
+    // Verify software aids are withheld
+    expect(screen.getByText(/Withheld in Timed Assessment/)).toBeInTheDocument();
 
     // Verify option text is rendered cleanly
     expect(screen.getByText('Binomial')).toBeInTheDocument();

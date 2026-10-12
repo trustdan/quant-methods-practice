@@ -32,7 +32,7 @@ OFFLINE DIAGNOSTICS & DOCTOR:
 
 USEFUL CLI COMMANDS:
   ./quant-practice -help             : View all available command-line flags
-  ./quant-practice -list-bank        : View all 21 approved curriculum questions
+  ./quant-practice -list-bank        : View all 137 approved curriculum questions
   ./quant-practice -diagnostics      : Run environment and asset health checks
   ./quant-practice -exam             : Start an assessment mode session in CLI
   ./quant-practice -high-scores      : View the Quant Flight arcade leaderboard

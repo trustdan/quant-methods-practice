@@ -68,6 +68,8 @@ func TestMigrationsFreshDatabase(t *testing.T) {
 		"tutor_drafts",
 		"exam_responses",
 		"arcade_scores",
+		"tutor_threads",
+		"tutor_messages",
 	}
 
 	for _, table := range requiredTables {

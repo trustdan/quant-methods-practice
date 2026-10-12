@@ -6,6 +6,8 @@ import {
   ExamCommandDTO,
   PublicQuestionView,
 } from './types';
+import { SoftwareToolDrawer } from '../reference/SoftwareToolDrawer';
+import { WorkedSoftwareCallBox } from '../reference/WorkedSoftwareCallBox';
 
 interface ExamsProps {
   active: boolean;
@@ -700,6 +702,15 @@ export const Exams: React.FC<ExamsProps> = ({ active, onReturnToPractice }) => {
               )}
             </div>
 
+            {/* Software Tool Drawer (Withheld during active exam) */}
+            <div style={{ marginBottom: '1.25rem' }}>
+              <SoftwareToolDrawer
+                title={currentQuestion.title}
+                withheld={true}
+                withheldReason="Software aids are strictly withheld during active timed assessments to evaluate independent conceptual mastery. Full syntax unlocks in the post-exam review."
+              />
+            </div>
+
             {/* Stages Input Section */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               {currentQuestion.stages.map((stage, stIdx) => {
@@ -882,6 +893,15 @@ export const Exams: React.FC<ExamsProps> = ({ active, onReturnToPractice }) => {
 
                 <div style={{ fontSize: '0.92rem', marginBottom: '1rem', color: 'var(--text-primary)' }}>
                   <MathMarkdown content={qr.scenario_markdown} />
+                </div>
+
+                {/* Worked Software Call (Unlocked in Post-Exam Review) */}
+                <div style={{ marginBottom: '1rem' }}>
+                  <WorkedSoftwareCallBox
+                    lookup={{ template_id: qr.template_id, title: qr.title }}
+                    expectedAnswer={qr.stage_reports.find((sr) => sr.expected_answer?.value !== undefined)?.expected_answer?.value}
+                    allowSideBySide={true}
+                  />
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>

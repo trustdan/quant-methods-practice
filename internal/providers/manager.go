@@ -2,6 +2,7 @@ package providers
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sync"
 
@@ -49,8 +50,12 @@ func NewProviderManager(vault auth.Vault, budget *BudgetTracker, catalog *Catalo
 	anthropic := NewAnthropicAdapter(vault, budget)
 	gemini := NewGeminiAdapter(vault, budget)
 	openai := NewOpenAIAdapter(vault, budget)
+	local := NewLocalLLMAdapter(DefaultLocalLLMBaseURL)
 	pm.chatgpt = siwc.NewClient(vault)
 	chatgpt := NewChatGPTPlanAdapter(pm.chatgpt, budget)
+
+	pm.services[auth.RouteLocal] = local
+	pm.discoverers[auth.RouteLocal] = local
 
 	pm.services[auth.RouteAnthropic] = anthropic
 	pm.discoverers[auth.RouteAnthropic] = anthropic
@@ -66,6 +71,7 @@ func NewProviderManager(vault auth.Vault, budget *BudgetTracker, catalog *Catalo
 
 	// Default active models
 	pm.activeModels[auth.RouteOffline] = "offline-curriculum"
+	pm.activeModels[auth.RouteLocal] = local.DefaultModel
 	pm.activeModels[auth.RouteAnthropic] = anthropic.DefaultModel
 	pm.activeModels[auth.RouteGemini] = gemini.DefaultModel
 	pm.activeModels[auth.RouteOpenAI] = openai.DefaultModel
@@ -88,6 +94,26 @@ func (pm *ProviderManager) GetActiveRoute() string {
 	return pm.activeRoute
 }
 
+// GetLocalEndpoint returns the configured loopback endpoint for local LLMs.
+func (pm *ProviderManager) GetLocalEndpoint() string {
+	pm.mu.RLock()
+	defer pm.mu.RUnlock()
+	if loc, ok := pm.services[auth.RouteLocal].(*LocalLLMAdapter); ok {
+		return loc.GetBaseURL()
+	}
+	return DefaultLocalLLMBaseURL
+}
+
+// SetLocalEndpoint configures the loopback endpoint for local LLMs.
+func (pm *ProviderManager) SetLocalEndpoint(endpoint string) error {
+	pm.mu.Lock()
+	defer pm.mu.Unlock()
+	if loc, ok := pm.services[auth.RouteLocal].(*LocalLLMAdapter); ok {
+		return loc.SetBaseURL(endpoint)
+	}
+	return errors.New("local LLM adapter not registered")
+}
+
 // GetActiveModel returns the active model for the active route.
 func (pm *ProviderManager) GetActiveModel() string {
 	pm.mu.RLock()
@@ -102,6 +128,7 @@ func (pm *ProviderManager) SetActive(route, model string) error {
 
 	validRoutes := map[string]bool{
 		auth.RouteOffline:   true,
+		auth.RouteLocal:     true,
 		auth.RouteAnthropic: true,
 		auth.RouteGemini:    true,
 		auth.RouteOpenAI:    true,
@@ -127,6 +154,8 @@ func (pm *ProviderManager) SetActive(route, model string) error {
 		// Update adapter default model if applicable
 		if svc, ok := pm.services[route]; ok {
 			switch adapter := svc.(type) {
+			case *LocalLLMAdapter:
+				adapter.DefaultModel = model
 			case *AnthropicAdapter:
 				adapter.DefaultModel = model
 			case *GeminiAdapter:
@@ -149,6 +178,7 @@ func (pm *ProviderManager) GetSummaries() []ProviderSummary {
 
 	routes := []string{
 		auth.RouteOffline,
+		auth.RouteLocal,
 		auth.RouteAnthropic,
 		auth.RouteGemini,
 		auth.RouteOpenAI,
@@ -157,6 +187,7 @@ func (pm *ProviderManager) GetSummaries() []ProviderSummary {
 
 	names := map[string]string{
 		auth.RouteOffline:   "Offline Reviewed (Default)",
+		auth.RouteLocal:     "Local Offline LLM (LM Studio / Ollama)",
 		auth.RouteAnthropic: "Anthropic Claude",
 		auth.RouteGemini:    "Google Gemini",
 		auth.RouteOpenAI:    "OpenAI API",
@@ -165,6 +196,7 @@ func (pm *ProviderManager) GetSummaries() []ProviderSummary {
 
 	requiresKey := map[string]bool{
 		auth.RouteOffline:   false,
+		auth.RouteLocal:     false,
 		auth.RouteAnthropic: true,
 		auth.RouteGemini:    true,
 		auth.RouteOpenAI:    true,
@@ -187,6 +219,12 @@ func (pm *ProviderManager) GetSummaries() []ProviderSummary {
 		case auth.RouteOffline:
 			sum.Configured, sum.AuthKind, sum.Billing = true, "none", "none"
 			sum.Source = string(auth.SourceNone)
+		case auth.RouteLocal:
+			sum.Configured, sum.AuthKind, sum.Billing = true, "local_loopback", "none"
+			sum.Source = string(auth.SourceNone)
+			if loc, ok := pm.services[auth.RouteLocal].(*LocalLLMAdapter); ok {
+				sum.Endpoint = loc.GetBaseURL()
+			}
 		case auth.RouteChatGPT:
 			// Never read through the generic vault status: that would mask the
 			// account store blob as if it were an API key.
@@ -232,7 +270,7 @@ func (pm *ProviderManager) RefreshModels(ctx context.Context, route string) ([]M
 	}
 
 	var key string
-	if route != auth.RouteChatGPT { // the plan route authenticates with its own OAuth tokens
+	if route != auth.RouteChatGPT && route != auth.RouteLocal { // plan route uses OAuth tokens; local uses loopback
 		var err error
 		key, err = pm.vault.Get(route)
 		if err != nil || key == "" {
@@ -286,4 +324,16 @@ func (pm *ProviderManager) ChatGPT() *siwc.Client {
 // Budget returns the underlying BudgetTracker.
 func (pm *ProviderManager) Budget() *BudgetTracker {
 	return pm.budget
+}
+
+// LocalLLM returns the LocalLLMAdapter instance if registered.
+func (pm *ProviderManager) LocalLLM() *LocalLLMAdapter {
+	pm.mu.RLock()
+	defer pm.mu.RUnlock()
+	if svc, ok := pm.services[auth.RouteLocal]; ok {
+		if local, ok := svc.(*LocalLLMAdapter); ok {
+			return local
+		}
+	}
+	return nil
 }

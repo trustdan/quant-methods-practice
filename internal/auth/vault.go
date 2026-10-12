@@ -131,12 +131,12 @@ func (v *StandardVault) Status(route string) CredentialStatus {
 }
 
 func (v *StandardVault) AllStatuses() []CredentialStatus {
-	routes := []string{RouteOffline, RouteAnthropic, RouteGemini, RouteOpenAI}
+	routes := []string{RouteOffline, RouteLocal, RouteAnthropic, RouteGemini, RouteOpenAI}
 	statuses := make([]CredentialStatus, 0, len(routes))
 	for _, r := range routes {
-		if r == RouteOffline {
+		if r == RouteOffline || r == RouteLocal {
 			statuses = append(statuses, CredentialStatus{
-				Route:      RouteOffline,
+				Route:      r,
 				Configured: true,
 				Source:     SourceNone,
 			})

@@ -1,5 +1,169 @@
 # Handoff
 
+## Backlog Items 2 & 4 Complete: Multi-Turn Interactive AI Tutor & Local LLM Provider - October 12, 2026 (Windows)
+
+- **Objective**: Implemented Backlog Item 2 (Interactive Multi-Turn AI Tutor Chat) and Backlog Item 4 (Local Offline LLM Provider - LM Studio / Ollama) from [PLAN.md](../PLAN.md), delivering:
+  1. **Local LLM Loopback Adapter (`LocalLLMAdapter`)**: A strict loopback-only (`localhost`, `127.0.0.1`, `::1`) OpenAI-compatible provider adapter supporting LM Studio (default port `1234`), Ollama (port `11434`), and custom loopback endpoints. It features zero internet network calls, zero billing/API cost, absolute offline privacy, dynamic model discovery via `GET /v1/models`, and streaming SSE delta ingestion via `POST /v1/chat/completions`.
+  2. **Conversational Thread Persistence in SQLite**: Schema migration `003_tutor_threads.sql` creating `tutor_threads` and `tutor_messages` tables with indices on `(instance_id, stage_id)` and `(thread_id, created_at)`. Full CRUD storage methods (`CreateTutorThread`, `GetTutorThread`, `ListTutorThreads`, `DeleteTutorThread`, `AppendTutorMessage`, `GetTutorMessages`).
+  3. **Pedagogical System Prompt Guardrails**: Enhanced `internal/providers/prompt.go` with strict Socratic rules for active, unresolved stages (`!req.StageResolved`). The tutor provides diagnostic cues, conceptual analogies, and step-by-step guidance while withholding final numeric answers and calculation formulas until stage completion.
+  4. **HTTP Endpoints & SSE Streaming**: Full REST API for thread lifecycle (`GET/POST /api/tutor/threads`, `GET/DELETE /api/tutor/threads/{id}`, `POST /api/tutor/threads/{id}/messages`), and streaming server-sent events via `GET /api/tutor/threads/{id}/messages/{msgId}/events`.
+  5. **Dual-Save Capability**: Individual AI assistant messages or complete multi-turn conversation transcripts formatted into clean Markdown can be persisted directly to the learner's personal note library with source provenance, stage references, and tags.
+  6. **Interactive Frontend Dual-Mode Panel (`AITutorPanel.tsx`)**: Mode switcher toggling between Quick Guidance (one-shot derivations, hints, worked examples) and Interactive Chat (persistent multi-turn dialogue with MathJax-rendered message bubbles, thread selector, quick-prompt chips, and live typing streams).
+  7. **Provider Configuration UI (`ProviderSettings.tsx`)**: Dedicated `Local Offline LLM` tab with loopback endpoint switcher (preset buttons for LM Studio `:1234` and Ollama `:11434`, plus custom loopback port input and persistence), dynamic model discovery probe button, model dropdown, offline privacy guarantee notices, and an interactive tabbed setup walkthrough (step-by-step instructions for LM Studio GUI setup, Ollama CLI setup, and troubleshooting FAQ).
+- **Artifacts Created & Updated**:
+  - `internal/storage/migrations/003_tutor_threads.sql`: SQLite DDL for `tutor_threads` and `tutor_messages`.
+  - `internal/storage/tutor_threads.go` & `tutor_threads_test.go`: Thread and message storage engine implementation and unit tests.
+  - `internal/storage/migrations_test.go`: Added thread tables to migration verification.
+  - `internal/auth/types.go` & `vault.go`: Added `RouteLocal = "local"`.
+  - `internal/providers/local.go` & `local_test.go`: Loopback `LocalLLMAdapter`, model discovery, and SSE stream consumer with loopback host validation tests and actionable error diagnostics.
+  - `internal/providers/types.go`, `catalog.go`, `manager.go`, `prompt.go`, `providers_test.go`: Registered local provider route, updated catalog, added local endpoint getter/setter, added chat system prompt with Socratic guardrails.
+  - `internal/tutor/types.go` & `offline.go`: Added `ActionChat = "chat"`, message structures, and offline Socratic chat generator.
+  - `internal/httpapi/providers.go` & `providers_test.go`: Added `/api/providers/local/endpoint` GET/POST endpoints with loopback validation and preference persistence.
+  - `internal/httpapi/tutor_threads.go` & `tutor_threads_test.go`: HTTP endpoints for thread management, message posting, and SSE event streaming.
+  - `internal/httpapi/server.go`: Wired `TutorThreadStore` into HTTP server routing.
+  - `web/src/types/providers.ts` & `tutor.ts`: Added `'local'` and `'local_offline'` routes and DTOs for threads and chat messages.
+  - `web/src/features/providers/ProviderSettings.tsx` & `ProviderSettings.test.tsx`: Added Local Offline LLM tab with endpoint presets, custom port persistence, interactive LM Studio/Ollama setup guides, and comprehensive unit tests.
+  - `web/src/features/tutor/AITutorPanel.tsx` & `AITutorPanel.test.tsx`: Dual-mode quick/chat UI, message streams, thread management, dual note saving, and tests.
+  - `web/src/app/App.tsx`: Passed `stageResolved` status to `AITutorPanel`.
+  - `PLAN.md`: Marked Backlog Items 2 and 4 as `[COMPLETE]`.
+- **Verification Run**:
+  - `powershell -ExecutionPolicy Bypass -File scripts\test.ps1`:
+    - Scaffold validation: 35 Markdown files, 92 local links, 298 JSON files.
+    - Frontend: 24 test files, 147/147 tests passed (0 failed).
+    - TypeScript typecheck: 0 errors (`tsc --noEmit`).
+    - ESLint: 0 errors, 0 warnings (`eslint src`).
+    - Production build: Asset compilation and Go binary build succeeded.
+    - Browser end-to-end tests: 16/16 Playwright tests passed across all specs.
+    - Go test & vet: All 16 Go packages passed with clean formatting and no vet issues.
+    - Release verification: All 6 sandbox checks passed.
+- **Next Work**:
+  - Stage 20: Ongoing Content Quality, transfer groups, and curriculum breadth review.
+
+## Stage 19 Complete: Release Hardening & Standalone Packaging - October 12, 2026 (Windows)
+
+- **Objective**: Implemented Stage 19 of the roadmap ([PLAN.md](../PLAN.md)), delivering standalone multi-platform offline packaging (Windows amd64, macOS arm64/amd64, Linux amd64/arm64) with embedded UI, bank, and fonts; embedded approved curriculum bank (all 137 approved templates loaded seamlessly from memory when running outside the repo); offline doctor/diagnostics CLI command (`-diagnostics` / `-doctor`) verifying environment, assets, 137 templates, math engine derivations, and SQLite storage; CLI arcade leaderboard (`-high-scores`); complete learner data JSON export (`-export-data`); standalone launchers (`start.bat` and `start.sh`); automated SHA-256 checksum generation; and isolated sandbox verification suites (`scripts/verify_release.ps1` and `scripts/verify_release.sh`).
+- **Artifacts Created & Updated**:
+  - `curriculum/embedded.go`: Embedded all 137 approved question templates (`//go:embed approved/*.json var ApprovedFS embed.FS`).
+  - `internal/bank/bank.go`: Added `LoadActiveBankFS(fsys fs.FS, dir string, reg *Registry) (*Bank, error)` to load and validate question banks from an embedded or virtual filesystem.
+  - `internal/bank/bank_test.go`: Added `TestLoadActiveBankFS` unit test verifying all 137 templates load and validate cleanly directly from `curriculum.ApprovedFS`.
+  - `cmd/quant-practice/main.go`: Added `loadDefaultBank()` fallback resolution (checking disk first, then embedded assets), added `-diagnostics` / `-doctor` health checks, `-high-scores` ASCII leaderboard, and `-export-data` learner progress JSON export. Fixed `version` injection and `fmt.Println` formatting.
+  - `cmd/quant-practice/main_test.go`: Created unit test suite covering `loadDefaultBank`, `runExportData`, and `runHighScores`.
+  - `scripts/package.ps1` & `scripts/package.sh`: Injected release version via `-ldflags "-s -w -X main.version=$version"`.
+  - `scripts/release-launchers/README.txt`: Updated question bank count from 21 to 137.
+  - `scripts/verify_release.sh`: Updated for 137 questions and added leaderboard verification.
+  - `scripts/verify_release.ps1`: Created comprehensive Windows release verification script testing SHA-256 checksums, isolated sandbox extraction, file hygiene (no source code or secrets), CLI offline commands, embedded bank resolution, database backup/export, and loopback HTTP server with embedded UI.
+  - `scripts/test.ps1`: Integrated release verification step into root test suite.
+  - `PLAN.md`: Marked Stage 19 as `[COMPLETE]`.
+- **Verification Run**:
+  - `powershell -ExecutionPolicy Bypass -File scripts\test.ps1`: All checks passed cleanly:
+    - Scaffold validation: 35 Markdown files, 92 local links, 298 JSON files.
+    - Frontend: 24 test files, 143/143 tests passed; TypeScript clean (0 errors); ESLint clean (0 errors/warnings).
+    - Production build: UI bundle built cleanly (600 kB JS / 23 kB CSS) and native binary `bin/quant-practice.exe`.
+    - Browser end-to-end tests: 16/16 Playwright tests passed across arcade, candidates, exams, foundation, visuals, and worksheets.
+    - Go suite: Clean formatting (`gofmt -s`), unit tests across all 16 packages passed, and `go vet` clean.
+    - Release verification in isolated sandbox: SHA-256 checksum verification, archive extraction, package hygiene (zero sources/secrets), offline doctor diagnostics, 137 embedded bank templates, arcade leaderboard, analytical math engine derivation, database backup/export, and loopback server HTTP UI & API endpoints all passed.
+  - `python scripts/check_content_coverage.py`: Coverage OK (121/121 additions, 22/22 objectives, 137 unique templates).
+- **Next Work**:
+  - Backlog Item 2: Multi-Turn Interactive AI Tutor & Local LLM Provider (LM Studio / Ollama loopback adapter).
+  - Stage 20: Ongoing Content Quality, transfer groups, and curriculum breadth review.
+
+## Stage 18 Complete: Quant Flight Arcade Complete Parity - October 12, 2026 (Windows)
+
+- **Objective**: Implemented Stage 18 of the roadmap ([PLAN.md](../PLAN.md)), delivering complete parity for the Quant Flight 60Hz vector space arcade engine: autofire, smart bombs with shockwave detonations, dual health (shields + hull with passive shield regeneration), heavy armored hazards with fragment splitting, four cosmic sectors with hyper-drive warp transitions and bonus scoring, persistent high scores/leaderboard integration with 3-letter initials arcade entry, and title/attract mode cycling.
+- **Artifacts Created & Updated**:
+  - `web/src/features/arcade/types.ts`: Extended with `Ship` dual health (`shields`, `hull`, `bombs`, `bombCooldown`, `shieldRechargeTimer`, `invulnerableTimer`), `HazardKind` (`'standard' | 'heavy' | 'fragment'`), `Shockwave` entity schema, `SECTORS` configuration for 4 cosmic sectors (Univariate Void, Bivariate Belt, Sampling Nebula, Inference Core), `ArcadeScoreEntry`, and constants (`BOMB_MAX_RADIUS = 340`, `BOMB_DURATION = 0.55`).
+  - `web/src/features/arcade/simulation.ts`: Implemented fixed-step simulation with autofire repeat, smart bomb shockwave detonation damaging all threats within radius, dual-health damage hierarchy (shields absorb first; excess penetrates hull; zero hull triggers game over), passive shield regeneration after unhit delay, heavy hazard destruction with dual-fragment splitting, sector progression tracking, and hyper-drive warp transitions with bonus points and bomb/shield replenishment. Autopilot enhanced to utilize smart bombs under threat crowding while strictly isolating demo play from human leaderboards.
+  - `web/src/features/arcade/renderer.ts`: Updated canvas renderer with sector-themed gradient nebulae, hyper-drive warp starfield streaking lines, expanding neon shockwave rings, armored octagonal heavy hazards with mini HP pips, jagged triangular fragments, dual-health HUD meters (cyan shields + dynamic hull gauge), vector diamond bomb stock indicators, and Game Over failure overlay.
+  - `web/src/features/arcade/ArcadeGame.tsx`: Wired smart bomb keys (`KeyB`, `KeyX`), held-key autofire, backend score fetching (`GET /api/arcade/scores`) and local storage sync (`localStorage['quant_arcade_leaderboard']`), 3-letter arcade initials picker on Game Over with cycling/typing, score submission (`POST /api/arcade/scores`), and interactive Hall of Fame leaderboard modal with "Launch New Flight" restart action.
+  - `web/src/features/arcade/simulation.test.ts`: Added comprehensive unit tests covering smart bomb detonation, shockwave blast damage, dual health shield absorption and hull bleedthrough, game over trigger, heavy hazard fragment splitting, sector warp progression and rewards, and shield passive regeneration (14/14 tests passed).
+  - `web/src/features/arcade/ArcadeGame.test.tsx`: Added tests verifying Hall of Fame modal rendering, leaderboard toggling, and new flight launch from leaderboard (7/7 tests passed).
+  - `PLAN.md`: Marked Stage 18 as `[COMPLETE]`.
+- **Verification Run**:
+  - `npm run test`: 24 test files, 143/143 tests passed cleanly.
+  - `npm run typecheck`: TypeScript clean (0 errors).
+  - `npm run lint`: ESLint clean (0 errors, 0 warnings).
+  - `npm run build`: Production bundle built cleanly (600 kB JS / 23 kB CSS).
+  - `python scripts/validate_scaffold.py`: Scaffold OK (35 Markdown, 91 local links, 297 JSON).
+  - `python scripts/check_content_coverage.py`: Coverage OK (121/121 additions, 22/22 objectives, 137 unique templates).
+  - `go test ./...` & `go vet ./internal/... ./cmd/...`: All 15 Go packages passed cleanly.
+- **Next Work**:
+  - Backlog Item 2: Multi-Turn Interactive AI Tutor & Local LLM Provider (LM Studio / Ollama loopback adapter).
+  - Stage 19: Release Hardening & Standalone Packaging (embedded Go binaries, launchers, checksums).
+
+## Phases 3, 4 & 5 Complete: Software Interpolation, Cheatsheet Catalog & Guardrails - October 12, 2026 (Windows)
+
+- **Objective**: Completed Phases 3, 4, and 5 of the Software Tooling Plan ([SOFTWARE-TOOLING-PLAN.md](SOFTWARE-TOOLING-PLAN.md)), delivering post-submission exact parameter interpolation, a standalone 50-recipe Software Cheatsheet in the Reference Library with print/export support, and assessment policy guardrails with post-exam review unlocks.
+- **Artifacts Created & Updated**:
+  - `web/src/features/reference/softwareWorkedCalls.ts`: Post-submission parameter interpolation engine mapping problem parameters ($n, p, k, \mu, \sigma, \lambda, \alpha, \text{slope}, \text{intercept}$, etc.) and target answers directly into evaluated Excel and R function calls (e.g., `=BINOM.DIST(2, 4, 0.5, FALSE) -> 0.375` and `dbinom(2, size = 4, prob = 0.5) -> 0.375`).
+  - `web/src/features/reference/softwareWorkedCalls.test.ts`: Vitest suite covering binomial PMF/CDF, Poisson, normal CDF/quantiles, uniform, exponential, CLT SE, confidence intervals, regression predictions, and fallback interpolation (8/8 passed).
+  - `web/src/features/reference/WorkedSoftwareCallBox.tsx`: Interactive post-answer feedback component supporting tabbed or side-by-side display, clipboard copying with feedback, and evaluated answer badges.
+  - `web/src/features/reference/WorkedSoftwareCallBox.test.tsx`: Vitest suite covering tab switching, side-by-side mode, clipboard copy, and result rendering (4/4 passed).
+  - `web/src/features/reference/SoftwareCheatsheetCatalog.tsx`: Dedicated 50-recipe searchable and filterable cheatsheet catalog with module pills (M1–M6), display mode switcher (Side-by-Side, Excel Only, R Only), copy buttons, and print/PDF export trigger.
+  - `web/src/features/reference/SoftwareCheatsheetCatalog.test.tsx`: Vitest suite covering module pill filtering, display mode switching, print button, and details expansion (5/5 passed).
+  - `web/src/features/reference/ReferenceLibrary.tsx`: Added top-level section tab switcher between `[ 📖 Mathematical Concepts & Formulas ]` and `[ 💻 Software Cheatsheet (Excel & R) ]`.
+  - `web/src/features/reference/ReferenceLibrary.test.tsx`: Updated suite testing section tab switching, cheatsheet search, and category filtering (4/4 passed).
+  - `web/src/features/practice/PracticeDrill.tsx`: Embedded `WorkedSoftwareCallBox` directly inside the completed stage explanation banner and passed session parameters to recap.
+  - `web/src/features/practice/PracticeDrill.test.tsx`: Added assertions verifying worked software call renders upon stage completion and in full recap (13/13 passed).
+  - `web/src/features/practice/DrillRecapView.tsx`: Integrated Worked Software Verification card reproducing the canonical answer in both tools.
+  - `web/src/features/exams/Exams.tsx`: Enforced strict assessment policy guardrail during active exams (`SoftwareToolDrawer` with `withheld={true}`) and unlocked `WorkedSoftwareCallBox` in post-exam review.
+  - `web/src/features/exams/Exams.test.tsx`: Verified software aid withholding during active exam and worked call unlocking in post-exam report (3/3 passed).
+  - `web/src/index.css`: Added styles for `.software-cheatsheet-catalog`, hover effects, and `@media print` rules for clean paper/PDF export.
+- **Verification Run**:
+  - `npm run test`: 24 test files, 134/134 tests passed cleanly.
+  - `npm run typecheck`: TypeScript clean (0 errors).
+  - `npm run lint`: ESLint clean (0 errors, 0 warnings).
+  - `npm run build`: Production bundle built cleanly (584 kB JS / 23 kB CSS).
+  - `python scripts/validate_scaffold.py`: Scaffold OK (35 Markdown, 90 local links, 297 JSON).
+  - `python scripts/check_content_coverage.py`: Coverage OK (121/121 additions, 22/22 objectives, 137 unique templates).
+  - `go test ./...` & `go vet ./internal/... ./cmd/...`: All 15 Go packages passed cleanly.
+- **Next Work**:
+  - Software Tooling Plan is now 100% complete across all 5 phases (Catalog, Drawer, Interpolation, Cheatsheet, Guardrails).
+  - Continue to syllabus expansion, candidate review, or other backlog items per project priorities.
+
+## Phase 2 Complete: Interactive Software Tool Drawer UI (Excel & R) - October 12, 2026 (Windows)
+
+- **Objective**: Implemented Phase 2 of the Software Tooling Plan ([SOFTWARE-TOOLING-PLAN.md](SOFTWARE-TOOLING-PLAN.md)). Integrated an interactive, collapsible Software Tool Drawer providing generic Excel and R syntax directly within the Practice Drill and Worksheets views.
+- **Artifacts Created & Updated**:
+  - `web/src/features/reference/SoftwareToolDrawer.tsx`: Reusable drawer component with accessible ARIA tablist/tabpanel, persistent tab preference (`localStorage['quant_preferred_software_tool']`), monospace syntax box, one-click copy button with animated feedback, arguments definition table, common traps/pitfalls callout, context notes, and exam mode guardrails (`withheld={true}`).
+  - `web/src/features/reference/SoftwareToolDrawer.test.tsx`: Vitest suite covering collapsed/expanded states, Excel/R tab switching, keyboard arrow navigation, localStorage persistence, clipboard copying, and exam withheld rendering (8/8 tests passed).
+  - `web/src/navigation/keymap.ts` & `web/src/navigation/keymap.test.ts`: Added `'TOGGLE_SOFTWARE_DRAWER'` command mapped to <kbd>u</kbd> in practice mode, preserving reading-mode scroll behavior.
+  - `web/src/app/App.tsx`: Dispatches `'toggle-software-drawer'` window event upon receiving `TOGGLE_SOFTWARE_DRAWER` command.
+  - `web/src/features/practice/PracticeDrill.tsx`: Wired drawer directly below the scenario header card with state, key listener (<kbd>u</kbd>), and custom event listener.
+  - `web/src/features/worksheets/Worksheets.tsx`: Embedded drawer within full solution and dataset case questions.
+  - `web/src/index.css`: Comprehensive responsive styles for `.software-tool-drawer`, `.software-tab-bar`, `.software-syntax-box`, and callouts with Excel green and R blue accents.
+- **Verification Run**:
+  - `npm run test`: 21 test files, 115/115 tests passed cleanly.
+  - `npm run typecheck`: TypeScript clean (0 errors).
+  - `npm run lint`: ESLint clean (0 errors, 0 warnings).
+  - `npm run build`: Production bundle built cleanly (547 kB JS / 22 kB CSS).
+  - `python scripts/validate_scaffold.py`: Scaffold OK (35 Markdown, 89 local links, 297 JSON).
+  - `python scripts/check_content_coverage.py`: Coverage OK (121/121 additions, 22/22 objectives, 137 unique templates).
+  - `go test ./...` & `go vet ./internal/... ./cmd/...`: All 15 Go packages passed cleanly.
+- **Next Work (Phase 3 & Phase 4)**:
+  - Phase 3: Post-answer parameter interpolation (exact plugged-in formula in explanation banners).
+  - Phase 4: Standalone "Software Cheatsheet" tab in Reference Library view.
+
+## Phase 1 Complete: Canonical Software Recipe Catalog (Excel & R) - October 12, 2026 (Windows)
+
+- **Objective**: Implemented Phase 1 of the Software Tooling Plan ([SOFTWARE-TOOLING-PLAN.md](SOFTWARE-TOOLING-PLAN.md)). Created a centralized, strongly typed catalog mapping all 6 modules and 22 learning objectives to their canonical Microsoft Excel functions and R / RStudio syntax, with zero schema migrations required on the 137 approved templates.
+- **Artifacts Created & Updated**:
+  - `web/src/features/reference/softwareRecipes.ts`: Defines `SoftwareArgumentDesc`, `SoftwareSpec`, and `SoftwareRecipe` schemas. Provides 50 exhaustive statistical recipes spanning descriptive statistics, set probability rules, discrete RVs, binomial, Poisson, continuous distributions (normal, uniform, exponential), CLT & sampling distributions, confidence intervals, sample size determination, one-sample & two-sample hypothesis testing, and simple/multiple regression with ANOVA & diagnostics.
+  - Implements deterministic `TEMPLATE_TO_RECIPE_MAP` linking all 137 approved templates to their primary recipe, plus multi-level fallbacks by `family_id` + `module_id`, `family_id`, title keywords, and `module_id`.
+  - Helper functions: `getAllRecipes()`, `getRecipeById(id)`, `getRecipesByModule(moduleId)`, `getRecipesByFamily(familyId)`, and `getRecipeForTemplate(query)`.
+  - `web/src/features/reference/softwareRecipes.test.ts`: Vitest test suite verifying all 50 recipes have complete Excel/R specifications, all 6 modules have coverage, query fallbacks work properly, and every single one of the 137 approved templates in `curriculum/approved/` resolves to a valid software recipe.
+- **Verification Run**:
+  - `npm run test -- src/features/reference/softwareRecipes.test.ts`: 5/5 tests passed.
+  - `npm run test`: 20 test files, 105/105 tests passed cleanly.
+  - `npm run typecheck`: TypeScript compilation passed with zero errors.
+  - `npm run lint`: ESLint passed with zero warnings/errors.
+  - `npm run build`: Production bundle built successfully (453 kB JS / 14 kB CSS).
+  - `python scripts/validate_scaffold.py`: Scaffold OK (35 Markdown files, 88 local links, 297 JSON files).
+  - `python scripts/check_content_coverage.py`: Coverage OK (121/121 additions, 22/22 objectives, 137 unique templates).
+  - `go test ./...` & `go vet ./...`: All 15 Go packages passed cleanly.
+- **Next Work (Phase 2)**:
+  - Build `SoftwareToolDrawer` UI component for active Practice Drill and Worksheets pre-submission view.
+  - Implement tab switcher (`[ 📊 Excel ]` vs `[ 🔷 R / RStudio ]`), copy-to-clipboard button, and hotkey trigger (<kbd>u</kbd>).
+
 ## Fix GitHub CI verify build failure - October 12, 2026 (Windows)
 
 - **Root Cause**: `internal/httpapi/arcade.go` was committed without a `package httpapi` declaration (starting directly with `import (`) and had not been wired into `internal/httpapi/server.go` (`ArcadeStore` field on `Config` and `Server`, `/api/arcade/scores` route registration).

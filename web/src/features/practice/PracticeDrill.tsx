@@ -10,6 +10,8 @@ import { MathMarkdown } from '../../components/MathMarkdown';
 import { StageStrip, StageInfo } from '../../components/StageStrip';
 import { QuestionStrip } from '../../components/QuestionStrip';
 import { DrillRecapView } from './DrillRecapView';
+import { SoftwareToolDrawer } from '../reference/SoftwareToolDrawer';
+import { WorkedSoftwareCallBox } from '../reference/WorkedSoftwareCallBox';
 
 interface PracticeDrillProps {
   session: PublicSessionView;
@@ -45,6 +47,7 @@ export const PracticeDrill: React.FC<PracticeDrillProps> = ({
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [showRecapTab, setShowRecapTab] = useState<boolean>(session.completed);
   const [lockedStageNotice, setLockedStageNotice] = useState<string | null>(null);
+  const [isDrawerExpanded, setIsDrawerExpanded] = useState<boolean>(false);
 
   // In-memory draft store per stage ID
   const draftsRef = useRef<Record<string, DraftRecord>>({});
@@ -59,6 +62,15 @@ export const PracticeDrill: React.FC<PracticeDrillProps> = ({
       maxReachableIndex = i;
     }
   }
+
+  // Listen to toggle-software-drawer custom event
+  useEffect(() => {
+    const handleToggleDrawer = () => {
+      setIsDrawerExpanded((prev) => !prev);
+    };
+    window.addEventListener('toggle-software-drawer', handleToggleDrawer);
+    return () => window.removeEventListener('toggle-software-drawer', handleToggleDrawer);
+  }, []);
 
   // Populate draftsRef from server session draft_answer on initial load
   useEffect(() => {
@@ -360,6 +372,9 @@ export const PracticeDrill: React.FC<PracticeDrillProps> = ({
       } else if (e.key === '?' || e.key === 'e') {
         e.preventDefault();
         handleRequestHint();
+      } else if (e.key === 'u' || e.key === 'U') {
+        e.preventDefault();
+        setIsDrawerExpanded((prev) => !prev);
       } else if (currentStage?.kind === 'choice' && currentStage.status !== 'completed') {
         // Choice selection 1-4 or a-d
         const letterMap: Record<string, number> = { a: 0, b: 1, c: 2, d: 3 };
@@ -417,7 +432,12 @@ export const PracticeDrill: React.FC<PracticeDrillProps> = ({
             Restart Drill
           </button>
         </div>
-        <DrillRecapView recap={session.recap} onRestart={onResetDrill} />
+        <DrillRecapView
+          recap={session.recap}
+          templateId={session.template_id}
+          parameters={session.parameters}
+          onRestart={onResetDrill}
+        />
       </div>
     );
   }
@@ -518,6 +538,14 @@ export const PracticeDrill: React.FC<PracticeDrillProps> = ({
           ))}
         </div>
       </div>
+
+      {/* Software Tool Drawer (Excel & R) */}
+      <SoftwareToolDrawer
+        templateId={session.template_id}
+        title={session.title}
+        isExpanded={isDrawerExpanded}
+        onToggleExpanded={setIsDrawerExpanded}
+      />
 
       {/* Stage Navigation Strip */}
       <div className="strip-container">
@@ -711,7 +739,7 @@ export const PracticeDrill: React.FC<PracticeDrillProps> = ({
         )}
 
         {/* Completed Explanation / Feedback Banner */}
-        {isCompleted && currentStage.last_feedback && (
+        {isCompleted && (
           <div
             style={{
               marginTop: '1.5rem',
@@ -721,16 +749,29 @@ export const PracticeDrill: React.FC<PracticeDrillProps> = ({
               borderRadius: 'var(--radius-md)',
             }}
           >
-            <div
-              style={{
-                fontWeight: 600,
-                color: currentStage.revealed ? '#c084fc' : 'var(--accent-emerald)',
-                marginBottom: '0.5rem',
-              }}
-            >
-              {currentStage.revealed ? 'Solution Revealed:' : 'Mathematical Explanation:'}
-            </div>
-            <MathMarkdown content={currentStage.last_feedback} />
+            {currentStage.last_feedback && (
+              <>
+                <div
+                  style={{
+                    fontWeight: 600,
+                    color: currentStage.revealed ? '#c084fc' : 'var(--accent-emerald)',
+                    marginBottom: '0.5rem',
+                  }}
+                >
+                  {currentStage.revealed ? 'Solution Revealed:' : 'Mathematical Explanation:'}
+                </div>
+                <MathMarkdown content={currentStage.last_feedback} />
+              </>
+            )}
+
+            {/* Post-Submission Worked Software Call (Phase 3) */}
+            <WorkedSoftwareCallBox
+              lookup={{ template_id: session.template_id, title: session.title }}
+              parameters={session.parameters}
+              expectedAnswer={currentStage.expected_answer?.value ?? session.recap?.canonical_derivation?.canonical_probability}
+              stageLabel={currentStage.label}
+              stageNumber={currentStage.number}
+            />
           </div>
         )}
 

@@ -44,7 +44,7 @@ foreach ($t in $targets) {
     Write-Host "  --> Compiling $($t.OS)/$($t.Arch)..."
     $env:GOOS = $t.OS
     $env:GOARCH = $t.Arch
-    go build -ldflags "-s -w" -o (Join-Path $pkgDir $t.Bin) ./cmd/quant-practice
+    go build -ldflags "-s -w -X main.version=$version" -o (Join-Path $pkgDir $t.Bin) ./cmd/quant-practice
 
     if ($t.Launcher -eq "start.bat") {
         Copy-Item (Join-Path $rootDir "scripts\release-launchers\start.bat") (Join-Path $pkgDir "start.bat")

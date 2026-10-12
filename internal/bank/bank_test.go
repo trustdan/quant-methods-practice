@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/trustdan/quant-methods-practice/curriculum"
 	"github.com/trustdan/quant-methods-practice/internal/bank"
 	"github.com/trustdan/quant-methods-practice/internal/domain"
 )
@@ -730,5 +731,34 @@ func TestRejectInvalidContinuousDistributionParameters(t *testing.T) {
 				t.Errorf("two_sample_test ValidateParameters() error = %v, wantErr %v", err, tc.wantErr)
 			}
 		})
+	}
+}
+
+func TestLoadActiveBankFS(t *testing.T) {
+	b, err := bank.LoadActiveBankFS(curriculum.ApprovedFS, "approved", nil)
+	if err != nil {
+		t.Fatalf("LoadActiveBankFS failed on embedded curriculum: %v", err)
+	}
+
+	if b.Count() != 137 {
+		t.Fatalf("expected 137 approved templates from embedded FS, got %d", b.Count())
+	}
+
+	// Verify key templates are present and active
+	checkIDs := []string{
+		"binomial_fair_coin_exactly_two",
+		"normal_between_package_weight",
+		"regression_sales_advertising",
+		"twosample_choose_design",
+	}
+	for _, id := range checkIDs {
+		tmpl, ok := b.Get(id)
+		if !ok {
+			t.Errorf("expected embedded bank to contain %s", id)
+			continue
+		}
+		if tmpl.Status != domain.StatusActive {
+			t.Errorf("template %s has status %s, expected active", id, tmpl.Status)
+		}
 	}
 }

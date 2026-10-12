@@ -5,6 +5,12 @@ import { AITutorPanel } from './AITutorPanel';
 describe('AITutorPanel Component', () => {
   beforeEach(() => {
     vi.restoreAllMocks();
+    global.fetch = vi.fn().mockImplementation(() =>
+      Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({}),
+      })
+    );
   });
 
   it('renders nothing when isOpen is false', () => {
@@ -179,5 +185,190 @@ describe('AITutorPanel Component', () => {
     expect(screen.queryByText(/Save Explanation Before Leaving\?/i)).toBeNull();
     expect(onClose).not.toHaveBeenCalled();
     expect(screen.getByText(/Unsaved note content/i)).toBeInTheDocument();
+  });
+
+  it('displays Stage Completed banner when stageResolved is true', () => {
+    render(
+      <AITutorPanel
+        isOpen={true}
+        onClose={vi.fn()}
+        sessionId="sess_test"
+        instanceId="inst_test"
+        stageId="stage_test"
+        stageResolved={true}
+      />
+    );
+
+    expect(screen.getByText('Advisory AI explanation:')).toBeInTheDocument();
+    expect(screen.getByText(/Stage Completed/i)).toBeInTheDocument();
+    expect(screen.getByText(/Full derivations and Excel\/R formula breakdowns are available/i)).toBeInTheDocument();
+  });
+
+  it('switches to Interactive Chat tab and displays conversation threads and messages', async () => {
+    const mockThreads = [
+      {
+        id: 'th_123',
+        session_id: 'sess_test',
+        instance_id: 'inst_test',
+        stage_id: 'stage_test',
+        title: 'Hypergeometric vs Binomial Discussion',
+        messages_count: 2,
+        messages: [
+          {
+            id: 'msg_1',
+            thread_id: 'th_123',
+            role: 'user',
+            content: 'Is this sampling with or without replacement?',
+            created_at: new Date().toISOString(),
+          },
+          {
+            id: 'msg_2',
+            thread_id: 'th_123',
+            role: 'assistant',
+            content: 'Consider whether each draw changes the remaining pool size.',
+            created_at: new Date().toISOString(),
+          },
+        ],
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      },
+    ];
+
+    global.fetch = vi.fn().mockImplementation((url: string) => {
+      if (url.startsWith('/api/tutor/threads/th_123')) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve(mockThreads[0]),
+        });
+      }
+      if (url.startsWith('/api/tutor/threads')) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve(mockThreads),
+        });
+      }
+      if (url.startsWith('/api/tutor/drafts/')) {
+        return Promise.resolve({ ok: true, json: () => Promise.resolve(null) });
+      }
+      if (url === '/api/providers') {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ active_route: 'local', active_model: 'llama-3.2-3b' }),
+        });
+      }
+      return Promise.resolve({ ok: true, json: () => Promise.resolve({}) });
+    });
+
+    render(
+      <AITutorPanel
+        isOpen={true}
+        onClose={vi.fn()}
+        sessionId="sess_test"
+        instanceId="inst_test"
+        stageId="stage_test"
+      />
+    );
+
+    // Switch to Interactive Chat tab
+    const chatTab = screen.getByRole('button', { name: /Interactive Chat/i });
+    fireEvent.click(chatTab);
+
+    await waitFor(() => {
+      expect(screen.getByText('Hypergeometric vs Binomial Discussion')).toBeInTheDocument();
+      expect(screen.getByText(/Is this sampling with or without replacement\?/i)).toBeInTheDocument();
+      expect(screen.getByText(/Consider whether each draw changes the remaining pool size\./i)).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /Save Full Chat/i })).toBeInTheDocument();
+    });
+  });
+
+  it('allows saving entire chat conversation transcript to notes', async () => {
+    const mockThreads = [
+      {
+        id: 'th_456',
+        session_id: 'sess_test',
+        instance_id: 'inst_test',
+        stage_id: 'stage_test',
+        title: 'Poisson Distribution Limit',
+        messages_count: 2,
+        messages: [
+          {
+            id: 'm1',
+            thread_id: 'th_456',
+            role: 'user',
+            content: 'When does binomial approximate Poisson?',
+            created_at: new Date().toISOString(),
+          },
+          {
+            id: 'm2',
+            thread_id: 'th_456',
+            role: 'assistant',
+            content: 'When n is large and p is small, with lambda = n*p constant.',
+            created_at: new Date().toISOString(),
+          },
+        ],
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      },
+    ];
+
+    const onNoteSaved = vi.fn();
+
+    global.fetch = vi.fn().mockImplementation((url: string, opts?: RequestInit) => {
+      if (url.startsWith('/api/tutor/threads/th_456')) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve(mockThreads[0]),
+        });
+      }
+      if (url.startsWith('/api/tutor/threads')) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve(mockThreads),
+        });
+      }
+      if (url === '/api/notes' && opts?.method === 'POST') {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ id: 'note_conversation_1' }),
+        });
+      }
+      if (url.startsWith('/api/tutor/drafts/')) {
+        return Promise.resolve({ ok: true, json: () => Promise.resolve(null) });
+      }
+      if (url === '/api/providers') {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ active_route: 'local', active_model: 'llama-3.2-3b' }),
+        });
+      }
+      return Promise.resolve({ ok: true, json: () => Promise.resolve({}) });
+    });
+
+    render(
+      <AITutorPanel
+        isOpen={true}
+        onClose={vi.fn()}
+        sessionId="sess_test"
+        instanceId="inst_test"
+        stageId="stage_test"
+        onNoteSaved={onNoteSaved}
+      />
+    );
+
+    // Switch to Chat tab
+    fireEvent.click(screen.getByRole('button', { name: /Interactive Chat/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText(/When does binomial approximate Poisson\?/i)).toBeInTheDocument();
+    });
+
+    // Click Save Full Chat
+    const saveConvoBtn = screen.getByRole('button', { name: /Save Full Chat/i });
+    fireEvent.click(saveConvoBtn);
+
+    await waitFor(() => {
+      expect(screen.getByText(/✓ Full conversation transcript saved to Note Library/i)).toBeInTheDocument();
+      expect(onNoteSaved).toHaveBeenCalled();
+    });
   });
 });
