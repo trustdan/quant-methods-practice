@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "template_id": "exponential_percentile_service",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T20:00:00Z",
+  "delegation_basis": "Row 3.3 backlog implementation authorization",
+  "mathematical_audit": {
+    "family_id": "exponential_dist",
+    "parameters": {
+      "lambda": 0.4,
+      "mean": 2.5,
+      "p": 0.9
+    },
+    "canonical_probability": 0.9,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 2.5,
+      "variance": 6.25,
+      "standard_deviation": 2.5
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.05,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {
+        "id": "formulate_quantile_equation",
+        "kind": "choice",
+        "evidence": "exponential_quantile_derivation"
+      },
+      {
+        "id": "calculate_sla_cutoff",
+        "kind": "choice",
+        "evidence": "exponential_quantile_numerical_value"
+      },
+      {
+        "id": "percentile_skewness_comparison",
+        "kind": "choice",
+        "evidence": "exponential_skewness_quantile_interpretation"
+      }
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Verified mathematically: Quantile x* = -ln(1 - 0.90)/0.40 = 2.302585/0.40 = 5.75646 hours. Options verified non-colliding."
+}

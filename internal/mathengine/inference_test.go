@@ -122,3 +122,71 @@ func TestSimulateConfidenceIntervalCoverage(t *testing.T) {
 		t.Errorf("coverage out of expected range for 95%% CI: %v", coverage)
 	}
 }
+
+func TestSamplingDistributionProportion(t *testing.T) {
+	// p = 0.30, n = 200
+	// SE = sqrt(0.30 * 0.70 / 200) = sqrt(0.00105) ~ 0.0324037
+	// np = 60 >= 10, n(1-p) = 140 >= 10 -> isNormal = true
+	sd, err := ComputeSamplingDistributionProportion(0.30, 200, 0)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	expectedSE := math.Sqrt(0.30 * 0.70 / 200.0)
+	if math.Abs(sd.StandardErr-expectedSE) > 1e-9 {
+		t.Errorf("expected SE %v, got %v", expectedSE, sd.StandardErr)
+	}
+	if !sd.IsNormal {
+		t.Errorf("expected isNormal=true for np=60, n(1-p)=140")
+	}
+	if sd.FPCApplied {
+		t.Errorf("FPC should not be applied when popSize = 0")
+	}
+
+	// z-score for pHat = 0.35
+	z := sd.ZScore(0.35)
+	expectedZ := (0.35 - 0.30) / expectedSE
+	if math.Abs(z-expectedZ) > 1e-9 {
+		t.Errorf("expected Z %v, got %v", expectedZ, z)
+	}
+
+	// ProbabilityAbove(0.35)
+	pAbove := sd.ProbabilityAbove(0.35)
+	if math.Abs(pAbove-0.0614) > 0.002 {
+		t.Errorf("expected P(pHat > 0.35) ~ 0.0614, got %v", pAbove)
+	}
+
+	// Finite population with FPC: N = 500, n = 100, p = 0.40
+	// n/N = 0.20 > 0.05
+	sdFPC, err := ComputeSamplingDistributionProportion(0.40, 100, 500)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if !sdFPC.FPCApplied {
+		t.Errorf("expected FPC applied")
+	}
+	expectedFPC := math.Sqrt(400.0 / 499.0)
+	if math.Abs(sdFPC.FPCFactor-expectedFPC) > 1e-4 {
+		t.Errorf("expected FPC factor %v, got %v", expectedFPC, sdFPC.FPCFactor)
+	}
+}
+
+func TestSamplingDistributionMeanHelpers(t *testing.T) {
+	// mu = 80, sigma = 24, n = 36 -> SE = 4.0
+	sd, err := ComputeSamplingDistributionMean(80.0, 24.0, 36, 0, false)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	z := sd.ZScore(86.0)
+	if math.Abs(z-1.50) > 1e-9 {
+		t.Errorf("expected Z = 1.50, got %v", z)
+	}
+	pAbove := sd.ProbabilityAbove(86.0)
+	if math.Abs(pAbove-0.0668) > 0.001 {
+		t.Errorf("expected P(Xbar > 86) ~ 0.0668, got %v", pAbove)
+	}
+	pBelow := sd.ProbabilityBelow(86.0)
+	if math.Abs(pBelow-0.9332) > 0.001 {
+		t.Errorf("expected P(Xbar <= 86) ~ 0.9332, got %v", pBelow)
+	}
+}
+

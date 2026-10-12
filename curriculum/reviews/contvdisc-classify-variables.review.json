@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "template_id": "contvdisc_classify_variables",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T23:30:00Z",
+  "delegation_basis": "Module 3 backlog authorization",
+  "mathematical_audit": {
+    "family_id": "concept_check",
+    "parameters": {
+      "topic": "discrete_vs_continuous_classification"
+    },
+    "canonical_probability": 1.0,
+    "distractor_collision_audit": {
+      "tolerance": 0.0,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 4,
+    "concept_count": 4,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "classify_wait_time", "kind": "choice", "evidence": "classify_wait_time_continuous"},
+      {"id": "classify_complaints", "kind": "choice", "evidence": "classify_complaints_discrete"},
+      {"id": "classify_package_weight", "kind": "choice", "evidence": "classify_package_weight_continuous"},
+      {"id": "classify_defects", "kind": "choice", "evidence": "classify_defects_discrete"}
+    ]
+  },
+  "notes": "Verified pedagogical taxonomy: distinguishes counted discrete integer outcomes (complaints, defects) from measured continuous quantities (wait time, package weight) and addresses common rounding vs. variable type misconceptions."
+}

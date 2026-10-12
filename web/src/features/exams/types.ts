@@ -81,6 +81,7 @@ export interface PublicExamView {
   time_remaining_seconds?: number;
   current_question_index: number;
   total_questions: number;
+  bank_total_questions?: number;
   answered_questions: number;
   questions: PublicQuestionView[];
   report?: ExamReport;

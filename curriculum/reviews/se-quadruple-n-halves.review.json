@@ -1,0 +1,14 @@
+{
+  "template_id": "se_quadruple_n_halves",
+  "reviewed_at": "2026-10-11T21:00:00Z",
+  "reviewer": "assistant_delegated",
+  "delegation_basis": "Stage 20 content backlog authorization",
+  "verdict": "approved",
+  "findings": [
+    "Verified initial standard error SE_1 = 20.0 / sqrt(25) = 20.0 / 5 = 4.0 um.",
+    "Verified quadrupled standard error SE_2 = 20.0 / sqrt(100) = 20.0 / 10 = 2.0 um.",
+    "Confirmed square-root law of standard error reduction: SE ratio = 4.0 / 2.0 = 2.0 = sqrt(100 / 25).",
+    "Distractors rigorously reflect misconceptions: dividing by n without sqrt, multiplying by sqrt(n), degrees of freedom n-1 confusion, and linear quartering.",
+    "Excel formulas =20.0/SQRT(25) and =20.0/SQRT(100) included and verified."
+  ]
+}

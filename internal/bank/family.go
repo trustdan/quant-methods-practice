@@ -5,6 +5,7 @@ import (
 	"math"
 	"sync"
 
+	"github.com/trustdan/quant-methods-practice/internal/domain"
 	"github.com/trustdan/quant-methods-practice/internal/mathengine"
 )
 
@@ -13,6 +14,11 @@ type Family interface {
 	ID() string
 	SupportedRuleVersions() []int
 	ValidateParameters(ruleVersion int, params map[string]interface{}) error
+}
+
+// TemplateValidator allows a family to enforce family-specific question template structures.
+type TemplateValidator interface {
+	ValidateTemplate(tmpl *domain.QuestionTemplate) error
 }
 
 // Registry stores supported mathematical problem families.
@@ -369,6 +375,7 @@ func (n *NormalFamily) ValidateParameters(ruleVersion int, params map[string]int
 
 	allowed := map[string]bool{
 		"mu": true, "sigma": true, "x": true, "x1": true, "x2": true, "tail": true,
+		"p": true, "k": true, "mu_b": true, "sigma_b": true, "x_b": true,
 	}
 	for k := range params {
 		if !allowed[k] {
@@ -401,6 +408,39 @@ func (n *NormalFamily) ValidateParameters(ruleVersion int, params map[string]int
 			if ok1 && ok2 && x1 > x2 {
 				return fmt.Errorf("normal_dist parameter \"x1\" (%v) cannot exceed \"x2\" (%v)", x1, x2)
 			}
+		}
+	}
+
+	if rawP, hasP := params["p"]; hasP {
+		pVal, ok := toFloat(rawP)
+		if !ok || pVal <= 0 || pVal >= 1 {
+			return fmt.Errorf("normal_dist parameter \"p\" must be in open interval (0, 1), got %v", rawP)
+		}
+	}
+
+	if rawK, hasK := params["k"]; hasK {
+		kVal, ok := toFloat(rawK)
+		if !ok || kVal <= 0 {
+			return fmt.Errorf("normal_dist parameter \"k\" must be strictly positive, got %v", rawK)
+		}
+	}
+
+	if rawMuB, hasMuB := params["mu_b"]; hasMuB {
+		if _, ok := toFloat(rawMuB); !ok {
+			return fmt.Errorf("normal_dist parameter \"mu_b\" must be a number, got %v", rawMuB)
+		}
+	}
+
+	if rawSigmaB, hasSigmaB := params["sigma_b"]; hasSigmaB {
+		sB, ok := toFloat(rawSigmaB)
+		if !ok || sB <= 0 {
+			return fmt.Errorf("normal_dist parameter \"sigma_b\" must be strictly positive, got %v", rawSigmaB)
+		}
+	}
+
+	if rawXB, hasXB := params["x_b"]; hasXB {
+		if _, ok := toFloat(rawXB); !ok {
+			return fmt.Errorf("normal_dist parameter \"x_b\" must be a number, got %v", rawXB)
 		}
 	}
 
@@ -482,7 +522,8 @@ func (e *ExponentialFamily) ValidateParameters(ruleVersion int, params map[strin
 	}
 
 	allowed := map[string]bool{
-		"lambda": true, "x": true, "x1": true, "x2": true, "tail": true,
+		"lambda": true, "mean": true, "x": true, "x1": true, "x2": true, "tail": true,
+		"p": true, "s": true, "t": true,
 	}
 	for k := range params {
 		if !allowed[k] {
@@ -497,6 +538,57 @@ func (e *ExponentialFamily) ValidateParameters(ruleVersion int, params map[strin
 	lambda, ok := toFloat(rawLambda)
 	if !ok || lambda <= 0 {
 		return fmt.Errorf("exponential_dist parameter \"lambda\" must be strictly positive, got %v", rawLambda)
+	}
+
+	if rawMean, hasMean := params["mean"]; hasMean {
+		meanVal, ok := toFloat(rawMean)
+		if !ok || meanVal <= 0 {
+			return fmt.Errorf("exponential_dist parameter \"mean\" must be strictly positive, got %v", rawMean)
+		}
+	}
+
+	if rawP, hasP := params["p"]; hasP {
+		pVal, ok := toFloat(rawP)
+		if !ok || pVal <= 0 || pVal >= 1 {
+			return fmt.Errorf("exponential_dist parameter \"p\" must be in open interval (0, 1), got %v", rawP)
+		}
+	}
+
+	if rawS, hasS := params["s"]; hasS {
+		sVal, ok := toFloat(rawS)
+		if !ok || sVal < 0 {
+			return fmt.Errorf("exponential_dist parameter \"s\" must be non-negative, got %v", rawS)
+		}
+	}
+
+	if rawT, hasT := params["t"]; hasT {
+		tVal, ok := toFloat(rawT)
+		if !ok || tVal <= 0 {
+			return fmt.Errorf("exponential_dist parameter \"t\" must be strictly positive, got %v", rawT)
+		}
+	}
+
+	if rawX, hasX := params["x"]; hasX {
+		xVal, ok := toFloat(rawX)
+		if !ok || xVal < 0 {
+			return fmt.Errorf("exponential_dist parameter \"x\" must be non-negative, got %v", rawX)
+		}
+	}
+
+	rawX1, hasX1 := params["x1"]
+	rawX2, hasX2 := params["x2"]
+	if hasX1 || hasX2 {
+		if !hasX1 || !hasX2 {
+			return fmt.Errorf("exponential_dist interval requires both \"x1\" and \"x2\"")
+		}
+		x1, ok1 := toFloat(rawX1)
+		x2, ok2 := toFloat(rawX2)
+		if !ok1 || !ok2 {
+			return fmt.Errorf("exponential_dist interval bounds \"x1\" and \"x2\" must be numbers")
+		}
+		if x1 > x2 {
+			return fmt.Errorf("exponential_dist lower bound \"x1\" (%v) cannot exceed upper bound \"x2\" (%v)", x1, x2)
+		}
 	}
 
 	return nil
@@ -523,7 +615,9 @@ func (s *SamplingDistributionFamily) ValidateParameters(ruleVersion int, params 
 	}
 
 	allowed := map[string]bool{
-		"stat": true, "mu": true, "sigma": true, "p": true, "n": true, "pop_size": true, "pop_is_normal": true,
+		"stat": true, "mu": true, "sigma": true, "p": true, "n": true,
+		"pop_size": true, "pop_is_normal": true, "pop_shape": true,
+		"x_bar": true, "p_hat": true, "x": true,
 	}
 	for k := range params {
 		if !allowed[k] {
@@ -538,6 +632,28 @@ func (s *SamplingDistributionFamily) ValidateParameters(ruleVersion int, params 
 	n, ok := toFloat(rawN)
 	if !ok || n <= 0 || math.Floor(n) != n {
 		return fmt.Errorf("sampling_distribution parameter \"n\" must be a positive integer, got %v", rawN)
+	}
+
+	if rawPopSize, ok := params["pop_size"]; ok {
+		popSize, ok := toFloat(rawPopSize)
+		if !ok || popSize <= 0 || math.Floor(popSize) != popSize {
+			return fmt.Errorf("sampling_distribution parameter \"pop_size\" must be a positive integer, got %v", rawPopSize)
+		}
+		if int(n) > int(popSize) {
+			return fmt.Errorf("sampling_distribution sample size n (%d) cannot exceed pop_size (%d)", int(n), int(popSize))
+		}
+	}
+
+	if rawPopNormal, ok := params["pop_is_normal"]; ok {
+		if _, ok := rawPopNormal.(bool); !ok {
+			return fmt.Errorf("sampling_distribution parameter \"pop_is_normal\" must be a boolean, got %v", rawPopNormal)
+		}
+	}
+
+	if rawPopShape, ok := params["pop_shape"]; ok {
+		if shapeStr, ok := rawPopShape.(string); !ok || shapeStr == "" {
+			return fmt.Errorf("sampling_distribution parameter \"pop_shape\" must be a non-empty string, got %v", rawPopShape)
+		}
 	}
 
 	rawStat, hasStat := params["stat"]
@@ -557,6 +673,13 @@ func (s *SamplingDistributionFamily) ValidateParameters(ruleVersion int, params 
 		if !ok || p <= 0 || p >= 1 {
 			return fmt.Errorf("sampling_distribution parameter \"p\" must be in (0, 1), got %v", rawP)
 		}
+
+		if rawPHat, ok := params["p_hat"]; ok {
+			pHat, ok := toFloat(rawPHat)
+			if !ok || pHat <= 0 || pHat >= 1 {
+				return fmt.Errorf("sampling_distribution parameter \"p_hat\" must be in (0, 1), got %v", rawPHat)
+			}
+		}
 	} else {
 		// mean
 		rawMu, ok := params["mu"]
@@ -574,6 +697,18 @@ func (s *SamplingDistributionFamily) ValidateParameters(ruleVersion int, params 
 		sigma, ok := toFloat(rawSigma)
 		if !ok || sigma <= 0 {
 			return fmt.Errorf("sampling_distribution parameter \"sigma\" must be strictly positive, got %v", rawSigma)
+		}
+
+		if rawXBar, ok := params["x_bar"]; ok {
+			if _, ok := toFloat(rawXBar); !ok {
+				return fmt.Errorf("sampling_distribution parameter \"x_bar\" must be a number, got %v", rawXBar)
+			}
+		}
+
+		if rawX, ok := params["x"]; ok {
+			if _, ok := toFloat(rawX); !ok {
+				return fmt.Errorf("sampling_distribution parameter \"x\" must be a number, got %v", rawX)
+			}
 		}
 	}
 
@@ -755,6 +890,406 @@ func toFloat(val interface{}) (float64, bool) {
 	}
 }
 
+// ConceptCheckFamily implements conceptual questions with choice-only stages and verified distractors.
+type ConceptCheckFamily struct{}
+
+// NewConceptCheckFamily returns an instance of ConceptCheckFamily.
+func NewConceptCheckFamily() *ConceptCheckFamily {
+	return &ConceptCheckFamily{}
+}
+
+func (c *ConceptCheckFamily) ID() string {
+	return "concept_check"
+}
+
+func (c *ConceptCheckFamily) SupportedRuleVersions() []int {
+	return []int{1}
+}
+
+func (c *ConceptCheckFamily) ValidateParameters(ruleVersion int, params map[string]interface{}) error {
+	if ruleVersion != 1 {
+		return fmt.Errorf("concept_check unsupported rule_version %d (supported: 1)", ruleVersion)
+	}
+
+	allowed := map[string]bool{
+		"topic":     true,
+		"concept":   true,
+		"objective": true,
+	}
+	for k := range params {
+		if !allowed[k] {
+			return fmt.Errorf("concept_check unknown parameter %q", k)
+		}
+	}
+	return nil
+}
+
+func (c *ConceptCheckFamily) ValidateTemplate(tmpl *domain.QuestionTemplate) error {
+	for i, stage := range tmpl.Stages {
+		if stage.Kind != domain.StageKindChoice {
+			return fmt.Errorf("concept_check stage[%d] %q must be choice kind, got %q", i, stage.ID, stage.Kind)
+		}
+		if stage.NumericPolicy != nil {
+			return fmt.Errorf("concept_check stage[%d] %q numeric_policy must be null", i, stage.ID)
+		}
+		if stage.ExpectedAnswer.Kind != domain.AnswerKindChoice {
+			return fmt.Errorf("concept_check stage[%d] %q expected_answer.kind must be choice", i, stage.ID)
+		}
+
+		expectedID := stage.ExpectedAnswer.OptionID
+		foundExpected := false
+		for _, opt := range stage.Options {
+			if opt.ID == expectedID {
+				foundExpected = true
+				if opt.MisconceptionID != nil && *opt.MisconceptionID != "" {
+					return fmt.Errorf("concept_check stage %q correct option %q must have null misconception_id", stage.ID, opt.ID)
+				}
+				if opt.HintMarkdown != nil && *opt.HintMarkdown != "" {
+					return fmt.Errorf("concept_check stage %q correct option %q must have null hint_markdown", stage.ID, opt.ID)
+				}
+			} else {
+				// Distractor must have non-empty misconception and hint
+				if opt.MisconceptionID == nil || *opt.MisconceptionID == "" {
+					return fmt.Errorf("concept_check stage %q distractor option %q must have non-empty misconception_id", stage.ID, opt.ID)
+				}
+				if opt.HintMarkdown == nil || *opt.HintMarkdown == "" {
+					return fmt.Errorf("concept_check stage %q distractor option %q must have non-empty hint_markdown", stage.ID, opt.ID)
+				}
+			}
+		}
+		if !foundExpected {
+			return fmt.Errorf("concept_check stage %q expected_answer option_id %q not in options", stage.ID, expectedID)
+		}
+		if stage.ExplanationMarkdown == "" {
+			return fmt.Errorf("concept_check stage %q explanation_markdown cannot be empty", stage.ID)
+		}
+	}
+	return nil
+}
+
+// RegressionOutputFamily implements the Excel-style regression output summary family.
+type RegressionOutputFamily struct{}
+
+// NewRegressionOutputFamily returns an instance of RegressionOutputFamily.
+func NewRegressionOutputFamily() *RegressionOutputFamily {
+	return &RegressionOutputFamily{}
+}
+
+func (r *RegressionOutputFamily) ID() string {
+	return "regression_output"
+}
+
+func (r *RegressionOutputFamily) SupportedRuleVersions() []int {
+	return []int{1}
+}
+
+func (r *RegressionOutputFamily) ValidateParameters(ruleVersion int, params map[string]interface{}) error {
+	if ruleVersion != 1 {
+		return fmt.Errorf("regression_output unsupported rule_version %d (supported: 1)", ruleVersion)
+	}
+
+	allowed := map[string]bool{
+		"n":                true,
+		"k":                true,
+		"ssr":              true,
+		"sse":              true,
+		"sst":              true,
+		"confidence_level": true,
+		"alpha":            true,
+		"b0":               true,
+		"se_b0":            true,
+		"intercept_name":   true,
+		"intercept":        true,
+		"predictors":       true,
+		"b1":               true,
+		"se_b1":            true,
+		"x1_name":          true,
+		"x1_pred":          true,
+		"b2":               true,
+		"se_b2":            true,
+		"x2_name":          true,
+		"x2_pred":          true,
+		"b3":               true,
+		"se_b3":            true,
+		"x3_name":          true,
+		"x3_pred":          true,
+		"b4":               true,
+		"se_b4":            true,
+		"x4_name":          true,
+		"x4_pred":          true,
+	}
+	for k := range params {
+		if !allowed[k] {
+			return fmt.Errorf("regression_output unknown parameter %q", k)
+		}
+	}
+
+	rawN, ok := params["n"]
+	if !ok {
+		return fmt.Errorf("regression_output missing required parameter \"n\"")
+	}
+	nFloat, ok := toFloat(rawN)
+	if !ok || math.Floor(nFloat) != nFloat || nFloat <= 0 {
+		return fmt.Errorf("regression_output parameter \"n\" must be a positive integer, got %v", rawN)
+	}
+	n := int(nFloat)
+
+	rawK, ok := params["k"]
+	if !ok {
+		return fmt.Errorf("regression_output missing required parameter \"k\"")
+	}
+	kFloat, ok := toFloat(rawK)
+	if !ok || math.Floor(kFloat) != kFloat || kFloat < 1 || kFloat > 4 {
+		return fmt.Errorf("regression_output parameter \"k\" must be an integer between 1 and 4, got %v", rawK)
+	}
+	k := int(kFloat)
+
+	rawSSR, ok := params["ssr"]
+	if !ok {
+		return fmt.Errorf("regression_output missing required parameter \"ssr\"")
+	}
+	ssr, ok := toFloat(rawSSR)
+	if !ok || ssr < 0 {
+		return fmt.Errorf("regression_output parameter \"ssr\" must be non-negative, got %v", rawSSR)
+	}
+
+	rawSSE, ok := params["sse"]
+	if !ok {
+		return fmt.Errorf("regression_output missing required parameter \"sse\"")
+	}
+	sse, ok := toFloat(rawSSE)
+	if !ok || sse <= 0 {
+		return fmt.Errorf("regression_output parameter \"sse\" must be strictly positive, got %v", rawSSE)
+	}
+
+	var sstPtr *float64
+	if rawSST, hasSST := params["sst"]; hasSST {
+		sstVal, ok := toFloat(rawSST)
+		if !ok || sstVal <= 0 {
+			return fmt.Errorf("regression_output parameter \"sst\" must be positive, got %v", rawSST)
+		}
+		sstPtr = &sstVal
+	}
+
+	confLevel := 0.95
+	if rawCL, hasCL := params["confidence_level"]; hasCL {
+		clVal, ok := toFloat(rawCL)
+		if !ok || clVal <= 0 || clVal >= 1 {
+			return fmt.Errorf("regression_output parameter \"confidence_level\" must be in (0, 1), got %v", rawCL)
+		}
+		confLevel = clVal
+	} else if rawAlpha, hasAlpha := params["alpha"]; hasAlpha {
+		alphaVal, ok := toFloat(rawAlpha)
+		if !ok || alphaVal <= 0 || alphaVal >= 1 {
+			return fmt.Errorf("regression_output parameter \"alpha\" must be in (0, 1), got %v", rawAlpha)
+		}
+		confLevel = 1.0 - alphaVal
+	}
+
+	intercept := mathengine.OutputPredictorInput{Name: "Intercept"}
+	if rawIntName, hasIntName := params["intercept_name"]; hasIntName {
+		if s, ok := rawIntName.(string); ok && s != "" {
+			intercept.Name = s
+		}
+	}
+	if rawB0, hasB0 := params["b0"]; hasB0 {
+		b0, ok := toFloat(rawB0)
+		if !ok {
+			return fmt.Errorf("regression_output parameter \"b0\" must be a number, got %v", rawB0)
+		}
+		intercept.Coeff = b0
+	} else {
+		return fmt.Errorf("regression_output missing parameter \"b0\"")
+	}
+	if rawSeB0, hasSeB0 := params["se_b0"]; hasSeB0 {
+		seB0, ok := toFloat(rawSeB0)
+		if !ok || seB0 <= 0 {
+			return fmt.Errorf("regression_output parameter \"se_b0\" must be strictly positive, got %v", rawSeB0)
+		}
+		intercept.StdErr = seB0
+	} else {
+		return fmt.Errorf("regression_output missing parameter \"se_b0\"")
+	}
+
+	predictors := make([]mathengine.OutputPredictorInput, k)
+	for j := 1; j <= k; j++ {
+		bKey := fmt.Sprintf("b%d", j)
+		seKey := fmt.Sprintf("se_b%d", j)
+		nameKey := fmt.Sprintf("x%d_name", j)
+
+		rawBj, ok := params[bKey]
+		if !ok {
+			return fmt.Errorf("regression_output missing parameter %q for predictor %d", bKey, j)
+		}
+		bj, ok := toFloat(rawBj)
+		if !ok {
+			return fmt.Errorf("regression_output parameter %q must be a number, got %v", bKey, rawBj)
+		}
+
+		rawSeBj, ok := params[seKey]
+		if !ok {
+			return fmt.Errorf("regression_output missing parameter %q for predictor %d", seKey, j)
+		}
+		seBj, ok := toFloat(rawSeBj)
+		if !ok || seBj <= 0 {
+			return fmt.Errorf("regression_output parameter %q must be strictly positive, got %v", seKey, rawSeBj)
+		}
+
+		predName := fmt.Sprintf("X%d", j)
+		if rawName, hasName := params[nameKey]; hasName {
+			if s, ok := rawName.(string); ok && s != "" {
+				predName = s
+			}
+		}
+
+		predictors[j-1] = mathengine.OutputPredictorInput{
+			Name:   predName,
+			Coeff:  bj,
+			StdErr: seBj,
+		}
+	}
+
+	evalParams := mathengine.RegressionOutputParams{
+		N:               n,
+		K:               k,
+		SSR:             ssr,
+		SSE:             sse,
+		SST:             sstPtr,
+		ConfidenceLevel: confLevel,
+		Intercept:       intercept,
+		Predictors:      predictors,
+	}
+
+	if _, err := mathengine.EvaluateRegressionOutput(evalParams); err != nil {
+		return fmt.Errorf("regression_output mathematical consistency error: %w", err)
+	}
+
+	return nil
+}
+
+// SampleSizeFamily implements sample size planning for means, proportions, and standard errors.
+type SampleSizeFamily struct{}
+
+// NewSampleSizeFamily returns an instance of SampleSizeFamily.
+func NewSampleSizeFamily() *SampleSizeFamily {
+	return &SampleSizeFamily{}
+}
+
+func (s *SampleSizeFamily) ID() string {
+	return "sample_size"
+}
+
+func (s *SampleSizeFamily) SupportedRuleVersions() []int {
+	return []int{1}
+}
+
+func (s *SampleSizeFamily) ValidateParameters(ruleVersion int, params map[string]interface{}) error {
+	if ruleVersion != 1 {
+		return fmt.Errorf("sample_size unsupported rule_version %d (supported: 1)", ruleVersion)
+	}
+
+	allowed := map[string]bool{
+		"target": true, "sigma": true, "margin_of_error": true, "confidence_level": true,
+		"p": true, "target_se": true, "n": true, "n1": true, "n2": true, "moe_ratio": true,
+	}
+	for k := range params {
+		if !allowed[k] {
+			return fmt.Errorf("sample_size unknown parameter %q", k)
+		}
+	}
+
+	rawTarget, ok := params["target"]
+	if !ok {
+		return fmt.Errorf("sample_size missing required parameter \"target\"")
+	}
+	target, ok := rawTarget.(string)
+	if !ok {
+		return fmt.Errorf("sample_size parameter \"target\" must be a string, got %v", rawTarget)
+	}
+
+	switch target {
+	case "mean":
+		rawSigma, ok := params["sigma"]
+		if !ok {
+			return fmt.Errorf("sample_size target \"mean\" requires parameter \"sigma\"")
+		}
+		sigma, ok := toFloat(rawSigma)
+		if !ok || sigma <= 0 {
+			return fmt.Errorf("sample_size parameter \"sigma\" must be strictly positive, got %v", rawSigma)
+		}
+
+		rawMOE, ok := params["margin_of_error"]
+		if !ok {
+			return fmt.Errorf("sample_size target \"mean\" requires parameter \"margin_of_error\"")
+		}
+		moe, ok := toFloat(rawMOE)
+		if !ok || moe <= 0 {
+			return fmt.Errorf("sample_size parameter \"margin_of_error\" must be strictly positive, got %v", rawMOE)
+		}
+
+		rawCL, ok := params["confidence_level"]
+		if !ok {
+			return fmt.Errorf("sample_size target \"mean\" requires parameter \"confidence_level\"")
+		}
+		cl, ok := toFloat(rawCL)
+		if !ok || cl <= 0 || cl >= 1 {
+			return fmt.Errorf("sample_size parameter \"confidence_level\" must be in (0, 1), got %v", rawCL)
+		}
+
+	case "proportion":
+		rawMOE, ok := params["margin_of_error"]
+		if !ok {
+			return fmt.Errorf("sample_size target \"proportion\" requires parameter \"margin_of_error\"")
+		}
+		moe, ok := toFloat(rawMOE)
+		if !ok || moe <= 0 {
+			return fmt.Errorf("sample_size parameter \"margin_of_error\" must be strictly positive, got %v", rawMOE)
+		}
+
+		rawCL, ok := params["confidence_level"]
+		if !ok {
+			return fmt.Errorf("sample_size target \"proportion\" requires parameter \"confidence_level\"")
+		}
+		cl, ok := toFloat(rawCL)
+		if !ok || cl <= 0 || cl >= 1 {
+			return fmt.Errorf("sample_size parameter \"confidence_level\" must be in (0, 1), got %v", rawCL)
+		}
+
+		if rawP, hasP := params["p"]; hasP {
+			p, ok := toFloat(rawP)
+			if !ok || p <= 0 || p >= 1 {
+				return fmt.Errorf("sample_size parameter \"p\" must be in (0, 1), got %v", rawP)
+			}
+		}
+
+	case "target_se":
+		rawSigma, ok := params["sigma"]
+		if !ok {
+			return fmt.Errorf("sample_size target \"target_se\" requires parameter \"sigma\"")
+		}
+		sigma, ok := toFloat(rawSigma)
+		if !ok || sigma <= 0 {
+			return fmt.Errorf("sample_size parameter \"sigma\" must be strictly positive, got %v", rawSigma)
+		}
+
+		rawTSE, ok := params["target_se"]
+		if !ok {
+			return fmt.Errorf("sample_size target \"target_se\" requires parameter \"target_se\"")
+		}
+		tse, ok := toFloat(rawTSE)
+		if !ok || tse <= 0 {
+			return fmt.Errorf("sample_size parameter \"target_se\" must be strictly positive, got %v", rawTSE)
+		}
+
+	case "comparison", "scaling":
+		// valid general comparison cases
+	default:
+		return fmt.Errorf("sample_size unsupported target %q", target)
+	}
+
+	return nil
+}
+
 var (
 	defaultRegistryOnce sync.Once
 	defaultRegistry     *Registry
@@ -775,6 +1310,10 @@ func DefaultRegistry() *Registry {
 		defaultRegistry.Register(NewConfidenceIntervalFamily())
 		defaultRegistry.Register(NewHypothesisTestFamily())
 		defaultRegistry.Register(NewLinearRegressionFamily())
+		defaultRegistry.Register(NewConceptCheckFamily())
+		defaultRegistry.Register(NewRegressionOutputFamily())
+		defaultRegistry.Register(NewSampleSizeFamily())
 	})
 	return defaultRegistry
 }
+

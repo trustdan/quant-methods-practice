@@ -1,0 +1,160 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "se_what_n_changes",
+  "version": 1,
+  "status": "active",
+  "family_id": "concept_check",
+  "rule_version": 1,
+  "module_id": "module_4",
+  "title": "Impact of sample size on population parameters vs. sampling distribution",
+  "scenario_markdown": "A human resources analytics team analyzes the distribution of annual compensation for all $15,000$ employees in a multinational firm. The population has a known mean of $\\mu = \\$92,000$ and standard deviation of $\\sigma = \\$24,000$. To audit internal pay equity, an analyst recommends expanding the audit sample from $n = 36$ to $n = 144$ employees. A committee debates what this fourfold increase in sample size actually changes.",
+  "parameters": {
+    "topic": "sampling_distribution",
+    "concept": "sample_size_impact_parameters_vs_distribution",
+    "objective": "4.2"
+  },
+  "assumptions": [
+    "The population consists of all 15,000 current enterprise employees with fixed true parameters mu and sigma",
+    "Audits are conducted via simple random sampling",
+    "The sampling fraction 144 / 15,000 = 0.0096 is under 1%, so finite population correction is negligible"
+  ],
+  "concept_ids": [
+    "parameter_constancy_under_sampling",
+    "sampling_distribution_spread_reduction",
+    "individual_dispersion_vs_mean_precision"
+  ],
+  "setting_group": "corporate_hr_compensation_analytics",
+  "source_refs": [
+    "Course Module 4: Sampling Distributions and Confidence Intervals",
+    "docs/CONTENT-BACKLOG.md (Row 4.2)"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T21:15:00Z",
+    "notes": "Verified fundamental inferential invariance: population parameters mu = $92,000 and sigma = $24,000 are fixed constants unaffected by sample size n. The sampling distribution center remains E[X_bar] = mu = $92,000 while standard error shrinks from $24,000 / 6 = $4,000 to $24,000 / 12 = $2,000. Clarified that sampling precision improves without altering individual employee wage dispersion.",
+    "delegation_basis": "Stage 20 content backlog authorization"
+  },
+  "stages": [
+    {
+      "id": "effect_on_population_parameters",
+      "kind": "choice",
+      "prompt_markdown": "What happens to the true population mean $\\mu$ and population standard deviation $\\sigma$ when the audit sample size is increased from $n = 36$ to $n = 144$?",
+      "options": [
+        {
+          "id": "parameters_remain_constant",
+          "text_markdown": "Neither $\\mu$ nor $\\sigma$ changes; population parameters are fixed constants of the population, completely independent of sample size $n$.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "both_parameters_decrease",
+          "text_markdown": "Both $\\mu$ and $\\sigma$ decrease because gathering more data reduces overall uncertainty in the company.",
+          "misconception_id": "believes_sample_size_shrinks_population_sd",
+          "hint_markdown": "Collecting more sample data reduces our uncertainty about the population, but it does not change the actual employees' salaries or their population variance."
+        },
+        {
+          "id": "sigma_halves_mu_constant",
+          "text_markdown": "The population mean $\\mu$ stays the same, but the population standard deviation $\\sigma$ is cut in half ($24,000 \\to 12,000$).",
+          "misconception_id": "confuses_population_sd_with_standard_error",
+          "hint_markdown": "This confuses the population standard deviation $\\sigma$ with the standard error of the mean $\\sigma_{\\bar{x}} = \\sigma / \\sqrt{n}$. Standard error halves, but $\\sigma$ remains $\\$24,000$."
+        },
+        {
+          "id": "parameters_are_random_variables",
+          "text_markdown": "The population parameters become more dispersed because larger samples encounter more extreme outliers.",
+          "misconception_id": "considers_parameters_as_sample_functions",
+          "hint_markdown": "In classical statistics, population parameters are fixed, unknown constants, not sample-dependent random variables."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "parameters_remain_constant"
+      },
+      "evidence_concept_ids": [
+        "parameter_constancy_under_sampling"
+      ],
+      "explanation_markdown": "Population parameters $\\mu = \\$92,000$ and $\\sigma = \\$24,000$ are fixed numerical characteristics of the population of 15,000 employees. Taking a larger sample alters the properties of our *sample estimator* (sample mean $\\bar{X}$), but has zero physical effect on the population parameters themselves.",
+      "numeric_policy": null
+    },
+    {
+      "id": "effect_on_sampling_distribution",
+      "kind": "choice",
+      "prompt_markdown": "What happens to the center $\\mu_{\\bar{x}}$ and standard error $\\sigma_{\\bar{x}}$ of the sampling distribution of the sample mean $\\bar{X}$ when $n$ increases from $36$ to $144$?",
+      "options": [
+        {
+          "id": "center_fixed_spread_halves",
+          "text_markdown": "The center remains unchanged at $\\mu_{\\bar{x}} = \\$92,000$, while the standard error narrows from $\\$4,000$ to $\\$2,000$.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "both_center_and_spread_halve",
+          "text_markdown": "Both the center $\\mu_{\\bar{x}}$ and standard error $\\sigma_{\\bar{x}}$ are cut in half by the larger sample size.",
+          "misconception_id": "believes_center_shrinks_with_n",
+          "hint_markdown": "Because $\\bar{X}$ is an unbiased estimator ($E[\\bar{X}] = \\mu$), the expected value of the sample mean is always $\\mu$, regardless of $n$."
+        },
+        {
+          "id": "spread_quarters",
+          "text_markdown": "The center is unchanged, but the standard error quarters from $\\$4,000$ to $\\$1,000$ ($4\\times$ reduction).",
+          "misconception_id": "assumed_linear_quartering_of_se",
+          "hint_markdown": "Standard error scales with $1/\\sqrt{n}$: $\\sqrt{144/36} = \\sqrt{4} = 2$, cutting standard error from $\\$4,000$ to $\\$2,000$, not $\\$1,000$."
+        },
+        {
+          "id": "spread_broadens",
+          "text_markdown": "The center remains unchanged, but the standard error increases because larger samples accumulate more total variance.",
+          "misconception_id": "believes_larger_samples_increase_variance",
+          "hint_markdown": "Averages of larger samples are more tightly concentrated around the true mean, so standard error always decreases as $n$ increases."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "center_fixed_spread_halves"
+      },
+      "evidence_concept_ids": [
+        "sampling_distribution_spread_reduction"
+      ],
+      "explanation_markdown": "For $n = 36$: $\\sigma_{\\bar{x}} = \\frac{24,000}{\\sqrt{36}} = \\frac{24,000}{6} = \\$4,000$. For $n = 144$: $\\sigma_{\\bar{x}} = \\frac{24,000}{\\sqrt{144}} = \\frac{24,000}{12} = \\$2,000$. The center of the sampling distribution remains anchored at the true population mean $\\mu_{\\bar{x}} = \\mu = \\$92,000$ because the sample mean is an unbiased estimator.",
+      "numeric_policy": null
+    },
+    {
+      "id": "individual_vs_aggregate_precision",
+      "kind": "choice",
+      "prompt_markdown": "An executive asks: 'Does increasing the sample size to $144$ make individual employee compensation more uniform or closer to $\\$92,000$?' How should the lead analyst respond?",
+      "options": [
+        {
+          "id": "analyst_clarifies_distinction",
+          "text_markdown": "'No. Increasing sample size sharpens our precision in estimating the population average $\\mu$, but it does not change the actual pay dispersion among individual workers.'",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "analyst_claims_individual_compression",
+          "text_markdown": "'Yes. Expanding the sample forces individual employees' salaries closer to the central average.'",
+          "misconception_id": "ecological_fallacy_individual_vs_aggregate",
+          "hint_markdown": "Sampling is an observational measurement process; it has no causal power to alter individual workers' salaries."
+        },
+        {
+          "id": "analyst_cites_clt_for_individuals",
+          "text_markdown": "'Yes, because the Central Limit Theorem forces all individual observations to conform to a narrower normal bell curve.'",
+          "misconception_id": "clt_applied_to_individual_observations",
+          "hint_markdown": "The Central Limit Theorem describes the behavior of sample averages (statistics), never the behavior of individual data points in the population."
+        },
+        {
+          "id": "analyst_claims_uncertainty_rises",
+          "text_markdown": "'No, because surveying 144 workers creates more room for human payroll errors than surveying 36 workers.'",
+          "misconception_id": "confuses_measurement_error_with_sampling_variability",
+          "hint_markdown": "Statistically, larger samples provide strictly superior estimation precision, despite physical administrative overhead."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "analyst_clarifies_distinction"
+      },
+      "evidence_concept_ids": [
+        "individual_dispersion_vs_mean_precision"
+      ],
+      "explanation_markdown": "A crucial distinction in statistical literacy is between **population dispersion** (measured by $\\sigma = \\$24,000$) and **estimation precision** (measured by $\\sigma_{\\bar{x}} = \\sigma / \\sqrt{n}$). Increasing sample size reduces standard error $\\sigma_{\\bar{x}}$, making our estimate of $\\mu$ far more reliable, but it has no effect on the underlying variation among individual members of the population.",
+      "numeric_policy": null
+    }
+  ]
+}

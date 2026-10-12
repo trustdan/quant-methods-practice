@@ -1,0 +1,146 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "clt_skewed_service_times",
+  "version": 1,
+  "status": "active",
+  "family_id": "sampling_distribution",
+  "rule_version": 1,
+  "module_id": "module_4",
+  "title": "Central Limit Theorem applied to skewed exponential service times",
+  "scenario_markdown": "An enterprise IT help desk tracks the duration of technical support calls. Individual call durations follow an exponential distribution (severely right-skewed with many quick calls and a long tail of complex escalations) with mean $\\mu = 6.0$ minutes and standard deviation $\\sigma = 6.0$ minutes. A service manager monitors a random sample of $n = 64$ calls.",
+  "parameters": {
+    "stat": "mean",
+    "mu": 6.0,
+    "sigma": 6.0,
+    "n": 64,
+    "pop_shape": "exponential",
+    "pop_is_normal": false,
+    "x_bar": 4.8
+  },
+  "assumptions": [
+    "Individual call durations follow an exponential distribution with positive skew",
+    "Calls are sampled independently from a continuous arrival stream",
+    "Sample size n = 64 >= 30, so the Central Limit Theorem guarantees that the sample mean X_bar is approximately normally distributed despite the underlying non-normality"
+  ],
+  "concept_ids": [
+    "clt_skewed_population_justification",
+    "clt_skewed_standard_error",
+    "clt_skewed_lower_tail_probability"
+  ],
+  "setting_group": "helpdesk_call_duration_clt",
+  "source_refs": [
+    "Course Module 4: Sampling Distributions and the Central Limit Theorem",
+    "docs/CONTENT-BACKLOG.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T20:00:00Z",
+    "notes": "Verified CLT for skewed population: n = 64 >= 30. SE = 6.0 / sqrt(64) = 0.75. Z = (4.8 - 6.0) / 0.75 = -1.60. P(X_bar < 4.8) = Phi(-1.60) = 0.054799.",
+    "delegation_basis": "Stage 16 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "clt_non_normal_justification",
+      "kind": "choice",
+      "prompt_markdown": "Why is the service manager justified in using the normal distribution to compute probabilities for the sample mean $\\bar{X}$, even though individual call durations are severely skewed?",
+      "options": [
+        {
+          "id": "just_clt_n_ge_30",
+          "text_markdown": "By the Central Limit Theorem, the distribution of the sample mean $\\bar{X}$ approaches normality for sufficiently large samples ($n \\ge 30$), regardless of the population distribution shape.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "just_exponential_is_normal",
+          "text_markdown": "The exponential distribution is symmetric and approximately normal whenever $\\mu = \\sigma$.",
+          "misconception_id": "believes_exponential_is_symmetric",
+          "hint_markdown": "The exponential distribution is highly asymmetric and heavily right-skewed; it is never bell-shaped or symmetric."
+        },
+        {
+          "id": "just_sample_forces_pop_normal",
+          "text_markdown": "Taking a sample of $n = 64$ transforms the underlying population into a normal distribution.",
+          "misconception_id": "confuses_sample_mean_distribution_with_population_distribution",
+          "hint_markdown": "Sampling does not alter the underlying population distribution (individual calls remain exponential). It is the sampling distribution of the average $\\bar{X}$ that becomes normal."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "just_clt_n_ge_30"
+      },
+      "evidence_concept_ids": [
+        "clt_skewed_population_justification"
+      ],
+      "explanation_markdown": "The central power of the Central Limit Theorem (CLT) is that it requires no assumption of normality about the underlying population. Provided the sample size is sufficiently large (typically $n \\ge 30$), the sampling distribution of the sample mean $\\bar{X}$ is approximately normal, with mean $\\mu$ and standard error $\\sigma/\\sqrt{n}$. Here $n = 64 > 30$, so the normal approximation applies.",
+      "numeric_policy": null
+    },
+    {
+      "id": "skewed_standard_error",
+      "kind": "choice",
+      "prompt_markdown": "What is the standard error of the sample mean call duration $\\sigma_{\\bar{x}}$ for this sample of $n = 64$ calls?",
+      "options": [
+        {
+          "id": "se_correct",
+          "text_markdown": "$\\sigma_{\\bar{x}} = \\frac{\\sigma}{\\sqrt{n}} = \\frac{6.0}{\\sqrt{64}} = \\frac{6.0}{8} = 0.75$ minutes",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "se_no_sqrt",
+          "text_markdown": "$\\sigma_{\\bar{x}} = \\frac{6.0}{64} = 0.0938$ minutes",
+          "misconception_id": "divided_by_n_instead_of_sqrt_n",
+          "hint_markdown": "Remember to divide by $\\sqrt{n} = \\sqrt{64} = 8$, not by $n = 64$."
+        },
+        {
+          "id": "se_raw_sigma",
+          "text_markdown": "$\\sigma_{\\bar{x}} = 6.0$ minutes",
+          "misconception_id": "confuse_pop_sd_with_standard_error",
+          "hint_markdown": "6.0 minutes is the standard deviation of a single individual call. The average of 64 calls varies much less, with standard error $\\sigma/\\sqrt{n}$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "se_correct"
+      },
+      "evidence_concept_ids": [
+        "clt_skewed_standard_error"
+      ],
+      "explanation_markdown": "The standard error is $\\sigma_{\\bar{x}} = \\frac{\\sigma}{\\sqrt{n}} = \\frac{6.0}{\\sqrt{64}} = \\frac{6.0}{8} = 0.75$ minutes. The variability of the 64-call sample mean is 8 times smaller than the variability of an individual call.",
+      "numeric_policy": null
+    },
+    {
+      "id": "lower_tail_probability",
+      "kind": "choice",
+      "prompt_markdown": "What is the probability that the sample mean call duration is less than $4.8$ minutes, $P(\\bar{X} < 4.8)$?",
+      "options": [
+        {
+          "id": "prob_correct",
+          "text_markdown": "$P(\\bar{X} < 4.8) = \\Phi(-1.60) = 0.0548$ ($5.48\\%$)",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "prob_upper_complement",
+          "text_markdown": "$P(\\bar{X} < 4.8) = 1 - \\Phi(-1.60) = 0.9452$ ($94.52\\%$)",
+          "misconception_id": "confused_upper_tail_with_cumulative_cdf",
+          "hint_markdown": "The question asks for the probability of being less than $4.8$ minutes (the lower tail). Because $4.8 < 6.0$, the $Z$-score is negative and the probability must be less than $0.50$, not $0.9452$."
+        },
+        {
+          "id": "prob_individual_call",
+          "text_markdown": "$P(\\bar{X} < 4.8) = \\Phi(-0.20) = 0.4207$ ($42.07\\%$)",
+          "misconception_id": "calculated_single_observation_tail_probability",
+          "hint_markdown": "$\\Phi(-0.20)$ arises from standardizing with $\\sigma = 6.0$ instead of $\\sigma_{\\bar{x}} = 0.75$. For the sample mean, divide the deviation by $0.75$, yielding $Z = -1.60$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "prob_correct"
+      },
+      "evidence_concept_ids": [
+        "clt_skewed_lower_tail_probability"
+      ],
+      "explanation_markdown": "Standardizing gives $Z = \\frac{\\bar{x} - \\mu}{\\sigma_{\\bar{x}}} = \\frac{4.8 - 6.0}{0.75} = \\frac{-1.20}{0.75} = -1.60$. From the cumulative standard normal distribution table, $\\Phi(-1.60) = 0.0548$ (or $5.48\\%$). Excel formula: `=NORM.DIST(4.8, 6.0, 6.0/SQRT(64), TRUE)` or `=NORM.S.DIST(-1.60, TRUE)`.",
+      "numeric_policy": null
+    }
+  ]
+}

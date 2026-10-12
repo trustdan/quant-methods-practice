@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "template_id": "normal_inventory_service_level",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T20:00:00Z",
+  "delegation_basis": "Content backlog Batch 1: Row 3.2 normal distribution expansion",
+  "mathematical_audit": {
+    "family_id": "normal_dist",
+    "parameters": {
+      "mu": 200.0,
+      "sigma": 30.0,
+      "p": 0.90,
+      "tail": "lower"
+    },
+    "canonical_probability": 0.1000,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 200.0,
+      "variance": 900.0,
+      "standard_deviation": 30.0
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.001,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {
+        "id": "service_level_z_score",
+        "kind": "choice",
+        "evidence": "normal_service_level_quantile"
+      },
+      {
+        "id": "calculate_order_point_and_safety_stock",
+        "kind": "choice",
+        "evidence": "safety_stock_calculation"
+      },
+      {
+        "id": "stockout_probability_numeric",
+        "kind": "numeric",
+        "evidence": "stockout_probability_complement"
+      }
+    ],
+    "numeric_policy": {
+      "version": 1,
+      "allowed_forms": [
+        "decimal",
+        "percent",
+        "fraction"
+      ],
+      "absolute_tolerance": 0.001,
+      "relative_tolerance": 0.01
+    }
+  },
+  "notes": "Verified inventory service level calculations: Z* = 1.2815516 (table 1.28), safety stock = 38.45 kits, target inventory s = 238.45 kits. Daily stockout probability is complement P(X > 238.45) = 1 - 0.9000 = 0.1000. Addressed zero safety stock misconception and arbitrary percentage heuristics."
+}

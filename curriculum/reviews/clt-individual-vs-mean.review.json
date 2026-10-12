@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "template_id": "clt_individual_vs_mean",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T20:00:00Z",
+  "delegation_basis": "Stage 16 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "sampling_distribution",
+    "parameters": {
+      "stat": "mean",
+      "mu": 40.0,
+      "sigma": 10.0,
+      "n": 25,
+      "pop_is_normal": true,
+      "x": 45.0,
+      "x_bar": 45.0
+    },
+    "canonical_probability": 0.00620967,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 40.0,
+      "variance": 4.0,
+      "standard_deviation": 2.0
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "single_observation_tail", "kind": "choice", "evidence": "clt_individual_tail_probability"},
+      {"id": "sample_mean_tail", "kind": "choice", "evidence": "clt_sample_mean_tail_probability"},
+      {"id": "variance_reduction_principle", "kind": "choice", "evidence": "clt_variance_reduction_principle"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Verified individual vs mean comparison: Individual P(X > 45) = 1 - Phi(0.50) = 0.3085375. Sample mean P(X_bar > 45) = 1 - Phi(2.50) = 0.00620967. Clear pedagogical contrast showing 5x reduction in standard error and 50x reduction in tail probability."
+}

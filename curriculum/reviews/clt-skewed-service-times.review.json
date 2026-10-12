@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "template_id": "clt_skewed_service_times",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T20:00:00Z",
+  "delegation_basis": "Stage 16 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "sampling_distribution",
+    "parameters": {
+      "stat": "mean",
+      "mu": 6.0,
+      "sigma": 6.0,
+      "n": 64,
+      "pop_shape": "exponential",
+      "pop_is_normal": false,
+      "x_bar": 4.8
+    },
+    "canonical_probability": 0.0547993,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 6.0,
+      "variance": 0.5625,
+      "standard_deviation": 0.75
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "clt_non_normal_justification", "kind": "choice", "evidence": "clt_skewed_population_justification"},
+      {"id": "skewed_standard_error", "kind": "choice", "evidence": "clt_skewed_standard_error"},
+      {"id": "lower_tail_probability", "kind": "choice", "evidence": "clt_skewed_lower_tail_probability"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Verified CLT for skewed exponential distribution: mu = 6.0, sigma = 6.0, n = 64. SE = 6.0 / 8 = 0.75. Z = (4.8 - 6.0) / 0.75 = -1.60. P(X_bar < 4.8) = Phi(-1.60) = 0.0547993. All distractors verified."
+}

@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "template_id": "clt_proportion_coupon_users",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T20:00:00Z",
+  "delegation_basis": "Stage 16 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "sampling_distribution",
+    "parameters": {
+      "stat": "proportion",
+      "p": 0.30,
+      "n": 200,
+      "p_hat": 0.35
+    },
+    "canonical_probability": 0.0614183,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 0.30,
+      "variance": 0.00105,
+      "standard_deviation": 0.0324037
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "success_failure_check", "kind": "choice", "evidence": "clt_proportion_success_failure_check"},
+      {"id": "standard_error_proportion", "kind": "choice", "evidence": "clt_proportion_standard_error"},
+      {"id": "tail_probability_proportion", "kind": "choice", "evidence": "clt_proportion_tail_probability"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Verified proportion sampling distribution: p = 0.30, n = 200. Success-failure condition np = 60 >= 10 and n(1-p) = 140 >= 10 both hold. SE = sqrt(0.21 / 200) = 0.0324037. Z = 0.05 / 0.0324037 = 1.543. Upper tail P(p_hat > 0.35) = 1 - Phi(1.54) = 0.0618 (exact 0.0614)."
+}

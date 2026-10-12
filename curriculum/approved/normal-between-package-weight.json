@@ -1,0 +1,140 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "normal_between_package_weight",
+  "version": 1,
+  "status": "active",
+  "family_id": "normal_dist",
+  "rule_version": 1,
+  "module_id": "module_3",
+  "title": "Package weight normal interval probability",
+  "scenario_markdown": "A high-speed cereal packaging line fills family-size boxes with net weights that follow a normal distribution with mean $\\mu = 500$ grams and standard deviation $\\sigma = 8$ grams ($X \\sim N(500, 8^2)$). Quality assurance standards accept boxes whose net weight falls between $490$ grams and $510$ grams. What is the probability that a randomly selected box meets this quality specification ($P(490 < X < 510)$)?",
+  "parameters": {
+    "mu": 500.0,
+    "sigma": 8.0,
+    "x1": 490.0,
+    "x2": 510.0
+  },
+  "assumptions": [
+    "Continuous normal distribution X ~ N(500, 8^2) in grams",
+    "Independent packaging fill trials identically distributed",
+    "Standard normal table / cumulative normal distribution applies"
+  ],
+  "concept_ids": [
+    "normal_interval_z_standardization",
+    "normal_interval_probability_evaluation",
+    "continuous_interval_boundary_invariance"
+  ],
+  "setting_group": "normal_package_weights",
+  "source_refs": [
+    "Course Module 3: Continuous Probability Distributions",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T20:00:00Z",
+    "notes": "Reviewed normal interval derivation: Z1 = (490 - 500)/8 = -1.25, Z2 = (510 - 500)/8 = +1.25. P(-1.25 < Z < 1.25) = Phi(1.25) - Phi(-1.25) = 0.89435 - 0.10565 = 0.7887. Verified boundary invariance P(490 < X < 510) = P(490 <= X <= 510).",
+    "delegation_basis": "Content backlog Batch 1: Row 3.2 normal distribution expansion"
+  },
+  "stages": [
+    {
+      "id": "standardize_interval_bounds",
+      "kind": "choice",
+      "prompt_markdown": "What are the standardized standard scores ($Z$-scores) corresponding to the lower and upper specification limits $X_1 = 490\\text{ g}$ and $X_2 = 510\\text{ g}$?",
+      "options": [
+        {
+          "id": "correct_z_pair",
+          "text_markdown": "$Z_1 = \\frac{490 - 500}{8} = -1.25$ and $Z_2 = \\frac{510 - 500}{8} = +1.25$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "unscaled_raw_distance",
+          "text_markdown": "$Z_1 = 490 - 500 = -10.0$ and $Z_2 = 510 - 500 = +10.0$",
+          "misconception_id": "omit_scaling_by_sigma",
+          "hint_markdown": "Standardization requires dividing the difference between each raw bound and the mean by the standard deviation $\\sigma = 8$."
+        },
+        {
+          "id": "inverted_subtraction_bounds",
+          "text_markdown": "$Z_1 = \\frac{500 - 490}{8} = +1.25$ and $Z_2 = \\frac{500 - 510}{8} = -1.25$",
+          "misconception_id": "inverted_z_score_difference",
+          "hint_markdown": "The $Z$-score formula is $\\frac{X - \\mu}{\\sigma}$, subtracting the mean from the value, so $X_1 < \\mu$ produces a negative $Z$-score."
+        },
+        {
+          "id": "spread_over_sigma",
+          "text_markdown": "$Z = \\frac{510 - 490}{8} = +2.50$ (a single combined score)",
+          "misconception_id": "range_standardization_error",
+          "hint_markdown": "Each interval endpoint must be standardized individually relative to the distribution mean $\\mu$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "correct_z_pair"
+      },
+      "evidence_concept_ids": [
+        "normal_interval_z_standardization"
+      ],
+      "explanation_markdown": "$Z_1 = \\frac{X_1 - \\mu}{\\sigma} = \\frac{490 - 500}{8} = -1.25$ and $Z_2 = \\frac{X_2 - \\mu}{\\sigma} = \\frac{510 - 500}{8} = +1.25$. The specification limits lie symmetric at $1.25$ standard deviations below and above the mean.",
+      "numeric_policy": null
+    },
+    {
+      "id": "compute_interval_probability",
+      "kind": "numeric",
+      "prompt_markdown": "Find the probability that a package weight falls between $490\\text{ g}$ and $510\\text{ g}$: $P(490 < X < 510) = P(-1.25 < Z < 1.25) = \\Phi(1.25) - \\Phi(-1.25)$. Enter as a decimal or percentage rounded to four decimal places.",
+      "options": [],
+      "expected_answer": {
+        "kind": "numeric",
+        "value": 0.7887,
+        "units": "probability"
+      },
+      "evidence_concept_ids": [
+        "normal_interval_probability_evaluation"
+      ],
+      "explanation_markdown": "Using standard normal tables or software: $\\Phi(1.25) \\approx 0.89435$ and $\\Phi(-1.25) = 1 - \\Phi(1.25) \\approx 0.10565$. Therefore, $P(-1.25 < Z < 1.25) = 0.89435 - 0.10565 = 0.7887$ (or $78.87\\%$, or $2\\Phi(1.25) - 1 = 0.7887$). Excel formula: `=NORM.DIST(510, 500, 8, TRUE) - NORM.DIST(490, 500, 8, TRUE)` or `=NORM.S.DIST(1.25, TRUE) - NORM.S.DIST(-1.25, TRUE)`.",
+      "numeric_policy": {
+        "version": 1,
+        "allowed_forms": [
+          "decimal",
+          "percent",
+          "fraction"
+        ],
+        "absolute_tolerance": 0.002,
+        "relative_tolerance": 0.01
+      }
+    },
+    {
+      "id": "assess_boundary_invariance",
+      "kind": "choice",
+      "prompt_markdown": "Does the probability $P(490 < X < 510)$ differ from the non-strict interval probability $P(490 \\le X \\le 510)$?",
+      "options": [
+        {
+          "id": "bounds_identical",
+          "text_markdown": "No, they are identical. Because $X$ is a continuous random variable, the probability of any exact single point is zero ($P(X = 490) = 0$ and $P(X = 510) = 0$), so including or excluding boundary endpoints does not change the probability.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "bounds_include_extra_mass",
+          "text_markdown": "Yes, $P(490 \\le X \\le 510)$ is strictly greater because it includes the probability masses at exactly $490\\text{ g}$ and $510\\text{ g}$.",
+          "misconception_id": "discrete_boundary_confusion",
+          "hint_markdown": "For continuous random variables, area under the curve at an exact point of zero width has probability zero ($P(X = c) = 0$)."
+        },
+        {
+          "id": "depends_on_continuity_correction",
+          "text_markdown": "Yes, the values differ unless a discrete continuity correction of $\\pm 0.5$ is applied to the bounds.",
+          "misconception_id": "misapply_continuity_correction",
+          "hint_markdown": "Continuity corrections are only used when approximating a discrete distribution with a continuous one, not when analyzing an inherently continuous variable like weight."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "bounds_identical"
+      },
+      "evidence_concept_ids": [
+        "continuous_interval_boundary_invariance"
+      ],
+      "explanation_markdown": "In all continuous probability distributions, probability is defined as the area under the density curve over an interval. Since single points have zero width ($dx = 0$), $P(X = 490) = 0$ and $P(X = 510) = 0$. Consequently, $P(490 < X < 510) = P(490 \\le X \\le 510) = P(490 \\le X < 510) = P(490 < X \\le 510)$.",
+      "numeric_policy": null
+    }
+  ]
+}

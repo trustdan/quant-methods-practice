@@ -1,0 +1,15 @@
+{
+  "template_id": "se_proportion_depends_on_p",
+  "reviewed_at": "2026-10-11T21:10:00Z",
+  "reviewer": "assistant_delegated",
+  "delegation_basis": "Stage 20 content backlog authorization",
+  "verdict": "approved",
+  "findings": [
+    "Verified Survey A: SE = sqrt(0.50 * 0.50 / 400) = sqrt(0.000625) = 0.025 (2.50%).",
+    "Verified Survey B: SE = sqrt(0.10 * 0.90 / 400) = sqrt(0.000225) = 0.015 (1.50%).",
+    "Verified success-failure conditions: Survey A np = 200 >= 10, n(1-p) = 200 >= 10; Survey B np = 40 >= 10, n(1-p) = 360 >= 10.",
+    "Proved theoretical maximum at p = 0.50: d/dp [p(1-p)] = 1 - 2p = 0 => p = 0.50.",
+    "Distractors correctly isolate forgetting the square root, dividing variance by sqrt(n), forgetting (1-p), and confusing sample size with estimator bias.",
+    "Excel formulas =SQRT(0.50*0.50/400) and =SQRT(0.10*0.90/400) verified."
+  ]
+}

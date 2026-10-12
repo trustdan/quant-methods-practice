@@ -402,6 +402,13 @@ func TestRejectInvalidContinuousDistributionParameters(t *testing.T) {
 		{"valid standard normal", map[string]interface{}{"mu": 0.0, "sigma": 1.0}, false},
 		{"valid with cutoff x", map[string]interface{}{"mu": 100.0, "sigma": 15.0, "x": 115.0, "tail": "upper"}, false},
 		{"valid interval bounds", map[string]interface{}{"mu": 0.0, "sigma": 1.0, "x1": -1.96, "x2": 1.96}, false},
+		{"valid with quantile p", map[string]interface{}{"mu": 80000.0, "sigma": 12000.0, "p": 0.95, "tail": "upper"}, false},
+		{"valid with empirical k", map[string]interface{}{"mu": 100.0, "sigma": 15.0, "k": 2.0}, false},
+		{"valid with comparison params", map[string]interface{}{"mu": 500000.0, "sigma": 50000.0, "x": 580000.0, "mu_b": 300000.0, "sigma_b": 40000.0, "x_b": 370000.0}, false},
+		{"invalid p zero", map[string]interface{}{"mu": 0.0, "sigma": 1.0, "p": 0.0}, true},
+		{"invalid p one", map[string]interface{}{"mu": 0.0, "sigma": 1.0, "p": 1.0}, true},
+		{"invalid negative k", map[string]interface{}{"mu": 100.0, "sigma": 15.0, "k": -1.0}, true},
+		{"invalid negative sigma_b", map[string]interface{}{"mu": 500.0, "sigma": 50.0, "mu_b": 300.0, "sigma_b": -10.0}, true},
 		{"inverted interval bounds", map[string]interface{}{"mu": 0.0, "sigma": 1.0, "x1": 2.0, "x2": -1.0}, true},
 		{"missing mu", map[string]interface{}{"sigma": 1.0}, true},
 		{"missing sigma", map[string]interface{}{"mu": 0.0}, true},
@@ -454,9 +461,18 @@ func TestRejectInvalidContinuousDistributionParameters(t *testing.T) {
 		wantErr bool
 	}{
 		{"valid rate", map[string]interface{}{"lambda": 0.5}, false},
+		{"valid full params", map[string]interface{}{"lambda": 0.25, "mean": 4.0, "x": 2.0, "tail": "lower"}, false},
+		{"valid quantile p", map[string]interface{}{"lambda": 0.40, "p": 0.90}, false},
+		{"valid memoryless", map[string]interface{}{"lambda": 0.1667, "s": 5.0, "t": 3.0}, false},
+		{"valid interval", map[string]interface{}{"lambda": 0.001, "x1": 500.0, "x2": 1500.0}, false},
 		{"missing lambda", map[string]interface{}{}, true},
 		{"negative lambda", map[string]interface{}{"lambda": -2.0}, true},
 		{"zero lambda", map[string]interface{}{"lambda": 0.0}, true},
+		{"invalid quantile p zero", map[string]interface{}{"lambda": 0.5, "p": 0.0}, true},
+		{"invalid quantile p one", map[string]interface{}{"lambda": 0.5, "p": 1.0}, true},
+		{"invalid interval bounds", map[string]interface{}{"lambda": 0.5, "x1": 10.0, "x2": 5.0}, true},
+		{"missing interval bound", map[string]interface{}{"lambda": 0.5, "x1": 5.0}, true},
+		{"negative mean", map[string]interface{}{"lambda": 0.5, "mean": -2.0}, true},
 		{"unknown param", map[string]interface{}{"lambda": 1.0, "rate": 1.0}, true},
 	}
 	for _, tc := range expCases {
@@ -480,9 +496,15 @@ func TestRejectInvalidContinuousDistributionParameters(t *testing.T) {
 	}{
 		{"valid mean", map[string]interface{}{"stat": "mean", "mu": 50.0, "sigma": 10.0, "n": 25}, false},
 		{"valid proportion", map[string]interface{}{"stat": "proportion", "p": 0.4, "n": 100}, false},
+		{"valid mean with x_bar and pop_size", map[string]interface{}{"stat": "mean", "mu": 50000.0, "sigma": 8000.0, "n": 64, "pop_size": 400, "x_bar": 51835.33}, false},
+		{"valid proportion with p_hat", map[string]interface{}{"stat": "proportion", "p": 0.30, "n": 200, "p_hat": 0.35}, false},
+		{"valid skewed pop_shape", map[string]interface{}{"stat": "mean", "mu": 6.0, "sigma": 6.0, "n": 64, "pop_shape": "exponential", "pop_is_normal": false, "x_bar": 4.8}, false},
 		{"missing n", map[string]interface{}{"mu": 50.0, "sigma": 10.0}, true},
 		{"negative n", map[string]interface{}{"mu": 50.0, "sigma": 10.0, "n": -5}, true},
 		{"missing sigma for mean", map[string]interface{}{"stat": "mean", "mu": 50.0, "n": 25}, true},
+		{"n exceeds pop_size", map[string]interface{}{"mu": 50.0, "sigma": 10.0, "n": 100, "pop_size": 50}, true},
+		{"invalid p_hat", map[string]interface{}{"stat": "proportion", "p": 0.4, "n": 100, "p_hat": 1.5}, true},
+		{"invalid pop_is_normal type", map[string]interface{}{"mu": 50.0, "sigma": 10.0, "n": 25, "pop_is_normal": "yes"}, true},
 	}
 	for _, tc := range sampCases {
 		t.Run("sampling_"+tc.name, func(t *testing.T) {
@@ -561,4 +583,32 @@ func TestRejectInvalidContinuousDistributionParameters(t *testing.T) {
 			}
 		})
 	}
+
+	// Sample size
+	ssFam, ok := reg.Get("sample_size")
+	if !ok {
+		t.Fatal("sample_size not registered")
+	}
+	ssCases := []struct {
+		name    string
+		params  map[string]interface{}
+		wantErr bool
+	}{
+		{"valid mean", map[string]interface{}{"target": "mean", "sigma": 25.0, "margin_of_error": 5.0, "confidence_level": 0.95}, false},
+		{"missing sigma for mean", map[string]interface{}{"target": "mean", "margin_of_error": 5.0, "confidence_level": 0.95}, true},
+		{"valid proportion", map[string]interface{}{"target": "proportion", "p": 0.20, "margin_of_error": 0.03, "confidence_level": 0.95}, false},
+		{"valid conservative proportion", map[string]interface{}{"target": "proportion", "margin_of_error": 0.04, "confidence_level": 0.90}, false},
+		{"valid target_se", map[string]interface{}{"target": "target_se", "sigma": 15.0, "target_se": 2.0}, false},
+		{"missing target_se value", map[string]interface{}{"target": "target_se", "sigma": 15.0}, true},
+		{"unsupported target", map[string]interface{}{"target": "unknown"}, true},
+	}
+	for _, tc := range ssCases {
+		t.Run("ss_"+tc.name, func(t *testing.T) {
+			err := ssFam.ValidateParameters(1, tc.params)
+			if (err != nil) != tc.wantErr {
+				t.Errorf("sample_size ValidateParameters() error = %v, wantErr %v", err, tc.wantErr)
+			}
+		})
+	}
 }
+

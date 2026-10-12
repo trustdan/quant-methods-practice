@@ -1,0 +1,160 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "se_proportion_depends_on_p",
+  "version": 1,
+  "status": "active",
+  "family_id": "sampling_distribution",
+  "rule_version": 1,
+  "module_id": "module_4",
+  "title": "Standard error of a proportion: dependency on true proportion p",
+  "scenario_markdown": "A polling and public opinion research firm designs two statewide probability surveys, each with sample size $n = 400$. In Survey A (a hotly contested referendum), the true population support is closely split near $p_A = 0.50$. In Survey B (household ownership of premium electric vehicles), the true population adoption is low, near $p_B = 0.10$.",
+  "parameters": {
+    "stat": "proportion",
+    "p": 0.5,
+    "n": 400
+  },
+  "assumptions": [
+    "Independent random sampling of respondents without replacement from a large state population",
+    "Sampling fraction is under 5%, so FPC factor is not required",
+    "Success-failure conditions are met: for Survey A, np = 200 >= 10 and n(1-p) = 200 >= 10; for Survey B, np = 40 >= 10 and n(1-p) = 360 >= 10"
+  ],
+  "concept_ids": [
+    "standard_error_proportion_formula",
+    "maximum_variance_at_half",
+    "survey_precision_comparison"
+  ],
+  "setting_group": "market_research_opinion_polling",
+  "source_refs": [
+    "Course Module 4: Sampling Distributions and Confidence Intervals",
+    "docs/CONTENT-BACKLOG.md (Row 4.2)"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T21:10:00Z",
+    "notes": "Verified mathematical derivations: Survey A SE = sqrt(0.50 * 0.50 / 400) = sqrt(0.25 / 400) = 0.025 (2.50%). Survey B SE = sqrt(0.10 * 0.90 / 400) = sqrt(0.09 / 400) = 0.015 (1.50%). Ratio of standard errors = 0.025 / 0.015 = 5/3 approx 1.667. Proved quadratic peak of p(1-p) at p = 0.50. Excel formulas: =SQRT(0.50*0.50/400) and =SQRT(0.10*0.90/400).",
+    "delegation_basis": "Stage 20 content backlog authorization"
+  },
+  "stages": [
+    {
+      "id": "se_survey_a",
+      "kind": "choice",
+      "prompt_markdown": "Calculate the standard error $\\sigma_{\\hat{p}}$ for Survey A with $n = 400$ and $p_A = 0.50$.",
+      "options": [
+        {
+          "id": "se_a_0_025",
+          "text_markdown": "$\\sigma_{\\hat{p}} = 0.025$ ($2.50\\%$)",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "se_a_0_000625",
+          "text_markdown": "$\\sigma_{\\hat{p}} = 0.000625$ ($0.0625\\%$)",
+          "misconception_id": "forgot_square_root_in_proportion_se",
+          "hint_markdown": "This is the sampling variance $\\frac{p(1-p)}{n} = \\frac{0.25}{400} = 0.000625$; you must take the square root $\\sqrt{0.000625} = 0.025$."
+        },
+        {
+          "id": "se_a_0_0125",
+          "text_markdown": "$\\sigma_{\\hat{p}} = 0.0125$ ($1.25\\%$)",
+          "misconception_id": "divided_variance_numerator_by_sqrt_n",
+          "hint_markdown": "Do not divide $p(1-p) = 0.25$ by $\\sqrt{n} = 20$; the entire fraction $\\frac{p(1-p)}{n}$ is under the square root."
+        },
+        {
+          "id": "se_a_0_0354",
+          "text_markdown": "$\\sigma_{\\hat{p}} \\approx 0.0354$ ($3.54\\%$)",
+          "misconception_id": "forgot_one_minus_p_factor",
+          "hint_markdown": "Remember the complement term $(1 - p)$: $\\sigma_{\\hat{p}} = \\sqrt{\\frac{p(1-p)}{n}}$, not $\\sqrt{\\frac{p}{n}}$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "se_a_0_025"
+      },
+      "evidence_concept_ids": [
+        "standard_error_proportion_formula"
+      ],
+      "explanation_markdown": "For Survey A: $\\sigma_{\\hat{p}} = \\sqrt{\\frac{p(1-p)}{n}} = \\sqrt{\\frac{0.50 \\times 0.50}{400}} = \\sqrt{\\frac{0.25}{400}} = \\sqrt{0.000625} = 0.025$ ($2.5\\%$). Excel formula: `=SQRT(0.50*0.50/400)`.",
+      "numeric_policy": null
+    },
+    {
+      "id": "se_survey_b",
+      "kind": "choice",
+      "prompt_markdown": "Calculate the standard error $\\sigma_{\\hat{p}}$ for Survey B with the same sample size $n = 400$ but $p_B = 0.10$.",
+      "options": [
+        {
+          "id": "se_b_0_015",
+          "text_markdown": "$\\sigma_{\\hat{p}} = 0.015$ ($1.50\\%$)",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "se_b_0_025",
+          "text_markdown": "$\\sigma_{\\hat{p}} = 0.025$ ($2.50\\%$, because both surveys have identical sample size $n = 400$)",
+          "misconception_id": "assumed_proportion_se_constant_at_given_n",
+          "hint_markdown": "Unlike the sample mean where $\\sigma$ is fixed, the standard error of a proportion directly depends on the true proportion $p$ through $p(1-p)$."
+        },
+        {
+          "id": "se_b_0_005",
+          "text_markdown": "$\\sigma_{\\hat{p}} = 0.005$ ($0.50\\%$)",
+          "misconception_id": "used_p_instead_of_sqrt_p_one_minus_p",
+          "hint_markdown": "$\\sqrt{\\frac{0.10 \\times 0.90}{400}} = \\sqrt{\\frac{0.09}{400}} = \\frac{0.30}{20} = 0.015$, not $\\frac{0.10}{20}$."
+        },
+        {
+          "id": "se_b_0_000225",
+          "text_markdown": "$\\sigma_{\\hat{p}} = 0.000225$ ($0.0225\\%$)",
+          "misconception_id": "forgot_square_root_in_proportion_se",
+          "hint_markdown": "Remember to take the square root of the variance: $\\sqrt{0.000225} = 0.015$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "se_b_0_015"
+      },
+      "evidence_concept_ids": [
+        "survey_precision_comparison"
+      ],
+      "explanation_markdown": "For Survey B: $\\sigma_{\\hat{p}} = \\sqrt{\\frac{p(1-p)}{n}} = \\sqrt{\\frac{0.10 \\times 0.90}{400}} = \\sqrt{\\frac{0.09}{400}} = \\sqrt{0.000225} = 0.015$ ($1.5\\%$). Excel formula: `=SQRT(0.10*0.90/400)`.",
+      "numeric_policy": null
+    },
+    {
+      "id": "parabolic_maximum_at_half",
+      "kind": "choice",
+      "prompt_markdown": "Why is the standard error of Survey A ($0.025$) notably higher than that of Survey B ($0.015$) despite using identical sample sizes ($n = 400$)?",
+      "options": [
+        {
+          "id": "parabola_peak_at_half",
+          "text_markdown": "The product $p(1-p)$ describes a downward parabola reaching its maximum at $p = 0.50$, so estimation uncertainty is highest when a population is evenly split.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "extreme_proportions_more_variable",
+          "text_markdown": "Extreme or rare proportions have greater statistical variability because rare events are harder to observe.",
+          "misconception_id": "believes_extreme_p_has_higher_se",
+          "hint_markdown": "When $p$ is close to 0 or 1, most outcomes are identical, so Bernoulli variability $p(1-p)$ is actually very small (e.g., $0.10 \\times 0.90 = 0.09$ vs $0.50 \\times 0.50 = 0.25$)."
+        },
+        {
+          "id": "clt_fails_for_b",
+          "text_markdown": "Survey B violates the Central Limit Theorem because $p = 0.10$ is too small for a normal approximation.",
+          "misconception_id": "success_failure_condition_misunderstood",
+          "hint_markdown": "For Survey B, $np = 400(0.10) = 40 \\ge 10$ and $n(1-p) = 400(0.90) = 360 \\ge 10$, so the normal approximation is fully satisfied."
+        },
+        {
+          "id": "sample_size_bias",
+          "text_markdown": "A sample size of $n = 400$ is biased when surveying split opinions.",
+          "misconception_id": "sample_size_confused_with_estimator_bias",
+          "hint_markdown": "Sample proportion $\\hat{p}$ is an unbiased estimator ($E[\\hat{p}] = p$) regardless of whether $p = 0.5$ or $p = 0.1$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "parabola_peak_at_half"
+      },
+      "evidence_concept_ids": [
+        "maximum_variance_at_half"
+      ],
+      "explanation_markdown": "The Bernoulli variance term $p(1-p) = p - p^2$ has its derivative $1 - 2p = 0$, giving a strict global maximum at $p = 0.50$ where $p(1-p) = 0.25$. When $p = 0.10$, $p(1-p) = 0.09$, which is less than $36\\%$ of the variance at $p = 0.50$. Consequently, public opinion polls face the largest sampling variability and margin of error when the electorate is evenly split ($50/50$). This is why conservative sample size planning assumes $p = 0.50$ when no prior estimate is available.",
+      "numeric_policy": null
+    }
+  ]
+}

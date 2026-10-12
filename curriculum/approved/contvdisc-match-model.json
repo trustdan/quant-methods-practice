@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "contvdisc_match_model",
+  "version": 1,
+  "status": "active",
+  "family_id": "concept_check",
+  "rule_version": 1,
+  "module_id": "module_3",
+  "title": "Matching business scenarios to theoretical probability distributions",
+  "scenario_markdown": "A business analytics consultancy must select the appropriate theoretical distribution model for four client applications: (1) the continuous time between consecutive incoming help desk calls, (2) monthly sales volume aggregated across 100 retail stores, (3) the number of purchasing customers out of 500 targeted marketing email recipients with a constant conversion rate, and (4) the count of support tickets logged per hour.",
+  "parameters": {
+    "topic": "distribution_model_selection"
+  },
+  "assumptions": [
+    "Exponential distribution models continuous time elapsed between independent Poisson events",
+    "Normal distribution models continuous variables influenced by many additive independent factors",
+    "Binomial distribution models discrete counts of successes in a fixed number of independent Bernoulli trials",
+    "Poisson distribution models discrete counts of occurrences over a continuous fixed time or space interval"
+  ],
+  "concept_ids": ["model_waiting_time_exponential", "model_aggregated_volume_normal", "model_fixed_trials_binomial", "model_arrival_counts_poisson"],
+  "setting_group": "consulting_model_selection",
+  "source_refs": ["Course Module 3: Continuous Probability Distributions", "docs/COURSE-MAP.md"],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T23:42:00Z",
+    "notes": "Reviewed model selection rules: continuous waiting times -> Exponential; symmetric continuous aggregated totals -> Normal; fixed-trial discrete binary outcomes -> Binomial; interval count rates -> Poisson.",
+    "delegation_basis": "Module 3 backlog authorization"
+  },
+  "stages": [
+    {
+      "id": "match_waiting_times",
+      "kind": "choice",
+      "prompt_markdown": "Which distribution best models the continuous elapsed time between consecutive customer support phone calls?",
+      "options": [
+        {"id": "model_exponential", "text_markdown": "Exponential distribution, because it models continuous waiting times between Poisson arrival events.", "misconception_id": null, "hint_markdown": null},
+        {"id": "model_poisson_time_confused", "text_markdown": "Poisson distribution, because incoming calls arrive at a call center.", "misconception_id": "confuse_count_with_waiting_time", "hint_markdown": "Poisson models the discrete *count* of calls in an hour; the continuous *time elapsed* between calls is modeled by the Exponential distribution."},
+        {"id": "model_uniform_time", "text_markdown": "Uniform distribution, because any arrival time is equally likely.", "misconception_id": "confuse_independent_arrivals_with_uniform", "hint_markdown": "Memoryless independent arrivals have exponentially decaying inter-arrival times, not a flat uniform density."}
+      ],
+      "expected_answer": {"kind": "choice", "option_id": "model_exponential"},
+      "evidence_concept_ids": ["model_waiting_time_exponential"],
+      "explanation_markdown": "The Exponential distribution is the standard continuous model for waiting times or durations between Poisson events. Its probability density $f(x) = \\lambda e^{-\\lambda x}$ reflects a constant event rate $\\lambda$.",
+      "numeric_policy": null
+    },
+    {
+      "id": "match_aggregated_volume",
+      "kind": "choice",
+      "prompt_markdown": "Which distribution best models monthly chain sales volume resulting from the aggregation of many independent market factors?",
+      "options": [
+        {"id": "model_normal", "text_markdown": "Normal distribution, because sums and averages of many independent business factors produce a symmetric bell-shaped distribution.", "misconception_id": null, "hint_markdown": null},
+        {"id": "model_exponential_volume", "text_markdown": "Exponential distribution, because higher sales volumes are less common than lower sales volumes.", "misconception_id": "asymmetric_decay_confused_with_bell_shape", "hint_markdown": "Aggregated sales typically cluster symmetrically around an average monthly mean rather than decaying strictly from zero."},
+        {"id": "model_discrete_uniform", "text_markdown": "Discrete uniform distribution, because each retail store generates revenue.", "misconception_id": "store_identity_confused_with_outcome_probabilities", "hint_markdown": "Sales volume is a continuous dollar measurement with varying frequencies, not equal-probability discrete outcomes."}
+      ],
+      "expected_answer": {"kind": "choice", "option_id": "model_normal"},
+      "evidence_concept_ids": ["model_aggregated_volume_normal"],
+      "explanation_markdown": "By the Central Limit Theorem and empirical evidence, continuous metrics that represent the sum of many independent small fluctuations (e.g. sales, customer heights, test scores) follow a normal distribution $N(\\mu, \\sigma^2)$ characterized by its symmetric bell curve.",
+      "numeric_policy": null
+    },
+    {
+      "id": "match_email_conversions",
+      "kind": "choice",
+      "prompt_markdown": "Which distribution models the number of conversions among $n = 500$ email recipients with an independent conversion probability of $p = 0.04$?",
+      "options": [
+        {"id": "model_binomial", "text_markdown": "Binomial distribution, because there is a fixed number of trials ($n = 500$), two possible outcomes per trial, and a constant success probability ($p = 0.04$).", "misconception_id": null, "hint_markdown": null},
+        {"id": "model_continuous_uniform_conv", "text_markdown": "Continuous uniform distribution between $0$ and $500$.", "misconception_id": "range_confused_with_equal_density", "hint_markdown": "Converting customers is a discrete count with peak probability near the mean $np = 20$, not a flat uniform density."},
+        {"id": "model_exponential_conv", "text_markdown": "Exponential distribution, because conversion probability is low ($4\\%$).", "misconception_id": "low_probability_confused_with_exponential", "hint_markdown": "The count of conversions is an integer count out of $n$ fixed trials; Exponential is a continuous distribution for waiting times."}
+      ],
+      "expected_answer": {"kind": "choice", "option_id": "model_binomial"},
+      "evidence_concept_ids": ["model_fixed_trials_binomial"],
+      "explanation_markdown": "This setting satisfies all four binomial conditions: (1) fixed number of trials $n = 500$, (2) binary outcomes (convert/do not convert), (3) constant probability $p = 0.04$, and (4) independent customer decisions. Thus, $X \\sim \\text{Binomial}(500, 0.04)$.",
+      "numeric_policy": null
+    },
+    {
+      "id": "match_hourly_tickets",
+      "kind": "choice",
+      "prompt_markdown": "Which distribution best models the number of support tickets arriving during a 1-hour shift with a historical average rate of 12 tickets per hour?",
+      "options": [
+        {"id": "model_poisson", "text_markdown": "Poisson distribution, because it models discrete counts of occurrences over a continuous interval of time with a known constant rate $\\lambda = 12$.", "misconception_id": null, "hint_markdown": null},
+        {"id": "model_binomial_without_n", "text_markdown": "Binomial distribution with $n = 12$ and $p = 0.5$.", "misconception_id": "invent_arbitrary_trials_for_rate", "hint_markdown": "There is no fixed limit of $12$ trials; tickets arrive continuously throughout the hour, so Poisson is the natural model."},
+        {"id": "model_normal_discrete", "text_markdown": "Normal distribution, because hourly ticket counts are continuous.", "misconception_id": "ticket_count_confused_with_continuous", "hint_markdown": "Tickets are discrete countable integers ($0, 1, 2, \\dots$), not continuous measurements."}
+      ],
+      "expected_answer": {"kind": "choice", "option_id": "model_poisson"},
+      "evidence_concept_ids": ["model_arrival_counts_poisson"],
+      "explanation_markdown": "When counting occurrences over a continuous time or space interval without a fixed maximum trial count $n$, the Poisson distribution with parameter $\\lambda = 12$ tickets/hour is the appropriate model: $P(Y = k) = e^{-12} 12^k / k!$.",
+      "numeric_policy": null
+    }
+  ]
+}

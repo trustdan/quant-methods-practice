@@ -1,0 +1,148 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "exponential_percentile_service",
+  "version": 1,
+  "status": "active",
+  "family_id": "exponential_dist",
+  "rule_version": 1,
+  "module_id": "module_3",
+  "title": "Cloud SLA service ticket resolution time percentile",
+  "scenario_markdown": "Resolution time $X$ (in hours) for cloud infrastructure support tickets follows an exponential distribution with rate parameter $\\lambda = 0.40$ tickets resolved per hour (mean resolution time $\\mu = 1/\\lambda = 2.5$ hours). Management wishes to establish a 90th percentile Service Level Agreement (SLA) target $x^*$, such that $90\\%$ of tickets are resolved within $x^*$ hours ($P(X \\le x^*) = 0.90$).",
+  "parameters": {
+    "lambda": 0.4,
+    "mean": 2.5,
+    "p": 0.9
+  },
+  "assumptions": [
+    "Continuous exponential resolution time X ~ Exp(lambda = 0.40)",
+    "Mean resolution time mu = 1/lambda = 2.5 hours",
+    "Quantile condition P(X <= x*) = 0.90"
+  ],
+  "concept_ids": [
+    "exponential_quantile_derivation",
+    "exponential_quantile_numerical_value",
+    "exponential_skewness_quantile_interpretation"
+  ],
+  "setting_group": "exponential_cloud_sla",
+  "source_refs": [
+    "Course Module 3: Continuous Probability Distributions",
+    "docs/CONTENT-BACKLOG.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T20:00:00Z",
+    "notes": "Verified quantile derivation: 1 - exp(-0.40 * x*) = 0.90 => exp(-0.40 * x*) = 0.10 => x* = -ln(0.10)/0.40 = 2.302585/0.40 = 5.75646 hours. Rounded to two decimals is 5.76 hours. Excel formula: =-LN(1 - 0.90)/0.40.",
+    "delegation_basis": "Row 3.3 backlog implementation authorization"
+  },
+  "stages": [
+    {
+      "id": "formulate_quantile_equation",
+      "kind": "choice",
+      "prompt_markdown": "To find the 90th percentile $x^*$ where $P(X \\le x^*) = 0.90$ for an exponential distribution with rate $\\lambda = 0.40$, which mathematical formula isolates $x^*$?",
+      "options": [
+        {
+          "id": "quantile_algebra",
+          "text_markdown": "$x^* = -\\frac{\\ln(1 - 0.90)}{\\lambda} = -\\frac{\\ln(0.10)}{0.40}$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "linear_quantile",
+          "text_markdown": "$x^* = 0.90 \\times \\mu = 0.90 \\times 2.5 = 2.25$ hours",
+          "misconception_id": "assume_uniform_percentile",
+          "hint_markdown": "Linear scaling applies only to the uniform distribution $U(0, b)$; the exponential distribution is non-linear and right-skewed."
+        },
+        {
+          "id": "normal_quantile",
+          "text_markdown": "$x^* = \\mu + 1.282 \\sigma = 2.5 + 1.282(2.5) = 5.705$ hours",
+          "misconception_id": "apply_normal_quantile_to_exponential",
+          "hint_markdown": "The standard normal quantile $z = 1.282$ applies only to bell-shaped normal distributions, not exponential distributions."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "quantile_algebra"
+      },
+      "evidence_concept_ids": [
+        "exponential_quantile_derivation"
+      ],
+      "explanation_markdown": "Setting $F(x^*) = 1 - e^{-\\lambda x^*} = p$ yields $e^{-\\lambda x^*} = 1 - p$. Taking natural logarithms: $-\\lambda x^* = \\ln(1 - p) \\implies x^* = -\\frac{\\ln(1 - p)}{\\lambda} = -\\frac{\\ln(0.10)}{0.40}$.",
+      "numeric_policy": null
+    },
+    {
+      "id": "calculate_sla_cutoff",
+      "kind": "choice",
+      "prompt_markdown": "Evaluating $x^* = -\\frac{\\ln(0.10)}{0.40}$, what is the numerical 90th percentile resolution time?",
+      "options": [
+        {
+          "id": "cutoff_correct",
+          "text_markdown": "$x^* = \\frac{2.3026}{0.40} \\approx 5.76$ hours",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "cutoff_linear",
+          "text_markdown": "$x^* = 0.90 \\times 2.50 = 2.25$ hours",
+          "misconception_id": "assume_uniform_percentile",
+          "hint_markdown": "The exponential distribution is right-skewed; linear scaling applies only to uniform distributions."
+        },
+        {
+          "id": "cutoff_inverted_log",
+          "text_markdown": "$x^* = -\\frac{\\ln(0.90)}{0.40} \\approx 0.26$ hours",
+          "misconception_id": "use_p_instead_of_one_minus_p",
+          "hint_markdown": "Solving $1 - e^{-\\lambda x^*} = 0.90$ gives $e^{-\\lambda x^*} = 0.10$, so you must take $\\ln(0.10)$, not $\\ln(0.90)$."
+        },
+        {
+          "id": "cutoff_normal_approx",
+          "text_markdown": "$x^* = 2.5 + 1.282(2.5) \\approx 5.71$ hours",
+          "misconception_id": "apply_normal_quantile_to_exponential",
+          "hint_markdown": "The exponential distribution is not bell-shaped; using standard normal $z = 1.282$ is an approximation that ignores the exponential functional form."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "cutoff_correct"
+      },
+      "evidence_concept_ids": [
+        "exponential_quantile_numerical_value"
+      ],
+      "explanation_markdown": "$x^* = -\\frac{-2.302585}{0.40} \\approx 5.7565$ hours (or approximately $5.76$ hours). In Excel, this quantile is computed using `=-LN(1 - 0.90)/0.40`.",
+      "numeric_policy": null
+    },
+    {
+      "id": "percentile_skewness_comparison",
+      "kind": "choice",
+      "prompt_markdown": "Notice that the 90th percentile ($5.76$ hours) is more than double the mean resolution time ($2.50$ hours). What property of the exponential distribution causes this disparity?",
+      "options": [
+        {
+          "id": "skewness_long_tail",
+          "text_markdown": "The exponential distribution is heavily right-skewed with a long right tail, so upper percentiles stretch far above the mean to capture infrequent high-duration cases",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "symmetric_assumption",
+          "text_markdown": "The disparity is a calculation anomaly; in all continuous distributions the 90th percentile is exactly $1.96$ standard deviations above the mean",
+          "misconception_id": "confuse_all_continuous_with_normal",
+          "hint_markdown": "Only the normal distribution follows empirical rule standard deviation multiples. Exponential skewness causes upper percentiles to extend much further."
+        },
+        {
+          "id": "excel_built_in_inv",
+          "text_markdown": "Analysts should instead use `=EXPON.INV(0.90, 0.40)` to enforce symmetry around the mean",
+          "misconception_id": "invent_nonexistent_excel_function",
+          "hint_markdown": "Excel does not have an `=EXPON.INV` function; quantiles must be solved algebraically using `=-LN(1-p)/lambda`."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "skewness_long_tail"
+      },
+      "evidence_concept_ids": [
+        "exponential_skewness_quantile_interpretation"
+      ],
+      "explanation_markdown": "Because the exponential distribution has density $f(x) = \\lambda e^{-\\lambda x}$ peaking at $x = 0$ and tapering off gradually to $+\\infty$, the median is $\\frac{\\ln(2)}{\\lambda} \\approx 0.693\\mu$, well below the mean $\\mu$. Consequently, the 90th percentile $-\\frac{\\ln(0.10)}{\\lambda} \\approx 2.303\\mu$ sits far above the mean.",
+      "numeric_policy": null
+    }
+  ]
+}

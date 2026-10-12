@@ -70,6 +70,7 @@ type DrillSession struct {
 	Questions            []QuestionState        `json:"questions,omitempty"`
 	Settings             domain.SessionSettings `json:"settings"`
 	ContrastCount        int                    `json:"contrast_count,omitempty"`
+	BankTotalQuestions   int                    `json:"bank_total_questions,omitempty"`
 
 	contrastFinder func(originID, misID string) (*domain.QuestionTemplate, bool)
 }
@@ -220,6 +221,7 @@ type PublicSessionView struct {
 	UpdatedAt            time.Time            `json:"updated_at"`
 	CurrentQuestionIndex int                  `json:"current_question_index"`
 	TotalQuestions       int                  `json:"total_questions"`
+	BankTotalQuestions   int                  `json:"bank_total_questions,omitempty"`
 	Questions            []PublicQuestionInfo `json:"questions"`
 	AllCompleted         bool                 `json:"all_completed"`
 	ScaffoldLevel        string               `json:"scaffold_level,omitempty"`

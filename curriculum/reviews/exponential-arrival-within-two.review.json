@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "template_id": "exponential_arrival_within_two",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T20:00:00Z",
+  "delegation_basis": "Row 3.3 backlog implementation authorization",
+  "mathematical_audit": {
+    "family_id": "exponential_dist",
+    "parameters": {
+      "lambda": 0.25,
+      "mean": 4.0,
+      "x": 2.0,
+      "tail": "lower"
+    },
+    "canonical_probability": 0.3935,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 4.0,
+      "variance": 16.0,
+      "standard_deviation": 4.0
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.001,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {
+        "id": "identify_rate_parameter",
+        "kind": "choice",
+        "evidence": "exponential_parameter_identification"
+      },
+      {
+        "id": "calculate_arrival_within_two",
+        "kind": "numeric",
+        "evidence": "exponential_cdf_calculation"
+      },
+      {
+        "id": "interpret_cumulative_vs_density",
+        "kind": "choice",
+        "evidence": "exponential_excel_cumulative_interpretation"
+      }
+    ],
+    "numeric_policy": {
+      "version": 1,
+      "allowed_forms": [
+        "decimal",
+        "percent",
+        "fraction"
+      ],
+      "absolute_tolerance": 0.001,
+      "relative_tolerance": 0.01
+    }
+  },
+  "notes": "Verified mathematically: Rate lambda = 1/4 = 0.25. P(X <= 2) = 1 - exp(-0.5) = 0.39346934... Rounded canonical key 0.3935. Distractors verified non-colliding."
+}

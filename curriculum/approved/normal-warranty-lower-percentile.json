@@ -1,0 +1,155 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "normal_warranty_lower_percentile",
+  "version": 1,
+  "status": "active",
+  "family_id": "normal_dist",
+  "rule_version": 1,
+  "module_id": "module_3",
+  "title": "Tire warranty replacement threshold lower percentile",
+  "scenario_markdown": "The tread lifespan of a heavy-duty commercial tire is normally distributed with mean $\\mu = 60,000$ miles and standard deviation $\\sigma = 8,000$ miles ($X \\sim N(60000, 8000^2)$). The manufacturer wants to establish a mileage warranty limit $X_w$ such that only $2\\%$ ($0.02$) of tires wear out before reaching the warranty threshold ($P(X \\le X_w) = 0.02$). What warranty mileage should the company guarantee?",
+  "parameters": {
+    "mu": 60000.0,
+    "sigma": 8000.0,
+    "p": 0.02,
+    "tail": "lower"
+  },
+  "assumptions": [
+    "Continuous normal distribution X ~ N(60000, 8000^2) in miles",
+    "Independent tire wear lifespans under normal driving conditions",
+    "Lower 2% tail corresponds to cumulative probability Phi(Z*) = 0.02"
+  ],
+  "concept_ids": [
+    "normal_lower_tail_percentile",
+    "normal_negative_z_score",
+    "normal_warranty_business_decision"
+  ],
+  "setting_group": "normal_tire_lifespan",
+  "source_refs": [
+    "Course Module 3: Continuous Probability Distributions",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T20:00:00Z",
+    "notes": "Reviewed lower tail quantile: Phi(-2.0537) = 0.02 (table Z = -2.05). Unstandardized warranty cutoff Xw = 60000 + (-2.0537)(8000) = 43,570 miles (or 43,600 with Z = -2.05). Analyzed business cost implication of shifting threshold to 50k miles (claim rate jumps to 10.56%).",
+    "delegation_basis": "Content backlog Batch 1: Row 3.2 normal distribution expansion"
+  },
+  "stages": [
+    {
+      "id": "determine_negative_z",
+      "kind": "choice",
+      "prompt_markdown": "What standard score $Z^*$ corresponds to the lower $2\\%$ tail of the normal distribution ($P(Z \\le Z^*) = 0.02$)?",
+      "options": [
+        {
+          "id": "z_minus_two_zero_five",
+          "text_markdown": "$Z^* \\approx -2.05$ (or $-2.054$), where $\\Phi(-2.054) \\approx 0.0200$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "z_plus_two_zero_five",
+          "text_markdown": "$Z^* \\approx +2.054$",
+          "misconception_id": "positive_z_for_lower_tail",
+          "hint_markdown": "A positive $Z$-score corresponds to a value above the mean ($98\\text{th}$ percentile), not the bottom $2\\%$."
+        },
+        {
+          "id": "z_minus_two_three_three",
+          "text_markdown": "$Z^* \\approx -2.326$",
+          "misconception_id": "incorrect_tail_percentile_z",
+          "hint_markdown": "$-2.326$ corresponds to a $1\\%$ lower tail, not $2\\%$."
+        },
+        {
+          "id": "z_point_zero_two",
+          "text_markdown": "$Z^* = -0.02$",
+          "misconception_id": "confuse_probability_with_z_score",
+          "hint_markdown": "$-0.02$ confuses the probability area ($0.02$) with the standardized coordinate on the horizontal axis."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "z_minus_two_zero_five"
+      },
+      "evidence_concept_ids": [
+        "normal_lower_tail_percentile"
+      ],
+      "explanation_markdown": "By symmetry and cumulative normal tables, the standard score with $2\\%$ cumulative probability in the lower tail satisfies $\\Phi(Z^*) = 0.02$. Looking up $0.02$ in the standard normal table gives $Z^* \\approx -2.05$ (software gives $-2.05375$). Excel formula: `=NORM.S.INV(0.02)`.",
+      "numeric_policy": null
+    },
+    {
+      "id": "calculate_warranty_mileage",
+      "kind": "choice",
+      "prompt_markdown": "Using $Z^* \\approx -2.054$, what is the warranty mileage cutoff $X_w = \\mu + Z^* \\sigma$?",
+      "options": [
+        {
+          "id": "mileage_forty_three_five_seventy",
+          "text_markdown": "$X_w = 60000 + (-2.054)(8000) \\approx 43,570\\text{ miles}$ (or $43,600\\text{ miles}$ using table $Z = -2.05$)",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "mileage_seventy_six_four_thirty",
+          "text_markdown": "$X_w = 60000 + (2.054)(8000) = 76,432\\text{ miles}$",
+          "misconception_id": "add_sigma_for_lower_bound",
+          "hint_markdown": "A warranty protects early failures, so the threshold must lie below the average lifespan."
+        },
+        {
+          "id": "mileage_fifty_two_thousand",
+          "text_markdown": "$X_w = 60000 - 8000 = 52,000\\text{ miles}$",
+          "misconception_id": "assume_one_sigma_rule",
+          "hint_markdown": "Subtracting exactly one standard deviation leaves $15.87\\%$ of tires below the threshold, far exceeding the $2\\%$ target."
+        },
+        {
+          "id": "mileage_fifty_eight_eight_hundred",
+          "text_markdown": "$X_w = 60000 \\times 0.98 = 58,800\\text{ miles}$",
+          "misconception_id": "linear_percentage_misconception",
+          "hint_markdown": "Percentiles of a normal distribution are non-linear and depend on standard deviations, not a direct percentage reduction of the mean."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "mileage_forty_three_five_seventy"
+      },
+      "evidence_concept_ids": [
+        "normal_negative_z_score"
+      ],
+      "explanation_markdown": "$X_w = \\mu + Z^* \\sigma = 60000 + (-2.05375)(8000) = 60000 - 16430 = 43,570\\text{ miles}$ (or $43,600\\text{ miles}$ with 2-decimal table rounding $Z = -2.05$). Excel formula: `=NORM.INV(0.02, 60000, 8000)` yields $43,570.01\\text{ miles}$.",
+      "numeric_policy": null
+    },
+    {
+      "id": "warranty_cost_interpretation",
+      "kind": "choice",
+      "prompt_markdown": "If the company instead set an overly aggressive warranty limit at $50,000\\text{ miles}$, how would this affect warranty claim replacement rates?",
+      "options": [
+        {
+          "id": "claims_jump_to_ten_percent",
+          "text_markdown": "Warranty claims would increase sharply from $2\\%$ to approximately $10.56\\%$, because $Z = \\frac{50000 - 60000}{8000} = -1.25$ and $\\Phi(-1.25) \\approx 0.1056$.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "claims_decrease",
+          "text_markdown": "Warranty claims would decrease because $50,000\\text{ miles}$ is below the average tire lifespan of $60,000\\text{ miles}$.",
+          "misconception_id": "misunderstand_cutoff_direction",
+          "hint_markdown": "Raising the warranty mileage increases the proportion of tires that fail before reaching the limit."
+        },
+        {
+          "id": "claims_remain_fixed",
+          "text_markdown": "Warranty claims would remain at exactly $2\\%$ because the manufacturer can contractually limit replacements.",
+          "misconception_id": "confuse_contract_with_statistical_outcome",
+          "hint_markdown": "The failure rate is determined by the physical distribution of tire wear relative to the declared warranty threshold."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "claims_jump_to_ten_percent"
+      },
+      "evidence_concept_ids": [
+        "normal_warranty_business_decision"
+      ],
+      "explanation_markdown": "At $X = 50000\\text{ miles}$, $Z = \\frac{50000 - 60000}{8000} = -1.25$. From normal distribution tables, $P(X \\le 50000) = \\Phi(-1.25) \\approx 0.10565$ (or $10.56\\%$). Raising the warranty limit by only $6,430$ miles increases warranty replacements more than five-fold, highlighting the steep curvature of the normal distribution tail.",
+      "numeric_policy": null
+    }
+  ]
+}

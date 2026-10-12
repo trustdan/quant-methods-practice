@@ -354,6 +354,11 @@ func (e *ExponentialDistribution) ExcelPDF(x float64) string {
 	return fmt.Sprintf("=EXPON.DIST(%.4g, %.4g, FALSE)", x, e.Lambda)
 }
 
+// ExcelQuantile returns the Excel formula for exponential quantile: =-LN(1 - p) / lambda.
+func (e *ExponentialDistribution) ExcelQuantile(p float64) string {
+	return fmt.Sprintf("=-LN(1 - %.4g) / %.4g", p, e.Lambda)
+}
+
 // ContinuousEventKind specifies continuous event relations.
 type ContinuousEventKind string
 

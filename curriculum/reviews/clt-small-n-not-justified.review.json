@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "template_id": "clt_small_n_not_justified",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T20:00:00Z",
+  "delegation_basis": "Stage 16 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "concept_check",
+    "parameters": {
+      "topic": "sampling_distribution",
+      "concept": "clt_sample_size_condition",
+      "objective": "4.1"
+    },
+    "canonical_probability": null,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 0.0,
+      "variance": 0.0,
+      "standard_deviation": 0.0
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.0,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "intern_reasoning_flaw", "kind": "choice", "evidence": "clt_small_n_skewed_flaw"},
+      {"id": "condition_for_small_n_normality", "kind": "choice", "evidence": "clt_population_normality_prerequisite"},
+      {"id": "skewed_small_sample_impact", "kind": "choice", "evidence": "clt_skewness_impact_on_inference"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Reviewed conceptual question enforcing CLT sample size constraints. Validates that n = 9 is insufficient for non-normal populations, that exact normality for small n requires a normal population, and that applying the normal table to small skewed samples underestimates right-tail risk."
+}

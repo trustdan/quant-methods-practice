@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "template_id": "clt_finite_population_correction",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T20:00:00Z",
+  "delegation_basis": "Stage 16 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "sampling_distribution",
+    "parameters": {
+      "stat": "mean",
+      "mu": 50000.0,
+      "sigma": 8000.0,
+      "n": 64,
+      "pop_size": 400,
+      "x_bar": 51835.33
+    },
+    "canonical_probability": 0.0227501,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 50000.0,
+      "variance": 842105.26,
+      "standard_deviation": 917.6629
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "fpc_applicability_threshold", "kind": "choice", "evidence": "clt_fpc_applicability_threshold"},
+      {"id": "fpc_factor_calculation", "kind": "choice", "evidence": "clt_fpc_factor_calculation"},
+      {"id": "fpc_standard_error_impact", "kind": "choice", "evidence": "clt_fpc_standard_error_impact"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Verified FPC sampling distribution audit: N = 400, n = 64, fraction = 0.16 > 0.05. FPC multiplier = sqrt(336 / 399) = 0.9176629. Base SE = 1000.00. Corrected SE = 917.6629. Distractor calculations audited."
+}

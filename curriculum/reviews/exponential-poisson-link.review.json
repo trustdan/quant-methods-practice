@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "template_id": "exponential_poisson_link",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T20:00:00Z",
+  "delegation_basis": "Row 3.3 backlog implementation authorization",
+  "mathematical_audit": {
+    "family_id": "exponential_dist",
+    "parameters": {
+      "lambda": 0.2,
+      "mean": 5.0,
+      "x": 10.0,
+      "tail": "upper"
+    },
+    "canonical_probability": 0.1353,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 5.0,
+      "variance": 25.0,
+      "standard_deviation": 5.0
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.001,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {
+        "id": "connect_poisson_rate_to_exponential",
+        "kind": "choice",
+        "evidence": "poisson_exponential_parameter_bridge"
+      },
+      {
+        "id": "calculate_gap_probability",
+        "kind": "numeric",
+        "evidence": "exponential_survival_calculation"
+      },
+      {
+        "id": "demonstrate_poisson_duality",
+        "kind": "choice",
+        "evidence": "poisson_exponential_duality_principle"
+      }
+    ],
+    "numeric_policy": {
+      "version": 1,
+      "allowed_forms": [
+        "decimal",
+        "percent",
+        "fraction"
+      ],
+      "absolute_tolerance": 0.001,
+      "relative_tolerance": 0.01
+    }
+  },
+  "notes": "Verified mathematically: Rate lambda_min = 12/60 = 0.20 per min. P(X > 10 min) = exp(-2) = 0.13533528... Rounded canonical key 0.1353. Poisson zero-count duality P(Y = 0) with mu_Y = 2.0 gives exact agreement exp(-2). Distractors verified."
+}

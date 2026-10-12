@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "contvdisc_classify_variables",
+  "version": 1,
+  "status": "active",
+  "family_id": "concept_check",
+  "rule_version": 1,
+  "module_id": "module_3",
+  "title": "Classifying discrete and continuous business variables",
+  "scenario_markdown": "An operations manager at an e-commerce fulfillment center tracks four business metrics: (1) customer service wait time in minutes, (2) customer complaints logged per shift, (3) outbound shipping package weight in kilograms, and (4) defective items found in a sample of 50 units.",
+  "parameters": {
+    "topic": "discrete_vs_continuous_classification"
+  },
+  "assumptions": [
+    "Discrete random variables take on countable values (typically integer counts resulting from counting)",
+    "Continuous random variables take on any value within an interval (typically resulting from measurement)"
+  ],
+  "concept_ids": ["classify_wait_time_continuous", "classify_complaints_discrete", "classify_package_weight_continuous", "classify_defects_discrete"],
+  "setting_group": "fulfillment_center_metrics",
+  "source_refs": ["Course Module 3: Continuous Probability Distributions", "docs/COURSE-MAP.md"],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T23:30:00Z",
+    "notes": "Reviewed classification: wait time and package weight are continuous (measured); complaints and defects are discrete (counted integers).",
+    "delegation_basis": "Module 3 backlog authorization"
+  },
+  "stages": [
+    {
+      "id": "classify_wait_time",
+      "kind": "choice",
+      "prompt_markdown": "How should customer service wait time (measured in minutes) be classified?",
+      "options": [
+        {"id": "wait_time_continuous", "text_markdown": "Continuous, because time can take any value along an unbroken continuum within an interval.", "misconception_id": null, "hint_markdown": null},
+        {"id": "wait_time_discrete", "text_markdown": "Discrete, because digital stopwatches round time to whole seconds.", "misconception_id": "measurement_rounding_as_discrete", "hint_markdown": "Rounding during measurement does not make the underlying variable discrete; time itself is continuous."},
+        {"id": "wait_time_categorical", "text_markdown": "Categorical, because wait times can be grouped into short, medium, and long.", "misconception_id": "binning_confused_with_variable_type", "hint_markdown": "Grouping quantitative values into bins does not change the numeric nature of the original measurement."}
+      ],
+      "expected_answer": {"kind": "choice", "option_id": "wait_time_continuous"},
+      "evidence_concept_ids": ["classify_wait_time_continuous"],
+      "explanation_markdown": "Wait time is a continuous random variable because it is a measurement that can take any value within a interval, such as $4.328$ minutes. Any rounding on a clock is a limitation of the instrument, not the variable.",
+      "numeric_policy": null
+    },
+    {
+      "id": "classify_complaints",
+      "kind": "choice",
+      "prompt_markdown": "How should the number of customer complaints logged during a shift be classified?",
+      "options": [
+        {"id": "complaints_discrete", "text_markdown": "Discrete, because complaints are countable integer outcomes ($0, 1, 2, \\dots$) with no fractional values possible.", "misconception_id": null, "hint_markdown": null},
+        {"id": "complaints_continuous", "text_markdown": "Continuous, because the shift complaint count can vary smoothly over time.", "misconception_id": "variation_confused_with_continuity", "hint_markdown": "A complaint is an indivisible unit; you cannot have $2.7$ customer complaints filed in a single shift."},
+        {"id": "complaints_binary", "text_markdown": "Binary, because each shift either has complaints or does not.", "misconception_id": "reduction_to_indicator", "hint_markdown": "The metric counts the total number of complaints, which can be any non-negative integer ($0, 1, 2, \\dots$), not just yes/no."}
+      ],
+      "expected_answer": {"kind": "choice", "option_id": "complaints_discrete"},
+      "evidence_concept_ids": ["classify_complaints_discrete"],
+      "explanation_markdown": "The number of complaints is a discrete random variable because it results from counting distinct, indivisible events. The sample space is $\\{0, 1, 2, 3, \\dots\\}$.",
+      "numeric_policy": null
+    },
+    {
+      "id": "classify_package_weight",
+      "kind": "choice",
+      "prompt_markdown": "How should outbound shipping package weight (in kilograms) be classified?",
+      "options": [
+        {"id": "weight_continuous", "text_markdown": "Continuous, because weight is a physical measurement that can take any real value on a continuous scale.", "misconception_id": null, "hint_markdown": null},
+        {"id": "weight_discrete", "text_markdown": "Discrete, because shipping scales display weight to two decimal places ($0.01$ kg).", "misconception_id": "scale_precision_confused_with_discrete", "hint_markdown": "Scale display resolution is an instrument limit; true physical mass can take any value in an interval."},
+        {"id": "weight_ordinal", "text_markdown": "Ordinal, because heavier packages cost more than lighter packages.", "misconception_id": "ordering_confused_with_scale", "hint_markdown": "Weight is measured on a continuous ratio scale with meaningful units and ratios, not merely ranks."}
+      ],
+      "expected_answer": {"kind": "choice", "option_id": "weight_continuous"},
+      "evidence_concept_ids": ["classify_package_weight_continuous"],
+      "explanation_markdown": "Package weight is continuous because weight is determined by measurement on a continuum. Between any two possible weights, an infinite number of other weights exist.",
+      "numeric_policy": null
+    },
+    {
+      "id": "classify_defects",
+      "kind": "choice",
+      "prompt_markdown": "How should the count of defective items in a sample of 50 inspected units be classified?",
+      "options": [
+        {"id": "defects_discrete", "text_markdown": "Discrete, because the possible defect counts are restricted to the finite set of integers $\\{0, 1, 2, \\dots, 50\\}$.", "misconception_id": null, "hint_markdown": null},
+        {"id": "defects_continuous", "text_markdown": "Continuous, because we can compute the sample defect proportion $\\hat{p} = X/50$.", "misconception_id": "proportion_confused_with_raw_count", "hint_markdown": "The question asks about the count of defective items $X$, which is strictly integer-valued."},
+        {"id": "defects_uniform", "text_markdown": "Continuous uniform, because any unit has equal probability of being defective.", "misconception_id": "equal_probability_confused_with_continuous_uniform", "hint_markdown": "Even if items have identical failure rates, the count of defects is a discrete binomial variable, not a continuous distribution."}
+      ],
+      "expected_answer": {"kind": "choice", "option_id": "defects_discrete"},
+      "evidence_concept_ids": ["classify_defects_discrete"],
+      "explanation_markdown": "The number of defective items $X$ in $n = 50$ trials is a discrete random variable (modeled by a binomial distribution) with countable support $\\{0, 1, \\dots, 50\\}$.",
+      "numeric_policy": null
+    }
+  ]
+}

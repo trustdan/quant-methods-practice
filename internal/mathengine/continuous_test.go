@@ -211,6 +211,22 @@ func TestExponentialDistribution(t *testing.T) {
 		t.Errorf("expected median %v, got %v", math.Ln2/2.0, median)
 	}
 
+	// Interval: P(0.5 <= X <= 1.5)
+	intervalProb, err := exp.Interval(0.5, 1.5)
+	if err != nil {
+		t.Fatalf("unexpected interval error: %v", err)
+	}
+	expectedInterval := math.Exp(-2.0*0.5) - math.Exp(-2.0*1.5)
+	if math.Abs(intervalProb-expectedInterval) > 1e-12 {
+		t.Errorf("expected interval %v, got %v", expectedInterval, intervalProb)
+	}
+
+	// ExcelQuantile
+	excelQ := exp.ExcelQuantile(0.90)
+	if excelQ != "=-LN(1 - 0.9) / 2" {
+		t.Errorf("unexpected ExcelQuantile: %s", excelQ)
+	}
+
 	// Invalid lambda
 	if _, err := NewExponentialDistribution(0); err == nil {
 		t.Errorf("expected error for lambda=0")

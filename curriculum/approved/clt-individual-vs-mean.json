@@ -1,0 +1,146 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "clt_individual_vs_mean",
+  "version": 1,
+  "status": "active",
+  "family_id": "sampling_distribution",
+  "rule_version": 1,
+  "module_id": "module_4",
+  "title": "Probability of individual observation versus sample mean",
+  "scenario_markdown": "A commercial airline studies checked baggage weights to manage fuel load and cabin balancing. Passenger bag weights are normally distributed with population mean $\\mu = 40.0$ lbs and standard deviation $\\sigma = 10.0$ lbs. The flight operations manager evaluates the risk of a single passenger's bag exceeding $45.0$ lbs versus the risk that the average weight of a random sample of $n = 25$ bags exceeds $45.0$ lbs.",
+  "parameters": {
+    "stat": "mean",
+    "mu": 40.0,
+    "sigma": 10.0,
+    "n": 25,
+    "pop_is_normal": true,
+    "x": 45.0,
+    "x_bar": 45.0
+  },
+  "assumptions": [
+    "Individual baggage weights are normally distributed: X ~ N(40.0, 10.0^2)",
+    "Bags in the sample of n = 25 are randomly and independently selected",
+    "Because the population is normal, the sample mean X_bar is exactly normally distributed for any sample size n: X_bar ~ N(mu, sigma^2/n)"
+  ],
+  "concept_ids": [
+    "clt_individual_tail_probability",
+    "clt_sample_mean_tail_probability",
+    "clt_variance_reduction_principle"
+  ],
+  "setting_group": "airline_baggage_weight_comparison",
+  "source_refs": [
+    "Course Module 4: Sampling Distributions and the Central Limit Theorem",
+    "docs/CONTENT-BACKLOG.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T20:00:00Z",
+    "notes": "Verified individual vs sample mean comparison: Individual Z = (45 - 40) / 10 = 0.50, P(X > 45) = 1 - Phi(0.50) = 0.3085. Sample mean SE = 10 / sqrt(25) = 2.00, Z = (45 - 40) / 2 = 2.50, P(X_bar > 45) = 1 - Phi(2.50) = 0.0062.",
+    "delegation_basis": "Stage 16 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "single_observation_tail",
+      "kind": "choice",
+      "prompt_markdown": "What is the probability that a single randomly selected passenger's bag weighs more than $45.0$ lbs, $P(X > 45.0)$?",
+      "options": [
+        {
+          "id": "indiv_correct",
+          "text_markdown": "$P(X > 45.0) = 1 - \\Phi(0.50) = 1 - 0.6915 = 0.3085$ ($30.85\\%$)",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "indiv_lower_tail",
+          "text_markdown": "$P(X > 45.0) = \\Phi(0.50) = 0.6915$ ($69.15\\%$)",
+          "misconception_id": "confused_upper_tail_with_cumulative_cdf",
+          "hint_markdown": "The question asks for the probability that weight exceeds $45.0$ lbs. For a value above the mean, the exceedance probability is the upper tail $1 - \\Phi(0.50)$, not the cumulative probability $0.6915$."
+        },
+        {
+          "id": "indiv_used_se",
+          "text_markdown": "$P(X > 45.0) = 1 - \\Phi(2.50) = 0.0062$ ($0.62\\%$)",
+          "misconception_id": "used_standard_error_for_single_observation",
+          "hint_markdown": "For a single observation ($n = 1$), divide the deviation by the population standard deviation $\\sigma = 10.0$ lbs, not the standard error of a 25-bag sample."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "indiv_correct"
+      },
+      "evidence_concept_ids": [
+        "clt_individual_tail_probability"
+      ],
+      "explanation_markdown": "For an individual observation $X$, standardizing uses the population standard deviation $\\sigma = 10.0$: $Z = \\frac{X - \\mu}{\\sigma} = \\frac{45.0 - 40.0}{10.0} = +0.50$. The upper tail probability is $P(X > 45.0) = 1 - \\Phi(0.50) = 1 - 0.6915 = 0.3085$ (or $30.85\\%$). Excel formula: `=1 - NORM.DIST(45, 40, 10, TRUE)`.",
+      "numeric_policy": null
+    },
+    {
+      "id": "sample_mean_tail",
+      "kind": "choice",
+      "prompt_markdown": "What is the probability that the mean weight of a random sample of $n = 25$ bags exceeds $45.0$ lbs, $P(\\bar{X} > 45.0)$?",
+      "options": [
+        {
+          "id": "mean_correct",
+          "text_markdown": "$P(\\bar{X} > 45.0) = 1 - \\Phi(2.50) = 1 - 0.9938 = 0.0062$ ($0.62\\%$)",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "mean_same_as_individual",
+          "text_markdown": "$P(\\bar{X} > 45.0) = 1 - \\Phi(0.50) = 0.3085$ ($30.85\\%$)",
+          "misconception_id": "believes_sample_mean_has_same_spread_as_population",
+          "hint_markdown": "The sample mean does not have the same variability as an individual bag. Standardizing $\\bar{X}$ requires dividing by $\\sigma_{\\bar{x}} = \\sigma/\\sqrt{n} = 10/\\sqrt{25} = 2.0$ lbs."
+        },
+        {
+          "id": "mean_lower_tail",
+          "text_markdown": "$P(\\bar{X} > 45.0) = \\Phi(2.50) = 0.9938$ ($99.38\\%$)",
+          "misconception_id": "confused_upper_tail_with_cumulative_cdf",
+          "hint_markdown": "$0.9938$ is the probability that the average is less than or equal to $45.0$ lbs ($P(\\bar{X} \\le 45)$). Subtract from 1 for the upper tail."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "mean_correct"
+      },
+      "evidence_concept_ids": [
+        "clt_sample_mean_tail_probability"
+      ],
+      "explanation_markdown": "For the sample mean $\\bar{X}$ of $n = 25$ bags, the standard error is $\\sigma_{\\bar{x}} = \\frac{\\sigma}{\\sqrt{n}} = \\frac{10.0}{\\sqrt{25}} = \\frac{10.0}{5} = 2.0$ lbs. Standardizing gives $Z = \\frac{45.0 - 40.0}{2.0} = +2.50$. The upper tail probability is $P(\\bar{X} > 45.0) = 1 - \\Phi(2.50) = 1 - 0.9938 = 0.0062$ (or $0.62\\%$). Excel formula: `=1 - NORM.DIST(45, 40, 10/SQRT(25), TRUE)`.",
+      "numeric_policy": null
+    },
+    {
+      "id": "variance_reduction_principle",
+      "kind": "choice",
+      "prompt_markdown": "Why is $P(\\bar{X} > 45.0) = 0.0062$ approximately $50$ times smaller than $P(X > 45.0) = 0.3085$?",
+      "options": [
+        {
+          "id": "var_correct",
+          "text_markdown": "Averaging $n = 25$ independent bags causes individual positive and negative fluctuations to cancel out, reducing standard error by $\\sqrt{25} = 5$ times and concentrating the distribution of $\\bar{X}$ tightly around $\\mu = 40.0$.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "var_mean_shifts",
+          "text_markdown": "Taking a sample shifts the expected value of $\\bar{X}$ downward away from $45.0$ lbs.",
+          "misconception_id": "believes_sample_mean_expectation_changes_with_n",
+          "hint_markdown": "The expected value of the sample mean is strictly unchanged: $E[\\bar{X}] = \\mu = 40.0$ lbs for any sample size $n$. Only the variance decreases."
+        },
+        {
+          "id": "var_bags_lighter",
+          "text_markdown": "Passengers pack lighter bags when traveling in groups of 25.",
+          "misconception_id": "confuses_mathematical_aggregation_with_behavioral_change",
+          "hint_markdown": "The problem assumes independent random sampling from the identical population distribution; the reduction in tail probability is an inherent mathematical property of the standard error shrinking by $1/\\sqrt{n}$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "var_correct"
+      },
+      "evidence_concept_ids": [
+        "clt_variance_reduction_principle"
+      ],
+      "explanation_markdown": "The Law of Large Numbers and Central Limit Theorem demonstrate that while individual values frequently deviate from $\\mu$ (with standard deviation $\\sigma = 10.0$), the mean of $n = 25$ independent values has standard error $\\sigma_{\\bar{x}} = 10.0 / 5 = 2.0$. Because $\\sigma_{\\bar{x}}$ is 5 times smaller, an average exceeding $\\mu$ by 5 lbs represents $2.50$ standard errors ($0.62\\%$ probability), whereas for an individual it is only $0.50$ standard deviations ($30.85\\%$ probability).",
+      "numeric_policy": null
+    }
+  ]
+}

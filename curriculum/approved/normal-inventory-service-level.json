@@ -1,0 +1,146 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "normal_inventory_service_level",
+  "version": 1,
+  "status": "active",
+  "family_id": "normal_dist",
+  "rule_version": 1,
+  "module_id": "module_3",
+  "title": "Inventory reorder point under normal demand and service level",
+  "scenario_markdown": "Daily hospital demand for a critical surgical dressing kit follows a normal distribution with mean $\\mu = 200$ kits and standard deviation $\\sigma = 30$ kits ($X \\sim N(200, 30^2)$). To prevent surgical cancellations while minimizing holding costs, the materials manager establishes a $90\\%$ cycle service level, meaning inventory must be sufficient to satisfy total daily demand on at least $90\\%$ of days ($P(X \\le s) \\ge 0.90$). What inventory stock $s$ must be on hand each morning, and what is the resulting daily stockout probability?",
+  "parameters": {
+    "mu": 200.0,
+    "sigma": 30.0,
+    "p": 0.90,
+    "tail": "lower"
+  },
+  "assumptions": [
+    "Continuous normal distribution X ~ N(200, 30^2) in units",
+    "Independent daily demand draws without serial autocorrelation",
+    "Service level 0.90 corresponds to cumulative non-stockout probability P(X <= s) = 0.90"
+  ],
+  "concept_ids": [
+    "normal_service_level_quantile",
+    "safety_stock_calculation",
+    "stockout_probability_complement"
+  ],
+  "setting_group": "normal_medical_inventory",
+  "source_refs": [
+    "Course Module 3: Continuous Probability Distributions",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T20:00:00Z",
+    "notes": "Reviewed inventory service level derivation: Z* for 90% service level is 1.28155 (table 1.28). Safety stock ss = 1.28155 * 30 = 38.45 kits. Total stock s = 200 + 38.45 = 238.45 kits. Daily stockout probability is 1 - 0.9000 = 0.1000. Excel NORM.INV(0.90, 200, 30) verified.",
+    "delegation_basis": "Content backlog Batch 1: Row 3.2 normal distribution expansion"
+  },
+  "stages": [
+    {
+      "id": "service_level_z_score",
+      "kind": "choice",
+      "prompt_markdown": "What standardized score $Z^*$ provides a $90\\%$ cycle service level ($P(Z \\le Z^*) = 0.90$)?",
+      "options": [
+        {
+          "id": "z_one_two_eight",
+          "text_markdown": "$Z^* \\approx +1.282$ (or $1.28$), where $\\Phi(1.282) \\approx 0.9000$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "z_negative_one_two_eight",
+          "text_markdown": "$Z^* \\approx -1.282$",
+          "misconception_id": "negative_z_for_service_level",
+          "hint_markdown": "A service level above $50\\%$ requires carrying inventory above mean demand, which requires a positive $Z$-score."
+        },
+        {
+          "id": "z_one_six_four_five",
+          "text_markdown": "$Z^* \\approx +1.645$",
+          "misconception_id": "confuse_90_with_95_service_level",
+          "hint_markdown": "$1.645$ corresponds to a $95\\%$ service level, not a $90\\%$ service level."
+        },
+        {
+          "id": "z_zero_point_nine",
+          "text_markdown": "$Z^* = 0.90$",
+          "misconception_id": "confuse_probability_with_z_score",
+          "hint_markdown": "$0.90$ is the service level probability (cumulative area), not the number of standard deviations $Z$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "z_one_two_eight"
+      },
+      "evidence_concept_ids": [
+        "normal_service_level_quantile"
+      ],
+      "explanation_markdown": "A $90\\%$ service level requires cumulative non-stockout probability $\\Phi(Z^*) = 0.90$. Looking up $0.9000$ in standard normal tables gives $Z^* \\approx 1.28$ (software gives $1.28155$). Excel formula: `=NORM.S.INV(0.90)`.",
+      "numeric_policy": null
+    },
+    {
+      "id": "calculate_order_point_and_safety_stock",
+      "kind": "choice",
+      "prompt_markdown": "Using $Z^* \\approx 1.282$, what total inventory level $s = \\mu + Z^* \\sigma$ (expected demand plus safety stock $ss = Z^* \\sigma$) must the hospital stock?",
+      "options": [
+        {
+          "id": "stock_two_thirty_eight",
+          "text_markdown": "$s = 200 + 1.2816(30) \\approx 238.45\\text{ kits}$ (safety stock $ss \\approx 38.45\\text{ kits}$)",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "stock_two_hundred_only",
+          "text_markdown": "$s = 200\\text{ kits}$ (holding zero safety stock)",
+          "misconception_id": "zero_safety_stock_mean_demand",
+          "hint_markdown": "Stocking only expected demand ($200$ kits) satisfies demand on only $50\\%$ of days ($Z = 0$), resulting in a $50\\%$ stockout probability."
+        },
+        {
+          "id": "stock_subtracted_safety",
+          "text_markdown": "$s = 200 - 1.2816(30) \\approx 161.55\\text{ kits}$",
+          "misconception_id": "subtract_safety_stock",
+          "hint_markdown": "Safety stock must be added as a buffer above expected demand, not subtracted."
+        },
+        {
+          "id": "stock_ten_percent_buffer",
+          "text_markdown": "$s = 200 \\times 1.10 = 220\\text{ kits}$",
+          "misconception_id": "arbitrary_buffer_heuristic",
+          "hint_markdown": "A flat percentage buffer ignores demand volatility $\\sigma = 30$. $220$ kits gives $Z = (220-200)/30 = 0.67$, achieving only a $74.8\\%$ service level."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "stock_two_thirty_eight"
+      },
+      "evidence_concept_ids": [
+        "safety_stock_calculation"
+      ],
+      "explanation_markdown": "Total stock consists of cycle stock (mean demand $\\mu = 200$) plus safety stock ($ss = Z^* \\sigma = 1.28155 \\times 30 = 38.45\\text{ kits}$): $s = 200 + 38.45 = 238.45\\text{ kits}$ (or $238.4$ kits with table $Z = 1.28$). In practice, the hospital stocks $\\lceil 238.45 \\rceil = 239$ kits. Excel formula: `=NORM.INV(0.90, 200, 30)`.",
+      "numeric_policy": null
+    },
+    {
+      "id": "stockout_probability_numeric",
+      "kind": "numeric",
+      "prompt_markdown": "When maintaining this target stock level of $s = 238.45\\text{ kits}$, what is the exact probability of experiencing a stockout on any given day ($P(X > 238.45)$)? Enter as a decimal or percentage rounded to four decimal places.",
+      "options": [],
+      "expected_answer": {
+        "kind": "numeric",
+        "value": 0.1000,
+        "units": "probability"
+      },
+      "evidence_concept_ids": [
+        "stockout_probability_complement"
+      ],
+      "explanation_markdown": "A stockout occurs when daily demand exceeds stock on hand. By the complement rule: $P(X > s) = 1 - P(X \\le s) = 1 - 0.9000 = 0.1000$ (or $10.00\\%$). Excel formula: `=1 - NORM.DIST(238.45, 200, 30, TRUE)` or `=1 - NORM.S.DIST(1.2816, TRUE)`.",
+      "numeric_policy": {
+        "version": 1,
+        "allowed_forms": [
+          "decimal",
+          "percent",
+          "fraction"
+        ],
+        "absolute_tolerance": 0.001,
+        "relative_tolerance": 0.01
+      }
+    }
+  ]
+}

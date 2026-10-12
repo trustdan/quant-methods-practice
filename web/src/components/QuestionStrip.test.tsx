@@ -21,4 +21,18 @@ describe('QuestionStrip', () => {
     fireEvent.click(buttons[1]);
     expect(onSelect).toHaveBeenCalledWith(1);
   });
+
+  it('renders situational awareness badge with bank total questions', () => {
+    render(
+      <QuestionStrip
+        totalQuestions={10}
+        currentQuestionIndex={2}
+        bankTotalQuestions={21}
+        onSelectQuestion={vi.fn()}
+      />
+    );
+
+    expect(screen.getByText(/Problem 3 of 10/)).toBeInTheDocument();
+    expect(screen.getByText(/Randomized from 21 in bank/)).toBeInTheDocument();
+  });
 });

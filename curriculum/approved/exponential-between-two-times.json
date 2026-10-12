@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "exponential_between_two_times",
+  "version": 1,
+  "status": "active",
+  "family_id": "exponential_dist",
+  "rule_version": 1,
+  "module_id": "module_3",
+  "title": "Hardware operational lifetime failure between interval bounds",
+  "scenario_markdown": "The operational lifetime $X$ (in operating hours) of an electric vehicle power inverter module follows an exponential distribution with a mean lifetime of $\\mu = 1{,}000$ operating hours (failure rate $\\lambda = 1/1{,}000 = 0.001\\text{ hr}^{-1}$). Reliability engineers need to determine the probability that a module fails between 500 and 1,500 operating hours ($P(500 < X < 1{,}500)$).",
+  "parameters": {
+    "lambda": 0.001,
+    "mean": 1000.0,
+    "x1": 500.0,
+    "x2": 1500.0
+  },
+  "assumptions": [
+    "Continuous exponential lifetime X ~ Exp(lambda = 0.001)",
+    "Mean time between failures mu = 1,000 hours",
+    "Single point mass probabilities are zero (P(X = c) = 0)"
+  ],
+  "concept_ids": [
+    "exponential_interval_algebra",
+    "exponential_interval_numeric_value",
+    "exponential_boundary_invariance_property"
+  ],
+  "setting_group": "exponential_hardware_mtbf",
+  "source_refs": [
+    "Course Module 3: Continuous Probability Distributions",
+    "docs/CONTENT-BACKLOG.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T20:00:00Z",
+    "notes": "Verified interval derivation: P(500 < X < 1500) = F(1500) - F(500) = (1 - exp(-1.5)) - (1 - exp(-0.5)) = exp(-0.5) - exp(-1.5) = 0.60653066 - 0.22313016 = 0.3834005. Excel formula: =EXPON.DIST(1500, 0.001, TRUE) - EXPON.DIST(500, 0.001, TRUE).",
+    "delegation_basis": "Row 3.3 backlog implementation authorization"
+  },
+  "stages": [
+    {
+      "id": "formulate_interval_probability",
+      "kind": "choice",
+      "prompt_markdown": "How is the probability of failing between 500 and 1,500 hours, $P(500 < X < 1500)$, expressed in terms of the exponential cumulative distribution function $F(x) = 1 - e^{-\\lambda x}$?",
+      "options": [
+        {
+          "id": "interval_difference",
+          "text_markdown": "$P(500 < X < 1500) = F(1500) - F(500) = e^{-0.001(500)} - e^{-0.001(1500)} = e^{-0.5} - e^{-1.5}$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "interval_sum",
+          "text_markdown": "$P(500 < X < 1500) = F(1500) + F(500)$",
+          "misconception_id": "add_cumulative_probabilities",
+          "hint_markdown": "Cumulative probabilities overlap; subtracting $F(500)$ from $F(1500)$ strips out the lower tail up to 500."
+        },
+        {
+          "id": "uniform_width_ratio",
+          "text_markdown": "$P(500 < X < 1500) = \\frac{1500 - 500}{1000} = 1.0$",
+          "misconception_id": "treat_exponential_as_uniform",
+          "hint_markdown": "The exponential distribution has a decaying density, not a uniform constant density."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "interval_difference"
+      },
+      "evidence_concept_ids": [
+        "exponential_interval_algebra"
+      ],
+      "explanation_markdown": "The probability of an interval $[x_1, x_2]$ is the difference between cumulative distribution function values: $P(x_1 < X < x_2) = F(x_2) - F(x_1) = (1 - e^{-\\lambda x_2}) - (1 - e^{-\\lambda x_1}) = e^{-\\lambda x_1} - e^{-\\lambda x_2} = e^{-0.5} - e^{-1.5}$.",
+      "numeric_policy": null
+    },
+    {
+      "id": "calculate_interval_numeric",
+      "kind": "numeric",
+      "prompt_markdown": "Calculate $P(500 < X < 1500) = e^{-0.5} - e^{-1.5}$. Enter as a decimal rounded to at least three places (e.g., 0.383 or 0.3834).",
+      "options": [],
+      "expected_answer": {
+        "kind": "numeric",
+        "value": 0.3834,
+        "units": "probability"
+      },
+      "evidence_concept_ids": [
+        "exponential_interval_numeric_value"
+      ],
+      "explanation_markdown": "$P(500 < X < 1500) = e^{-0.5} - e^{-1.5} \\approx 0.60653 - 0.22313 = 0.3834$ (or $38.34\\%$). Excel formula: `=EXPON.DIST(1500, 0.001, TRUE) - EXPON.DIST(500, 0.001, TRUE)`.",
+      "numeric_policy": {
+        "version": 1,
+        "allowed_forms": [
+          "decimal",
+          "percent",
+          "fraction"
+        ],
+        "absolute_tolerance": 0.001,
+        "relative_tolerance": 0.01
+      }
+    },
+    {
+      "id": "endpoint_strictness_property",
+      "kind": "choice",
+      "prompt_markdown": "For this continuous exponential distribution, how does the strict inequality probability $P(500 < X < 1500)$ compare to the non-strict inequality probability $P(500 \\le X \\le 1500)$?",
+      "options": [
+        {
+          "id": "boundary_invariance",
+          "text_markdown": "They are strictly equal ($P(500 < X < 1500) = P(500 \\le X \\le 1500)$) because the probability of continuous $X$ taking any exact single value is zero ($P(X = 500) = 0$ and $P(X = 1500) = 0$)",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "discrete_style_difference",
+          "text_markdown": "The non-strict probability is strictly larger because it includes point masses at 500 and 1500",
+          "misconception_id": "apply_discrete_boundary_to_continuous",
+          "hint_markdown": "In continuous distributions, the area under the curve at a single point is zero width, so boundary points contribute zero probability."
+        },
+        {
+          "id": "excel_boundary_adjustment",
+          "text_markdown": "In Excel, one must evaluate `=EXPON.DIST(1499.9, ...)` to reflect strict inequality",
+          "misconception_id": "discrete_continuity_correction_misapplication",
+          "hint_markdown": "Continuous variables do not require endpoint subtraction or adjustment; $F(x)$ is continuous everywhere for $x > 0$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "boundary_invariance"
+      },
+      "evidence_concept_ids": [
+        "exponential_boundary_invariance_property"
+      ],
+      "explanation_markdown": "In continuous probability models, $P(X = c) = \\int_c^c f(x)\\,dx = 0$ for any real number $c$. Therefore: $P(a < X < b) = P(a \\le X < b) = P(a < X \\le b) = P(a \\le X \\le b)$. Whether the endpoints are included makes no difference to the probability.",
+      "numeric_policy": null
+    }
+  ]
+}

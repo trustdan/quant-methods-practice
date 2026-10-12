@@ -65,15 +65,18 @@ func New(id string, cfg ExamConfig, tmpls []*domain.QuestionTemplate, now time.T
 		selectedTmpls = tmpls
 	}
 
-	// Shuffle templates deterministically if seed provided
+	// Shuffle templates deterministically using explicit seed or clock-based seed
+	effSeed := cfg.Seed
+	if effSeed == 0 {
+		effSeed = now.UnixNano()
+	}
+
 	available := make([]*domain.QuestionTemplate, len(selectedTmpls))
 	copy(available, selectedTmpls)
-	if cfg.Seed != 0 {
-		r := rand.New(rand.NewSource(cfg.Seed))
-		r.Shuffle(len(available), func(i, j int) {
-			available[i], available[j] = available[j], available[i]
-		})
-	}
+	r := rand.New(rand.NewSource(effSeed))
+	r.Shuffle(len(available), func(i, j int) {
+		available[i], available[j] = available[j], available[i]
+	})
 
 	chosen := available
 	if len(chosen) > qCount {
@@ -82,15 +85,8 @@ func New(id string, cfg ExamConfig, tmpls []*domain.QuestionTemplate, now time.T
 
 	questions := make([]domain.QuestionInstance, len(chosen))
 	for idx, tmpl := range chosen {
-		qSeed := cfg.Seed
-		if cfg.Seed != 0 {
-			qSeed = cfg.Seed + int64((idx+1)*1000)
-		}
-
-		var rng *rand.Rand
-		if qSeed != 0 {
-			rng = rand.New(rand.NewSource(qSeed))
-		}
+		qSeed := effSeed + int64((idx+1)*1000)
+		rng := rand.New(rand.NewSource(qSeed))
 
 		stages := make([]domain.StageInstance, len(tmpl.Stages))
 		for sIdx, st := range tmpl.Stages {
@@ -153,6 +149,7 @@ func New(id string, cfg ExamConfig, tmpls []*domain.QuestionTemplate, now time.T
 		CurrentQuestionIndex: 0,
 		Questions:            questions,
 		Responses:            make(map[string]domain.SubmittedAnswer),
+		BankTotalQuestions:   len(tmpls),
 	}
 
 	if cfg.DurationMinutes > 0 {
@@ -511,6 +508,7 @@ func Public(r *ExamRecord, now time.Time) PublicExamView {
 		TimeRemainingSeconds: remainingSec,
 		CurrentQuestionIndex: r.CurrentQuestionIndex,
 		TotalQuestions:       len(r.Questions),
+		BankTotalQuestions:   r.BankTotalQuestions,
 		AnsweredQuestions:    answeredQuestionsCount,
 		Questions:            publicQuestions,
 	}

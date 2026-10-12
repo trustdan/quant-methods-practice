@@ -13,6 +13,7 @@ export interface QuestionInfo {
 export interface QuestionStripProps {
   totalQuestions: number;
   currentQuestionIndex: number;
+  bankTotalQuestions?: number;
   questions?: QuestionInfo[];
   onSelectQuestion: (index: number) => void;
   onPrevProblem?: () => void;
@@ -22,6 +23,7 @@ export interface QuestionStripProps {
 export const QuestionStrip: React.FC<QuestionStripProps> = ({
   totalQuestions,
   currentQuestionIndex,
+  bankTotalQuestions,
   questions,
   onSelectQuestion,
   onPrevProblem,
@@ -56,9 +58,33 @@ export const QuestionStrip: React.FC<QuestionStripProps> = ({
     >
       {/* Left: Problem counter & Jump list */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
-        <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted)' }}>
-          Problem {currentQuestionIndex + 1} of {totalQuestions}:
-        </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+          <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-main)' }}>
+            Problem {currentQuestionIndex + 1} of {totalQuestions}:
+          </span>
+          {bankTotalQuestions && bankTotalQuestions > 0 ? (
+            <span
+              className="badge"
+              id="bank-situational-badge"
+              style={{
+                fontSize: '0.75rem',
+                padding: '0.15rem 0.55rem',
+                borderRadius: '999px',
+                background: 'var(--bg-surface-elevated)',
+                border: '1px solid var(--border-subtle)',
+                color: 'var(--accent-cyan)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.35rem',
+                fontWeight: 500,
+              }}
+              title={`This practice session is randomized from your pool of ${bankTotalQuestions} approved questions in the curriculum bank.`}
+            >
+              <span aria-hidden="true">🎲</span>
+              <span>Randomized from {bankTotalQuestions} in bank</span>
+            </span>
+          ) : null}
+        </div>
         <div className="question-strip" style={{ display: 'flex', gap: '0.35rem', flexWrap: 'wrap' }}>
           {items.map((q) => {
             const isActive = q.index === currentQuestionIndex;

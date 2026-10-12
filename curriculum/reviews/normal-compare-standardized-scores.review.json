@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "template_id": "normal_compare_standardized_scores",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T20:00:00Z",
+  "delegation_basis": "Content backlog Batch 1: Row 3.2 normal distribution expansion",
+  "mathematical_audit": {
+    "family_id": "normal_dist",
+    "parameters": {
+      "mu": 500000.0,
+      "sigma": 50000.0,
+      "x": 580000.0,
+      "mu_b": 300000.0,
+      "sigma_b": 40000.0,
+      "x_b": 370000.0
+    },
+    "canonical_probability": 0.9452,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 500000.0,
+      "variance": 2500000000.0,
+      "standard_deviation": 50000.0
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.001,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {
+        "id": "compute_manager_z_scores",
+        "kind": "choice",
+        "evidence": "normal_standardization_comparison"
+      },
+      {
+        "id": "determine_superior_performance",
+        "kind": "choice",
+        "evidence": "relative_vs_absolute_performance"
+      },
+      {
+        "id": "percentile_comparison",
+        "kind": "choice",
+        "evidence": "z_score_interpretation"
+      }
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Verified comparative standard scores: ZA = +1.60 (percentile Phi(1.60) = 0.9452), ZB = +1.75 (percentile Phi(1.75) = 0.9599). Manager B performed relatively better despite lower raw sales ($370k vs $580k). Addressed common bias of raw magnitude vs standardized score."
+}

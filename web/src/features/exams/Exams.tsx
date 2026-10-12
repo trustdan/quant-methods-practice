@@ -441,9 +441,13 @@ export const Exams: React.FC<ExamsProps> = ({ active, onReturnToPractice }) => {
                   onChange={(e) => setSelectedModule(e.target.value)}
                   style={{ width: '100%', padding: '0.5rem 0.75rem', background: 'var(--bg-surface-elevated)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: 'var(--text-primary)' }}
                 >
-                  <option value="all">All Modules (Foundations + Discrete Distributions + Moments)</option>
-                  <option value="module_01">Module 1: Foundations of Probability</option>
-                  <option value="module_02">Module 2: Discrete Distributions &amp; Moments</option>
+                  <option value="all">All Modules (Comprehensive Exam)</option>
+                  <option value="module_1">Module 1: Foundations of Probability &amp; Sets</option>
+                  <option value="module_2">Module 2: Discrete Distributions &amp; Moments</option>
+                  <option value="module_3">Module 3: Continuous Distributions (Uniform, Normal, Exponential)</option>
+                  <option value="module_4">Module 4: Sampling Distributions, CLT, CI &amp; Sample Size</option>
+                  <option value="module_5">Module 5: Hypothesis Testing &amp; Decision Errors</option>
+                  <option value="module_6">Module 6: Regression Analysis &amp; Diagnostics</option>
                 </select>
               </div>
 
@@ -578,6 +582,9 @@ export const Exams: React.FC<ExamsProps> = ({ active, onReturnToPractice }) => {
               <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
                 Question {activeQuestionIndex + 1} of {activeExam.total_questions} •{' '}
                 {activeExam.answered_questions} of {activeExam.total_questions} answered
+                {activeExam.bank_total_questions && activeExam.bank_total_questions > 0 ? (
+                  <span> • 🎲 Randomized from {activeExam.bank_total_questions} bank questions</span>
+                ) : null}
               </div>
             </div>
 

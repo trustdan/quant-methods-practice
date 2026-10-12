@@ -1,5 +1,119 @@
 # Handoff
 
+## Session Randomization & Curriculum Module Filtering Completed — October 11, 2026 (Windows)
+
+Completed session randomization mechanism, module filtering across all 6 curriculum modules, and interactive controls:
+- **Session Randomization Mechanism**:
+  - Implemented clock-based PRNG seeding (`time.Now().UnixNano()` / `Date.now()`) for practice drills (`internal/httpapi/server.go`) and exams (`internal/exam/exam.go`).
+  - Added option shuffling and mastery-weighted sampling across active templates so learners get different problems and shuffled answer choices across sessions.
+  - Preserved snapshot isolation and deterministic introductory walkthrough for clean database test runs (`binomial_fair_coin_exactly_two` at position 1 and `binomial_defective_at_most_one` at position 2 when unconstrained).
+- **Curriculum Module Filter**:
+  - Configured full support for Modules 1–6 in Practice Drills (`web/src/features/settings/SettingsModal.tsx`): individual checkboxes with descriptions, "Select All", "Clear All", question count selection (5, 10, 15, 20, or All 44), intensity modes, and settings persistence (`/api/settings`).
+  - Added module dropdown in Assessments (`web/src/features/exams/Exams.tsx`) allowing full mock exams targeted to any individual module or comprehensive across all modules.
+- **Quick Randomization Actions**:
+  - Added front-and-center "🎲 New Drill" buttons in both the main application header and the practice drill action bar (`web/src/app/App.tsx`, `web/src/features/practice/PracticeDrill.tsx`), allowing immediate clock-seeded problem re-shuffling at any point.
+- **Verification**:
+  - All 15 Playwright E2E test suites passed (15/15) including arcade, candidates, exams, foundation 01–12, visuals, and worksheets.
+  - All 19 Vitest test files passed (100/100 tests).
+  - All 15 Go packages passed (`go test -count=1 ./...`).
+  - `python scripts/validate_scaffold.py` passed with 0 errors.
+
+## Batch 2: Row 4.2 completed — October 11, 2026 (Windows)
+
+Completed all 5 new approved questions and reviews for **Row 4.2 (Sample size and standard error)** in `sample_size`, `sampling_distribution`, and `concept_check` families:
+- `curriculum/approved/se-quadruple-n-halves.json` + review: aerospace titanium pin diameters $\sigma = 20.0\\ \mu\text{m}$, contrasting initial $n_1 = 25$ ($SE_1 = 20/5 = 4.0\\ \mu\text{m}$) against quadrupled $n_2 = 100$ ($SE_2 = 20/10 = 2.0\\ \mu\text{m}$), and demonstrating the inverse square-root law where a $4\times$ data increase cuts standard error in half. Excel: `=20/SQRT(25)` and `=20/SQRT(100)`.
+- `curriculum/approved/se-n-for-target-se.json` + review: emergency department wait times $\sigma = 15.0$ minutes, target standard error $SE \le 2.0$ minutes, deriving continuous bound $n \ge (15/2)^2 = 56.25$, proving why conventional round-down ($n = 56 \implies SE \approx 2.0045 > 2.0$) violates constraint, requiring ceiling integer $n = 57$ ($SE \approx 1.9869 \le 2.0$). Excel: `=ROUNDUP((15/2)^2, 0)`.
+- `curriculum/approved/se-proportion-depends-on-p.json` + review: comparing statewide referendum $p_A = 0.50$ against niche EV ownership $p_B = 0.10$ at identical sample sizes $n = 400$, computing $SE_A = \sqrt{0.25/400} = 0.025$ ($2.5\%$) vs $SE_B = \sqrt{0.09/400} = 0.015$ ($1.5\%$), and proving parabolic variance peak at $p = 0.50$ explaining why split elections have maximum sampling uncertainty. Excel: `=SQRT(0.50*0.50/400)` and `=SQRT(0.10*0.90/400)`.
+- `curriculum/approved/se-what-n-changes.json` + review: enterprise HR salary distribution ($\mu = \$92\text{k}, \sigma = \$24\text{k}$), establishing that expanding sample size from $n = 36$ to $n = 144$ leaves true population parameters $\mu$ and $\sigma$ completely unchanged, while narrowing the sampling distribution spread from $\sigma_{\bar{x}} = \$4{,}000$ to $\$2{,}000$, and debunking ecological fallacies that sample size compresses individual employee wage dispersion.
+- `curriculum/approved/se-survey-design-compare.json` + review: telecom Net Promoter Score survey designs ($n_1 = 100$ vs $n_2 = 900$), computing error ratio $E_1 / E_2 = \sqrt{900/100} = 3.0$, analyzing the $66.7\%$ error reduction vs $9\times$ data collection cost, and deriving the general quadratic scaling law requiring $k^2 = 25\times$ sample size to achieve a $k = 5\times$ precision gain. Excel: `=SQRT(900/100)` and `=5^2`.
+
+Engine prerequisite (ENG-SAMPLESIZE):
+- Implemented `internal/mathengine/sample_size.go` with domain models and functions: `ComputeSampleSizeMean`, `ComputeSampleSizeProportion`, `ComputeSampleSizeTargetSE`, `StandardErrorMean`, and `StandardErrorProportion`.
+- Registered `sample_size` family with rule version 1 and parameter validation in `internal/bank/family.go` and `DefaultRegistry()`.
+- Added unit test coverage in `internal/mathengine/sample_size_test.go` and `internal/bank/bank_test.go`.
+
+Active approved templates expanded from 39 to 44 (16 existing + 17 Batch 1 + 6 Row 4.1 + 5 Row 4.2). All 15 Go packages pass `go test -count=1 ./...`, `go vet`, and `python scripts/validate_scaffold.py` passes with 0 errors.
+
+**Next concrete task:** Batch 2: Row 4.3 (Confidence intervals for mean and proportion, 6 questions) or Row 4.4 (Required sample size for margin of error, 5 questions).
+
+## Batch 2: Row 4.1 completed — October 11, 2026 (Windows)
+
+Completed all 6 new approved questions and reviews for **Row 4.1 (Central Limit Theorem — mean and proportion)** in `sampling_distribution` (and `concept_check`) family:
+- `curriculum/approved/clt-mean-order-value.json` + review: order values $\mu = \$80.00, \sigma = \$24.00, n = 36 \ge 30$, standard error $\sigma_{\bar{x}} = 24 / 6 = \$4.00$, $Z = (86 - 80) / 4 = 1.50$, upper tail $P(\bar{X} > 86) = 1 - \Phi(1.50) = 0.0668$, and Excel formula `=1 - NORM.DIST(86, 80, 24/SQRT(36), TRUE)`.
+- `curriculum/approved/clt-skewed-service-times.json` + review: technical support call durations following a heavily right-skewed exponential distribution $\mu = 6.0, \sigma = 6.0, n = 64 \ge 30$, normal approximation justification by CLT, $\sigma_{\bar{x}} = 6.0 / 8 = 0.75$, $Z = (4.8 - 6.0) / 0.75 = -1.60$, lower tail $P(\bar{X} < 4.8) = \Phi(-1.60) = 0.0548$, and Excel formula `=NORM.DIST(4.8, 6.0, 6.0/SQRT(64), TRUE)`.
+- `curriculum/approved/clt-individual-vs-mean.json` + review: baggage weights $N(40.0, 10.0^2)$, contrasting single passenger tail $P(X > 45.0) = 1 - \Phi(0.50) = 0.3085$ against 25-passenger sample mean tail $P(\bar{X} > 45.0) = 1 - \Phi(2.50) = 0.0062$, demonstrating the $\sqrt{n} = 5\times$ standard error reduction ($2.0$ lbs vs $10.0$ lbs) and resulting $50\times$ tail probability drop.
+- `curriculum/approved/clt-small-n-not-justified.json` + review: insurance flood claims ($\mu = \$25\text{k}, \sigma = \$18\text{k}$, heavily right-skewed), evaluating intern's small sample $n = 9 < 30$, identifying that CLT requires $n \ge 30$ when population is non-normal, showing exact small-$n$ normality requires an underlying normal population, and analyzing why symmetric normal tables underestimate right-tail catastrophe risk.
+- `curriculum/approved/clt-proportion-coupon-users.json` + review: promotional coupon redemptions $p = 0.30, n = 200$, verifying success-failure conditions $np = 60 \ge 10$ and $n(1-p) = 140 \ge 10$, standard error $\sigma_{\hat{p}} = \sqrt{0.30(0.70)/200} \approx 0.0324$, $Z = (0.35 - 0.30) / 0.0324 = +1.54$, tail probability $P(\hat{p} > 0.35) = 1 - \Phi(1.54) = 0.0618$, and Excel formula `=1 - NORM.DIST(0.35, 0.30, SQRT(0.30*0.70/200), TRUE)`.
+- `curriculum/approved/clt-finite-population-correction.json` + review: commercial loan balances $N = 400, n = 64$, verifying sampling fraction $n/N = 0.16 > 0.05$ requires FPC, computing FPC factor $\sqrt{(400-64)/399} = \sqrt{336/399} \approx 0.9177$, reducing uncorrected standard error $\$1{,}000.00$ to corrected $\sigma_{\bar{x}} = \$917.66$, and explaining uncertainty reduction from sampling without replacement.
+
+Engine extension (ENG-PROP-SAMPLING):
+- Added `SamplingDistributionProportion` domain type, `ComputeSamplingDistributionProportion(p, n, popSize)`, `ZScore`, `ProbabilityBelow`, and `ProbabilityAbove` to `internal/mathengine/inference.go`.
+- Added `ZScore`, `ProbabilityBelow`, and `ProbabilityAbove` helper methods to `SamplingDistributionMean`.
+- Extended `SamplingDistributionFamily.ValidateParameters` in `internal/bank/family.go` to support optional parameters `x_bar`, `p_hat`, `x`, `pop_shape`, `pop_is_normal`, and `pop_size` with strict bounds checking ($n \le pop\_size$).
+- Added unit tests in `internal/mathengine/inference_test.go` and `internal/bank/bank_test.go`.
+
+Active approved templates expanded from 33 to 39 (16 existing + 17 Batch 1 + 6 Row 4.1). All 15 Go packages pass `go test -count=1 ./...`, `go vet`, and `python scripts/validate_scaffold.py` passes with 0 errors.
+
+**Next concrete task:** Batch 2: Row 4.2 (Sample size and standard error, 5 questions) or Row 4.3 (Confidence interval for mean and proportion, 6 questions).
+
+## Batch 1: Row 3.3 completed — October 11, 2026 (Windows)
+
+Completed all 6 new approved questions and reviews for **Row 3.3 (Exponential distribution)** in `exponential_dist` family:
+- `curriculum/approved/exponential-arrival-within-two.json` + review: bank teller arrivals $\text{Exp}(\lambda = 0.25)$ ($\mu = 4$ min), $P(X \le 2) = 1 - e^{-0.5} = 0.3935$, and Excel function `=EXPON.DIST(2, 0.25, TRUE)`.
+- `curriculum/approved/exponential-memoryless-wait.json` + review: tech support queue wait $\mu = 6$ min ($\lambda = 1/6$), memoryless conditional wait $P(X > 8 \mid X > 5) = P(X > 3) = e^{-0.5} = 0.6065$, and managerial invariance of past wait time on remaining duration.
+- `curriculum/approved/exponential-rate-vs-mean-param.json` + review: 911 dispatch interval $\mu = 10$ min ($\lambda = 0.10$), $P(X \le 5) = 1 - e^{-0.5} = 0.3935$, and analysis of the classic software trap where entering mean $10$ into `=EXPON.DIST` inflates the probability to $1 - e^{-50} \approx 1.000$.
+- `curriculum/approved/exponential-percentile-service.json` + review: cloud infrastructure SLA ticket resolution $\lambda = 0.40$/hr ($\mu = 2.5$ hrs), solving 90th percentile $x^* = -\frac{\ln(0.10)}{0.40} = 5.76$ hrs, absence of `EXPON.INV` in Excel, and right-skewed tail elongation ($5.76$ hrs $> 2 \times \mu$).
+- `curriculum/approved/exponential-poisson-link.json` + review: e-commerce payments at 12 transactions/hour ($\lambda = 0.20$/min), interarrival gap $P(X > 10) = e^{-2} = 0.1353$, and exact mathematical duality with discrete Poisson zero-arrival probability $P(Y = 0) = e^{-2}$.
+- `curriculum/approved/exponential-between-two-times.json` + review: EV inverter module lifetime $\mu = 1{,}000$ hrs ($\lambda = 0.001$), interval probability $P(500 < X < 1500) = e^{-0.5} - e^{-1.5} = 0.3834$, and continuous endpoint boundary invariance $P(500 < X < 1500) = P(500 \le X \le 1500)$.
+
+Extended `ExponentialFamily.ValidateParameters` in `internal/bank/family.go` to support optional parameters `mean`, `p` ($0 < p < 1$), `s` ($\ge 0$), `t` ($> 0$), `x` ($\ge 0$), and `x1, x2` ($x_1 \le x_2$). Added `ExcelQuantile` helper to `ExponentialDistribution` in `internal/mathengine/continuous.go`. Added unit test coverage in `internal/bank/bank_test.go` and `internal/mathengine/continuous_test.go`.
+
+Batch 1 (Module 3: Continuous distributions) is now fully complete (Rows 3.1, 3.2, and 3.3). Total active approved templates expanded from 27 to 33 (1 existing + 6 new for Row 3.3). All 16 Go packages pass `go test -count=1 ./...`, `go vet`, and `python scripts/validate_scaffold.py` passes with 0 errors.
+
+**Next concrete task:** Batch 2: Row 4.1 (Central Limit Theorem — mean and proportion, 6 questions) in `curriculum/approved/` using `sampling_distribution` (+ ENG-PROP-SAMPLING).
+
+## Batch 1: Row 3.2 completed — October 11, 2026 (Windows)
+
+Completed all 6 new approved questions and reviews for **Row 3.2 (Normal distribution)** in `normal_dist` family:
+- `curriculum/approved/normal-between-package-weight.json` + review: packaging net weight $N(500, 8^2)$, standardizing bounds $Z_1 = -1.25, Z_2 = +1.25$, interval probability $P(490 < X < 510) = \Phi(1.25) - \Phi(-1.25) = 0.7887$, and endpoint boundary invariance $P(490 < X < 510) = P(490 \le X \le 510)$.
+- `curriculum/approved/normal-inverse-bonus-cutoff.json` + review: executive sales bonus $N(80000, 12000^2)$, top-5% critical score $Z^* = +1.645$, unstandardized threshold $X^* = 80000 + 1.645(12000) = \$99,740$, and Excel function `=NORM.INV(0.95, 80000, 12000)`.
+- `curriculum/approved/normal-warranty-lower-percentile.json` + review: commercial tire tread lifespan $N(60000, 8000^2)$, lower 2% tail quantile $Z^* \approx -2.054$, warranty limit $X_w = 60000 - 2.054(8000) = 43,570\text{ miles}$, and cost analysis showing replacement rate jumps from 2% to 10.56% if set to 50k miles.
+- `curriculum/approved/normal-compare-standardized-scores.json` + review: cross-territory manager evaluation $N(500000, 50000^2)$ ($x_A = \$580k \implies Z_A = +1.60$) vs $N(300000, 40000^2)$ ($x_B = \$370k \implies Z_B = +1.75$), demonstrating Manager B's superior relative achievement despite lower raw volume.
+- `curriculum/approved/normal-inventory-service-level.json` + review: hospital demand $N(200, 30^2)$, 90% cycle service level $Z^* \approx +1.282$, safety stock $38.45$ kits, target stock level $s = 238.45$ kits, and complement stockout probability $P(X > 238.45) = 0.1000$.
+- `curriculum/approved/normal-empirical-vs-exact.json` + review: roller bearing diameters $N(100, 15^2)$, comparing Empirical Rule's $\approx 95\%$ rule-of-thumb against exact cumulative normal table value $\Phi(2.00) - \Phi(-2.00) = 0.9545$, and bell-shaped normality prerequisites vs. Chebyshev bounds.
+
+Extended `NormalFamily.ValidateParameters` in `internal/bank/family.go` to support optional quantile parameter `p` ($0 < p < 1$), multiplier `k` ($k > 0$), and comparison parameters `mu_b`, `sigma_b`, `x_b`. Added unit tests in `internal/bank/bank_test.go`.
+
+Total active approved templates expanded from 21 to 27 (1 existing + 6 new for Row 3.2). All 15 Go packages pass `go test -count=1 ./...`, `go vet`, and `python scripts/validate_scaffold.py` passes with 0 errors.
+
+**Next concrete task:** Row 3.3 (Exponential distribution — 6 questions, 1 existing + 5/6 new) in `curriculum/approved/` using `exponential_dist` family.
+
+## Batch 1: Row 3.1 completed — October 11, 2026 (Windows)
+
+Completed all 5 new approved questions and reviews for **Row 3.1 (Discrete vs. continuous distributions)**:
+- `curriculum/approved/contvdisc-classify-variables.json` + review: classifies wait time (continuous), complaints (discrete), package weight (continuous), defects (discrete).
+- `curriculum/approved/contvdisc-point-probability-zero.json` + review: continuous $P(X = 5) = 0$ vs. discrete Poisson $P(Y = 5) \approx 0.1755$, explaining why continuous probabilities represent intervals/areas under curves.
+- `curriculum/approved/contvdisc-area-is-probability.json` + review: uniform delivery window $U(10, 40)$, density height $1/30$, $P(15 < X < 25) = 1/3 \approx 0.3333$, mean $E[X] = 25$.
+- `curriculum/approved/contvdisc-strict-vs-nonstrict.json` + review: boundary invariance $P(X \le c) = P(X < c)$ for continuous Normal vs. discrete Binomial inequality differences $P(Y < 2) \ne P(Y \le 2)$.
+- `curriculum/approved/contvdisc-match-model.json` + review: taxonomy matching business scenarios to Exponential, Normal, Binomial, and Poisson distributions.
+
+Total active approved templates expanded from 16 to 21. All Go tests, bank validation (`TestLoadActiveBankAdmitsApproved`), and scaffold checks pass.
+
+**Next concrete task:** Row 3.2 (Normal distribution — 6 questions, 1 existing + 5 new) in `curriculum/approved/` using `normal_dist` family.
+
+## Content backlog engine prerequisites (Batch 1) — October 11, 2026 (Windows)
+
+Implemented and verified the two engine prerequisites:
+- `internal/mathengine/f_dist.go`: Snedecor's $F$-distribution $F(d_1, d_2)$ with exact CDF and survival via regularized incomplete beta $I_x(a, b)$, mean, variance, Excel formulas (`=F.DIST.RT`), and equivalence testing with Student's $t$ ($F(1, \nu) = t^2(\nu)$).
+- `internal/mathengine/regression_output.go`: Excel-style regression output summary engine supporting $k \in [1, 4]$ predictors, evaluating ANOVA ($MSR, MSE, F, \text{Significance } F$), model fit ($R^2, \text{adj } R^2, s_e$), predictor coefficients ($t$, $p$-values, $(1-\alpha)\%$ CIs, $\hat{y}$ predictions), and consistency checks ($SST = SSR + SSE, t^2 = F$ when $k = 1$).
+- `internal/bank/family.go`: Registered `concept_check` and `regression_output` problem families; added `TemplateValidator` interface enforcing choice-only stages, required misconception IDs, and hint markdown on all distractors.
+- `internal/bank/parser.go`: Connected `TemplateValidator` into `ValidateTemplate`.
+- Unit tests: Added comprehensive test coverage in `f_dist_test.go`, `regression_output_test.go`, and `new_families_test.go`. All 15 Go packages pass `go test -count=1 ./...` and `go vet`. Frontend test suite passed (99/99 tests).
+
+## Content backlog plan — October 11, 2026 (Windows)
+
+Added [CONTENT-BACKLOG.md](CONTENT-BACKLOG.md): 22 objective rows from the published module objectives, 121 proposed questions (at least 5 new per row), 9 engine prerequisites, batch order and open course conventions. Recorded the objectives in [COURSE-MAP.md](COURSE-MAP.md) and removed multiple regression from its exclusions.
+
 ## Stage 17 — October 10, 2026 (macOS)
 
 Stage 00 through Stage 17 are complete within their documented scope. Stage 18 (Arcade complete parity) is next. All changes from this Mac session remain local and uncommitted.

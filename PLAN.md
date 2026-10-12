@@ -24,7 +24,7 @@ Stage 00 through Stage 17 are **complete within their recorded scope** (Stage 12
 | 17 Arcade first playable [COMPLETE] | Canvas fixed-step engine, original starfield/ship, attract/manual/skip, held-key steering+fire, pause, reduced motion. | Immediate skip at every state; keyup/blur safe; game cleanup leaves drills responsive; seeded simulation and browser smoke. |
 | 18 Arcade complete parity | Autofire/bombs, acceleration, dual health, heavy hazards/fragments, four sectors/continuation, high scores/initials and leaderboard/title transition. | Scores persist; demo ineligible; simultaneous input works; deterministic collisions/bombs/transitions; small screen/reduced-motion behavior. |
 | 19 Release hardening | Windows/macOS/Linux binaries with embedded UI/bank/fonts, launchers, backup/export, checksums, license notices, diagnostics/docs. | Extracted packages run offline natively, no Go/Node required; no personal data/secrets shipped; full release test matrix recorded. |
-| 20 Content quality and ongoing breadth | Review transfer groups, distractions, amount/event bounds, candidate quality, course alignment and bank breadth in small batches. | Coverage/repetition review before count increases; every new family has reviewed rules/tests; empirical learning claims remain separate. |
+| 20 Content quality and ongoing breadth | Review transfer groups, distractions, amount/event bounds, candidate quality, course alignment and bank breadth in small batches. | Coverage/repetition review before count increases; every new family has reviewed rules/tests; empirical learning claims remain separate. Objective-by-objective work is tracked in [docs/CONTENT-BACKLOG.md](docs/CONTENT-BACKLOG.md). |
 
 ## Priorities and dependencies
 

@@ -1,0 +1,135 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "exponential_poisson_link",
+  "version": 1,
+  "status": "active",
+  "family_id": "exponential_dist",
+  "rule_version": 1,
+  "module_id": "module_3",
+  "title": "E-commerce transaction Poisson arrival stream and exponential interarrival gap",
+  "scenario_markdown": "An e-commerce payment platform processes transactions arriving according to a Poisson process at an average rate of 12 transactions per hour. Management needs to calculate the probability that the interarrival time $X$ between consecutive transactions exceeds 10 minutes ($P(X > 10\\text{ min})$).",
+  "parameters": {
+    "lambda": 0.2,
+    "mean": 5.0,
+    "x": 10.0,
+    "tail": "upper"
+  },
+  "assumptions": [
+    "Poisson transaction arrivals at 12 per hour",
+    "Continuous interarrival time X ~ Exp(lambda = 12/60 = 0.20 per minute)",
+    "Mean time between transactions mu = 1/0.20 = 5 minutes",
+    "Duality P(X > t) = P(N_t = 0) holds between Poisson counts and exponential interarrival times"
+  ],
+  "concept_ids": [
+    "poisson_exponential_parameter_bridge",
+    "exponential_survival_calculation",
+    "poisson_exponential_duality_principle"
+  ],
+  "setting_group": "exponential_ecommerce_transactions",
+  "source_refs": [
+    "Course Module 3: Continuous Probability Distributions",
+    "docs/CONTENT-BACKLOG.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T20:00:00Z",
+    "notes": "Verified rate lambda_min = 12/60 = 0.20 per min. P(X > 10 min) = exp(-0.20 * 10) = exp(-2) = 0.135335... Poisson count duality: mu_Y = 12 * (10/60) = 2.0. P(Y = 0) = exp(-2) * 2^0 / 0! = exp(-2) = 0.135335. Exact algebraic agreement.",
+    "delegation_basis": "Row 3.3 backlog implementation authorization"
+  },
+  "stages": [
+    {
+      "id": "connect_poisson_rate_to_exponential",
+      "kind": "choice",
+      "prompt_markdown": "If transactions follow a Poisson process with arrival rate $\\lambda = 12$ transactions per hour, what is the distribution and parameter of the continuous interarrival time $X$ (in minutes)?",
+      "options": [
+        {
+          "id": "exp_minute_rate",
+          "text_markdown": "$X \\sim \\text{Exp}(\\lambda = 0.20\\text{ min}^{-1})$ with mean interarrival time $\\mu = \\frac{1}{0.20} = 5$ minutes",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "poisson_minutes",
+          "text_markdown": "$X \\sim \\text{Poisson}(\\lambda = 5)$ arrivals per minute",
+          "misconception_id": "confuse_time_with_count_distribution",
+          "hint_markdown": "Interarrival time is a continuous variable measured on the real line, which follows the Exponential distribution, whereas Poisson models discrete counts of arrivals."
+        },
+        {
+          "id": "unconverted_rate",
+          "text_markdown": "$X \\sim \\text{Exp}(\\lambda = 12\\text{ min}^{-1})$ with mean interarrival time $\\mu = 12$ minutes",
+          "misconception_id": "fail_to_convert_time_units",
+          "hint_markdown": "Rate 12 per hour must be converted to minutes: $12/60 = 0.20$ transactions per minute."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "exp_minute_rate"
+      },
+      "evidence_concept_ids": [
+        "poisson_exponential_parameter_bridge"
+      ],
+      "explanation_markdown": "When event counts follow a Poisson process with hourly rate $\\lambda_{\\text{hr}} = 12$, the time between events follows an exponential distribution. Converting to minutes: $\\lambda = 12/60 = 0.20$ transactions per minute, yielding mean gap $\\mu = 1/0.20 = 5$ minutes.",
+      "numeric_policy": null
+    },
+    {
+      "id": "calculate_gap_probability",
+      "kind": "numeric",
+      "prompt_markdown": "Calculate the probability that the gap between consecutive transactions exceeds 10 minutes: $P(X > 10) = e^{-0.20 \\times 10} = e^{-2}$. Enter as a decimal rounded to at least three places (e.g., 0.135 or 0.1353).",
+      "options": [],
+      "expected_answer": {
+        "kind": "numeric",
+        "value": 0.1353,
+        "units": "probability"
+      },
+      "evidence_concept_ids": [
+        "exponential_survival_calculation"
+      ],
+      "explanation_markdown": "$P(X > 10) = e^{-2} \\approx 0.1353$ (or $13.53\\%$). Excel formula: `=1 - EXPON.DIST(10, 0.20, TRUE)` or `=EXP(-2)`.",
+      "numeric_policy": {
+        "version": 1,
+        "allowed_forms": [
+          "decimal",
+          "percent",
+          "fraction"
+        ],
+        "absolute_tolerance": 0.001,
+        "relative_tolerance": 0.01
+      }
+    },
+    {
+      "id": "demonstrate_poisson_duality",
+      "kind": "choice",
+      "prompt_markdown": "Why does the exponential survival probability $P(X > 10)$ exactly equal the discrete Poisson probability $P(Y = 0)$ for a 10-minute interval where expected arrivals $\\mu_Y = 2.0$?",
+      "options": [
+        {
+          "id": "duality_identity",
+          "text_markdown": "Waiting more than 10 minutes for the next arrival is logically equivalent to observing zero arrivals in that 10-minute span: $P(X > 10) = P(Y = 0) = e^{-2} \\approx 0.1353$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "coincidental_approximation",
+          "text_markdown": "It is only a numerical approximation that holds when $\\lambda$ is small",
+          "misconception_id": "believe_duality_is_approximate",
+          "hint_markdown": "The relationship between Poisson counts and exponential interarrival times is an exact mathematical duality, not an approximation."
+        },
+        {
+          "id": "complement_confusion",
+          "text_markdown": "Because $P(X > 10) = 1 - P(Y \\le 1)$",
+          "misconception_id": "misapply_poisson_cumulative_link",
+          "hint_markdown": "The complement of $X > 10$ is $X \\le 10$, which corresponds to at least one arrival occurring ($Y \\ge 1$)."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "duality_identity"
+      },
+      "evidence_concept_ids": [
+        "poisson_exponential_duality_principle"
+      ],
+      "explanation_markdown": "By definition, the interarrival time exceeds $t$ if and only if zero events occur in the time window $[0, t]$. In a 10-minute window, the expected count is $\\mu_Y = 12 \\times (10/60) = 2.0$. By Poisson PMF, $P(Y = 0) = \\frac{e^{-2} 2^0}{0!} = e^{-2} \\approx 0.1353$. In Excel, `=POISSON.DIST(0, 2, FALSE)` returns exactly `=1 - EXPON.DIST(10, 0.20, TRUE)`.",
+      "numeric_policy": null
+    }
+  ]
+}

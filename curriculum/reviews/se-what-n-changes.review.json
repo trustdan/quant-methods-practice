@@ -1,0 +1,14 @@
+{
+  "template_id": "se_what_n_changes",
+  "reviewed_at": "2026-10-11T21:15:00Z",
+  "reviewer": "assistant_delegated",
+  "delegation_basis": "Stage 20 content backlog authorization",
+  "verdict": "approved",
+  "findings": [
+    "Verified parameter constancy: population mean mu = $92,000 and population standard deviation sigma = $24,000 are invariant to sample size n.",
+    "Verified sampling distribution moments: E[X_bar] = mu = $92,000; SE at n=36 is 24,000 / 6 = $4,000; SE at n=144 is 24,000 / 12 = $2,000.",
+    "Clarified fundamental distinction between population variability (sigma) and estimation uncertainty (SE = sigma / sqrt(n)).",
+    "All distractors carry explicit misconception IDs and instructive corrective hints.",
+    "Concept check parameters conform to standard registry schema."
+  ]
+}

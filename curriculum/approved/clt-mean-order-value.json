@@ -1,0 +1,150 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "clt_mean_order_value",
+  "version": 1,
+  "status": "active",
+  "family_id": "sampling_distribution",
+  "rule_version": 1,
+  "module_id": "module_4",
+  "title": "Central Limit Theorem for sample mean order value",
+  "scenario_markdown": "An online retail analytics team analyzes transaction totals across a large customer base. The population of individual order values has mean $\\mu = \\$80.00$ and standard deviation $\\sigma = \\$24.00$. A quality auditor draws an independent random sample of $n = 36$ orders.",
+  "parameters": {
+    "stat": "mean",
+    "mu": 80.0,
+    "sigma": 24.0,
+    "n": 36,
+    "x_bar": 86.0
+  },
+  "assumptions": [
+    "Independent random sampling of orders from a large population",
+    "Sample size n = 36 >= 30, so by the Central Limit Theorem the sample mean X_bar is approximately normally distributed regardless of population shape",
+    "Finite population correction is not required because the order population is large relative to sample size"
+  ],
+  "concept_ids": [
+    "clt_mean_standard_error",
+    "clt_mean_z_standardization",
+    "clt_mean_tail_probability"
+  ],
+  "setting_group": "ecommerce_order_value_clt",
+  "source_refs": [
+    "Course Module 4: Sampling Distributions and the Central Limit Theorem",
+    "docs/CONTENT-BACKLOG.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T20:00:00Z",
+    "notes": "Verified CLT calculations: n = 36 >= 30, SE = 24 / sqrt(36) = 4.00. Z = (86 - 80) / 4.00 = 1.50. P(X_bar > 86) = 1 - Phi(1.50) = 1 - 0.9332 = 0.0668.",
+    "delegation_basis": "Stage 16 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "standard_error_calculation",
+      "kind": "choice",
+      "prompt_markdown": "What is the standard error of the sample mean $\\sigma_{\\bar{x}}$ for this sample of $n = 36$ orders?",
+      "options": [
+        {
+          "id": "se_correct",
+          "text_markdown": "$\\sigma_{\\bar{x}} = \\frac{\\sigma}{\\sqrt{n}} = \\frac{24.00}{\\sqrt{36}} = \\$4.00$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "se_used_pop_sigma",
+          "text_markdown": "$\\sigma_{\\bar{x}} = \\sigma = \\$24.00$",
+          "misconception_id": "confuse_pop_sd_with_standard_error",
+          "hint_markdown": "The standard error describes the variability of the sample mean across samples, which shrinks by a factor of $\\sqrt{n}$; it is not the standard deviation of individual orders."
+        },
+        {
+          "id": "se_divided_by_n",
+          "text_markdown": "$\\sigma_{\\bar{x}} = \\frac{24.00}{36} = \\$0.67$",
+          "misconception_id": "divided_by_n_instead_of_sqrt_n",
+          "hint_markdown": "Recall the square root law: standard error divides $\\sigma$ by the square root $\\sqrt{n}$, not by $n$ itself."
+        },
+        {
+          "id": "se_used_n_minus_one",
+          "text_markdown": "$\\sigma_{\\bar{x}} = \\frac{24.00}{\\sqrt{35}} \\approx \\$4.06$",
+          "misconception_id": "used_df_in_standard_error_denominator",
+          "hint_markdown": "Degrees of freedom $n - 1$ apply when estimating sample standard deviation $s$, but the theoretical standard error uses the sample size $n$ in the square root denominator $\\sqrt{n}$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "se_correct"
+      },
+      "evidence_concept_ids": [
+        "clt_mean_standard_error"
+      ],
+      "explanation_markdown": "By the Central Limit Theorem, the standard error of the sample mean is $\\sigma_{\\bar{x}} = \\frac{\\sigma}{\\sqrt{n}} = \\frac{24.00}{\\sqrt{36}} = \\frac{24.00}{6} = \\$4.00$. Averaging 36 independent orders reduces standard deviation by a factor of $\\sqrt{36} = 6$.",
+      "numeric_policy": null
+    },
+    {
+      "id": "z_score_standardization",
+      "kind": "choice",
+      "prompt_markdown": "What is the standardized $Z$-score for an observed sample mean $\\bar{x} = \\$86.00$?",
+      "options": [
+        {
+          "id": "z_correct",
+          "text_markdown": "$Z = \\frac{\\bar{x} - \\mu}{\\sigma_{\\bar{x}}} = \\frac{86.00 - 80.00}{4.00} = +1.50$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "z_used_individual_sigma",
+          "text_markdown": "$Z = \\frac{86.00 - 80.00}{24.00} = +0.25$",
+          "misconception_id": "standardized_sample_mean_with_individual_sigma",
+          "hint_markdown": "When standardizing a sample mean $\\bar{x}$, you must divide by the standard error $\\sigma_{\\bar{x}} = \\$4.00$, not the individual order standard deviation $\\sigma = \\$24.00$."
+        },
+        {
+          "id": "z_inverted_difference",
+          "text_markdown": "$Z = \\frac{80.00 - 86.00}{4.00} = -1.50$",
+          "misconception_id": "inverted_subtraction_order",
+          "hint_markdown": "The sample observation $\\bar{x} = 86.00$ is greater than the center $\\mu = 80.00$, which corresponds to a positive deviation $+6.00$ and positive $Z$-score."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "z_correct"
+      },
+      "evidence_concept_ids": [
+        "clt_mean_z_standardization"
+      ],
+      "explanation_markdown": "Standardizing the sample mean uses the standard error in the denominator: $Z = \\frac{\\bar{x} - \\mu}{\\sigma_{\\bar{x}}} = \\frac{86.00 - 80.00}{4.00} = \\frac{+6.00}{4.00} = +1.50$. The sample mean lies 1.50 standard errors above the population mean.",
+      "numeric_policy": null
+    },
+    {
+      "id": "tail_probability_calculation",
+      "kind": "choice",
+      "prompt_markdown": "Using the standard normal distribution table or Excel, what is the probability that the sample mean exceeds $\\$86.00$, $P(\\bar{X} > 86)$?",
+      "options": [
+        {
+          "id": "prob_correct",
+          "text_markdown": "$P(\\bar{X} > 86) = 1 - \\Phi(1.50) = 1 - 0.9332 = 0.0668$ ($6.68\\%$)",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "prob_lower_tail",
+          "text_markdown": "$P(\\bar{X} > 86) = \\Phi(1.50) = 0.9332$ ($93.32\\%$)",
+          "misconception_id": "confused_upper_tail_with_cumulative_cdf",
+          "hint_markdown": "The question asks for the probability of exceeding $\\$86.00$ ($P(\\bar{X} > 86)$), which is the upper tail $1 - \\Phi(Z)$, whereas $\\Phi(1.50) = 0.9332$ is the cumulative lower-tail probability."
+        },
+        {
+          "id": "prob_individual_order",
+          "text_markdown": "$P(\\bar{X} > 86) = 1 - \\Phi(0.25) = 1 - 0.5987 = 0.4013$ ($40.13\\%$)",
+          "misconception_id": "calculated_single_observation_tail_probability",
+          "hint_markdown": "0.4013 is the probability that a single individual order exceeds $\\$86.00$. Averaging 36 orders clusters much more tightly around the mean, producing a much smaller tail probability."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "prob_correct"
+      },
+      "evidence_concept_ids": [
+        "clt_mean_tail_probability"
+      ],
+      "explanation_markdown": "For $Z = +1.50$, the cumulative normal probability is $\\Phi(1.50) = 0.9332$. The upper tail probability is $P(\\bar{X} > 86) = P(Z > 1.50) = 1 - \\Phi(1.50) = 1 - 0.9332 = 0.0668$ (or $6.68\\%$). Excel formula: `=1 - NORM.DIST(86, 80, 24/SQRT(36), TRUE)` or `=1 - NORM.S.DIST(1.5, TRUE)`.",
+      "numeric_policy": null
+    }
+  ]
+}

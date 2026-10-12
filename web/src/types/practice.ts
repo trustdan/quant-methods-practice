@@ -124,6 +124,7 @@ export interface PublicSessionView {
   updated_at: string;
   current_question_index?: number;
   total_questions?: number;
+  bank_total_questions?: number;
   questions?: PublicQuestionInfo[];
   all_completed?: boolean;
   scaffold_level?: 'full' | 'intermediate' | 'faded';

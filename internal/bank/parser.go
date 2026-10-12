@@ -98,6 +98,12 @@ func ValidateTemplate(tmpl *domain.QuestionTemplate, reg *Registry) error {
 		return fmt.Errorf("parameter validation failed: %w", err)
 	}
 
+	if tv, ok := fam.(TemplateValidator); ok {
+		if err := tv.ValidateTemplate(tmpl); err != nil {
+			return fmt.Errorf("family %q template validation failed: %w", tmpl.FamilyID, err)
+		}
+	}
+
 	if err := domain.ValidateID("module_id", tmpl.ModuleID); err != nil {
 		return err
 	}

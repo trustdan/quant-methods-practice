@@ -13,7 +13,6 @@ import (
 	"net/http"
 	"os"
 	"path"
-	"sort"
 	"strings"
 	"sync"
 	"time"
@@ -175,6 +174,9 @@ func NewServer(cfg Config) (*Server, error) {
 	}
 
 	if s.sessionManager != nil && s.bank != nil {
+		s.sessionManager.SetBankCount(func() int {
+			return s.bank.Count()
+		})
 		s.sessionManager.SetContrastFinder(func(originID, misID string) (*domain.QuestionTemplate, bool) {
 			partnerID, found := mastery.FindContrastPartner(originID, misID)
 			if !found {
@@ -438,16 +440,10 @@ func (s *Server) handlePracticeSessions(w http.ResponseWriter, r *http.Request) 
 				filtered = allTemplates
 			}
 
-			// Ensure canonical introductory template is placed first if present
-			sort.SliceStable(filtered, func(i, j int) bool {
-				if filtered[i].ID == "binomial_fair_coin_exactly_two" {
-					return true
-				}
-				if filtered[j].ID == "binomial_fair_coin_exactly_two" {
-					return false
-				}
-				return filtered[i].ID < filtered[j].ID
-			})
+			effSeed := req.Seed
+			if effSeed == 0 {
+				effSeed = time.Now().UnixNano()
+			}
 
 			qCount := req.QuestionCount
 			if qCount <= 0 {
@@ -474,7 +470,7 @@ func (s *Server) handlePracticeSessions(w http.ResponseWriter, r *http.Request) 
 				MasteryMap:         masteryMap,
 				QuestionCount:      qCount,
 				Intensity:          req.Intensity,
-				Seed:               req.Seed,
+				Seed:               effSeed,
 				Now:                time.Now(),
 			}
 			selected := mastery.SelectQuestions(selectionOpts)
@@ -499,7 +495,7 @@ func (s *Server) handlePracticeSessions(w http.ResponseWriter, r *http.Request) 
 				settings.Intensity = "standard"
 			}
 
-			sess, err = s.sessionManager.CreateMultiQuestionSessionWithScaffolds(selected, scaffolds, settings, req.Seed)
+			sess, err = s.sessionManager.CreateMultiQuestionSessionWithScaffolds(selected, scaffolds, settings, effSeed)
 		}
 
 		if err != nil {
@@ -510,7 +506,7 @@ func (s *Server) handlePracticeSessions(w http.ResponseWriter, r *http.Request) 
 		s.lastSessionID = sess.ID
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusCreated)
-		_ = json.NewEncoder(w).Encode(sess.ToPublicView())
+		_ = json.NewEncoder(w).Encode(s.publicSessionViewWithBank(sess))
 
 	case http.MethodGet:
 		s.mu.RLock()
@@ -520,7 +516,7 @@ func (s *Server) handlePracticeSessions(w http.ResponseWriter, r *http.Request) 
 		if lastID != "" {
 			if sess, ok := s.sessionManager.GetSession(lastID); ok {
 				w.Header().Set("Content-Type", "application/json")
-				_ = json.NewEncoder(w).Encode(sess.ToPublicView())
+				_ = json.NewEncoder(w).Encode(s.publicSessionViewWithBank(sess))
 				return
 			}
 		}
@@ -531,11 +527,11 @@ func (s *Server) handlePracticeSessions(w http.ResponseWriter, r *http.Request) 
 			s.lastSessionID = sess.ID
 			s.mu.Unlock()
 			w.Header().Set("Content-Type", "application/json")
-			_ = json.NewEncoder(w).Encode(sess.ToPublicView())
+			_ = json.NewEncoder(w).Encode(s.publicSessionViewWithBank(sess))
 			return
 		}
 
-		// If no active session, create one
+		// If no active session, create one randomized by system clock and honoring user module preferences
 		s.mu.Lock()
 		defer s.mu.Unlock()
 
@@ -544,30 +540,131 @@ func (s *Server) handlePracticeSessions(w http.ResponseWriter, r *http.Request) 
 			return
 		}
 
-		allTemplates := s.bank.List()
-		sort.SliceStable(allTemplates, func(i, j int) bool {
-			if allTemplates[i].ID == "binomial_fair_coin_exactly_two" {
-				return true
-			}
-			if allTemplates[j].ID == "binomial_fair_coin_exactly_two" {
-				return false
-			}
-			return allTemplates[i].ID < allTemplates[j].ID
-		})
-		qCount := 10
-		if s.bank.Count() < 10 {
-			qCount = s.bank.Count()
+		// Check if user has saved module/count preferences in store
+		var userPrefs struct {
+			QuestionCount int      `json:"question_count"`
+			ModuleIDs     []string `json:"module_ids"`
+			Intensity     string   `json:"intensity"`
 		}
-		selected := make([]*domain.QuestionTemplate, 0, qCount)
-		for i := 0; i < qCount; i++ {
-			selected = append(selected, allTemplates[i%len(allTemplates)])
+		if s.config.Store != nil {
+			if val, err := s.config.Store.GetSettings(r.Context(), "user_preferences"); err == nil && val != "" {
+				_ = json.Unmarshal([]byte(val), &userPrefs)
+			}
+		}
+
+		candidates := s.bank.List()
+		if len(userPrefs.ModuleIDs) > 0 {
+			modMap := make(map[string]bool)
+			for _, m := range userPrefs.ModuleIDs {
+				modMap[m] = true
+			}
+			var filtered []*domain.QuestionTemplate
+			for _, tmpl := range candidates {
+				if modMap[tmpl.ModuleID] {
+					filtered = append(filtered, tmpl)
+				}
+			}
+			if len(filtered) > 0 {
+				candidates = filtered
+			}
+		}
+
+		qCount := userPrefs.QuestionCount
+		if qCount <= 0 {
+			qCount = 10
+		}
+		if qCount > len(candidates) {
+			qCount = len(candidates)
+		}
+
+		var masteryMap map[string]*mastery.ConceptMastery
+		hasHistory := false
+		if s.config.Store != nil {
+			if storeWithMastery, ok := s.config.Store.(interface {
+				GetAllMasteryProjections(ctx context.Context) (map[string]*mastery.ConceptMastery, error)
+				GetHistoricalExposures(ctx context.Context) ([]mastery.RawExposure, error)
+			}); ok {
+				masteryMap, _ = storeWithMastery.GetAllMasteryProjections(r.Context())
+				if exposures, err := storeWithMastery.GetHistoricalExposures(r.Context()); err == nil && len(exposures) > 0 {
+					hasHistory = true
+				}
+			}
+		}
+
+		sessionSeed := int64(0)
+		if hasHistory || len(userPrefs.ModuleIDs) > 0 {
+			sessionSeed = time.Now().UnixNano()
+		}
+		selectionOpts := mastery.SelectionOptions{
+			CandidateTemplates: candidates,
+			MasteryMap:         masteryMap,
+			QuestionCount:      qCount,
+			Intensity:          userPrefs.Intensity,
+			Seed:               sessionSeed,
+			Now:                time.Now(),
+		}
+		selected := mastery.SelectQuestions(selectionOpts)
+		if len(selected) == 0 {
+			selected = candidates
+			if len(selected) > qCount {
+				selected = selected[:qCount]
+			}
+		}
+
+		// When no module filter is active, ensure canonical introductory foundation templates occupy initial positions
+		if len(userPrefs.ModuleIDs) == 0 {
+			foundFirst := false
+			for i, tmpl := range selected {
+				if tmpl.ID == "binomial_fair_coin_exactly_two" {
+					if i > 0 {
+						selected[0], selected[i] = selected[i], selected[0]
+					}
+					foundFirst = true
+					break
+				}
+			}
+			if !foundFirst {
+				if firstTmpl, ok := s.bank.Get("binomial_fair_coin_exactly_two"); ok {
+					if len(selected) > 0 {
+						selected[0] = firstTmpl
+					} else {
+						selected = append(selected, firstTmpl)
+					}
+				}
+			}
+			if len(selected) > 1 {
+				foundSecond := false
+				for i := 1; i < len(selected); i++ {
+					if selected[i].ID == "binomial_defective_at_most_one" {
+						if i > 1 {
+							selected[1], selected[i] = selected[i], selected[1]
+						}
+						foundSecond = true
+						break
+					}
+				}
+				if !foundSecond {
+					if secondTmpl, ok := s.bank.Get("binomial_defective_at_most_one"); ok {
+						selected[1] = secondTmpl
+					}
+				}
+			}
+		}
+
+		scaffolds := make([]mastery.ScaffoldLevel, len(selected))
+		for i, tmpl := range selected {
+			scaffolds[i] = mastery.DetermineTemplateScaffold(tmpl, masteryMap)
 		}
 
 		settings := domain.SessionSettings{
 			QuestionCount: qCount,
-			Intensity:     "standard",
+			ModuleIDs:     userPrefs.ModuleIDs,
+			Intensity:     userPrefs.Intensity,
 		}
-		sess, err := s.sessionManager.CreateMultiQuestionSession(selected, settings, 0)
+		if settings.Intensity == "" {
+			settings.Intensity = "standard"
+		}
+		sess, err := s.sessionManager.CreateMultiQuestionSessionWithScaffolds(selected, scaffolds, settings, sessionSeed)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("failed to create session: %v", err), http.StatusInternalServerError)
 			return
@@ -575,7 +672,7 @@ func (s *Server) handlePracticeSessions(w http.ResponseWriter, r *http.Request) 
 
 		s.lastSessionID = sess.ID
 		w.Header().Set("Content-Type", "application/json")
-		_ = json.NewEncoder(w).Encode(sess.ToPublicView())
+		_ = json.NewEncoder(w).Encode(s.publicSessionViewWithBank(sess))
 
 	default:
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
@@ -707,7 +804,7 @@ func (s *Server) handlePracticeSessionByID(w http.ResponseWriter, r *http.Reques
 			return
 		}
 		w.Header().Set("Content-Type", "application/json")
-		_ = json.NewEncoder(w).Encode(sess.ToPublicView())
+		_ = json.NewEncoder(w).Encode(s.publicSessionViewWithBank(sess))
 		return
 	}
 
@@ -723,7 +820,14 @@ func (s *Server) handlePracticeSessionByID(w http.ResponseWriter, r *http.Reques
 			return
 		}
 
+		if s.bank != nil && sess.BankTotalQuestions == 0 {
+			sess.BankTotalQuestions = s.bank.Count()
+		}
+
 		res, err := sess.ExecuteCommand(cmd, nil)
+		if res != nil && res.SessionState.BankTotalQuestions == 0 && s.bank != nil {
+			res.SessionState.BankTotalQuestions = s.bank.Count()
+		}
 		w.Header().Set("Content-Type", "application/json")
 		if err == drill.ErrRevisionConflict {
 			w.WriteHeader(http.StatusConflict)
@@ -745,6 +849,20 @@ func (s *Server) handlePracticeSessionByID(w http.ResponseWriter, r *http.Reques
 	}
 
 	http.NotFound(w, r)
+}
+
+func (s *Server) publicSessionViewWithBank(sess *drill.DrillSession) drill.PublicSessionView {
+	if sess == nil {
+		return drill.PublicSessionView{}
+	}
+	if s.bank != nil && sess.BankTotalQuestions == 0 {
+		sess.BankTotalQuestions = s.bank.Count()
+	}
+	view := sess.ToPublicView()
+	if view.BankTotalQuestions == 0 && s.bank != nil {
+		view.BankTotalQuestions = s.bank.Count()
+	}
+	return view
 }
 
 func (s *Server) handleStaticOrSPA(w http.ResponseWriter, r *http.Request) {

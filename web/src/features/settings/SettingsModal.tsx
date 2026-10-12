@@ -13,6 +13,7 @@ interface SettingsModalProps {
   onClose: () => void;
   onStartSession: (config: SessionConfig) => Promise<void>;
   currentSettings?: SessionConfig;
+  bankTotalQuestions?: number;
 }
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({
@@ -20,6 +21,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   onClose,
   onStartSession,
   currentSettings,
+  bankTotalQuestions,
 }) => {
   const [activeTab, setActiveTab] = useState<'session' | 'providers'>('session');
   const [questionCount, setQuestionCount] = useState<number>(currentSettings?.question_count || 10);
@@ -171,73 +173,110 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
         {/* Question Count Selector */}
         <div>
-          <label style={{ display: 'block', fontWeight: 600, fontSize: '0.9rem', marginBottom: '0.4rem' }}>
-            Question Count:
-          </label>
-          <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+            <label style={{ fontWeight: 600, fontSize: '0.9rem', margin: 0 }}>
+              Question Count:
+            </label>
+            {bankTotalQuestions && bankTotalQuestions > 0 ? (
+              <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                🎲 Randomly sampled from <strong>{bankTotalQuestions}</strong> approved questions
+              </span>
+            ) : null}
+          </div>
+          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
             {[5, 10, 15, 20].map((cnt) => (
               <button
                 key={cnt}
                 type="button"
                 className={`btn ${questionCount === cnt ? 'btn-primary' : 'btn-outline'}`}
                 onClick={() => setQuestionCount(cnt)}
-                style={{ flex: 1, padding: '0.4rem' }}
+                style={{ flex: 1, minWidth: '70px', padding: '0.4rem' }}
               >
                 {cnt} Questions
               </button>
             ))}
+            {bankTotalQuestions && bankTotalQuestions > 20 && (
+              <button
+                type="button"
+                className={`btn ${questionCount === bankTotalQuestions ? 'btn-primary' : 'btn-outline'}`}
+                onClick={() => setQuestionCount(bankTotalQuestions)}
+                style={{ flex: 1, minWidth: '90px', padding: '0.4rem' }}
+                title="Practice all approved questions in the bank"
+              >
+                All ({bankTotalQuestions})
+              </button>
+            )}
           </div>
         </div>
 
         {/* Module Filters */}
         <div>
-          <label style={{ display: 'block', fontWeight: 600, fontSize: '0.9rem', marginBottom: '0.4rem' }}>
-            Curriculum Modules:
-          </label>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            <label
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                padding: '0.5rem 0.75rem',
-                borderRadius: 'var(--radius-sm)',
-                background: 'var(--bg-surface-elevated)',
-                cursor: 'pointer',
-              }}
-            >
-              <input
-                type="checkbox"
-                checked={selectedModules.includes('module_1')}
-                onChange={() => toggleModule('module_1')}
-              />
-              <span style={{ fontSize: '0.9rem' }}>
-                <strong>Module 1</strong>: Probability Foundations & Sets (Axioms, Complement, Union, Conditional, Independence)
-              </span>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+            <label style={{ fontWeight: 600, fontSize: '0.9rem', margin: 0 }}>
+              Curriculum Modules:
             </label>
-            <label
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                padding: '0.5rem 0.75rem',
-                borderRadius: 'var(--radius-sm)',
-                background: 'var(--bg-surface-elevated)',
-                cursor: 'pointer',
-              }}
-            >
-              <input
-                type="checkbox"
-                checked={selectedModules.includes('module_2')}
-                onChange={() => toggleModule('module_2')}
-              />
-              <span style={{ fontSize: '0.9rem' }}>
-                <strong>Module 2</strong>: Discrete Random Variables & Combinations (Binomial, Poisson, Sums & Variances)
-              </span>
-            </label>
+            <div style={{ display: 'flex', gap: '0.4rem' }}>
+              <button
+                type="button"
+                className="btn btn-ghost"
+                onClick={() => setSelectedModules(['module_1', 'module_2', 'module_3', 'module_4', 'module_5', 'module_6'])}
+                style={{ fontSize: '0.75rem', padding: '0.15rem 0.5rem' }}
+              >
+                Select All
+              </button>
+              <button
+                type="button"
+                className="btn btn-ghost"
+                onClick={() => setSelectedModules([])}
+                style={{ fontSize: '0.75rem', padding: '0.15rem 0.5rem' }}
+              >
+                Clear All
+              </button>
+            </div>
           </div>
-          <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: '0.3rem 0 0 0' }}>
-            Leave both checked (or unchecked) to sample across the entire 10-question curriculum.
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', maxHeight: '280px', overflowY: 'auto' }}>
+            {[
+              { id: 'module_1', num: 1, title: 'Probability Foundations & Sets', desc: 'Axioms, Complement, Union, Intersection, Conditional, Independence' },
+              { id: 'module_2', num: 2, title: 'Discrete Random Variables & Distributions', desc: 'PMF tables, E[X], Var(X), Binomial, Poisson, Linear combinations' },
+              { id: 'module_3', num: 3, title: 'Continuous Distributions', desc: 'Continuous vs Discrete, Uniform, Normal curve, Empirical rule, Z-scores, Exponential' },
+              { id: 'module_4', num: 4, title: 'Sampling Distributions & Estimation', desc: 'Central Limit Theorem (CLT), Standard error, Sample size planning, Confidence intervals' },
+              { id: 'module_5', num: 5, title: 'Hypothesis Testing & Decisions', desc: 'Null/Alternative formulation, Type I & II errors, One/Two-sample tests, p-values' },
+              { id: 'module_6', num: 6, title: 'Regression Analysis & Diagnostics', desc: 'OLS equation, Prediction, ANOVA table, R², Adjusted R², Significance F, Slope CI' },
+            ].map((mod) => (
+              <label
+                key={mod.id}
+                style={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: '0.5rem',
+                  padding: '0.5rem 0.75rem',
+                  borderRadius: 'var(--radius-sm)',
+                  background: 'var(--bg-surface-elevated)',
+                  cursor: 'pointer',
+                }}
+              >
+                <input
+                  type="checkbox"
+                  aria-label={`Module ${mod.num}: ${mod.title}`}
+                  checked={selectedModules.includes(mod.id)}
+                  onChange={() => toggleModule(mod.id)}
+                  style={{ marginTop: '0.2rem' }}
+                />
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>
+                    Module {mod.num}: {mod.title}
+                  </span>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                    {mod.desc}
+                  </span>
+                </div>
+              </label>
+            ))}
+          </div>
+          <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: '0.35rem 0 0 0' }}>
+            {selectedModules.length === 0
+              ? 'All modules active: sampling randomly across the full approved curriculum.'
+              : `Filtering active: sampling questions from ${selectedModules.length} selected module${selectedModules.length > 1 ? 's' : ''}.`}
           </p>
         </div>
 

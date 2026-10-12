@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "template_id": "normal_inverse_bonus_cutoff",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T20:00:00Z",
+  "delegation_basis": "Content backlog Batch 1: Row 3.2 normal distribution expansion",
+  "mathematical_audit": {
+    "family_id": "normal_dist",
+    "parameters": {
+      "mu": 80000.0,
+      "sigma": 12000.0,
+      "p": 0.95,
+      "tail": "upper"
+    },
+    "canonical_probability": 0.95,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 80000.0,
+      "variance": 144000000.0,
+      "standard_deviation": 12000.0
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.001,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {
+        "id": "find_critical_z",
+        "kind": "choice",
+        "evidence": "normal_critical_z_quantile"
+      },
+      {
+        "id": "unstandardize_cutoff",
+        "kind": "choice",
+        "evidence": "normal_unstandardize_value"
+      },
+      {
+        "id": "tail_excel_formula",
+        "kind": "choice",
+        "evidence": "normal_upper_tail_vs_percentile"
+      }
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Verified inverse normal quantile calculation: Phi(1.6448536) = 0.95. Unstandardized cutoff X* = 80000 + 1.6448536(12000) = $99,738.24 ($99,740). Excel function NORM.INV(0.95, 80000, 12000) verified."
+}

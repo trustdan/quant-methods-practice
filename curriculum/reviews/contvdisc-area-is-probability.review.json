@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "template_id": "contvdisc_area_is_probability",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T23:35:00Z",
+  "delegation_basis": "Module 3 backlog authorization",
+  "mathematical_audit": {
+    "family_id": "uniform_dist",
+    "parameters": {
+      "a": 10.0,
+      "b": 40.0,
+      "x1": 15.0,
+      "x2": 25.0,
+      "tail": "interval"
+    },
+    "canonical_probability": 0.3333333333333333,
+    "canonical_rational": "1/3",
+    "moments": {
+      "mean": 25.0,
+      "variance": 75.0,
+      "standard_deviation": 8.66025
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "density_height_calc", "kind": "choice", "evidence": "uniform_density_height_reciprocal"},
+      {"id": "interval_area_prob", "kind": "numeric", "evidence": "uniform_rectangle_area_probability"},
+      {"id": "expected_delivery_time", "kind": "choice", "evidence": "uniform_expected_midpoint"}
+    ],
+    "numeric_policy": {
+      "version": 1,
+      "allowed_forms": ["fraction", "decimal", "percent"],
+      "absolute_tolerance": 0.005,
+      "relative_tolerance": 0.02
+    }
+  },
+  "notes": "Verified derivation: width = 30, height = 1/30, P(15 < X < 25) = 10 * 1/30 = 1/3 = 0.3333. E[X] = (10+40)/2 = 25. 1-to-1 evidence mapping verified."
+}

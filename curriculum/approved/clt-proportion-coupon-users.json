@@ -1,0 +1,143 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "clt_proportion_coupon_users",
+  "version": 1,
+  "status": "active",
+  "family_id": "sampling_distribution",
+  "rule_version": 1,
+  "module_id": "module_4",
+  "title": "Sampling distribution of sample proportion for coupon redemption",
+  "scenario_markdown": "A retail e-commerce marketing manager establishes that $p = 0.30$ ($30\\%$) of all active customer accounts redeem digital promotional coupons. In an audit of customer discount engagement, an analyst surveys an independent random sample of $n = 200$ customer accounts.",
+  "parameters": {
+    "stat": "proportion",
+    "p": 0.30,
+    "n": 200,
+    "p_hat": 0.35
+  },
+  "assumptions": [
+    "Independent random sample of customer accounts from a large account base",
+    "Success-failure conditions np >= 10 and n(1 - p) >= 10 are satisfied, justifying normal approximation for sample proportion p_hat",
+    "Finite population correction is negligible"
+  ],
+  "concept_ids": [
+    "clt_proportion_success_failure_check",
+    "clt_proportion_standard_error",
+    "clt_proportion_tail_probability"
+  ],
+  "setting_group": "retail_promotional_coupon_redemption",
+  "source_refs": [
+    "Course Module 4: Sampling Distributions and the Central Limit Theorem",
+    "docs/CONTENT-BACKLOG.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T20:00:00Z",
+    "notes": "Verified proportion sampling distribution: np = 60 >= 10, n(1-p) = 140 >= 10. SE = sqrt(0.30 * 0.70 / 200) = 0.0324037. Z = (0.35 - 0.30) / 0.0324037 = 1.543. P(p_hat > 0.35) = 1 - Phi(1.54) = 0.0618.",
+    "delegation_basis": "Stage 16 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "success_failure_check",
+      "kind": "choice",
+      "prompt_markdown": "Why is the normal approximation justified for modeling the sampling distribution of the sample proportion $\\hat{p}$ in this study?",
+      "options": [
+        {
+          "id": "check_correct",
+          "text_markdown": "Both expected successes $np = 200(0.30) = 60$ and expected failures $n(1 - p) = 200(0.70) = 140$ are at least 10, satisfying the success-failure condition.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "check_only_n_matters",
+          "text_markdown": "Any sample size with $n \\ge 30$ guarantees normality for proportions, regardless of the value of $p$.",
+          "misconception_id": "ignores_success_failure_condition_for_proportions",
+          "hint_markdown": "For proportions, sample size alone ($n \\ge 30$) is not sufficient if $p$ is extremely close to 0 or 1; you must check that both $np \\ge 10$ and $n(1-p) \\ge 10$."
+        },
+        {
+          "id": "check_must_equal_point_five",
+          "text_markdown": "The normal approximation requires the population proportion to be exactly $p = 0.50$.",
+          "misconception_id": "believes_proportions_require_symmetric_p",
+          "hint_markdown": "While $p = 0.50$ is most symmetric, any $p$ is valid for the normal approximation as long as $np$ and $n(1-p)$ both meet the threshold."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "check_correct"
+      },
+      "evidence_concept_ids": [
+        "clt_proportion_success_failure_check"
+      ],
+      "explanation_markdown": "The Central Limit Theorem applies to sample proportions when both the expected number of successes $np = 200 \\times 0.30 = 60$ and failures $n(1 - p) = 200 \\times 0.70 = 140$ are at least 10 (or $\\ge 5$ under relaxed conventions). Here both 60 and 140 exceed the threshold, ensuring the binomial distribution is sufficiently symmetric for the normal approximation.",
+      "numeric_policy": null
+    },
+    {
+      "id": "standard_error_proportion",
+      "kind": "choice",
+      "prompt_markdown": "What is the standard error of the sample proportion $\\sigma_{\\hat{p}}$ for this sample of $n = 200$ accounts?",
+      "options": [
+        {
+          "id": "se_prop_correct",
+          "text_markdown": "$\\sigma_{\\hat{p}} = \\sqrt{\\frac{p(1 - p)}{n}} = \\sqrt{\\frac{0.30(0.70)}{200}} = \\sqrt{0.00105} \\approx 0.0324$ ($3.24\\%$)",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "se_prop_count_sd",
+          "text_markdown": "$\\sigma_{\\hat{p}} = \\sqrt{np(1 - p)} = \\sqrt{200(0.30)(0.70)} \\approx 6.48$",
+          "misconception_id": "used_count_standard_deviation_for_proportion",
+          "hint_markdown": "$\\sqrt{np(1-p)} \\approx 6.48$ is the standard deviation of the count of successes $X$, not the sample proportion $\\hat{p} = X/n$."
+        },
+        {
+          "id": "se_prop_omitted_sqrt",
+          "text_markdown": "$\\sigma_{\\hat{p}} = \\frac{p(1 - p)}{n} = \\frac{0.21}{200} = 0.00105$",
+          "misconception_id": "omitted_square_root_in_se",
+          "hint_markdown": "$0.00105$ is the variance of the sample proportion $\\sigma_{\\hat{p}}^2$; remember to take the square root to obtain the standard error."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "se_prop_correct"
+      },
+      "evidence_concept_ids": [
+        "clt_proportion_standard_error"
+      ],
+      "explanation_markdown": "The standard error of a sample proportion is $\\sigma_{\\hat{p}} = \\sqrt{\\frac{p(1 - p)}{n}} = \\sqrt{\\frac{0.30 \\times 0.70}{200}} = \\sqrt{\\frac{0.21}{200}} = \\sqrt{0.00105} \\approx 0.0324$ (or $3.24\\%$). In Excel, this can be computed as `=SQRT(0.30 * 0.70 / 200)`.",
+      "numeric_policy": null
+    },
+    {
+      "id": "tail_probability_proportion",
+      "kind": "choice",
+      "prompt_markdown": "What is the probability that more than $35\\%$ of the sampled accounts redeem promotional coupons, $P(\\hat{p} > 0.35)$?",
+      "options": [
+        {
+          "id": "tail_prop_correct",
+          "text_markdown": "$P(\\hat{p} > 0.35) = 1 - \\Phi(1.54) = 1 - 0.9382 = 0.0618$ ($6.18\\%$)",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "tail_prop_lower_tail",
+          "text_markdown": "$P(\\hat{p} > 0.35) = \\Phi(1.54) = 0.9382$ ($93.82\\%$)",
+          "misconception_id": "confused_upper_tail_with_cumulative_cdf",
+          "hint_markdown": "The question asks for the probability that the proportion exceeds $0.35$, which is the upper tail area $1 - \\Phi(1.54)$, not the lower cumulative area."
+        },
+        {
+          "id": "tail_prop_used_half",
+          "text_markdown": "$P(\\hat{p} > 0.35) = 0.0309$ ($3.09\\%$)",
+          "misconception_id": "halved_one_tailed_probability",
+          "hint_markdown": "Do not divide the one-tailed tail probability by 2; the question asks strictly for the single upper tail $P(\\hat{p} > 0.35)$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "tail_prop_correct"
+      },
+      "evidence_concept_ids": [
+        "clt_proportion_tail_probability"
+      ],
+      "explanation_markdown": "Standardizing gives $Z = \\frac{\\hat{p} - p}{\\sigma_{\\hat{p}}} = \\frac{0.35 - 0.30}{0.0324} = \\frac{+0.05}{0.0324} \\approx +1.54$. From the standard normal table, $\\Phi(1.54) = 0.9382$. Therefore, the upper tail probability is $P(\\hat{p} > 0.35) = 1 - \\Phi(1.54) = 1 - 0.9382 = 0.0618$ (or $6.18\\%$). Excel formula: `=1 - NORM.DIST(0.35, 0.30, SQRT(0.30 * 0.70 / 200), TRUE)` or `=1 - NORM.S.DIST(1.54, TRUE)`.",
+      "numeric_policy": null
+    }
+  ]
+}

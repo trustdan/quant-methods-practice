@@ -61,6 +61,96 @@ func ComputeSamplingDistributionMean(mu, sigma float64, n int, popSize int, popI
 	}, nil
 }
 
+// ZScore returns the standardized z-score for an observed sample mean xBar.
+func (s *SamplingDistributionMean) ZScore(xBar float64) float64 {
+	return (xBar - s.Mu) / s.StandardErr
+}
+
+// ProbabilityBelow returns P(X_bar <= xBar) using the normal approximation.
+func (s *SamplingDistributionMean) ProbabilityBelow(xBar float64) float64 {
+	z := s.ZScore(xBar)
+	return StandardNormal().CDF(z)
+}
+
+// ProbabilityAbove returns P(X_bar >= xBar) = 1 - P(X_bar <= xBar).
+func (s *SamplingDistributionMean) ProbabilityAbove(xBar float64) float64 {
+	z := s.ZScore(xBar)
+	return StandardNormal().Survival(z)
+}
+
+// SamplingDistributionProportion evaluates the sampling distribution of the sample proportion p_hat.
+type SamplingDistributionProportion struct {
+	P           float64 `json:"p"`
+	SampleSize  int     `json:"sample_size"`
+	PopSize     int     `json:"pop_size,omitempty"`
+	StandardErr float64 `json:"standard_error"`
+	FPCApplied  bool    `json:"fpc_applied"`
+	FPCFactor   float64 `json:"fpc_factor"`
+	NP          float64 `json:"np"`
+	NOneMinusP  float64 `json:"n_one_minus_p"`
+	IsNormal    bool    `json:"is_normal"` // True if np >= 10 and n(1-p) >= 10
+}
+
+// ComputeSamplingDistributionProportion computes the sampling distribution moments and standard error for proportion.
+func ComputeSamplingDistributionProportion(p float64, n int, popSize int) (*SamplingDistributionProportion, error) {
+	if math.IsNaN(p) || math.IsInf(p, 0) || p <= 0 || p >= 1 {
+		return nil, fmt.Errorf("proportion p must be in open interval (0, 1), got %v", p)
+	}
+	if n <= 0 {
+		return nil, fmt.Errorf("sample size n must be strictly positive, got %d", n)
+	}
+	if popSize > 0 && n > popSize {
+		return nil, fmt.Errorf("sample size n (%d) cannot exceed population size N (%d)", n, popSize)
+	}
+
+	se := math.Sqrt(p * (1.0 - p) / float64(n))
+	fpcApplied := false
+	fpc := 1.0
+
+	if popSize > 0 {
+		frac := float64(n) / float64(popSize)
+		if frac > 0.05 && popSize > 1 {
+			fpcApplied = true
+			fpc = math.Sqrt(float64(popSize-n) / float64(popSize-1))
+			se *= fpc
+		}
+	}
+
+	np := float64(n) * p
+	nOneMinusP := float64(n) * (1.0 - p)
+	isNormal := np >= 10.0 && nOneMinusP >= 10.0
+
+	return &SamplingDistributionProportion{
+		P:           p,
+		SampleSize:  n,
+		PopSize:     popSize,
+		StandardErr: se,
+		FPCApplied:  fpcApplied,
+		FPCFactor:   fpc,
+		NP:          np,
+		NOneMinusP:  nOneMinusP,
+		IsNormal:    isNormal,
+	}, nil
+}
+
+// ZScore returns the standardized z-score for an observed sample proportion pHat.
+func (s *SamplingDistributionProportion) ZScore(pHat float64) float64 {
+	return (pHat - s.P) / s.StandardErr
+}
+
+// ProbabilityBelow returns P(p_hat <= pHat) using the normal approximation.
+func (s *SamplingDistributionProportion) ProbabilityBelow(pHat float64) float64 {
+	z := s.ZScore(pHat)
+	return StandardNormal().CDF(z)
+}
+
+// ProbabilityAbove returns P(p_hat >= pHat) = 1 - P(p_hat <= pHat).
+func (s *SamplingDistributionProportion) ProbabilityAbove(pHat float64) float64 {
+	z := s.ZScore(pHat)
+	return StandardNormal().Survival(z)
+}
+
+
 // ConfidenceIntervalResult encapsulates the computed interval, critical value, margin of error, and derivation.
 type ConfidenceIntervalResult struct {
 	Parameter       string   `json:"parameter"` // "mean_z", "mean_t", "proportion"

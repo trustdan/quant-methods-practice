@@ -1,0 +1,160 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "se_n_for_target_se",
+  "version": 1,
+  "status": "active",
+  "family_id": "sample_size",
+  "rule_version": 1,
+  "module_id": "module_4",
+  "title": "Sample size determination to achieve a target standard error",
+  "scenario_markdown": "A regional hospital network audits patient wait times from emergency department triage to physician evaluation. Historical records indicate that patient wait times have a standard deviation of $\\sigma = 15.0$ minutes. The medical director mandates a monthly sampling protocol to estimate mean wait time with a standard error of at most $\\sigma_{\\bar{x}} \\le 2.0$ minutes.",
+  "parameters": {
+    "target": "target_se",
+    "sigma": 15.0,
+    "target_se": 2.0
+  },
+  "assumptions": [
+    "Emergency department wait times are independent and identically distributed",
+    "Population standard deviation is stable at sigma = 15.0 minutes",
+    "The population of emergency department visits is large enough that the finite population correction factor is negligible"
+  ],
+  "concept_ids": [
+    "target_standard_error_inversion",
+    "sample_size_ceiling_rounding_rule",
+    "excel_sample_size_roundup"
+  ],
+  "setting_group": "hospital_emergency_operations",
+  "source_refs": [
+    "Course Module 4: Sampling Distributions and Confidence Intervals",
+    "docs/CONTENT-BACKLOG.md (Row 4.2)"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T21:05:00Z",
+    "notes": "Verified mathematical derivations: sigma / sqrt(n) <= 2.0 => sqrt(n) >= 15/2 = 7.5 => n >= 56.25. Ceiling rounding requires n = 57. At n = 56, SE = 15/sqrt(56) = 2.0045 > 2.0 (fails constraint). At n = 57, SE = 15/sqrt(57) = 1.9869 <= 2.0 (satisfies constraint). Excel formula: =ROUNDUP((15/2)^2, 0).",
+    "delegation_basis": "Stage 20 content backlog authorization"
+  },
+  "stages": [
+    {
+      "id": "solve_algebraic_bound",
+      "kind": "choice",
+      "prompt_markdown": "Rearrange the standard error formula $\\sigma_{\\bar{x}} = \\frac{\\sigma}{\\sqrt{n}}$ to solve for the continuous minimum bound on sample size $n$ when $\\sigma = 15.0$ and target $\\sigma_{\\bar{x}} \\le 2.0$.",
+      "options": [
+        {
+          "id": "bound_56_25",
+          "text_markdown": "$n \\ge \\left(\\frac{15.0}{2.0}\\right)^2 = (7.5)^2 = 56.25$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "bound_7_5",
+          "text_markdown": "$n \\ge \\frac{15.0}{2.0} = 7.5$",
+          "misconception_id": "forgot_squaring_in_sample_size",
+          "hint_markdown": "To isolate $n$ from $\\sqrt{n} \\ge \\sigma / SE$, you must square both sides of the inequality: $n \\ge (\\sigma / SE)^2$."
+        },
+        {
+          "id": "bound_30_0",
+          "text_markdown": "$n \\ge 15.0 \\times 2.0 = 30.0$",
+          "misconception_id": "multiplied_sigma_by_target_se",
+          "hint_markdown": "Standard error divides by $\\sqrt{n}$. Cross-multiplying yields $\\sqrt{n} \\ge \\sigma / SE$, not $\\sigma \\times SE$."
+        },
+        {
+          "id": "bound_10_61",
+          "text_markdown": "$n \\ge \\frac{15.0}{\\sqrt{2.0}} \\approx 10.61$",
+          "misconception_id": "divided_sigma_by_sqrt_se",
+          "hint_markdown": "The square root applies to the sample size $n$, not to the target standard error $SE$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "bound_56_25"
+      },
+      "evidence_concept_ids": [
+        "target_standard_error_inversion"
+      ],
+      "explanation_markdown": "Starting from $\\sigma_{\\bar{x}} = \\frac{\\sigma}{\\sqrt{n}} \\le 2.0$, cross-multiply to get $\\sqrt{n} \\ge \\frac{15.0}{2.0} = 7.5$. Squaring both sides yields $n \\ge (7.5)^2 = 56.25$.",
+      "numeric_policy": null
+    },
+    {
+      "id": "ceiling_rounding_justification",
+      "kind": "choice",
+      "prompt_markdown": "Given the mathematical threshold $n \\ge 56.25$, what is the smallest integer sample size that guarantees the target standard error is satisfied?",
+      "options": [
+        {
+          "id": "n_57",
+          "text_markdown": "$n = 57$ (always round up to the next whole integer)",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "n_56",
+          "text_markdown": "$n = 56$ (standard rounding down because the decimal $0.25 < 0.50$)",
+          "misconception_id": "standard_rounding_violates_precision_bound",
+          "hint_markdown": "If you round down to $n = 56$, the standard error is $\\frac{15}{\\sqrt{56}} \\approx 2.0045$ minutes, which strictly exceeds the $2.0$-minute maximum limit!"
+        },
+        {
+          "id": "n_60",
+          "text_markdown": "$n = 60$ (sample size must be rounded up to the nearest multiple of ten for CLT)",
+          "misconception_id": "artificial_multiple_of_ten_rule",
+          "hint_markdown": "Sample size planning does not require rounding to multiples of 10; any integer $n \\ge 57$ satisfies the bound."
+        },
+        {
+          "id": "n_56_even",
+          "text_markdown": "$n = 56$ (round to the nearest even number to avoid statistical bias)",
+          "misconception_id": "confuses_round_to_even_with_sample_size_ceiling",
+          "hint_markdown": "Banker's rounding (round to nearest even) does not apply to sample size planning, where bounds are strict inequalities."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "n_57"
+      },
+      "evidence_concept_ids": [
+        "sample_size_ceiling_rounding_rule"
+      ],
+      "explanation_markdown": "In sample size planning, one must always round **up** to the nearest whole integer (ceiling function $\\lceil 56.25 \\rceil = 57$). If $n = 56$ were selected, $\\sigma_{\\bar{x}} = \\frac{15.0}{\\sqrt{56}} \\approx 2.0045$ minutes, violating the target $\\le 2.0$. At $n = 57$, $\\sigma_{\\bar{x}} = \\frac{15.0}{\\sqrt{57}} \\approx 1.9869$ minutes, strictly meeting the requirement.",
+      "numeric_policy": null
+    },
+    {
+      "id": "excel_formula_implementation",
+      "kind": "choice",
+      "prompt_markdown": "Which Excel formula correctly evaluates this sample size planning calculation and rounds up to the required integer?",
+      "options": [
+        {
+          "id": "excel_roundup",
+          "text_markdown": "`=ROUNDUP((15.0 / 2.0)^2, 0)`",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "excel_round",
+          "text_markdown": "`=ROUND((15.0 / 2.0)^2, 0)`",
+          "misconception_id": "used_round_instead_of_roundup",
+          "hint_markdown": "`=ROUND` performs standard arithmetic rounding and would incorrectly return 56 instead of 57."
+        },
+        {
+          "id": "excel_rounddown",
+          "text_markdown": "`=ROUNDDOWN((15.0 / 2.0)^2, 0)`",
+          "misconception_id": "used_rounddown",
+          "hint_markdown": "`=ROUNDDOWN` truncates decimals and would return 56, violating the required precision."
+        },
+        {
+          "id": "excel_ceiling_math",
+          "text_markdown": "`=SQRT(15.0 / 2.0)`",
+          "misconception_id": "wrong_excel_function",
+          "hint_markdown": "You must square the ratio $(15 / 2)^2$ and wrap it in `=ROUNDUP(..., 0)`."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "excel_roundup"
+      },
+      "evidence_concept_ids": [
+        "excel_sample_size_roundup"
+      ],
+      "explanation_markdown": "Excel's `=ROUNDUP(number, 0)` rounds any fractional value away from zero to the next integer. `=ROUNDUP((15.0 / 2.0)^2, 0)` calculates $56.25$ and outputs $57$.",
+      "numeric_policy": null
+    }
+  ]
+}

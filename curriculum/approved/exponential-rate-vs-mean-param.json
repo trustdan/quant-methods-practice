@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "exponential_rate_vs_mean_param",
+  "version": 1,
+  "status": "active",
+  "family_id": "exponential_dist",
+  "rule_version": 1,
+  "module_id": "module_3",
+  "title": "Rate versus mean parameterization in emergency dispatch",
+  "scenario_markdown": "An emergency dispatch operations center processes 911 calls where the average time between ambulance dispatches is $\\mu = 10$ minutes. Interarrival times follow an exponential distribution. An analyst needs to evaluate the probability that the next dispatch occurs within 5 minutes ($P(X \\le 5)$) using spreadsheet modeling.",
+  "parameters": {
+    "lambda": 0.1,
+    "mean": 10.0,
+    "x": 5.0,
+    "tail": "lower"
+  },
+  "assumptions": [
+    "Continuous exponential interarrival time X ~ Exp(lambda = 0.10)",
+    "Mean dispatch interval mu = 10 minutes, so lambda = 1/mu = 0.10 dispatches/minute",
+    "Spreadsheet EXPON.DIST function requires rate parameter lambda"
+  ],
+  "concept_ids": [
+    "exponential_parameter_rate_vs_mean",
+    "exponential_dispatch_probability_calculation",
+    "exponential_parameter_misconception_analysis"
+  ],
+  "setting_group": "exponential_emergency_dispatch",
+  "source_refs": [
+    "Course Module 3: Continuous Probability Distributions",
+    "docs/CONTENT-BACKLOG.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T20:00:00Z",
+    "notes": "Verified rate lambda = 1/10 = 0.10 dispatches/min. P(X <= 5) = 1 - exp(-0.10 * 5) = 1 - exp(-0.5) = 0.393469... Excel parameter trap verified: passing mean 10 yields 1 - exp(-50) approx 1.0.",
+    "delegation_basis": "Row 3.3 backlog implementation authorization"
+  },
+  "stages": [
+    {
+      "id": "identify_software_parameter",
+      "kind": "choice",
+      "prompt_markdown": "In spreadsheet software like Microsoft Excel, the function `=EXPON.DIST(x, lambda, cumulative)` requires the rate parameter `lambda`. Given an average time between dispatches of $\\mu = 10$ minutes, what numerical value must be passed for `lambda`?",
+      "options": [
+        {
+          "id": "rate_reciprocal",
+          "text_markdown": "`lambda` $= \\frac{1}{\\mu} = \\frac{1}{10} = 0.10$ dispatches per minute",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "pass_mean_directly",
+          "text_markdown": "`lambda` $= \\mu = 10$ minutes",
+          "misconception_id": "confuse_rate_and_mean_parameterization",
+          "hint_markdown": "Excel's `lambda` argument is the event rate per unit time ($1/\\mu$), not the mean time between events $\\mu$."
+        },
+        {
+          "id": "pass_variance",
+          "text_markdown": "`lambda` $= \\frac{1}{\\mu^2} = 0.01$",
+          "misconception_id": "confuse_variance_with_rate",
+          "hint_markdown": "The variance $\\operatorname{Var}(X) = 1/\\lambda^2 = 100$, so $0.01$ is the reciprocal variance, not the rate."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "rate_reciprocal"
+      },
+      "evidence_concept_ids": [
+        "exponential_parameter_rate_vs_mean"
+      ],
+      "explanation_markdown": "Software packages like Excel parameterize the exponential distribution by its rate $\\lambda = 1/\\mu$. With $\\mu = 10$ minutes per dispatch, $\\lambda = 1/10 = 0.10$ dispatches per minute.",
+      "numeric_policy": null
+    },
+    {
+      "id": "compute_true_dispatch_probability",
+      "kind": "numeric",
+      "prompt_markdown": "Calculate the true probability that the next dispatch occurs within 5 minutes: $P(X \\le 5) = 1 - e^{-0.10 \\times 5} = 1 - e^{-0.5}$. Enter as a decimal rounded to at least three places (e.g., 0.393 or 0.3935).",
+      "options": [],
+      "expected_answer": {
+        "kind": "numeric",
+        "value": 0.3935,
+        "units": "probability"
+      },
+      "evidence_concept_ids": [
+        "exponential_dispatch_probability_calculation"
+      ],
+      "explanation_markdown": "$P(X \\le 5) = 1 - e^{-0.5} \\approx 0.3935$ (or $39.35\\%$). Correct Excel formula: `=EXPON.DIST(5, 0.10, TRUE)`.",
+      "numeric_policy": {
+        "version": 1,
+        "allowed_forms": [
+          "decimal",
+          "percent",
+          "fraction"
+        ],
+        "absolute_tolerance": 0.001,
+        "relative_tolerance": 0.01
+      }
+    },
+    {
+      "id": "analyze_parameter_error_impact",
+      "kind": "choice",
+      "prompt_markdown": "What error occurs in the calculation if an analyst mistakenly enters `=EXPON.DIST(5, 10, TRUE)` using the mean $\\mu = 10$ instead of the rate $\\lambda = 0.10$?",
+      "options": [
+        {
+          "id": "catastrophic_overestimate",
+          "text_markdown": "The formula assumes 10 dispatches occur per minute (mean interval 6 seconds), yielding $1 - e^{-50} \\approx 1.000$ ($100\\%$ probability), completely distorting operational planning",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "underestimate_zero",
+          "text_markdown": "The formula produces a probability near 0 because $10$ is larger than $5$",
+          "misconception_id": "inverse_monotonicity_fallacy",
+          "hint_markdown": "As rate $\\lambda$ increases, events occur much faster, driving the cumulative probability $1 - e^{-\\lambda x}$ toward 1, not 0."
+        },
+        {
+          "id": "excel_syntax_error",
+          "text_markdown": "Excel displays a `#NUM!` error because `lambda` cannot exceed 1.0",
+          "misconception_id": "assume_rate_bounded_by_one",
+          "hint_markdown": "Rate $\\lambda$ is an intensity parameter and can be any strictly positive real number (e.g. 10 arrivals/minute is perfectly valid)."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "catastrophic_overestimate"
+      },
+      "evidence_concept_ids": [
+        "exponential_parameter_misconception_analysis"
+      ],
+      "explanation_markdown": "Passing $\\lambda = 10$ instructs Excel that dispatches arrive at 10 per minute (one every 6 seconds). After 5 minutes (300 seconds), an event is virtually guaranteed: $1 - e^{-10 \\times 5} = 1 - e^{-50} = 0.9999999999999999999999\\dots$, turning a $39.35\\%$ probability into a $100\\%$ certainty.",
+      "numeric_policy": null
+    }
+  ]
+}

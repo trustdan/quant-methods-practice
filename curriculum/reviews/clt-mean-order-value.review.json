@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "template_id": "clt_mean_order_value",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T20:00:00Z",
+  "delegation_basis": "Stage 16 roadmap authorization",
+  "mathematical_audit": {
+    "family_id": "sampling_distribution",
+    "parameters": {
+      "stat": "mean",
+      "mu": 80.0,
+      "sigma": 24.0,
+      "n": 36,
+      "x_bar": 86.0
+    },
+    "canonical_probability": 0.0668072,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 80.0,
+      "variance": 16.0,
+      "standard_deviation": 4.0
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.005,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "standard_error_calculation", "kind": "choice", "evidence": "clt_mean_standard_error"},
+      {"id": "z_score_standardization", "kind": "choice", "evidence": "clt_mean_z_standardization"},
+      {"id": "tail_probability_calculation", "kind": "choice", "evidence": "clt_mean_tail_probability"}
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Verified CLT calculations: mu = 80, sigma = 24, n = 36. SE = 24 / 6 = 4.00. Z = (86 - 80) / 4 = 1.50. Tail probability P(X_bar > 86) = 1 - Phi(1.50) = 0.0668072. Distractors verified for distinct non-colliding values."
+}

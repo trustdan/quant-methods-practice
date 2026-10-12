@@ -17,6 +17,7 @@ interface PracticeDrillProps {
   onNavigateStage: (index: number) => void;
   onNavigateQuestion?: (index: number) => void;
   onResetDrill: () => void;
+  onNewSession?: () => void;
   onDraftChange?: (hasDraft: boolean) => void;
   onOpenTutor?: () => void;
 }
@@ -33,6 +34,7 @@ export const PracticeDrill: React.FC<PracticeDrillProps> = ({
   onNavigateStage,
   onNavigateQuestion,
   onResetDrill,
+  onNewSession,
   onDraftChange,
   onOpenTutor,
 }) => {
@@ -397,6 +399,7 @@ export const PracticeDrill: React.FC<PracticeDrillProps> = ({
         <QuestionStrip
           totalQuestions={session.total_questions || (session.questions ? session.questions.length : 1)}
           currentQuestionIndex={session.current_question_index || 0}
+          bankTotalQuestions={session.bank_total_questions}
           questions={session.questions?.map((q) => ({
             index: q.index,
             title: q.title,
@@ -432,6 +435,7 @@ export const PracticeDrill: React.FC<PracticeDrillProps> = ({
       <QuestionStrip
         totalQuestions={session.total_questions || (session.questions ? session.questions.length : 1)}
         currentQuestionIndex={session.current_question_index || 0}
+        bankTotalQuestions={session.bank_total_questions}
         questions={session.questions?.map((q) => ({
           index: q.index,
           title: q.title,
@@ -454,6 +458,20 @@ export const PracticeDrill: React.FC<PracticeDrillProps> = ({
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.4rem', flexWrap: 'wrap' }}>
               <span className="badge badge-cyan">Approved Scenario</span>
+              {session.bank_total_questions ? (
+                <span
+                  className="badge"
+                  style={{
+                    fontSize: '0.75rem',
+                    background: 'var(--bg-surface-elevated)',
+                    border: '1px solid var(--border-subtle)',
+                    color: 'var(--text-muted)',
+                  }}
+                  title={`Randomized from the pool of ${session.bank_total_questions} approved questions in the curriculum.`}
+                >
+                  🎲 Pool: {session.bank_total_questions} questions
+                </span>
+              ) : null}
               {session.is_contrast && (
                 <span className="contrast-badge" id="contrast-badge" title="Guided contrast partner problem with full guidance">
                   Guided Contrast
@@ -774,6 +792,16 @@ export const PracticeDrill: React.FC<PracticeDrillProps> = ({
             <button className="btn btn-outline" onClick={onResetDrill} title="Reset Drill">
               Reset Drill
             </button>
+            {onNewSession && (
+              <button
+                className="btn btn-outline"
+                id="btn-practice-new-drill"
+                onClick={onNewSession}
+                title="Start a fresh randomized practice drill (clock PRNG)"
+              >
+                🎲 New Drill
+              </button>
+            )}
           </div>
         </div>
       </div>

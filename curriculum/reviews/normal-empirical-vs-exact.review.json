@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "template_id": "normal_empirical_vs_exact",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T20:00:00Z",
+  "delegation_basis": "Content backlog Batch 1: Row 3.2 normal distribution expansion",
+  "mathematical_audit": {
+    "family_id": "normal_dist",
+    "parameters": {
+      "mu": 100.0,
+      "sigma": 15.0,
+      "x1": 70.0,
+      "x2": 130.0,
+      "k": 2.0
+    },
+    "canonical_probability": 0.9545,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 100.0,
+      "variance": 225.0,
+      "standard_deviation": 15.0
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.001,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {
+        "id": "empirical_rule_approximation",
+        "kind": "choice",
+        "evidence": "normal_empirical_rule_bounds"
+      },
+      {
+        "id": "exact_two_sigma_probability",
+        "kind": "numeric",
+        "evidence": "normal_exact_vs_empirical_tolerance"
+      },
+      {
+        "id": "empirical_rule_applicability",
+        "kind": "choice",
+        "evidence": "normal_empirical_rule_conditions"
+      }
+    ],
+    "numeric_policy": {
+      "version": 1,
+      "allowed_forms": [
+        "decimal",
+        "percent",
+        "fraction"
+      ],
+      "absolute_tolerance": 0.001,
+      "relative_tolerance": 0.01
+    }
+  },
+  "notes": "Verified empirical rule vs exact values: 68-95-99.7 rule rounds exact Phi(2.0) - Phi(-2.0) = 0.9772499 - 0.0227501 = 0.9544997 to ~95%. Evaluated condition of applicability (bell-shaped normality) versus general Chebyshev bounds (>= 75%)."
+}

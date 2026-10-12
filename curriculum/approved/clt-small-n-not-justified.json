@@ -1,0 +1,142 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "clt_small_n_not_justified",
+  "version": 1,
+  "status": "active",
+  "family_id": "concept_check",
+  "rule_version": 1,
+  "module_id": "module_4",
+  "title": "Limitations of the Central Limit Theorem with small sample size and skewed population",
+  "scenario_markdown": "An insurance analytics group models commercial flood damage claims. The population distribution of individual claims is heavily right-skewed with extreme positive outliers ($\text{mean } \\mu = \\$25,000, \\text{standard deviation } \\sigma = \\$18,000$). An intern takes a small random sample of $n = 9$ claims and uses the standard normal distribution ($Z$-table) to calculate the probability that the sample mean exceeds $\\$30,000$, claiming that 'by the Central Limit Theorem, sample averages are always normally distributed.'",
+  "parameters": {
+    "topic": "sampling_distribution",
+    "concept": "clt_sample_size_condition",
+    "objective": "4.1"
+  },
+  "assumptions": [
+    "Commercial flood claims follow a heavily right-skewed, non-normal distribution",
+    "Sample size is small: n = 9 < 30",
+    "No population normality can be assumed"
+  ],
+  "concept_ids": [
+    "clt_small_n_skewed_flaw",
+    "clt_population_normality_prerequisite",
+    "clt_skewness_impact_on_inference"
+  ],
+  "setting_group": "insurance_claims_small_sample_violation",
+  "source_refs": [
+    "Course Module 4: Sampling Distributions and the Central Limit Theorem",
+    "docs/CONTENT-BACKLOG.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T20:00:00Z",
+    "notes": "Reviewed conceptual limitations of CLT: n = 9 is insufficient for non-normal populations; CLT requires n >= 30 when population is skewed. If population is normal, X_bar is normal for any n.",
+    "delegation_basis": "Stage 16 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "intern_reasoning_flaw",
+      "kind": "choice",
+      "prompt_markdown": "What is the primary statistical flaw in the intern's justification for using the normal distribution?",
+      "options": [
+        {
+          "id": "flaw_small_n_skewed",
+          "text_markdown": "The Central Limit Theorem requires a sufficiently large sample size (typically $n \\ge 30$) when the population is non-normal. With only $n = 9$ from a heavily skewed population, the sampling distribution of $\bar{X}$ remains skewed.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "flaw_clt_only_counts",
+          "text_markdown": "The Central Limit Theorem applies exclusively to discrete counts, not continuous monetary values.",
+          "misconception_id": "believes_clt_limited_to_discrete_counts",
+          "hint_markdown": "The CLT applies to both discrete and continuous random variables with finite variance; it is not restricted to counts."
+        },
+        {
+          "id": "flaw_need_thousand",
+          "text_markdown": "The normal approximation requires a sample size of at least $n \\ge 1{,}000$ before any sampling distribution can be analyzed.",
+          "misconception_id": "drastically_inflated_clt_threshold",
+          "hint_markdown": "The standard introductory textbook rule of thumb for the Central Limit Theorem is $n \\ge 30$, not thousands."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "flaw_small_n_skewed"
+      },
+      "evidence_concept_ids": [
+        "clt_small_n_skewed_flaw"
+      ],
+      "explanation_markdown": "The Central Limit Theorem is an asymptotic theorem: as sample size increases, the sampling distribution of $\\bar{X}$ approaches a normal distribution. When the population distribution is severely skewed, small samples ($n = 9$) do not provide enough averaging to smooth out the skewness. The textbook rule of thumb requires $n \\ge 30$ before assuming approximate normality for non-normal populations.",
+      "numeric_policy": null
+    },
+    {
+      "id": "condition_for_small_n_normality",
+      "kind": "choice",
+      "prompt_markdown": "Under what condition WOULD a sample of size $n = 9$ yield an exactly normal sampling distribution for the sample mean $\\bar{X}$?",
+      "options": [
+        {
+          "id": "cond_normal_population",
+          "text_markdown": "If the underlying population of claim amounts itself is normally distributed.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "cond_mean_equals_median",
+          "text_markdown": "If the sample mean is confirmed to equal the sample median in the 9 observed claims.",
+          "misconception_id": "confuses_sample_symmetry_with_sampling_distribution_normality",
+          "hint_markdown": "Even if sample mean and median happen to coincide in one small sample, that does not guarantee that the sampling distribution across all possible samples is normal."
+        },
+        {
+          "id": "cond_fpc_applied",
+          "text_markdown": "If the finite population correction factor is applied to reduce the standard error.",
+          "misconception_id": "confuses_fpc_with_normality_condition",
+          "hint_markdown": "The finite population correction modifies the standard error formula when sampling from a finite population; it has no effect on whether the distribution shape is normal."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "cond_normal_population"
+      },
+      "evidence_concept_ids": [
+        "clt_population_normality_prerequisite"
+      ],
+      "explanation_markdown": "If the population itself is normally distributed $N(\\mu, \\sigma^2)$, then the linear combination $\\bar{X} = \\frac{1}{n}\\sum X_i$ is exactly normally distributed for ANY sample size $n$, even $n = 2$ or $n = 9$. When the population is not normal, we must rely on the CLT and have $n \\ge 30$.",
+      "numeric_policy": null
+    },
+    {
+      "id": "skewed_small_sample_impact",
+      "kind": "choice",
+      "prompt_markdown": "How does using the symmetric standard normal distribution table affect the intern's calculation of the upper tail probability $P(\\bar{X} > \\$30,000)$ on this right-skewed data with $n = 9$?",
+      "options": [
+        {
+          "id": "impact_underestimates_tail",
+          "text_markdown": "Because the true sampling distribution retains substantial right-skewness, the right tail is fatter and more elongated than the normal curve, causing the normal table to underestimate the true probability of high claim averages.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "impact_expected_value_changes",
+          "text_markdown": "The expected value $E[\\bar{X}]$ will no longer equal the population mean $\\mu = \\$25,000$.",
+          "misconception_id": "believes_skewness_biases_sample_mean_expectation",
+          "hint_markdown": "The sample mean remains an unbiased estimator ($E[\\bar{X}] = \\mu$) regardless of population shape or sample size; skewness alters the shape of the sampling distribution, not its center."
+        },
+        {
+          "id": "impact_becomes_uniform",
+          "text_markdown": "The sampling distribution collapses into a uniform rectangular distribution between $\\$0$ and $\\$50,000$.",
+          "misconception_id": "believes_small_sample_implies_uniform_distribution",
+          "hint_markdown": "Averages of skewed random variables retain skewness; they do not flatten into a uniform distribution."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "impact_underestimates_tail"
+      },
+      "evidence_concept_ids": [
+        "clt_skewness_impact_on_inference"
+      ],
+      "explanation_markdown": "Right-skewed distributions have heavy upper tails and frequent positive outliers. When $n$ is small ($n = 9$), averaging does not fully eliminate this skewness. Consequently, extreme positive sample averages occur more frequently than predicted by a thin-tailed, symmetric bell curve, so a standard normal calculation underestimates the upper-tail probability.",
+      "numeric_policy": null
+    }
+  ]
+}

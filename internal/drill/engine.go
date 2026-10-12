@@ -27,6 +27,7 @@ type SessionManager struct {
 	store          SessionStore
 	clock          func() time.Time
 	contrastFinder func(originID, misID string) (*domain.QuestionTemplate, bool)
+	bankCount      func() int
 }
 
 // NewSessionManager creates a manager for drill sessions.
@@ -52,6 +53,22 @@ func (sm *SessionManager) SetStore(store SessionStore) {
 	sm.mu.Lock()
 	defer sm.mu.Unlock()
 	sm.store = store
+}
+
+// SetBankCount assigns a callback returning the current approved bank question count.
+func (sm *SessionManager) SetBankCount(fn func() int) {
+	sm.mu.Lock()
+	defer sm.mu.Unlock()
+	sm.bankCount = fn
+}
+
+func (sm *SessionManager) getBankCount() int {
+	sm.mu.RLock()
+	defer sm.mu.RUnlock()
+	if sm.bankCount != nil {
+		return sm.bankCount()
+	}
+	return 0
 }
 
 // SetContrastFinder registers a contrast partner callback across managed sessions.
@@ -174,6 +191,7 @@ func (sm *SessionManager) CreateMultiQuestionSessionWithScaffolds(
 		CurrentQuestionIndex: 0,
 		Questions:            qStates,
 		Settings:             settings,
+		BankTotalQuestions:   sm.getBankCount(),
 		commandCache:         make(map[string]*CommandResult),
 		store:                sm.store,
 		contrastFinder:       sm.contrastFinder,
@@ -912,6 +930,7 @@ func (s *DrillSession) ToPublicView() PublicSessionView {
 		UpdatedAt:            s.UpdatedAt,
 		CurrentQuestionIndex: s.CurrentQuestionIndex,
 		TotalQuestions:       totalQ,
+		BankTotalQuestions:   s.BankTotalQuestions,
 		Questions:            qInfos,
 		AllCompleted:         allCompleted,
 		ScaffoldLevel:        activeScaffold,

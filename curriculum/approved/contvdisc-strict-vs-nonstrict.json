@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "contvdisc_strict_vs_nonstrict",
+  "version": 1,
+  "status": "active",
+  "family_id": "concept_check",
+  "rule_version": 1,
+  "module_id": "module_3",
+  "title": "Strict vs non-strict inequalities in continuous vs discrete distributions",
+  "scenario_markdown": "A quality engineering team evaluates inequality boundaries across two settings: (1) component operating lifetime $X$ in hours, which is continuous ($X \\sim N(100, 10^2)$), and (2) the number of defective parts $Y$ in a batch of 10 items, which is discrete ($Y \\sim \\text{Binomial}(n = 10, p = 0.2)$).",
+  "parameters": {
+    "topic": "strict_vs_nonstrict_inequalities"
+  },
+  "assumptions": [
+    "Continuous random variables have P(X = c) = 0 for any single point c",
+    "Discrete random variables have P(Y = k) > 0 for integer values k in their support"
+  ],
+  "concept_ids": ["continuous_strict_vs_weak_equality", "discrete_strict_vs_weak_difference", "general_boundary_inclusion_principle"],
+  "setting_group": "manufacturing_lifespan_and_defects",
+  "source_refs": ["Course Module 3: Continuous Probability Distributions", "docs/COURSE-MAP.md"],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T23:38:00Z",
+    "notes": "Reviewed derivation: for continuous X, P(X <= c) = P(X < c) + P(X = c) = P(X < c) + 0. For discrete Y ~ Binomial(10, 0.2), P(Y < 2) = P(Y <= 1) = 0.3758 != P(Y <= 2) = 0.6778 because P(Y = 2) = 0.3020.",
+    "delegation_basis": "Module 3 backlog authorization"
+  },
+  "stages": [
+    {
+      "id": "continuous_boundary_check",
+      "kind": "choice",
+      "prompt_markdown": "For the continuous lifespan $X \\sim N(100, 10^2)$, how does $P(X \\le 100)$ compare to the strict inequality $P(X < 100)$?",
+      "options": [
+        {"id": "continuous_identical", "text_markdown": "$P(X \\le 100) = P(X < 100) = 0.5000$ exactly, because the individual point $P(X = 100) = 0$.", "misconception_id": null, "hint_markdown": null},
+        {"id": "continuous_weak_strictly_greater", "text_markdown": "$P(X \\le 100)$ is strictly greater than $P(X < 100)$ because it includes the median value $100$.", "misconception_id": "continuous_point_adds_positive_area", "hint_markdown": "In any continuous distribution, single points have zero width and zero probability: $P(X = 100) = 0$."},
+        {"id": "continuous_requires_correction", "text_markdown": "$P(X < 100)$ must be approximated by adding or subtracting $0.5$ as a continuity correction.", "misconception_id": "confuse_continuity_correction_with_continuous_distribution", "hint_markdown": "A continuity correction is only used when approximating a discrete variable with a continuous one, not when working with an inherently continuous variable."}
+      ],
+      "expected_answer": {"kind": "choice", "option_id": "continuous_identical"},
+      "evidence_concept_ids": ["continuous_strict_vs_weak_equality"],
+      "explanation_markdown": "Because $X$ is continuous, the probability of any individual point is zero ($P(X = 100) = 0$). By the addition rule for disjoint events, $P(X \\le 100) = P(X < 100) + P(X = 100) = P(X < 100) + 0 = 0.5000$. Including or excluding boundary points never changes continuous probabilities.",
+      "numeric_policy": null
+    },
+    {
+      "id": "discrete_boundary_check",
+      "kind": "choice",
+      "prompt_markdown": "For the discrete defect count $Y \\sim \\text{Binomial}(10, 0.2)$, how does $P(Y < 2)$ compare to $P(Y \\le 2)$?",
+      "options": [
+        {"id": "discrete_strictly_less", "text_markdown": "$P(Y < 2) = P(Y \\le 1) \\approx 0.3758$, which is strictly less than $P(Y \\le 2) \\approx 0.6778$ by exactly $P(Y = 2) \\approx 0.3020$.", "misconception_id": null, "hint_markdown": null},
+        {"id": "discrete_identical_misconception", "text_markdown": "$P(Y < 2) = P(Y \\le 2)$, because the strictness of inequalities does not affect probability calculations.", "misconception_id": "overgeneralize_continuous_invariance_to_discrete", "hint_markdown": "In discrete distributions, $P(Y = 2) > 0$. Therefore, $P(Y \\le 2) = P(Y < 2) + P(Y = 2) > P(Y < 2)$."},
+        {"id": "discrete_requires_halving", "text_markdown": "$P(Y < 2)$ is half of $P(Y \\le 2)$.", "misconception_id": "arbitrary_inequality_ratio", "hint_markdown": "Calculate $P(Y \\le 1) = P(Y=0) + P(Y=1)$ vs. $P(Y \\le 2) = P(Y \\le 1) + P(Y=2)$."}
+      ],
+      "expected_answer": {"kind": "choice", "option_id": "discrete_strictly_less"},
+      "evidence_concept_ids": ["discrete_strict_vs_weak_difference"],
+      "explanation_markdown": "In discrete distributions, individual integers carry non-zero probability mass: $P(Y = 2) = \\binom{10}{2}(0.2)^2(0.8)^8 \\approx 0.3020$. Therefore, $P(Y < 2) = P(Y \\le 1) = \\text{BINOM.DIST}(1, 10, 0.2, \\text{TRUE}) \\approx 0.3758$, while $P(Y \\le 2) = \\text{BINOM.DIST}(2, 10, 0.2, \\text{TRUE}) \\approx 0.6778$. The boundary value makes a substantial difference.",
+      "numeric_policy": null
+    },
+    {
+      "id": "boundary_inclusion_rule",
+      "kind": "choice",
+      "prompt_markdown": "Which general principle summarizes the role of boundary points in continuous vs discrete probability?",
+      "options": [
+        {"id": "boundary_rule_correct", "text_markdown": "For continuous variables, endpoints do not matter ($P(a < X < b) = P(a \\le X \\le b)$); for discrete variables, endpoints must be handled with strict precision because $P(Y = k) > 0$.", "misconception_id": null, "hint_markdown": null},
+        {"id": "boundary_rule_always_matter", "text_markdown": "Endpoints always matter equally in both continuous and discrete distributions.", "misconception_id": "fail_to_recognize_continuous_measure_zero", "hint_markdown": "In continuous distributions, area over a single point is zero, so including the point adds zero area."},
+        {"id": "boundary_rule_never_matter", "text_markdown": "Endpoints never matter in either distribution once sample size exceeds 30.", "misconception_id": "clt_misconception_on_boundary_inclusion", "hint_markdown": "Sample size does not alter the fundamental definition of discrete random variables."}
+      ],
+      "expected_answer": {"kind": "choice", "option_id": "boundary_rule_correct"},
+      "evidence_concept_ids": ["general_boundary_inclusion_principle"],
+      "explanation_markdown": "A core invariant of probability: In continuous distributions, $P(a < X < b) = P(a \\le X < b) = P(a < X \\le b) = P(a \\le X \\le b)$ because $P(X = a) = P(X = b) = 0$. In discrete distributions, boundary points carry non-zero probability mass, so $P(Y < k) = P(Y \\le k - 1) \\ne P(Y \\le k)$.",
+      "numeric_policy": null
+    }
+  ]
+}

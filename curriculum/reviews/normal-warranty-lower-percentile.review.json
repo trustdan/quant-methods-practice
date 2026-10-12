@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "template_id": "normal_warranty_lower_percentile",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T20:00:00Z",
+  "delegation_basis": "Content backlog Batch 1: Row 3.2 normal distribution expansion",
+  "mathematical_audit": {
+    "family_id": "normal_dist",
+    "parameters": {
+      "mu": 60000.0,
+      "sigma": 8000.0,
+      "p": 0.02,
+      "tail": "lower"
+    },
+    "canonical_probability": 0.02,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 60000.0,
+      "variance": 64000000.0,
+      "standard_deviation": 8000.0
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.001,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {
+        "id": "determine_negative_z",
+        "kind": "choice",
+        "evidence": "normal_lower_tail_percentile"
+      },
+      {
+        "id": "calculate_warranty_mileage",
+        "kind": "choice",
+        "evidence": "normal_negative_z_score"
+      },
+      {
+        "id": "warranty_cost_interpretation",
+        "kind": "choice",
+        "evidence": "normal_warranty_business_decision"
+      }
+    ],
+    "numeric_policy": null
+  },
+  "notes": "Verified lower 2% normal quantile: Z* = -2.0537489, Xw = 43,570 miles. Table lookup Z = -2.05 gives 43,600 miles. Evaluated alternative limit at 50,000 miles giving Z = -1.25, Phi(-1.25) = 0.10565 (10.56% failure rate)."
+}

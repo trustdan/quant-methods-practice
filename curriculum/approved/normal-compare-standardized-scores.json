@@ -1,0 +1,157 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "normal_compare_standardized_scores",
+  "version": 1,
+  "status": "active",
+  "family_id": "normal_dist",
+  "rule_version": 1,
+  "module_id": "module_3",
+  "title": "Cross-regional sales performance standardized z-score comparison",
+  "scenario_markdown": "A retail corporation evaluates two district managers operating in territories with different baseline market sizes. District A monthly sales follow a normal distribution $X_A \\sim N(500000, 50000^2)$ (dollars), and Manager A achieved $x_A = \\$580,000$. District B monthly sales follow a normal distribution $X_B \\sim N(300000, 40000^2)$ (dollars), and Manager B achieved $x_B = \\$370,000$. How do the managers compare when standardized against their peer distributions?",
+  "parameters": {
+    "mu": 500000.0,
+    "sigma": 50000.0,
+    "x": 580000.0,
+    "mu_b": 300000.0,
+    "sigma_b": 40000.0,
+    "x_b": 370000.0
+  },
+  "assumptions": [
+    "Continuous normal distributions X_A ~ N(500000, 50000^2) and X_B ~ N(300000, 40000^2)",
+    "Standardized Z-scores allow direct relative comparison across distinct scales",
+    "Both districts operate under stable, independent market environments"
+  ],
+  "concept_ids": [
+    "normal_standardization_comparison",
+    "relative_vs_absolute_performance",
+    "z_score_interpretation"
+  ],
+  "setting_group": "normal_manager_performance",
+  "source_refs": [
+    "Course Module 3: Continuous Probability Distributions",
+    "docs/COURSE-MAP.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T20:00:00Z",
+    "notes": "Reviewed comparative standardization: ZA = (580k - 500k)/50k = +1.60 (percentile Phi(1.60) = 0.9452). ZB = (370k - 300k)/40k = +1.75 (percentile Phi(1.75) = 0.9599). Manager B outperformed a higher share of peers despite lower absolute sales volume. Excel formulas verified.",
+    "delegation_basis": "Content backlog Batch 1: Row 3.2 normal distribution expansion"
+  },
+  "stages": [
+    {
+      "id": "compute_manager_z_scores",
+      "kind": "choice",
+      "prompt_markdown": "What are the standardized $Z$-scores for Manager A ($x_A = \\$580,000$) and Manager B ($x_B = \\$370,000$)?",
+      "options": [
+        {
+          "id": "correct_z_scores",
+          "text_markdown": "$Z_A = \\frac{580000 - 500000}{50000} = +1.60$ and $Z_B = \\frac{370000 - 300000}{40000} = +1.75$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "raw_dollar_premiums",
+          "text_markdown": "$Z_A = 80000$ and $Z_B = 70000$ (comparing raw dollar premiums above the mean without standard deviation scaling)",
+          "misconception_id": "omit_scaling_by_sigma",
+          "hint_markdown": "Standardization requires dividing the distance from the mean by each territory's standard deviation $\\sigma$."
+        },
+        {
+          "id": "ratio_to_mean",
+          "text_markdown": "$Z_A = \\frac{580000}{500000} = 1.16$ and $Z_B = \\frac{370000}{300000} = 1.23$",
+          "misconception_id": "confuse_z_with_ratio",
+          "hint_markdown": "A $Z$-score measures standard deviations away from the mean ($(X - \\mu)/\\sigma$), not a ratio of revenue to mean ($X/\\mu$)."
+        },
+        {
+          "id": "inverted_signs",
+          "text_markdown": "$Z_A = -1.60$ and $Z_B = -1.75$",
+          "misconception_id": "inverted_z_score_difference",
+          "hint_markdown": "Because both managers produced sales above their respective district means, their $Z$-scores must be positive."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "correct_z_scores"
+      },
+      "evidence_concept_ids": [
+        "normal_standardization_comparison"
+      ],
+      "explanation_markdown": "$Z_A = \\frac{580000 - 500000}{50000} = \\frac{80000}{50000} = +1.60$, and $Z_B = \\frac{370000 - 300000}{40000} = \\frac{70000}{40000} = +1.75$. Excel formulas: `=(580000 - 500000) / 50000` and `=(370000 - 300000) / 40000`, or `=STANDARDIZE(580000, 500000, 50000)` and `=STANDARDIZE(370000, 300000, 40000)`.",
+      "numeric_policy": null
+    },
+    {
+      "id": "determine_superior_performance",
+      "kind": "choice",
+      "prompt_markdown": "Based on their standardized performance relative to their respective operating districts, which manager demonstrated stronger relative performance?",
+      "options": [
+        {
+          "id": "manager_b_superior",
+          "text_markdown": "Manager B performed relatively better because $Z_B = +1.75 > Z_A = +1.60$, standing $1.75$ standard deviations above district peers compared to $1.60$ for Manager A.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "manager_a_raw_volume",
+          "text_markdown": "Manager A performed better because Manager A generated $\\$580,000$ in total gross sales compared to only $\\$370,000$ for Manager B.",
+          "misconception_id": "raw_magnitude_bias",
+          "hint_markdown": "Raw sales comparisons ignore differences in market baseline size and market opportunity between different territories."
+        },
+        {
+          "id": "manager_a_dollar_premium",
+          "text_markdown": "Manager A performed better because Manager A exceeded the district mean by $\\$80,000$, whereas Manager B exceeded the mean by only $\\$70,000$.",
+          "misconception_id": "raw_margin_above_mean_bias",
+          "hint_markdown": "An $80,000 premium in a district with $\\sigma = \\$50,000$ represents fewer standard deviations than a $70,000 premium where $\\sigma = \\$40,000$."
+        },
+        {
+          "id": "both_equal_above_mean",
+          "text_markdown": "Both performed equally because both managers were in the upper half of their respective distributions.",
+          "misconception_id": "binary_above_below_mean_oversimplification",
+          "hint_markdown": "Standard scores provide an exact continuous measure of performance, revealing that $+1.75$ is further into the right tail than $+1.60$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "manager_b_superior"
+      },
+      "evidence_concept_ids": [
+        "relative_vs_absolute_performance"
+      ],
+      "explanation_markdown": "Standardization eliminates scale and location differences. While Manager A had higher raw sales ($580,000 vs $370,000) and a larger raw dollar margin above the mean ($80,000 vs $70,000), Manager B performed $1.75$ standard deviations above district expectation versus $1.60$ for Manager A. Therefore, Manager B demonstrated stronger relative achievement.",
+      "numeric_policy": null
+    },
+    {
+      "id": "percentile_comparison",
+      "kind": "choice",
+      "prompt_markdown": "What approximate percentage of peer managers did each outperform, and which Excel formula evaluates this?",
+      "options": [
+        {
+          "id": "percentiles_correct",
+          "text_markdown": "Manager A outperformed $\\Phi(1.60) \\approx 94.52\\%$ of peers (`=NORM.S.DIST(1.60, TRUE)`), while Manager B outperformed $\\Phi(1.75) \\approx 95.99\\%$ of peers (`=NORM.S.DIST(1.75, TRUE)`).",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "percentiles_tail_confusion",
+          "text_markdown": "Manager A outperformed $5.48\\%$ of peers and Manager B outperformed $4.01\\%$ of peers.",
+          "misconception_id": "confuse_tail_with_cumulative_percentile",
+          "hint_markdown": "$5.48\\%$ and $4.01\\%$ are the upper tail percentages of peers who scored higher than the managers, not the percentage outperformed."
+        },
+        {
+          "id": "percentiles_raw_sales",
+          "text_markdown": "Manager A outperformed $58\\%$ of peers and Manager B outperformed $37\\%$ of peers.",
+          "misconception_id": "confuse_raw_sales_with_percentiles",
+          "hint_markdown": "Raw revenue figures cannot be interpreted directly as percentiles without computing the cumulative normal distribution function."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "percentiles_correct"
+      },
+      "evidence_concept_ids": [
+        "z_score_interpretation"
+      ],
+      "explanation_markdown": "The cumulative standard normal distribution $\\Phi(z)$ yields the percentile ranking: $\\Phi(1.60) \\approx 0.94520$ ($94.52\\%$) for Manager A, and $\\Phi(1.75) \\approx 0.95994$ ($95.99\\%$) for Manager B. Excel formulas: `=NORM.DIST(580000, 500000, 50000, TRUE)` and `=NORM.DIST(370000, 300000, 40000, TRUE)`, or `=NORM.S.DIST(1.60, TRUE)` and `=NORM.S.DIST(1.75, TRUE)`.",
+      "numeric_policy": null
+    }
+  ]
+}

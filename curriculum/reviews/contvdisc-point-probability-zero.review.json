@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "template_id": "contvdisc_point_probability_zero",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T23:32:00Z",
+  "delegation_basis": "Module 3 backlog authorization",
+  "mathematical_audit": {
+    "family_id": "concept_check",
+    "parameters": {
+      "topic": "continuous_point_probability_zero"
+    },
+    "canonical_probability": 1.0,
+    "distractor_collision_audit": {
+      "tolerance": 0.0,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "continuous_point_zero", "kind": "choice", "evidence": "continuous_point_probability_is_zero"},
+      {"id": "discrete_point_nonzero", "kind": "choice", "evidence": "discrete_point_probability_is_mass"},
+      {"id": "continuous_area_explanation", "kind": "choice", "evidence": "continuous_probability_as_area"}
+    ]
+  },
+  "notes": "Verified pedagogical comparison: contrast between continuous P(X = c) = 0 (measure zero on continuum) and discrete Poisson point mass P(Y = 5) = 0.1755, clarifying why continuous probabilities are areas over intervals."
+}

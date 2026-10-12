@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "template_id": "normal_between_package_weight",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T20:00:00Z",
+  "delegation_basis": "Content backlog Batch 1: Row 3.2 normal distribution expansion",
+  "mathematical_audit": {
+    "family_id": "normal_dist",
+    "parameters": {
+      "mu": 500.0,
+      "sigma": 8.0,
+      "x1": 490.0,
+      "x2": 510.0
+    },
+    "canonical_probability": 0.7887,
+    "canonical_rational": "none",
+    "moments": {
+      "mean": 500.0,
+      "variance": 64.0,
+      "standard_deviation": 8.0
+    },
+    "distractor_collision_audit": {
+      "tolerance": 0.002,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {
+        "id": "standardize_interval_bounds",
+        "kind": "choice",
+        "evidence": "normal_interval_z_standardization"
+      },
+      {
+        "id": "compute_interval_probability",
+        "kind": "numeric",
+        "evidence": "normal_interval_probability_evaluation"
+      },
+      {
+        "id": "assess_boundary_invariance",
+        "kind": "choice",
+        "evidence": "continuous_interval_boundary_invariance"
+      }
+    ],
+    "numeric_policy": {
+      "version": 1,
+      "allowed_forms": [
+        "decimal",
+        "percent",
+        "fraction"
+      ],
+      "absolute_tolerance": 0.002,
+      "relative_tolerance": 0.01
+    }
+  },
+  "notes": "Verified normal interval probability: Z1 = -1.25, Z2 = +1.25. Phi(1.25) = 0.8943502, Phi(-1.25) = 0.1056498, Interval probability = 0.7887005. P(X=490) = P(X=510) = 0 confirmed for boundary invariance."
+}

@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "template_id": "contvdisc_strict_vs_nonstrict",
+  "template_version": 1,
+  "review_status": "approved",
+  "reviewer": "assistant_delegated",
+  "reviewed_at": "2026-10-11T23:38:00Z",
+  "delegation_basis": "Module 3 backlog authorization",
+  "mathematical_audit": {
+    "family_id": "concept_check",
+    "parameters": {
+      "topic": "strict_vs_nonstrict_inequalities"
+    },
+    "canonical_probability": 1.0,
+    "distractor_collision_audit": {
+      "tolerance": 0.0,
+      "colliding_distractors": []
+    }
+  },
+  "pedagogical_audit": {
+    "stage_count": 3,
+    "concept_count": 3,
+    "one_to_one_evidence_mapping": true,
+    "stages": [
+      {"id": "continuous_boundary_check", "kind": "choice", "evidence": "continuous_strict_vs_weak_equality"},
+      {"id": "discrete_boundary_check", "kind": "choice", "evidence": "discrete_strict_vs_weak_difference"},
+      {"id": "boundary_inclusion_rule", "kind": "choice", "evidence": "general_boundary_inclusion_principle"}
+    ]
+  },
+  "notes": "Verified pedagogical comparison: establishes the fundamental invariant that endpoints have zero measure in continuous distributions P(X <= c) = P(X < c) while contrasting with discrete binomial P(Y < 2) != P(Y <= 2)."
+}

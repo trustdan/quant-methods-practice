@@ -1,0 +1,14 @@
+{
+  "template_id": "se_n_for_target_se",
+  "reviewed_at": "2026-10-11T21:05:00Z",
+  "reviewer": "assistant_delegated",
+  "delegation_basis": "Stage 20 content backlog authorization",
+  "verdict": "approved",
+  "findings": [
+    "Verified continuous threshold: sigma / sqrt(n) <= 2.0 => sqrt(n) >= 7.5 => n >= 56.25.",
+    "Verified integer ceiling rounding: ceil(56.25) = 57.",
+    "Proved numerical failure of conventional rounding: at n = 56, SE = 15.0 / sqrt(56) = 2.004459 > 2.0 (target violated); at n = 57, SE = 15.0 / sqrt(57) = 1.986866 <= 2.0 (target met).",
+    "Distractors correctly target failure to square, multiplication instead of division, standard rounding down, and round-to-even misconceptions.",
+    "Excel formula =ROUNDUP((15.0 / 2.0)^2, 0) verified."
+  ]
+}

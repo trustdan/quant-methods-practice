@@ -1,0 +1,145 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "clt_finite_population_correction",
+  "version": 1,
+  "status": "active",
+  "family_id": "sampling_distribution",
+  "rule_version": 1,
+  "module_id": "module_4",
+  "title": "Central Limit Theorem with Finite Population Correction",
+  "scenario_markdown": "An internal audit team at a regional commercial bank reviews a branch portfolio consisting of exactly $N = 400$ commercial loan accounts. Across these 400 accounts, loan balances have population mean $\\mu = \\$50,000$ and standard deviation $\\sigma = \\$8,000$. The auditor draws a simple random sample of $n = 64$ loan files without replacement.",
+  "parameters": {
+    "stat": "mean",
+    "mu": 50000.0,
+    "sigma": 8000.0,
+    "n": 64,
+    "pop_size": 400,
+    "x_bar": 51835.33
+  },
+  "assumptions": [
+    "Simple random sampling without replacement from a finite population of size N = 400",
+    "Sample size n = 64 satisfies n / N = 64 / 400 = 0.16 > 0.05, requiring the Finite Population Correction (FPC)",
+    "Sample size n = 64 >= 30, so the sample mean X_bar is approximately normally distributed by the Central Limit Theorem"
+  ],
+  "concept_ids": [
+    "clt_fpc_applicability_threshold",
+    "clt_fpc_factor_calculation",
+    "clt_fpc_standard_error_impact"
+  ],
+  "setting_group": "bank_loan_portfolio_audit",
+  "source_refs": [
+    "Course Module 4: Sampling Distributions and the Central Limit Theorem",
+    "docs/CONTENT-BACKLOG.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T20:00:00Z",
+    "notes": "Verified FPC calculation: N = 400, n = 64. Fraction n/N = 0.16 > 0.05 requires FPC. FPC factor = sqrt(336 / 399) = 0.917663. Uncorrected SE = 8000 / 8 = 1000. Corrected SE = 1000 * 0.917663 = 917.66.",
+    "delegation_basis": "Stage 16 roadmap authorization"
+  },
+  "stages": [
+    {
+      "id": "fpc_applicability_threshold",
+      "kind": "choice",
+      "prompt_markdown": "Why must the auditor apply the Finite Population Correction (FPC) factor when calculating the standard error of the sample mean?",
+      "options": [
+        {
+          "id": "fpc_rule_met",
+          "text_markdown": "Sampling is conducted without replacement and the sampling fraction $\\frac{n}{N} = \\frac{64}{400} = 0.16$ ($16\\%$) exceeds the $5\\%$ ($0.05$) threshold.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "fpc_only_when_small_n",
+          "text_markdown": "FPC is applied whenever sample size is less than 100, regardless of population size $N$.",
+          "misconception_id": "believes_fpc_depends_only_on_n",
+          "hint_markdown": "FPC depends strictly on the sampling fraction $n/N$; if $N = 1{,}000{,}000$, a sample of $n = 64$ would not require FPC because $n/N < 0.05$."
+        },
+        {
+          "id": "fpc_with_replacement",
+          "text_markdown": "FPC is required whenever sampling is conducted with replacement.",
+          "misconception_id": "confuses_with_and_without_replacement",
+          "hint_markdown": "Sampling with replacement preserves population probabilities, treating the population as effectively infinite (FPC = 1.0). FPC is only used when sampling WITHOUT replacement."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "fpc_rule_met"
+      },
+      "evidence_concept_ids": [
+        "clt_fpc_applicability_threshold"
+      ],
+      "explanation_markdown": "When sampling without replacement from a finite population of size $N$, observations are not strictly independent. Standard practice dictates that whenever the sample represents more than $5\\%$ of the population ($n/N > 0.05$), the finite population correction factor $\\sqrt{\\frac{N - n}{N - 1}}$ must be applied. Here $\\frac{64}{400} = 0.16 = 16\\% > 5\\%$, so FPC is necessary.",
+      "numeric_policy": null
+    },
+    {
+      "id": "fpc_factor_calculation",
+      "kind": "choice",
+      "prompt_markdown": "What is the value of the Finite Population Correction (FPC) multiplier for this audit sample?",
+      "options": [
+        {
+          "id": "fpc_val_correct",
+          "text_markdown": "$\\text{FPC} = \\sqrt{\\frac{N - n}{N - 1}} = \\sqrt{\\frac{400 - 64}{400 - 1}} = \\sqrt{\\frac{336}{399}} \\approx 0.9177$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "fpc_val_no_sqrt",
+          "text_markdown": "$\\text{FPC} = \\frac{400 - 64}{400 - 1} = \\frac{336}{399} \\approx 0.8421$",
+          "misconception_id": "omitted_square_root_in_fpc",
+          "hint_markdown": "$0.8421$ is the variance correction factor $(N-n)/(N-1)$. Standard error requires taking the square root: $\\sqrt{0.8421} \\approx 0.9177$."
+        },
+        {
+          "id": "fpc_val_sampling_fraction",
+          "text_markdown": "$\\text{FPC} = 1 - \\frac{n}{N} = 1 - 0.16 = 0.8400$",
+          "misconception_id": "used_linear_fraction_instead_of_fpc_formula",
+          "hint_markdown": "The correct formula is $\\sqrt{\\frac{N - n}{N - 1}}$, not a linear subtraction $1 - n/N$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "fpc_val_correct"
+      },
+      "evidence_concept_ids": [
+        "clt_fpc_factor_calculation"
+      ],
+      "explanation_markdown": "The FPC factor is $\\sqrt{\\frac{N - n}{N - 1}} = \\sqrt{\\frac{400 - 64}{399}} = \\sqrt{\\frac{336}{399}} \\approx \\sqrt{0.842105} \\approx 0.9177$. This multiplier adjusts the standard error downward to account for the finite population.",
+      "numeric_policy": null
+    },
+    {
+      "id": "fpc_standard_error_impact",
+      "kind": "choice",
+      "prompt_markdown": "What is the corrected standard error of the sample mean $\\sigma_{\\bar{x}}$, and why is it smaller than the uncorrected standard error?",
+      "options": [
+        {
+          "id": "se_fpc_correct",
+          "text_markdown": "$\\sigma_{\\bar{x}} = \\frac{\\sigma}{\\sqrt{n}} \\times \\text{FPC} = \\frac{8{,}000}{8} \\times 0.9177 = \\$917.66$; it is smaller because sampling without replacement depletes the remaining unobserved accounts, reducing sampling uncertainty.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "se_fpc_uncorrected",
+          "text_markdown": "$\\sigma_{\\bar{x}} = \\frac{8{,}000}{\\sqrt{64}} = \\$1{,}000.00$; FPC only affects confidence intervals, not standard error.",
+          "misconception_id": "confuses_point_estimate_se_with_ci",
+          "hint_markdown": "$\\$1{,}000.00$ is the uncorrected standard error for an infinite population. FPC directly multiplies the standard error, reducing it to $\\$917.66$."
+        },
+        {
+          "id": "se_fpc_divided_by_pop_size",
+          "text_markdown": "$\\sigma_{\\bar{x}} = \\frac{8{,}000}{\\sqrt{400}} = \\$400.00$; dividing by total population size $N$.",
+          "misconception_id": "used_pop_size_in_standard_error_denominator",
+          "hint_markdown": "The denominator of the standard error is $\\sqrt{n} = \\sqrt{64} = 8$, not $\\sqrt{N}$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "se_fpc_correct"
+      },
+      "evidence_concept_ids": [
+        "clt_fpc_standard_error_impact"
+      ],
+      "explanation_markdown": "The uncorrected standard error is $\\frac{\\sigma}{\\sqrt{n}} = \\frac{8{,}000}{\\sqrt{64}} = \\$1{,}000.00$. Multiplying by the FPC factor gives the corrected standard error $\\sigma_{\\bar{x}} = 1{,}000 \\times 0.917663 = \\$917.66$. Sampling without replacement reduces uncertainty because each sampled account provides exact information and removes variability from the remaining unobserved population.",
+      "numeric_policy": null
+    }
+  ]
+}

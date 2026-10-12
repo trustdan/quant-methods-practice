@@ -416,6 +416,13 @@ export const App: React.FC = () => {
     }
   };
 
+  const handleQuickNewSession = async () => {
+    await handleStartConfiguredSession({
+      ...settingsConfig,
+      seed: undefined,
+    });
+  };
+
   const handleResetDrill = () => {
     handleSendCommand({
       command_id: `cmd_reset_${Date.now()}`,
@@ -696,6 +703,7 @@ export const App: React.FC = () => {
           <button
             className={`btn ${activeTab === 'drill' ? 'btn-primary' : 'btn-outline'}`}
             onClick={() => setActiveTab('drill')}
+            id="tab-drill"
             style={{ fontSize: '0.85rem', padding: '0.35rem 0.75rem' }}
           >
             Practice Drill
@@ -741,7 +749,7 @@ export const App: React.FC = () => {
             Question candidates
           </button>
           <button className={`btn ${activeTab === 'worksheets' ? 'btn-primary' : 'btn-outline'}`}
-            onClick={() => { setWorksheetsVisited(true); setActiveTab('worksheets'); }} title="Full solution (Shift+J) or dataset case (Shift+F)">
+            onClick={() => { setWorksheetsVisited(true); setActiveTab('worksheets'); }} id="tab-worksheets" title="Full solution (Shift+J) or dataset case (Shift+F)">
             Worksheets
           </button>
           <button
@@ -774,6 +782,7 @@ export const App: React.FC = () => {
           <button
             className={`btn ${activeTab === 'gallery' ? 'btn-primary' : 'btn-outline'}`}
             onClick={() => setActiveTab('gallery')}
+            id="tab-gallery"
             style={{ fontSize: '0.85rem', padding: '0.35rem 0.75rem' }}
           >
             Formula Gallery
@@ -798,6 +807,16 @@ export const App: React.FC = () => {
                 : 'Offline Client Mode'}
             </span>
           </div>
+          {activeTab === 'drill' && (
+            <button
+              className="btn btn-outline"
+              id="btn-header-new-drill"
+              onClick={handleQuickNewSession}
+              title="Start a fresh randomized practice drill (clock PRNG)"
+            >
+              🎲 New Drill
+            </button>
+          )}
           <button
             className="btn btn-outline"
             onClick={() => setShowSettingsModal(true)}
@@ -876,6 +895,7 @@ export const App: React.FC = () => {
             onNavigateStage={handleNavigateStage}
             onNavigateQuestion={handleNavigateQuestion}
             onResetDrill={handleResetDrill}
+            onNewSession={handleQuickNewSession}
             onDraftChange={setHasUnsavedDraft}
             onOpenTutor={() => setShowTutorModal(true)}
           />
@@ -1179,6 +1199,7 @@ export const App: React.FC = () => {
         onClose={() => setShowSettingsModal(false)}
         onStartSession={handleStartConfiguredSession}
         currentSettings={settingsConfig}
+        bankTotalQuestions={session.bank_total_questions}
       />
       {/* AI Tutor Panel */}
       <AITutorPanel

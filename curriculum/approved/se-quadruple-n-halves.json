@@ -1,0 +1,161 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "se_quadruple_n_halves",
+  "version": 1,
+  "status": "active",
+  "family_id": "sample_size",
+  "rule_version": 1,
+  "module_id": "module_4",
+  "title": "Standard error reduction: effect of quadrupling sample size",
+  "scenario_markdown": "A precision CNC milling line produces aerospace titanium pins whose diameters have a known process standard deviation of $\\sigma = 20.0\\ \\mu\\text{m}$. A quality assurance team initially draws a random sample of $n_1 = 25$ pins to estimate the mean pin diameter $\\mu$. To tighten their estimate, management approves quadrupling the sample size to $n_2 = 100$ pins.",
+  "parameters": {
+    "target": "comparison",
+    "sigma": 20.0,
+    "n1": 25,
+    "n2": 100
+  },
+  "assumptions": [
+    "Titanium pin diameters are independent and identically distributed",
+    "Process standard deviation sigma is stable at 20.0 microns",
+    "Sampling fraction is negligible (infinite population assumption, FPC not required)"
+  ],
+  "concept_ids": [
+    "standard_error_mean_formula",
+    "sample_size_square_root_scaling",
+    "diminishing_returns_of_sample_size"
+  ],
+  "setting_group": "manufacturing_component_specifications",
+  "source_refs": [
+    "Course Module 4: Sampling Distributions and Confidence Intervals",
+    "docs/CONTENT-BACKLOG.md (Row 4.2)"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T21:00:00Z",
+    "notes": "Verified mathematical derivations: SE_1 = 20.0 / sqrt(25) = 4.0 um; SE_2 = 20.0 / sqrt(100) = 2.0 um. Ratio SE_1 / SE_2 = 4.0 / 2.0 = 2.0. Quadrupling n reduces standard error by factor sqrt(4) = 2. Excel formulas: =20/SQRT(25) and =20/SQRT(100).",
+    "delegation_basis": "Stage 20 content backlog authorization"
+  },
+  "stages": [
+    {
+      "id": "se_initial_sample",
+      "kind": "choice",
+      "prompt_markdown": "Calculate the standard error of the sample mean $\\sigma_{\\bar{x}}$ for the initial sample of $n_1 = 25$ pins.",
+      "options": [
+        {
+          "id": "se_4_0",
+          "text_markdown": "$\\sigma_{\\bar{x}} = 4.0\\ \\mu\\text{m}$ ($20.0 / \\sqrt{25}$)",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "se_0_8",
+          "text_markdown": "$\\sigma_{\\bar{x}} = 0.8\\ \\mu\\text{m}$ ($20.0 / 25$)",
+          "misconception_id": "divide_by_n_instead_of_sqrt_n",
+          "hint_markdown": "Standard error divides the standard deviation by the square root of sample size $\\sqrt{n}$, not by $n$ itself."
+        },
+        {
+          "id": "se_100_0",
+          "text_markdown": "$\\sigma_{\\bar{x}} = 100.0\\ \\mu\\text{m}$ ($20.0 \\times \\sqrt{25}$)",
+          "misconception_id": "multiply_by_sqrt_n",
+          "hint_markdown": "Standard error decreases with sample size; divide by $\\sqrt{n}$, do not multiply."
+        },
+        {
+          "id": "se_4_08",
+          "text_markdown": "$\\sigma_{\\bar{x}} = 4.08\\ \\mu\\text{m}$ ($20.0 / \\sqrt{24}$)",
+          "misconception_id": "used_n_minus_1_in_se",
+          "hint_markdown": "Standard error of the mean uses $\\sqrt{n}$ in the denominator, not sample degrees of freedom $n - 1$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "se_4_0"
+      },
+      "evidence_concept_ids": [
+        "standard_error_mean_formula"
+      ],
+      "explanation_markdown": "The standard error of the sample mean is $\\sigma_{\\bar{x}} = \\frac{\\sigma}{\\sqrt{n}} = \\frac{20.0}{\\sqrt{25}} = \\frac{20.0}{5} = 4.0\\ \\mu\\text{m}$. Excel formula: `=20.0/SQRT(25)`.",
+      "numeric_policy": null
+    },
+    {
+      "id": "se_quadrupled_sample",
+      "kind": "choice",
+      "prompt_markdown": "Calculate the new standard error $\\sigma_{\\bar{x}}$ after quadrupling the sample size to $n_2 = 100$ pins.",
+      "options": [
+        {
+          "id": "se_2_0",
+          "text_markdown": "$\\sigma_{\\bar{x}} = 2.0\\ \\mu\\text{m}$ ($20.0 / \\sqrt{100}$)",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "se_1_0",
+          "text_markdown": "$\\sigma_{\\bar{x}} = 1.0\\ \\mu\\text{m}$ ($4.0 / 4$)",
+          "misconception_id": "assumed_linear_quartering",
+          "hint_markdown": "Quadrupling $n$ reduces standard error by $\\sqrt{4} = 2$, not by $4$."
+        },
+        {
+          "id": "se_0_2",
+          "text_markdown": "$\\sigma_{\\bar{x}} = 0.2\\ \\mu\\text{m}$ ($20.0 / 100$)",
+          "misconception_id": "divide_by_n_instead_of_sqrt_n",
+          "hint_markdown": "Remember to take the square root of sample size: $\\sqrt{100} = 10$, so $\\sigma_{\\bar{x}} = 20.0 / 10 = 2.0\\ \\mu\\text{m}$."
+        },
+        {
+          "id": "se_unchanged",
+          "text_markdown": "$\\sigma_{\\bar{x}} = 4.0\\ \\mu\\text{m}$ (standard error does not change with sample size)",
+          "misconception_id": "assumed_se_unchanged",
+          "hint_markdown": "Standard error measures the precision of the sample mean and shrinks as sample size increases."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "se_2_0"
+      },
+      "evidence_concept_ids": [
+        "sample_size_square_root_scaling"
+      ],
+      "explanation_markdown": "With $n_2 = 100$, the new standard error is $\\sigma_{\\bar{x}} = \\frac{\\sigma}{\\sqrt{n_2}} = \\frac{20.0}{\\sqrt{100}} = \\frac{20.0}{10} = 2.0\\ \\mu\\text{m}$. Excel formula: `=20.0/SQRT(100)`.",
+      "numeric_policy": null
+    },
+    {
+      "id": "square_root_law_principle",
+      "kind": "choice",
+      "prompt_markdown": "Why did a $4\\times$ increase in sample size ($25 \\to 100$) only cut the standard error in half ($4.0\\ \\mu\\text{m} \\to 2.0\\ \\mu\\text{m}$) rather than reducing it by fourfold?",
+      "options": [
+        {
+          "id": "sqrt_scaling_correct",
+          "text_markdown": "Because $\\sigma_{\\bar{x}}$ is inversely proportional to $\\sqrt{n}$, multiplying $n$ by $4$ reduces standard error by a factor of $\\sqrt{4} = 2$.",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "linear_scaling_misconception",
+          "text_markdown": "Statistical precision always scales linearly with sample size, but measurement error in machining prevents full gains.",
+          "misconception_id": "believes_precision_is_linear",
+          "hint_markdown": "The mathematical formula itself has $\\sqrt{n}$ in the denominator, establishing a square-root relationship rather than a linear one."
+        },
+        {
+          "id": "sample_size_changes_sigma",
+          "text_markdown": "Increasing sample size changes the underlying population standard deviation $\\sigma$, mitigating the reduction.",
+          "misconception_id": "confuses_sample_size_with_population_sd",
+          "hint_markdown": "The population standard deviation $\\sigma$ is a fixed property of the physical manufacturing process and does not change when we take larger samples."
+        },
+        {
+          "id": "fpc_suppression",
+          "text_markdown": "The finite population correction factor neutralized half of the sample size benefit.",
+          "misconception_id": "invoked_fpc_when_unwarranted",
+          "hint_markdown": "In continuous mass production of titanium pins, the population is effectively infinite, so the FPC factor is 1.0."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "sqrt_scaling_correct"
+      },
+      "evidence_concept_ids": [
+        "diminishing_returns_of_sample_size"
+      ],
+      "explanation_markdown": "The standard error formula $\\sigma_{\\bar{x}} = \\frac{\\sigma}{\\sqrt{n}}$ illustrates the 'square-root law' of sampling precision: to cut standard error in half, sample size must increase by $2^2 = 4\\times$. To cut it to one-tenth, sample size must increase by $10^2 = 100\\times$. This reflects the diminishing marginal return of collecting larger samples.",
+      "numeric_policy": null
+    }
+  ]
+}

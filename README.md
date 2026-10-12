@@ -55,6 +55,7 @@ These architectural choices are implemented and tested locally. Native release p
 | [docs/COURSE-MAP.md](docs/COURSE-MAP.md) | Course evidence, confirmed topics, and unknowns |
 | [docs/PEDAGOGY.md](docs/PEDAGOGY.md) | Seven-stage examples, feedback, scaffolding |
 | [docs/QUESTION-BANK.md](docs/QUESTION-BANK.md) | Deterministic generation, review, provenance |
+| [docs/CONTENT-BACKLOG.md](docs/CONTENT-BACKLOG.md) | Per-objective question backlog (≥5 per objective) |
 | [docs/NUMERICS.md](docs/NUMERICS.md) | Mathematical rules and grading tolerances |
 | [docs/NAVIGATION.md](docs/NAVIGATION.md) | Keyboard, focus, stage and question navigation |
 | [docs/MASTERY.md](docs/MASTERY.md) | Evidence and delayed transfer scheduling |

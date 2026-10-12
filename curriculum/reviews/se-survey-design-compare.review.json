@@ -1,0 +1,14 @@
+{
+  "template_id": "se_survey_design_compare",
+  "reviewed_at": "2026-10-11T21:20:00Z",
+  "reviewer": "assistant_delegated",
+  "delegation_basis": "Stage 20 content backlog authorization",
+  "verdict": "approved",
+  "findings": [
+    "Verified ratio of margins of error: E_1 / E_2 = sqrt(900 / 100) = sqrt(9) = 3.0.",
+    "Verified percentage reduction in margin of error: 1 - 1/3 = 2/3 = 66.67%.",
+    "Verified general quadratic scaling law: to divide error by k=5 requires k^2 = 25x sample size.",
+    "Distractors correctly target linear ratio assumptions, squaring the ratio, confusing sample percentage reduction with n, and miscalculating square roots.",
+    "Excel formulas =SQRT(900/100) and =5^2 included and verified."
+  ]
+}

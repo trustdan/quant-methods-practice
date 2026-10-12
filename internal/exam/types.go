@@ -42,6 +42,7 @@ type ExamRecord struct {
 	CurrentQuestionIndex int                               `json:"current_question_index"`
 	Questions            []domain.QuestionInstance         `json:"questions"`
 	Responses            map[string]domain.SubmittedAnswer `json:"responses"` // key: questionID:stageID
+	BankTotalQuestions   int                               `json:"bank_total_questions,omitempty"`
 	Report               *ExamReport                       `json:"report,omitempty"`
 }
 
@@ -138,6 +139,7 @@ type PublicExamView struct {
 	TimeRemainingSeconds *int                 `json:"time_remaining_seconds,omitempty"`
 	CurrentQuestionIndex int                  `json:"current_question_index"`
 	TotalQuestions       int                  `json:"total_questions"`
+	BankTotalQuestions   int                  `json:"bank_total_questions,omitempty"`
 	AnsweredQuestions    int                  `json:"answered_questions"`
 	Questions            []PublicQuestionView `json:"questions"`
 	Report               *ExamReport          `json:"report,omitempty"` // populated only when not active

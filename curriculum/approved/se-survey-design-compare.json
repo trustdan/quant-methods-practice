@@ -1,0 +1,161 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "se_survey_design_compare",
+  "version": 1,
+  "status": "active",
+  "family_id": "sample_size",
+  "rule_version": 1,
+  "module_id": "module_4",
+  "title": "Survey design comparison: sample size scaling and margin of error ratio",
+  "scenario_markdown": "A national telecommunications provider evaluates two survey designs to estimate the Net Promoter Score and satisfaction across its business subscribers. Plan A funds a sample of $n_1 = 100$ accounts, while Plan B funds an expanded sample of $n_2 = 900$ accounts. Both plans use the same target population, measurement scale, and $95\\%$ confidence level.",
+  "parameters": {
+    "target": "comparison",
+    "n1": 100,
+    "n2": 900,
+    "moe_ratio": 3.0
+  },
+  "assumptions": [
+    "Independent simple random sampling of business accounts",
+    "Underlying population standard deviation sigma is identical across both study designs",
+    "The customer base exceeds 100,000 accounts, making finite population correction factors negligible"
+  ],
+  "concept_ids": [
+    "margin_of_error_ratio_rule",
+    "diminishing_returns_of_sample_size",
+    "sample_size_multiplier_for_target_precision"
+  ],
+  "setting_group": "telecom_customer_churn_survey",
+  "source_refs": [
+    "Course Module 4: Sampling Distributions and Confidence Intervals",
+    "docs/CONTENT-BACKLOG.md (Row 4.2)"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T21:20:00Z",
+    "notes": "Verified mathematical ratio: E_1 / E_2 = (z * sigma / sqrt(100)) / (z * sigma / sqrt(900)) = sqrt(900 / 100) = sqrt(9) = 3.0. Plan B has 1/3 the margin of error of Plan A (66.7% narrower), despite requiring 9x the sample size. To achieve a 5x reduction in margin of error, required sample size multiplier is 5^2 = 25x. Excel formula: =SQRT(900/100).",
+    "delegation_basis": "Stage 20 content backlog authorization"
+  },
+  "stages": [
+    {
+      "id": "moe_ratio_plan_a_to_b",
+      "kind": "choice",
+      "prompt_markdown": "What is the ratio of Plan A's margin of error to Plan B's margin of error ($E_1 / E_2$)?",
+      "options": [
+        {
+          "id": "ratio_3_0",
+          "text_markdown": "$\\frac{E_1}{E_2} = 3.0$ (Plan A's interval is $3\\times$ as wide as Plan B's)",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "ratio_9_0",
+          "text_markdown": "$\\frac{E_1}{E_2} = 9.0$ ($900 / 100 = 9$)",
+          "misconception_id": "assumed_linear_ratio_of_sample_sizes",
+          "hint_markdown": "Margin of error is inversely proportional to the square root of sample size $\\sqrt{n}$, not $n$ itself: $\\sqrt{900 / 100} = \\sqrt{9} = 3.0$."
+        },
+        {
+          "id": "ratio_81_0",
+          "text_markdown": "$\\frac{E_1}{E_2} = 81.0$ ($9^2 = 81$)",
+          "misconception_id": "squared_ratio_of_sample_sizes",
+          "hint_markdown": "The ratio of errors is $\\sqrt{n_2 / n_1}$, not $(n_2 / n_1)^2$."
+        },
+        {
+          "id": "ratio_1_5",
+          "text_markdown": "$\\frac{E_1}{E_2} = 1.5$",
+          "misconception_id": "miscalculated_square_root",
+          "hint_markdown": "$\\sqrt{900} / \\sqrt{100} = 30 / 10 = 3.0$."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "ratio_3_0"
+      },
+      "evidence_concept_ids": [
+        "margin_of_error_ratio_rule"
+      ],
+      "explanation_markdown": "Margin of error is $E = z^* \\frac{\\sigma}{\\sqrt{n}}$. Taking the ratio of Plan A ($n_1 = 100$) to Plan B ($n_2 = 900$): $\\frac{E_1}{E_2} = \\frac{\\sigma / \\sqrt{100}}{\\sigma / \\sqrt{900}} = \\frac{\\sqrt{900}}{\\sqrt{100}} = \\frac{30}{10} = 3.0$. Excel formula: `=SQRT(900/100)`.",
+      "numeric_policy": null
+    },
+    {
+      "id": "diminishing_returns_tradeoff",
+      "kind": "choice",
+      "prompt_markdown": "Plan B requires collecting $9\\times$ as many responses as Plan A. What percentage reduction in margin of error does this $9\\times$ data investment deliver?",
+      "options": [
+        {
+          "id": "reduction_66_7_percent",
+          "text_markdown": "A $66.7\\%$ reduction in margin of error (Plan B's error is $\\frac{1}{3} \\approx 33.3\\%$ of Plan A's error).",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "reduction_88_9_percent",
+          "text_markdown": "An $88.9\\%$ reduction in margin of error (Plan B's error is $\\frac{1}{9} \\approx 11.1\\%$ of Plan A's error).",
+          "misconception_id": "assumed_linear_cost_to_error_ratio",
+          "hint_markdown": "Because the error shrinks by a factor of $\\sqrt{9} = 3$, the new error is $1/3$ of the original ($33.3\\%$ remaining, giving a $1 - 1/3 = 66.7\\%$ reduction), not $1/9$."
+        },
+        {
+          "id": "reduction_900_percent",
+          "text_markdown": "A $900\\%$ reduction in margin of error.",
+          "misconception_id": "confuses_percentage_reduction_with_n",
+          "hint_markdown": "A margin of error cannot be reduced by more than $100\\%$."
+        },
+        {
+          "id": "zero_reduction_without_pop_growth",
+          "text_markdown": "Zero practical reduction, because precision is governed entirely by the sample fraction $n/N$.",
+          "misconception_id": "erroneously_ties_precision_to_population_fraction",
+          "hint_markdown": "Absolute sample size $n$, not the sampling fraction $n/N$, determines estimation precision in large populations."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "reduction_66_7_percent"
+      },
+      "evidence_concept_ids": [
+        "diminishing_returns_of_sample_size"
+      ],
+      "explanation_markdown": "Since $E_2 = \\frac{1}{3} E_1$, the margin of error decreases from $100\\%$ down to $33.33\\%$, which is an absolute reduction of $1 - \\frac{1}{3} = \\frac{2}{3} \\approx 66.7\\%$. To get a $3\\times$ gain in precision, management had to pay for $9\\times$ as much data—a classic manifestation of diminishing returns.",
+      "numeric_policy": null
+    },
+    {
+      "id": "general_scaling_law",
+      "kind": "choice",
+      "prompt_markdown": "Based on the square-root law of standard error, by what factor must sample size $n$ be multiplied if an investigator desires to cut the margin of error to one-fifth ($1/5$) of its current size?",
+      "options": [
+        {
+          "id": "factor_25",
+          "text_markdown": "Multiply sample size by $5^2 = 25\\times$",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "factor_5",
+          "text_markdown": "Multiply sample size by $5\\times$",
+          "misconception_id": "believes_margin_of_error_scales_linearly_with_n",
+          "hint_markdown": "Multiplying $n$ by $5$ only reduces the margin of error by $\\sqrt{5} \\approx 2.24\\times$, not $5\\times$."
+        },
+        {
+          "id": "factor_sqrt_5",
+          "text_markdown": "Multiply sample size by $\\sqrt{5} \\approx 2.24\\times$",
+          "misconception_id": "takes_square_root_instead_of_squaring",
+          "hint_markdown": "Since $E \\propto 1/\\sqrt{n}$, we need $1/\\sqrt{k} = 1/5 \\implies \\sqrt{k} = 5 \\implies k = 5^2 = 25$."
+        },
+        {
+          "id": "factor_10",
+          "text_markdown": "Multiply sample size by $2 \\times 5 = 10\\times$",
+          "misconception_id": "doubled_the_factor",
+          "hint_markdown": "The scaling relationship is quadratic: square the desired precision factor ($5^2 = 25$)."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "factor_25"
+      },
+      "evidence_concept_ids": [
+        "sample_size_multiplier_for_target_precision"
+      ],
+      "explanation_markdown": "Because the margin of error is inversely proportional to $\\sqrt{n}$, reducing error by a factor of $k$ requires increasing sample size by $k^2$. To cut margin of error by $5\\times$, the sample size must be expanded by $5^2 = 25\\times$. Excel formula: `=5^2`.",
+      "numeric_policy": null
+    }
+  ]
+}

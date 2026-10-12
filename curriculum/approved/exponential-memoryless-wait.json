@@ -1,0 +1,135 @@
+{
+  "schema_version": 1,
+  "template_kind": "fixed_reference",
+  "id": "exponential_memoryless_wait",
+  "version": 1,
+  "status": "active",
+  "family_id": "exponential_dist",
+  "rule_version": 1,
+  "module_id": "module_3",
+  "title": "Technical support wait time under memoryless property",
+  "scenario_markdown": "Caller wait time on hold for enterprise technical support follows an exponential distribution with an average wait time of $\\mu = 6$ minutes (rate $\\lambda = 1/6\\text{ min}^{-1}$). A caller has already waited 5 minutes on hold. Management needs to evaluate the conditional probability that the caller must wait more than 3 additional minutes (total wait time exceeding 8 minutes).",
+  "parameters": {
+    "lambda": 0.16666666666666666,
+    "mean": 6.0,
+    "s": 5.0,
+    "t": 3.0,
+    "tail": "upper"
+  },
+  "assumptions": [
+    "Continuous exponential wait time X ~ Exp(lambda = 1/6)",
+    "Mean wait time mu = 1/lambda = 6 minutes",
+    "Memoryless property P(X > s + t | X > s) = P(X > t) holds"
+  ],
+  "concept_ids": [
+    "exponential_memoryless_formulation",
+    "exponential_memoryless_numeric_calculation",
+    "exponential_memoryless_managerial_interpretation"
+  ],
+  "setting_group": "exponential_it_support_queue",
+  "source_refs": [
+    "Course Module 3: Continuous Probability Distributions",
+    "docs/CONTENT-BACKLOG.md"
+  ],
+  "approval": {
+    "reviewer": "assistant_delegated",
+    "reviewed_at": "2026-10-11T20:00:00Z",
+    "notes": "Verified mathematically: P(X > 8 | X > 5) = P(X > 3) = exp(-3/6) = exp(-0.5) = 0.60653066... Memoryless property algebraically simplifies exp(-8/6)/exp(-5/6) = exp(-0.5). Excel formula: =1 - EXPON.DIST(3, 1/6, TRUE) or =EXP(-0.5).",
+    "delegation_basis": "Row 3.3 backlog implementation authorization"
+  },
+  "stages": [
+    {
+      "id": "state_memoryless_principle",
+      "kind": "choice",
+      "prompt_markdown": "By the memoryless property of the exponential distribution, how does the caller's conditional probability of waiting at least 3 *additional* minutes given that they have already waited 5 minutes, $P(X > 5 + 3 \\mid X > 5)$, relate to the unconditional probability $P(X > 3)$?",
+      "options": [
+        {
+          "id": "memoryless_identity",
+          "text_markdown": "$P(X > 5 + 3 \\mid X > 5) = P(X > 3) = e^{-\\lambda(3)}$ because the process 'forgets' elapsed wait time",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "gamblers_fallacy",
+          "text_markdown": "The conditional probability must be much lower than $P(X > 3)$ because the caller has 'put in their time' and service is overdue",
+          "misconception_id": "gamblers_fallacy_queue",
+          "hint_markdown": "The exponential distribution has a constant hazard rate; having waited 5 minutes neither hastens nor delays the arrival of service."
+        },
+        {
+          "id": "wearout_aging",
+          "text_markdown": "The conditional probability must be higher than $P(X > 3)$ because queue congestion compounds as callers wait longer",
+          "misconception_id": "assume_queue_aging",
+          "hint_markdown": "The exponential distribution models memoryless intervals where the remaining wait time distribution is identical to the original start distribution."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "memoryless_identity"
+      },
+      "evidence_concept_ids": [
+        "exponential_memoryless_formulation"
+      ],
+      "explanation_markdown": "The exponential distribution is uniquely memoryless: $P(X > s + t \\mid X > s) = \\frac{P(X > s + t)}{P(X > s)} = \\frac{e^{-\\lambda(s+t)}}{e^{-\\lambda s}} = e^{-\\lambda t} = P(X > t)$. The system forgets elapsed wait time $s = 5$.",
+      "numeric_policy": null
+    },
+    {
+      "id": "calculate_memoryless_probability",
+      "kind": "numeric",
+      "prompt_markdown": "Calculate this conditional probability: $P(X > 8 \\mid X > 5) = P(X > 3) = e^{-3/6} = e^{-0.5}$. Enter as a decimal rounded to at least three places (e.g., 0.607 or 0.6065).",
+      "options": [],
+      "expected_answer": {
+        "kind": "numeric",
+        "value": 0.6065,
+        "units": "probability"
+      },
+      "evidence_concept_ids": [
+        "exponential_memoryless_numeric_calculation"
+      ],
+      "explanation_markdown": "$P(X > 8 \\mid X > 5) = e^{-0.5} \\approx 0.6065$ (or $60.65\\%$). In Excel: `=EXP(-3/6)` or `=1 - EXPON.DIST(3, 1/6, TRUE)`.",
+      "numeric_policy": {
+        "version": 1,
+        "allowed_forms": [
+          "decimal",
+          "percent",
+          "fraction"
+        ],
+        "absolute_tolerance": 0.001,
+        "relative_tolerance": 0.01
+      }
+    },
+    {
+      "id": "managerial_queue_insight",
+      "kind": "choice",
+      "prompt_markdown": "What is the critical managerial implication of the memoryless property for service desk queue management?",
+      "options": [
+        {
+          "id": "managerial_memoryless",
+          "text_markdown": "Elapsed waiting time provides zero predictive power regarding remaining wait time: an agent estimating how long a customer will wait cannot use past wait time as an indicator",
+          "misconception_id": null,
+          "hint_markdown": null
+        },
+        {
+          "id": "fifo_invalid",
+          "text_markdown": "First-In-First-Out (FIFO) queue discipline guarantees that memoryless wait times always decrease steadily to zero as customers wait",
+          "misconception_id": "confuse_queue_discipline_with_distribution",
+          "hint_markdown": "Queue discipline dictates order of service, but if service completion times are exponential, the remaining duration until completion remains exponential regardless of time elapsed."
+        },
+        {
+          "id": "subtraction_shortcut",
+          "text_markdown": "The probability is computed by simple difference $P(X > 8) - P(X > 5) = e^{-8/6} - e^{-5/6}$",
+          "misconception_id": "confuse_conditional_with_difference",
+          "hint_markdown": "Conditional probability requires dividing by the conditioning event $P(A \\cap B)/P(B)$, which simplifies algebraically to $e^{-3/6}$, not a difference."
+        }
+      ],
+      "expected_answer": {
+        "kind": "choice",
+        "option_id": "managerial_memoryless"
+      },
+      "evidence_concept_ids": [
+        "exponential_memoryless_managerial_interpretation"
+      ],
+      "explanation_markdown": "Under memoryless service processes, a customer who has already waited 5 minutes still faces the exact same remaining wait time distribution as a customer who just joined the queue. Past waiting time does not 'earn' faster completion.",
+      "numeric_policy": null
+    }
+  ]
+}
