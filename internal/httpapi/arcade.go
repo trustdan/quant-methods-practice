@@ -1,3 +1,5 @@
+package httpapi
+
 import (
 	"context"
 	"encoding/json"

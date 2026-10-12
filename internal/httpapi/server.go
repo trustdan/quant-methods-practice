@@ -41,6 +41,7 @@ type Config struct {
 	CandidateStore    CandidateStore
 	WorksheetStore    WorksheetStore
 	ExamStore         ExamStore
+	ArcadeStore       ArcadeStore
 }
 
 type Server struct {
@@ -60,6 +61,7 @@ type Server struct {
 	candidateState    candidateState
 	worksheetStore    WorksheetStore
 	examStore         ExamStore
+	arcadeStore       ArcadeStore
 	lastSessionID     string
 	mu                sync.RWMutex
 }
@@ -154,6 +156,10 @@ func NewServer(cfg Config) (*Server, error) {
 	if s.candidateStore == nil && cfg.Store != nil {
 		s.candidateStore, _ = cfg.Store.(CandidateStore)
 	}
+	s.arcadeStore = cfg.ArcadeStore
+	if s.arcadeStore == nil && cfg.Store != nil {
+		s.arcadeStore, _ = cfg.Store.(ArcadeStore)
+	}
 	if s.candidateStore != nil {
 		records, err := s.candidateStore.ListCandidates(context.Background())
 		if err != nil {
@@ -214,6 +220,7 @@ func NewServer(cfg Config) (*Server, error) {
 	mux.HandleFunc("/api/providers", s.handleProviders)
 	mux.HandleFunc("/api/providers/", s.handleProviders)
 	mux.HandleFunc("/api/visuals/", s.handleVisuals)
+	mux.HandleFunc("/api/arcade/scores", s.handleArcadeScores)
 	mux.HandleFunc("/", s.handleStaticOrSPA)
 
 	wrapped := s.securityMiddleware(mux)

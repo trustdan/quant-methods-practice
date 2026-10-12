@@ -1,5 +1,20 @@
 # Handoff
 
+## Fix GitHub CI verify build failure - October 12, 2026 (Windows)
+
+- **Root Cause**: `internal/httpapi/arcade.go` was committed without a `package httpapi` declaration (starting directly with `import (`) and had not been wired into `internal/httpapi/server.go` (`ArcadeStore` field on `Config` and `Server`, `/api/arcade/scores` route registration).
+- **Fixes Applied**:
+  - Added `package httpapi` to [arcade.go](file:///c:/Users/Dan/quant-methods-practice/internal/httpapi/arcade.go).
+  - Wired `ArcadeStore` into `Config` and `Server` in [server.go](file:///c:/Users/Dan/quant-methods-practice/internal/httpapi/server.go), bound it in `NewServer`, and registered `mux.HandleFunc("/api/arcade/scores", s.handleArcadeScores)`.
+  - Added unit test suite in [arcade_test.go](file:///c:/Users/Dan/quant-methods-practice/internal/httpapi/arcade_test.go) covering GET/POST, demo score rejection, negative score rejection, malformed payload handling, and status codes.
+- **Verification Run**:
+  - `python scripts/validate_scaffold.py`: Scaffold OK.
+  - `gofmt -d cmd internal`: Clean diff.
+  - `npm run typecheck`, `npm run lint`, `npm run test` (19 test files, 100/100 passed), and `npm run build`: All passed cleanly.
+  - `go vet ./internal/... ./cmd/...`: Clean.
+  - `go test -v ./internal/... ./cmd/...`: All Go packages passed cleanly.
+  - `go build ./cmd/quant-practice`: Compiled successfully.
+
 ## GitHub README Redesign & Demo Tour Embedding - October 12, 2026 (Windows)
 
 - **README.md Overhaul**: Completely redesigned `README.md` into a modern, beautifully structured GitHub presentation document.
