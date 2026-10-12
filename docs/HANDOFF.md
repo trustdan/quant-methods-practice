@@ -1,5 +1,16 @@
 # Handoff
 
+## GitHub README Redesign & Demo Tour Embedding - October 12, 2026 (Windows)
+
+- **README.md Overhaul**: Completely redesigned `README.md` into a modern, beautifully structured GitHub presentation document.
+  - Centered hero section with dynamic SVG shields (Offline-First architecture, 137 questions, 22 objectives, Go numerics engine, React/TypeScript/Vite, 16/16 Playwright E2E passed).
+  - Embedded high-definition walkthrough video (`recordings/quant_methods_demo_tour.webm`, 720p 60 FPS) directly near the top with fallback links and an Act 1–Act 3 chapter breakdown table.
+  - Formatted feature cards detailing offline privacy, deterministic Go numerics, 7-stage pedagogical scaffolding, and keyboard fluency.
+  - Complete curriculum coverage hierarchy and objective table spanning all 6 modules (137 approved templates).
+  - Visuals Lab layout and guide covering Normal, Uniform, Exponential, Poisson, CLT, Confidence Intervals, Hypothesis Testing, and Regression.
+  - Quick-start guide, CLI reference commands, complete keyboard shortcut matrix, ASCII system architecture diagram, test commands, and comprehensive 29-document documentation map.
+- **Verification**: `python scripts/validate_scaffold.py` passes cleanly (34 Markdown files, 87 local links verified). `python scripts/check_content_coverage.py` passes across all 22 objectives. All 15 Go packages pass unit tests (`go test -count=1 ./internal/...`).
+
 ## Final Wave 4 + Wave 5 complete - October 11, 2026 (Windows)
 
 Completed the remaining **20 questions** (7 from Wave 4, 13 from Wave 5), with **60 stages**, 20 matching review records and explicit user-delegated approval. The active bank is now **137 questions: 16 original + all 121 planned additions**, covering all **22 published objective targets**. Current approval timestamps are UTC October 12, corresponding to the October 11 client date in America/Chicago. The user's explicit delegation was: "Yes—delegate review and activate after checks pass." New records identify `codex_delegated_final_waves`; they do not claim personal user reading or rely on the earlier vague roadmap-authorization notes.
