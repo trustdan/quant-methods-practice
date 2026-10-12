@@ -1,0 +1,22 @@
+Quant Methods Practice
+Copyright (c) 2026 Dan Rust
+
+This product bundles or utilizes the following third-party software and components:
+
+1. MathJax
+   - Copyright (c) The MathJax Consortium
+   - License: Apache License 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
+
+2. React
+   - Copyright (c) Meta Platforms, Inc. and affiliates
+   - License: MIT License (https://opensource.org/licenses/MIT)
+
+3. Vite
+   - Copyright (c) 2019-present Evan You & Vite Contributors
+   - License: MIT License (https://opensource.org/licenses/MIT)
+
+4. pure-Go SQLite driver (modernc.org/sqlite)
+   - Copyright (c) 2014 The SQLite Authors
+   - License: Public Domain / BSD-style
+
+All third-party trademarks and copyrights belong to their respective owners.

@@ -8,7 +8,7 @@ $distDir = Join-Path $rootDir "dist\release"
 $stagingBase = Join-Path $rootDir "dist\staging"
 
 Write-Host "=========================================================="
-Write-Host "  Quant Methods Practice — Multi-Platform Release Packager"
+Write-Host "  Quant Methods Practice -- Multi-Platform Release Packager"
 Write-Host "  Version: $version"
 Write-Host "=========================================================="
 
@@ -44,7 +44,7 @@ foreach ($t in $targets) {
     Write-Host "  --> Compiling $($t.OS)/$($t.Arch)..."
     $env:GOOS = $t.OS
     $env:GOARCH = $t.Arch
-    go build -ldflags="-s -w" -o (Join-Path $pkgDir $t.Bin) ./cmd/quant-practice
+    go build -ldflags "-s -w" -o (Join-Path $pkgDir $t.Bin) ./cmd/quant-practice
 
     if ($t.Launcher -eq "start.bat") {
         Copy-Item (Join-Path $rootDir "scripts\release-launchers\start.bat") (Join-Path $pkgDir "start.bat")
@@ -76,5 +76,5 @@ $checksums = Get-ChildItem "quant-practice-*" | ForEach-Object {
 $checksums | Out-File -Encoding ascii "SHA256SUMS.txt"
 Get-Content "SHA256SUMS.txt"
 Pop-Location
-
-Write-Host "`nRelease packaging complete!"
+Write-Host ""
+Write-Host "Release packaging complete."
