@@ -5,7 +5,7 @@
 // smooth scrolling down to reveal SVG statistical diagrams & KPI cards,
 // and a full tour of all tabs (Mastery, Reference, Notes, Candidates, Worksheets, Exams, Visuals Lab, Arcade, Gallery).
 
-import { spawn } from 'child_process';
+import { spawn, execSync } from 'child_process';
 import path from 'path';
 import fs from 'fs';
 import os from 'os';
@@ -20,7 +20,8 @@ const { chromium } = await import('../web/node_modules/playwright-core/index.mjs
 
 const binary = path.join(root, 'bin', process.platform === 'win32' ? 'quant-practice.exe' : 'quant-practice');
 const recordingsDir = path.join(root, 'recordings');
-const finalVideoPath = path.join(recordingsDir, 'quant_methods_demo_tour.webm');
+const finalMp4Path = path.join(recordingsDir, 'quant_methods_demo_tour.mp4');
+const finalWebmPath = path.join(recordingsDir, 'quant_methods_demo_tour.webm');
 const artifactDir = process.env.ARTIFACT_DIR || 'C:\\Users\\Dan\\.gemini\\antigravity-ide\\brain\\19fcc101-7ade-4743-ba60-156b8f97ae69';
 
 if (!fs.existsSync(recordingsDir)) {
@@ -393,26 +394,20 @@ async function runDemo() {
     const visualsTab = page.locator('#tab-visuals');
     if (await visualsTab.isVisible()) {
       await visualsTab.click();
-      await smoothScrollTo(page, 0, 300);
-      await page.waitForTimeout(1500);
+      await page.waitForTimeout(800);
 
       // Normal Distribution explorer
-      console.log('    [Visuals] Configuring Normal Distribution parameters...');
+      console.log('    [Visuals] Configuring Normal Distribution parameters (Upper Tail)...');
       const tailSelect = page.locator('#norm-tail-select');
       if (await tailSelect.isVisible()) {
         await tailSelect.selectOption('upper');
-        await page.waitForTimeout(800);
-      }
-      const cdfBtn = page.locator('#btn-toggle-normal-cdf');
-      if (await cdfBtn.isVisible()) {
-        await cdfBtn.click();
-        await page.waitForTimeout(800);
+        await page.waitForTimeout(600);
       }
 
-      // CRITICAL: Scroll down smoothly so the entire SVG curve and KPI values are in full view
-      console.log('    [Visuals] Scrolling down to view Normal Distribution diagram and spreadsheet formulas...');
+      // CRITICAL: Scroll down smoothly when getting to this page so the full bell curve, shaded tail & KPI cards are in view
+      console.log('    [Visuals] Scrolling down to view full Normal Distribution curve and spreadsheet formulas...');
       await scrollToDiagram(page);
-      await page.waitForTimeout(3000); // Let viewer inspect the full SVG bell curve, shaded tail & Excel formula
+      await page.waitForTimeout(3500); // Let viewer inspect the full SVG bell curve, shaded tail & Excel formula
 
       // Uniform tab
       console.log('    [Visuals] Switching to Uniform Distribution & scrolling to diagram...');
@@ -561,18 +556,34 @@ async function runDemo() {
       const generatedPath = await video.path();
       console.log(`==> Raw video saved at: ${generatedPath}`);
       if (fs.existsSync(generatedPath)) {
-        if (fs.existsSync(finalVideoPath)) {
-          fs.unlinkSync(finalVideoPath);
+        if (fs.existsSync(finalWebmPath)) {
+          fs.unlinkSync(finalWebmPath);
         }
-        fs.renameSync(generatedPath, finalVideoPath);
-        const stats = fs.statSync(finalVideoPath);
-        console.log(`==> Demo recording finalized: ${finalVideoPath} (${(stats.size / (1024 * 1024)).toFixed(2)} MB)`);
+        fs.renameSync(generatedPath, finalWebmPath);
+        console.log(`==> WebM demo recording saved: ${finalWebmPath}`);
+
+        // Transcode to MP4 (H.264 / 720p 60fps) using ffmpeg for universal playback
+        console.log('==> Transcoding to MP4 (H.264 / 720p)...');
+        try {
+          execSync(`ffmpeg -y -i "${finalWebmPath}" -c:v libx264 -preset fast -crf 22 -pix_fmt yuv420p -movflags +faststart "${finalMp4Path}"`, { stdio: 'inherit' });
+          const mp4Stats = fs.statSync(finalMp4Path);
+          console.log(`==> MP4 demo recording finalized: ${finalMp4Path} (${(mp4Stats.size / (1024 * 1024)).toFixed(2)} MB)`);
+        } catch (err) {
+          console.warn('ffmpeg transcode failed, copying webm as mp4 fallback:', err.message);
+          fs.copyFileSync(finalWebmPath, finalMp4Path);
+        }
 
         // Copy to artifact directory if available
-        if (fs.existsSync(artifactDir)) {
-          const artifactVideoPath = path.join(artifactDir, 'quant_methods_demo_tour.webm');
-          fs.copyFileSync(finalVideoPath, artifactVideoPath);
-          console.log(`==> Copied video to artifact directory: ${artifactVideoPath}`);
+        const currentArtifactDir = 'C:\\Users\\Dan\\.gemini\\antigravity-ide\\brain\\99bdccb8-3294-4c8c-b2a9-589e73714a54';
+        const targetDirs = [artifactDir, currentArtifactDir].filter((d) => d && fs.existsSync(d));
+        for (const dir of targetDirs) {
+          if (fs.existsSync(finalMp4Path)) {
+            fs.copyFileSync(finalMp4Path, path.join(dir, 'quant_methods_demo_tour.mp4'));
+          }
+          if (fs.existsSync(finalWebmPath)) {
+            fs.copyFileSync(finalWebmPath, path.join(dir, 'quant_methods_demo_tour.webm'));
+          }
+          console.log(`==> Copied video assets to artifact directory: ${dir}`);
         }
       }
     }

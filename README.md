@@ -31,8 +31,8 @@ Experience the full capabilities of **Quant Methods Practice** in this 720p 60&n
 
 <div align="center">
 
-<video src="recordings/quant_methods_demo_tour.webm" width="100%" controls="controls" muted="muted" playsinline style="border-radius: 8px; border: 1px solid #30363d; box-shadow: 0 8px 24px rgba(0,0,0,0.25);">
-  <a href="recordings/quant_methods_demo_tour.webm">▶️ Click here to watch or download the recording (quant_methods_demo_tour.webm)</a>
+<video src="recordings/quant_methods_demo_tour.mp4" width="100%" controls="controls" muted="muted" playsinline style="border-radius: 8px; border: 1px solid #30363d; box-shadow: 0 8px 24px rgba(0,0,0,0.25);">
+  <a href="recordings/quant_methods_demo_tour.mp4">▶️ Click here to watch or download the recording (quant_methods_demo_tour.mp4)</a>
 </video>
 
 <p align="center">
