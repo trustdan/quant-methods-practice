@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { ProviderSettings } from '../providers/ProviderSettings';
+import { setTourDismissed } from '../tour/ProductTourModal';
 
 export interface SessionConfig {
   question_count: number;
   module_ids: string[];
   intensity: string;
   seed?: number;
+  tour_dismissed?: boolean;
 }
 
 interface SettingsModalProps {
@@ -28,6 +30,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [selectedModules, setSelectedModules] = useState<string[]>(currentSettings?.module_ids || []);
   const [intensity, setIntensity] = useState<string>(currentSettings?.intensity || 'standard');
   const [seedInput, setSeedInput] = useState<string>(currentSettings?.seed ? String(currentSettings.seed) : '');
+  const [tourDismissed, setTourDismissedState] = useState<boolean>(currentSettings?.tour_dismissed ?? false);
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
@@ -36,6 +39,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       setSelectedModules(currentSettings.module_ids || []);
       setIntensity(currentSettings.intensity || 'standard');
       setSeedInput(currentSettings.seed ? String(currentSettings.seed) : '');
+      setTourDismissedState(currentSettings.tour_dismissed ?? false);
     }
   }, [currentSettings, isOpen]);
 
@@ -75,6 +79,26 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     }
   };
 
+  const handleToggleTourReset = async () => {
+    const nextVal = !tourDismissed;
+    setTourDismissedState(nextVal);
+    setTourDismissed(nextVal);
+    try {
+      await fetch('/api/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          question_count: questionCount,
+          module_ids: selectedModules,
+          intensity,
+          tour_dismissed: nextVal,
+        }),
+      });
+    } catch {
+      // offline fallback
+    }
+  };
+
   const handleSaveDefaults = async () => {
     setIsSaving(true);
     try {
@@ -85,6 +109,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           question_count: questionCount,
           module_ids: selectedModules,
           intensity,
+          tour_dismissed: tourDismissed,
         }),
       });
     } catch {
@@ -324,6 +349,35 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               fontSize: '0.9rem',
             }}
           />
+        </div>
+
+        {/* Product Tour Preferences */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '0.65rem 0.85rem',
+            background: 'var(--bg-surface-elevated)',
+            borderRadius: 'var(--radius-sm)',
+            border: '1px solid var(--border-subtle)',
+          }}
+        >
+          <div>
+            <div style={{ fontWeight: 600, fontSize: '0.85rem' }}>Interactive Product Tour</div>
+            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+              {tourDismissed ? 'Currently suppressed on app startup' : 'Will show automatically on app startup'}
+            </div>
+          </div>
+          <button
+            type="button"
+            className="btn btn-outline"
+            id="btn-settings-toggle-tour"
+            style={{ fontSize: '0.8rem', padding: '0.25rem 0.65rem' }}
+            onClick={handleToggleTourReset}
+          >
+            {tourDismissed ? 'Re-enable on Startup' : 'Reset Startup Tour'}
+          </button>
         </div>
 
         {/* Actions */}

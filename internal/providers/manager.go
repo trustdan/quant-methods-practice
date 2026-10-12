@@ -143,8 +143,17 @@ func (pm *ProviderManager) SetActive(route, model string) error {
 		if !ok || !acct.PlanGranted || acct.NeedsReauth {
 			return fmt.Errorf("sign in with a ChatGPT account that grants plan usage before activating this route")
 		}
-		if model == "" && pm.activeModels[route] == "" {
-			return fmt.Errorf("select a ChatGPT plan model (refresh the model list first)")
+		if model == "" {
+			if pm.activeModels[route] != "" {
+				model = pm.activeModels[route]
+			} else {
+				models, _ := pm.catalog.GetModels(route)
+				if len(models) > 0 {
+					model = models[0].ID
+				} else {
+					return fmt.Errorf("select a ChatGPT plan model (refresh the model list first)")
+				}
+			}
 		}
 	}
 
@@ -206,11 +215,15 @@ func (pm *ProviderManager) GetSummaries() []ProviderSummary {
 	summaries := make([]ProviderSummary, 0, len(routes))
 	for _, r := range routes {
 		models, _ := pm.catalog.GetModels(r)
+		actModel := pm.activeModels[r]
+		if actModel == "" && len(models) > 0 {
+			actModel = models[0].ID
+		}
 		sum := ProviderSummary{
 			Route:       r,
 			Name:        names[r],
 			Active:      r == pm.activeRoute,
-			ActiveModel: pm.activeModels[r],
+			ActiveModel: actModel,
 			ModelsCount: len(models),
 			RequiresKey: requiresKey[r],
 		}
@@ -285,6 +298,16 @@ func (pm *ProviderManager) RefreshModels(ctx context.Context, route string) ([]M
 
 	if len(models) > 0 {
 		pm.catalog.SetModels(route, models)
+		pm.mu.Lock()
+		if pm.activeModels[route] == "" {
+			pm.activeModels[route] = models[0].ID
+		}
+		if svc, ok := pm.services[route]; ok {
+			if a, ok := svc.(*ChatGPTPlanAdapter); ok && a.DefaultModel == "" {
+				a.DefaultModel = models[0].ID
+			}
+		}
+		pm.mu.Unlock()
 	}
 
 	return models, nil

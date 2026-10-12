@@ -18,6 +18,7 @@ import { AITutorPanel } from '../features/tutor/AITutorPanel';
 import { Exams } from '../features/exams/Exams';
 import { VisualsExplorer } from '../visuals/VisualsExplorer';
 import { ArcadeGame } from '../features/arcade/ArcadeGame';
+import { ProductTourModal, isTourDismissed, setTourDismissed } from '../features/tour/ProductTourModal';
 
 export const App: React.FC = () => {
   const [session, setSession] = useState<PublicSessionView>(DEFAULT_BINOMIAL_SESSION);
@@ -28,6 +29,7 @@ export const App: React.FC = () => {
   const [worksheetMode, setWorksheetMode] = useState<WorksheetMode>('full_solution');
   const [showTutorModal, setShowTutorModal] = useState<boolean>(false);
   const [showSettingsModal, setShowSettingsModal] = useState<boolean>(false);
+  const [showTourModal, setShowTourModal] = useState<boolean>(false);
   const [settingsConfig, setSettingsConfig] = useState<SessionConfig>({
     question_count: 10,
     module_ids: [],
@@ -95,16 +97,34 @@ export const App: React.FC = () => {
               const prefData = await prefRes.json();
               if (prefData) {
                 setSettingsConfig(prefData);
+                if (prefData.tour_dismissed) {
+                  setTourDismissed(true);
+                  setShowTourModal(false);
+                } else if (!isTourDismissed()) {
+                  setShowTourModal(true);
+                }
+              } else if (!isTourDismissed()) {
+                setShowTourModal(true);
               }
+            } else if (!isTourDismissed()) {
+              setShowTourModal(true);
             }
           } catch {
-            // ignore
+            if (!isTourDismissed()) {
+              setShowTourModal(true);
+            }
           }
         } else {
           setServerStatus('offline');
+          if (!isTourDismissed()) {
+            setShowTourModal(true);
+          }
         }
       } catch {
         setServerStatus('offline');
+        if (!isTourDismissed()) {
+          setShowTourModal(true);
+        }
       }
     };
 
@@ -507,7 +527,7 @@ export const App: React.FC = () => {
 
       const activeMode: KeyMode = showLeaveModal
         ? 'leave_intent'
-        : showHelpModal || showSettingsModal
+        : showTourModal || showHelpModal || showSettingsModal
         ? 'modal'
         : (activeTab === 'gallery' || activeTab === 'visuals' || activeTab === 'candidates' || activeTab === 'worksheets' || activeTab === 'exams')
         ? 'reading'
@@ -534,7 +554,9 @@ export const App: React.FC = () => {
 
         case 'ESCAPE':
           e.preventDefault();
-          if (showSettingsModal) {
+          if (showTourModal) {
+            setShowTourModal(false);
+          } else if (showSettingsModal) {
             setShowSettingsModal(false);
           } else if (showTutorModal) {
             setShowTutorModal(false);
@@ -830,6 +852,14 @@ export const App: React.FC = () => {
             title="Session Settings & Module Picker (t)"
           >
             <span className="kbd">t</span> Settings
+          </button>
+          <button
+            className="btn btn-outline"
+            id="btn-header-tour"
+            onClick={() => setShowTourModal(true)}
+            title="Product Tour & Feature Guide"
+          >
+            🚀 Tour
           </button>
           <button
             className="btn btn-outline"
@@ -1132,7 +1162,18 @@ export const App: React.FC = () => {
               </div>
             </div>
 
-            <div style={{ marginTop: '1.5rem', textAlign: 'right' }}>
+            <div style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <button
+                className="btn btn-outline"
+                id="btn-help-open-tour"
+                onClick={() => {
+                  handleCloseHelp();
+                  setShowTourModal(true);
+                }}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}
+              >
+                🚀 Launch Product Tour
+              </button>
               <button className="btn btn-primary" onClick={handleCloseHelp}>
                 Close Help
               </button>
@@ -1219,6 +1260,18 @@ export const App: React.FC = () => {
         topic={session.stages[session.current_stage_index]?.label || 'Probability'}
         concepts={[session.template_id]}
         stageResolved={session.stages[session.current_stage_index]?.status === 'completed'}
+      />
+      {/* Product Tour Modal */}
+      <ProductTourModal
+        isOpen={showTourModal}
+        onClose={() => setShowTourModal(false)}
+        onNavigateTab={(tab) => {
+          if (tab === 'candidates') setCandidatesVisited(true);
+          if (tab === 'worksheets') setWorksheetsVisited(true);
+          if (tab === 'exams') setExamsVisited(true);
+          setActiveTab(tab);
+        }}
+        onOpenTutor={() => setShowTutorModal(true)}
       />
     </>
   );

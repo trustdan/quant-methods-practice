@@ -1300,6 +1300,113 @@ html, body {
   border-color: rgba(56, 189, 248, 0.4);
 }
 
+/* Product Tour Modal & Interactive Callout Styles */
+@keyframes tourFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes tourBubblePop {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.tour-modal-backdrop {
+  animation: backdropFadeIn 0.2s ease-out;
+}
+
+@keyframes backdropFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.tour-spotlight-highlight {
+  position: fixed;
+  z-index: 1040;
+  border-radius: var(--radius-md);
+  border: 2px solid #38bdf8;
+  box-shadow: 0 0 0 9999px rgba(5, 8, 16, 0.76), 0 0 24px 4px rgba(56, 189, 248, 0.45);
+  pointer-events: none;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tour-spotlight-fallback {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(5, 8, 16, 0.76);
+  backdrop-filter: blur(4px);
+  z-index: 1040;
+}
+
+.tour-callout-bubble {
+  position: fixed;
+  z-index: 1060;
+  width: 440px;
+  max-width: calc(100vw - 32px);
+  background: rgba(15, 23, 42, 0.96);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6), 0 0 20px rgba(56, 189, 248, 0.18);
+  padding: 1.25rem;
+  color: var(--text-main);
+  box-sizing: border-box;
+  animation: tourBubblePop 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tour-bubble-arrow {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  background: #0f172a;
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  transform: rotate(45deg);
+  z-index: -1;
+}
+
+.tour-bubble-arrow.arrow-top {
+  top: -8px;
+  border-bottom: none;
+  border-right: none;
+}
+
+.tour-bubble-arrow.arrow-bottom {
+  bottom: -8px;
+  border-top: none;
+  border-left: none;
+}
+
+.tour-bubble-arrow.arrow-left {
+  left: -8px;
+  border-top: none;
+  border-right: none;
+}
+
+.tour-bubble-arrow.arrow-right {
+  right: -8px;
+  border-bottom: none;
+  border-left: none;
+}
+
 @media print {
   /* Hide interactive non-printable elements */
   .no-print,

@@ -359,7 +359,7 @@ export const Exams: React.FC<ExamsProps> = ({ active, onReturnToPractice }) => {
 
       {/* VIEW 1: ASSESSMENT SELECTION & HISTORY DASHBOARD */}
       {!activeExam && (
-        <div className="card" style={{ padding: '1.5rem' }}>
+        <div className="card" id="exam-config-card" style={{ padding: '1.5rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.5rem' }}>
             <div>
               <h2 style={{ margin: 0, fontSize: '1.35rem', fontWeight: 600 }}>Assessments &amp; Exam Mode</h2>

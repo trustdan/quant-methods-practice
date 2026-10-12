@@ -245,6 +245,14 @@ func (s *Server) handleProviders(w http.ResponseWriter, r *http.Request) {
 		}
 
 		models, isStale := s.providerManager.GetModels(route)
+		if len(models) == 0 && route == auth.RouteChatGPT {
+			if acct, ok := s.providerManager.ChatGPT().SelectedAccount(); ok && acct.PlanGranted && !acct.NeedsReauth {
+				if refreshed, err := s.providerManager.RefreshModels(r.Context(), route); err == nil && len(refreshed) > 0 {
+					models = refreshed
+					isStale = false
+				}
+			}
+		}
 		w.Header().Set("Content-Type", "application/json")
 		_ = json.NewEncoder(w).Encode(modelsResponseDTO{
 			Route:   route,

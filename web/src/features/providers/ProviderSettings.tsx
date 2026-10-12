@@ -66,12 +66,29 @@ export const ProviderSettings: React.FC<ProviderSettingsProps> = ({ onProviderCh
       const res = await fetch(`/api/providers/${route}/models`);
       if (res.ok) {
         const data: ModelsResponseDTO = await res.json();
-        const loadedModels = data.models || [];
+        let loadedModels = data.models || [];
+        if (loadedModels.length === 0) {
+          const curr = providersList.find((p) => p.route === route);
+          if (curr?.configured && route !== 'offline') {
+            try {
+              const refreshRes = await fetch(`/api/providers/${route}/models/refresh`, { method: 'POST' });
+              if (refreshRes.ok) {
+                const refreshData: ModelsResponseDTO = await refreshRes.json();
+                if (refreshData.models && refreshData.models.length > 0) {
+                  loadedModels = refreshData.models;
+                }
+              }
+            } catch {
+              // ignore
+            }
+          }
+        }
         setModels(loadedModels);
         setIsModelsStale(data.is_stale || false);
         if (loadedModels.length > 0) {
           const current = providersList.find((p) => p.route === route);
-          setSelectedModel(current?.active_model || loadedModels[0].id);
+          const match = loadedModels.find((m) => m.id === current?.active_model);
+          setSelectedModel(match ? match.id : (current?.active_model || loadedModels[0].id));
         } else {
           // Never carry another route's model over to this one.
           setSelectedModel('');
@@ -93,13 +110,18 @@ export const ProviderSettings: React.FC<ProviderSettingsProps> = ({ onProviderCh
   const handleSetActive = async () => {
     setStatusMessage(null);
     setErrorMessage(null);
+    const targetModel = selectedModel || (models.length > 0 ? models[0].id : '');
+    if (!targetModel && selectedRoute !== 'offline') {
+      setErrorMessage('Please choose or discover a model before setting this provider as active.');
+      return;
+    }
     try {
       const res = await fetch('/api/providers/active', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           route: selectedRoute,
-          model: selectedModel,
+          model: targetModel,
         }),
       });
 
@@ -109,10 +131,11 @@ export const ProviderSettings: React.FC<ProviderSettingsProps> = ({ onProviderCh
       }
 
       setActiveRoute(selectedRoute);
-      setActiveModel(selectedModel);
-      setStatusMessage(`✓ Active provider set to ${selectedRoute} (${selectedModel})`);
+      setActiveModel(targetModel);
+      setSelectedModel(targetModel);
+      setStatusMessage(`✓ Active provider set to ${selectedRoute} (${targetModel})`);
       if (onProviderChanged) {
-        onProviderChanged(selectedRoute, selectedModel);
+        onProviderChanged(selectedRoute, targetModel);
       }
       await loadProviders();
     } catch (err: unknown) {
@@ -361,8 +384,8 @@ export const ProviderSettings: React.FC<ProviderSettingsProps> = ({ onProviderCh
                 type="button"
                 className="btn btn-secondary"
                 onClick={handleSetActive}
-                disabled={!selectedModel}
-                title={selectedModel ? undefined : 'Choose a model first'}
+                disabled={!selectedModel && models.length === 0 && selectedRoute !== 'offline'}
+                title={(!selectedModel && models.length === 0 && selectedRoute !== 'offline') ? 'Choose or discover a model first' : undefined}
                 style={{ fontSize: '0.8rem', padding: '0.35rem 0.65rem' }}
               >
                 Set as Active
@@ -373,7 +396,10 @@ export const ProviderSettings: React.FC<ProviderSettingsProps> = ({ onProviderCh
 
         {selectedRoute === 'chatgpt' && (
           <ChatGPTPlanPanel
-            onAccountsChanged={loadProviders}
+            onAccountsChanged={async () => {
+              await loadProviders();
+              await loadModels('chatgpt');
+            }}
             onStatus={(m) => {
               setErrorMessage(null);
               setStatusMessage(m);
@@ -544,39 +570,132 @@ export const ProviderSettings: React.FC<ProviderSettingsProps> = ({ onProviderCh
 
               <div style={{ padding: '0.85rem', fontSize: '0.82rem', lineHeight: 1.55 }}>
                 {activeGuideTab === 'lmstudio' && (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                    <div style={{ fontWeight: 600, color: 'var(--text-main)' }}>
-                      How to set up and run with LM Studio (Recommended for GUI users):
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+                    <div>
+                      <div style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--text-main)' }}>
+                        Connecting to Local LLMs via LM Studio
+                      </div>
+                      <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginTop: '0.15rem' }}>
+                        How to set up and run with LM Studio (Recommended for GUI users): Follow these steps to run a local language model on your machine and connect it to this application.
+                      </div>
                     </div>
-                    <ol style={{ margin: 0, paddingLeft: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+
+                    <ol style={{ margin: 0, paddingLeft: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                       <li>
-                        <strong>Download & Install:</strong> Download LM Studio from{' '}
-                        <a href="https://lmstudio.ai" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent-primary)', textDecoration: 'underline' }}>
-                          lmstudio.ai
-                        </a>{' '}
-                        (Windows, macOS, or Linux).
+                        <strong>Step 1: Install LM Studio</strong>
+                        <div style={{ marginTop: '0.2rem' }}>
+                          Download and install LM Studio for your operating system from{' '}
+                          <a href="https://lmstudio.ai" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent-primary)', textDecoration: 'underline' }}>
+                            lmstudio.ai
+                          </a>. Launch the application.
+                        </div>
+                        <div style={{ marginTop: '0.25rem', color: 'var(--text-muted)', fontSize: '0.78rem' }}>
+                          ✓ <em>Verification:</em> The LM Studio home screen opens with the sidebar visible on the left.
+                        </div>
                       </li>
+
                       <li>
-                        <strong>Download a Model:</strong> In LM Studio, click the search icon (🔍) on the left sidebar. Recommended models for quantitative reasoning:
-                        <ul style={{ margin: '0.2rem 0', paddingLeft: '1.1rem' }}>
-                          <li><code>Llama-3.1-8B-Instruct-GGUF</code> (or 3.2-3B for lighter hardware)</li>
-                          <li><code>Qwen2.5-7B-Instruct-GGUF</code> (excellent at mathematics)</li>
-                          <li><code>Mistral-7B-Instruct-v0.3-GGUF</code></li>
+                        <strong>Step 2: Download a Model</strong>
+                        <div style={{ marginTop: '0.2rem' }}>
+                          Click the <strong>Search / Discover icon</strong> (magnifying glass 🔍) in the left-hand navigation sidebar. Search for a supported instruction-tuned model, such as:
+                          <ul style={{ margin: '0.25rem 0', paddingLeft: '1.1rem' }}>
+                            <li><code>Qwen2.5-7B-Instruct-GGUF</code> (recommended for quantitative and mathematical reasoning)</li>
+                            <li><code>Meta-Llama-3.1-8B-Instruct-GGUF</code> (or 3.2-3B for lighter hardware)</li>
+                          </ul>
+                          Under the model variants, select a quantization level suited to your hardware (e.g., <code>Q4_K_M</code> for standard GPU/RAM setups) and click <strong>Download</strong>.
+                        </div>
+                        <div style={{ marginTop: '0.25rem', color: 'var(--text-muted)', fontSize: '0.78rem' }}>
+                          ✓ <em>Verification:</em> Once downloaded, the model will appear in your local library under the <strong>My Models</strong> tab (folder icon).
+                        </div>
+                      </li>
+
+                      <li>
+                        <strong>Step 3: Load the Model and Start the Server</strong>
+                        <div style={{ marginTop: '0.2rem' }}>
+                          Click the <strong>Developer tab</strong> (the <code>&lt;-&gt;</code> / server icon) in the left-hand navigation sidebar (labeled <em>Developer</em> or <em>Local Server</em> depending on version).
+                        </div>
+                        <div style={{ marginTop: '0.2rem' }}>
+                          At the top of the Developer screen, click the <em>Select a model to load</em> dropdown and choose your downloaded model. Wait for the model to load into memory. The top bar will display the active model name along with estimated RAM/VRAM consumption.
+                        </div>
+                        <div style={{ marginTop: '0.2rem' }}>
+                          Locate the server controls at the top right and click the <strong>Start Server</strong> toggle/button.
+                        </div>
+                        <div style={{ marginTop: '0.25rem', color: 'var(--text-muted)', fontSize: '0.78rem' }}>
+                          ✓ <em>Verification:</em> The status indicator switches to green, displaying <code>Server running on http://localhost:1234</code>, and live server logs appear in the central console.
+                        </div>
+                      </li>
+
+                      <li>
+                        <strong>Step 4: Configure App Connection Settings</strong>
+                        <div style={{ marginTop: '0.25rem', overflowX: 'auto' }}>
+                          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.78rem', background: 'var(--bg-app)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-subtle)' }}>
+                            <thead>
+                              <tr style={{ borderBottom: '1px solid var(--border-subtle)', textAlign: 'left', color: 'var(--text-muted)' }}>
+                                <th style={{ padding: '0.35rem 0.6rem' }}>Setting</th>
+                                <th style={{ padding: '0.35rem 0.6rem' }}>Value</th>
+                                <th style={{ padding: '0.35rem 0.6rem' }}>Notes</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr style={{ borderBottom: '1px solid var(--border-subtle)' }}>
+                                <td style={{ padding: '0.35rem 0.6rem', fontWeight: 600 }}>API Base URL</td>
+                                <td style={{ padding: '0.35rem 0.6rem' }}><code>http://localhost:1234/v1</code></td>
+                                <td style={{ padding: '0.35rem 0.6rem', color: 'var(--text-muted)' }}>LM Studio exposes an OpenAI-compatible endpoint. Click preset <strong>LM Studio (:1234)</strong> above.</td>
+                              </tr>
+                              <tr style={{ borderBottom: '1px solid var(--border-subtle)' }}>
+                                <td style={{ padding: '0.35rem 0.6rem', fontWeight: 600 }}>API Key</td>
+                                <td style={{ padding: '0.35rem 0.6rem' }}><code>lm-studio</code></td>
+                                <td style={{ padding: '0.35rem 0.6rem', color: 'var(--text-muted)' }}>LM Studio does not require authentication, but client adapters require a non-empty string.</td>
+                              </tr>
+                              <tr>
+                                <td style={{ padding: '0.35rem 0.6rem', fontWeight: 600 }}>Model Name / ID</td>
+                                <td style={{ padding: '0.35rem 0.6rem' }}>Exact identifier from LM Studio</td>
+                                <td style={{ padding: '0.35rem 0.6rem', color: 'var(--text-muted)' }}>Found in the Developer tab (or click <strong>Probe / Refresh Local Models</strong> to detect automatically).</td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </li>
+
+                      <li>
+                        <strong>Step 5: Advanced & Environment Settings</strong>
+                        <div style={{ marginTop: '0.2rem', color: 'var(--text-muted)' }}>
+                          Depending on where this application runs relative to LM Studio, adjust the following toggles in LM Studio's right-hand <strong>Server Settings</strong> panel:
+                        </div>
+                        <ul style={{ margin: '0.3rem 0', paddingLeft: '1.1rem', display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                          <li>
+                            <strong>Browser-Based Apps (CORS):</strong> If this application runs in a web browser (e.g., <code>http://localhost:3000</code>), toggle <strong>Enable CORS</strong> to <strong>ON</strong>. Leaving this off causes the browser to block requests due to cross-origin security policies.
+                          </li>
+                          <li>
+                            <strong>Docker / WSL / Remote Clients:</strong> If this application runs inside Docker, WSL2, or a different device on your network, toggle <strong>Serve on Local Network</strong> to <strong>ON</strong> (binds to <code>0.0.0.0</code> instead of <code>127.0.0.1</code>). Use your host machine's local IP address or <code>http://host.docker.internal:1234/v1</code> as the Base URL.
+                          </li>
+                          <li>
+                            <strong>Context Length & Hardware Offload:</strong> In the model settings panel on the right, ensure <strong>GPU Offload</strong> is enabled to maximize inference speed, and verify the context window size matches your application's token requirements.
+                          </li>
                         </ul>
                       </li>
-                      <li>
-                        <strong>Open Developer / Server:</strong> Click the Developer tab on the left sidebar (icon with <code>&lt;-&gt;</code>).
-                      </li>
-                      <li>
-                        <strong>Load Model into Memory:</strong> Click the top dropdown (<em>"Select a model to load"</em>) and choose your downloaded model.
-                      </li>
-                      <li>
-                        <strong>Start Server:</strong> Ensure the port is <code>1234</code>, then click <strong>Start Server</strong>.
-                      </li>
-                      <li>
-                        <strong>Connect Antigravity:</strong> Click the <strong>LM Studio (:1234)</strong> preset button above and click <strong>Probe / Refresh Local Models</strong>.
-                      </li>
                     </ol>
+
+                    <div style={{ marginTop: '0.4rem', padding: '0.6rem 0.75rem', background: 'var(--bg-app)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-subtle)' }}>
+                      <div style={{ fontWeight: 600, fontSize: '0.8rem', color: 'var(--text-main)', marginBottom: '0.3rem' }}>
+                        📡 Connection Verification Checklist
+                      </div>
+                      <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '0.3rem' }}>
+                        To confirm the server is operating before running the app, execute this check in your terminal:
+                      </div>
+                      <div style={{ background: '#111827', color: '#e5e7eb', padding: '0.4rem 0.6rem', borderRadius: 'var(--radius-sm)', fontFamily: 'monospace', fontSize: '0.78rem', marginBottom: '0.4rem' }}>
+                        curl http://localhost:1234/v1/models
+                      </div>
+                      <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '0.2rem' }}>
+                        Expected Result: A JSON response listing the active model:
+                      </div>
+                      <pre style={{ margin: 0, background: '#111827', color: '#86efac', padding: '0.4rem 0.6rem', borderRadius: 'var(--radius-sm)', fontFamily: 'monospace', fontSize: '0.74rem', overflowX: 'auto' }}>
+{`{ "object": "list", "data": [ { "id": "model-identifier", "object": "model", "owned_by": "organization" } ] }`}
+                      </pre>
+                      <div style={{ fontSize: '0.76rem', color: 'var(--text-muted)', marginTop: '0.35rem' }}>
+                        Once the terminal returns this JSON object and LM Studio shows incoming request logs, click <strong>Probe / Refresh Local Models</strong> above and initiate a prompt.
+                      </div>
+                    </div>
                   </div>
                 )}
 

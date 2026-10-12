@@ -59,7 +59,12 @@ export const ChatGPTPlanPanel: React.FC<ChatGPTPlanPanelProps> = ({ onAccountsCh
       stopPolling();
       setAuthorizeUrl(null);
       if (st.state === 'complete') {
-        onStatus(`✓ Signed in to ChatGPT as ${st.account?.label ?? 'your account'}. Refresh the model list to choose a plan model.`);
+        try {
+          await fetch('/api/providers/chatgpt/models/refresh', { method: 'POST' });
+        } catch {
+          // ignore
+        }
+        onStatus(`✓ Signed in to ChatGPT as ${st.account?.label ?? 'your account'}.`);
       } else if (st.state === 'failed' || st.state === 'expired') {
         onError(st.error || 'ChatGPT sign-in did not complete.');
       }
@@ -116,6 +121,11 @@ export const ChatGPTPlanPanel: React.FC<ChatGPTPlanPanelProps> = ({ onAccountsCh
       const res = await fetch(`/api/providers/chatgpt/accounts/${encodeURIComponent(key)}/select`, { method: 'POST' });
       if (!res.ok) throw new Error(await res.text());
       setAccounts(await res.json());
+      try {
+        await fetch('/api/providers/chatgpt/models/refresh', { method: 'POST' });
+      } catch {
+        // ignore
+      }
       onAccountsChanged();
     } catch (err: unknown) {
       onError(err instanceof Error ? err.message : 'Could not switch ChatGPT account');

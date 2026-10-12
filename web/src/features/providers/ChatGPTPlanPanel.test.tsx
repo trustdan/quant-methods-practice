@@ -128,4 +128,65 @@ describe('ProviderSettings ChatGPT plan tab', () => {
     expect(document.querySelector('input[type="password"]')).toBeNull();
     expect(screen.getByText('Set as Active')).toBeDisabled();
   });
+
+  it('enables Set as Active and allows activating ChatGPT plan when signed in', async () => {
+    let activeRoute = 'local';
+    let activeModel = 'local-model';
+    const calls: string[] = [];
+
+    global.fetch = vi.fn().mockImplementation((url: string, opts?: RequestInit) => {
+      calls.push(`${opts?.method || 'GET'} ${url}`);
+      if (url === '/api/providers') {
+        return ok({
+          providers: [
+            { route: 'offline', name: 'Offline Reviewed', configured: true, active: activeRoute === 'offline', active_model: 'offline-curriculum', source: 'none', models_count: 1, requires_key: false, billing: 'none' },
+            { route: 'local', name: 'Local Offline LLM', configured: true, active: activeRoute === 'local', active_model: 'local-model', source: 'none', models_count: 1, requires_key: false, billing: 'none' },
+            { route: 'chatgpt', name: 'ChatGPT Plan', configured: true, active: activeRoute === 'chatgpt', active_model: activeModel, source: 'vault', models_count: 2, requires_key: false, auth_kind: 'oauth', billing: 'chatgpt_plan', account_label: 'dan@example.com' },
+          ],
+          active_route: activeRoute,
+          active_model: activeModel,
+          budget: { max_requests_per_session: 20, current_requests: 0, remaining_requests: 20, estimated_tokens: 0, cap_reached: false },
+        });
+      }
+      if (url === '/api/providers/chatgpt/accounts') {
+        return ok([{ key: 'k1', label: 'dan@example.com', plan_granted: true, needs_reauth: false, selected: true }]);
+      }
+      if (url.endsWith('/models')) {
+        return ok({
+          route: 'chatgpt',
+          models: [
+            { id: 'gpt-5.6-sol', name: 'GPT-5.6-Sol', provider: 'chatgpt' },
+            { id: 'gpt-6.1-sol', name: 'GPT-6.1-Sol', provider: 'chatgpt' },
+          ],
+          is_stale: false,
+        });
+      }
+      if (url === '/api/providers/active') {
+        const body = JSON.parse((opts?.body as string) || '{}');
+        activeRoute = body.route;
+        activeModel = body.model;
+        return ok({ status: 'ok', active_route: activeRoute, active_model: activeModel });
+      }
+      return ok({});
+    }) as unknown as typeof fetch;
+
+    render(<ProviderSettings />);
+
+    // Click ChatGPT Plan tab
+    fireEvent.click(await screen.findByText('ChatGPT Plan', { selector: 'span' }));
+
+    // Verify account label is rendered
+    expect(await screen.findByText(/Signed in as dan@example.com/)).toBeInTheDocument();
+
+    // Verify Set as Active button is enabled
+    const setActiveBtn = screen.getByRole('button', { name: 'Set as Active' });
+    expect(setActiveBtn).not.toBeDisabled();
+
+    // Click Set as Active
+    fireEvent.click(setActiveBtn);
+
+    await waitFor(() => {
+      expect(screen.getByText(/✓ Active provider set to chatgpt/)).toBeInTheDocument();
+    });
+  });
 });

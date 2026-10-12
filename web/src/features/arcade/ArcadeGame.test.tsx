@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ArcadeGame } from './ArcadeGame';
+import { createInitialState } from './simulation';
 
 describe('ArcadeGame Component', () => {
   it('renders canvas, status badge, and skip button', () => {
@@ -85,6 +86,64 @@ describe('ArcadeGame Component', () => {
     fireEvent.click(screen.getByRole('button', { name: /Launch New Flight/i }));
     expect(screen.queryByText(/TOP PILOT HALL OF FAME/i)).not.toBeInTheDocument();
     expect(screen.getByText(/🎮 Manual Flight/i)).toBeInTheDocument();
+  });
+
+  it('allows entering initials containing W, A, S, and D without moving slots or cycling letters', () => {
+    const gameOverState = {
+      ...createInitialState(42, 'manual'),
+      gameOver: true,
+      mode: 'manual' as const,
+      score: 5000,
+    };
+
+    render(<ArcadeGame onExit={vi.fn()} initialState={gameOverState} />);
+
+    expect(screen.getByText(/CRITICAL FAILURE — ENTER INITIALS/i)).toBeInTheDocument();
+
+    const modal = screen.getByText(/CRITICAL FAILURE — ENTER INITIALS/i).closest('#arcade-initials-modal')!;
+
+    // Type 'D' into slot 0 -> should set 'D' and advance to slot 1
+    fireEvent.keyDown(modal, { key: 'd' });
+    expect(screen.getByTestId('initial-slot-0')).toHaveTextContent('D');
+
+    // Type 'A' into slot 1 -> should set 'A' and advance to slot 2
+    fireEvent.keyDown(modal, { key: 'a' });
+    expect(screen.getByTestId('initial-slot-1')).toHaveTextContent('A');
+
+    // Type 'N' into slot 2 -> should set 'N'
+    fireEvent.keyDown(modal, { key: 'n' });
+    expect(screen.getByTestId('initial-slot-2')).toHaveTextContent('N');
+  });
+
+  it('allows entering W and S as initials and using arrow keys to cycle', () => {
+    const gameOverState = {
+      ...createInitialState(42, 'manual'),
+      gameOver: true,
+      mode: 'manual' as const,
+      score: 5000,
+    };
+
+    render(<ArcadeGame onExit={vi.fn()} initialState={gameOverState} />);
+    const modal = screen.getByText(/CRITICAL FAILURE — ENTER INITIALS/i).closest('#arcade-initials-modal')!;
+
+    // Type 'W' into slot 0
+    fireEvent.keyDown(modal, { key: 'w' });
+    expect(screen.getByTestId('initial-slot-0')).toHaveTextContent('W');
+
+    // Type 'S' into slot 1
+    fireEvent.keyDown(modal, { key: 's' });
+    expect(screen.getByTestId('initial-slot-1')).toHaveTextContent('S');
+
+    // Arrow keys cycle slot 2
+    fireEvent.keyDown(modal, { key: 'ArrowUp' });
+    // Slot 2 should have cycled from its default letter
+    expect(screen.getByTestId('initial-slot-2')).not.toHaveTextContent('');
+
+    // Arrow Left moves active slot back to slot 1
+    fireEvent.keyDown(modal, { key: 'ArrowLeft' });
+    // Overwrite slot 1 with 'X'
+    fireEvent.keyDown(modal, { key: 'x' });
+    expect(screen.getByTestId('initial-slot-1')).toHaveTextContent('X');
   });
 });
 

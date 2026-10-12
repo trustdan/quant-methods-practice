@@ -44,7 +44,7 @@ export const VisualsExplorer: React.FC<VisualsExplorerProps> = ({
   ];
 
   return (
-    <div className="card visuals-card" style={{ maxWidth: '1000px', width: '100%', margin: '0 auto', minWidth: 0, boxSizing: 'border-box' }}>
+    <div className="card visuals-card" id="visuals-explorer-card" style={{ maxWidth: '1000px', width: '100%', margin: '0 auto', minWidth: 0, boxSizing: 'border-box' }}>
       <div className="card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
         <div>
           <h2 className="card-title" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>

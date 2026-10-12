@@ -3,7 +3,7 @@
 ================================================================================
 
 Quant Methods Practice is a 100% self-contained, offline interactive quantitative
-methods and probability tutor. It includes all mathematical engines, curriculum
+methods and probability tutor. It includes all mathematical engines, practice
 problems, explanations, diagrams, fonts, and the Quant Flight arcade game directly
 embedded in the executable.
 
@@ -32,7 +32,7 @@ OFFLINE DIAGNOSTICS & DOCTOR:
 
 USEFUL CLI COMMANDS:
   ./quant-practice -help             : View all available command-line flags
-  ./quant-practice -list-bank        : View all 137 approved curriculum questions
+  ./quant-practice -list-bank        : View all 137 approved practice questions
   ./quant-practice -diagnostics      : Run environment and asset health checks
   ./quant-practice -exam             : Start an assessment mode session in CLI
   ./quant-practice -high-scores      : View the Quant Flight arcade leaderboard

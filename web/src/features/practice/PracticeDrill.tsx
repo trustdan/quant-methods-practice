@@ -548,7 +548,7 @@ export const PracticeDrill: React.FC<PracticeDrillProps> = ({
       />
 
       {/* Stage Navigation Strip */}
-      <div className="strip-container">
+      <div className="strip-container" id="stage-pipeline-tracker">
         <StageStrip
           stages={stripStages}
           currentStageIndex={session.current_stage_index}
@@ -776,7 +776,7 @@ export const PracticeDrill: React.FC<PracticeDrillProps> = ({
         )}
 
         {/* Action Row */}
-        <div style={{ marginTop: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem' }}>
+        <div id="stage-action-row" style={{ marginTop: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem' }}>
           <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
             {!isCompleted ? (
               <>

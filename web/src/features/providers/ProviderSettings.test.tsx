@@ -306,8 +306,13 @@ describe('ProviderSettings Component', () => {
 
     // Check default guide tab (LM Studio)
     await waitFor(() => {
+      expect(screen.getByText(/Connecting to Local LLMs via LM Studio/i)).toBeInTheDocument();
       expect(screen.getByText(/How to set up and run with LM Studio/i)).toBeInTheDocument();
       expect(screen.getByText(/Llama-3.1-8B-Instruct-GGUF/i)).toBeInTheDocument();
+      expect(screen.getByText(/Qwen2.5-7B-Instruct-GGUF/i)).toBeInTheDocument();
+      expect(screen.getByText(/Step 3: Load the Model and Start the Server/i)).toBeInTheDocument();
+      expect(screen.getByText(/curl http:\/\/localhost:1234\/v1\/models/i)).toBeInTheDocument();
+      expect(screen.getByText(/Browser-Based Apps \(CORS\)/i)).toBeInTheDocument();
     });
 
     // Switch to Ollama guide tab

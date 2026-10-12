@@ -121,7 +121,7 @@ export const Worksheets: React.FC<{ active: boolean; launchMode: WorksheetMode }
   const ready = unfinished.length > 0 && unfinished.every(item => item.kind === 'choice' ? answers[item.key]?.option_id : answers[item.key]?.numeric_raw?.trim());
 
   return <section hidden={!active} className="worksheet-workspace" aria-label="Worksheets">
-    <div className="card">
+    <div className="card" id="worksheet-workspace-card">
       <h2>Full solutions &amp; dataset cases</h2>
       <p>Complete the method, assumptions, calculation and interpretation together. These structured fields provide support; worksheet results are kept separate from independent mastery.</p>
       <div className="worksheet-actions">

@@ -44,4 +44,28 @@ describe('SettingsModal', () => {
       seed: undefined,
     });
   });
+
+  it('allows toggling and resetting startup tour preference', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve({}) });
+    vi.stubGlobal('fetch', fetchMock);
+
+    render(
+      <SettingsModal
+        isOpen={true}
+        onClose={vi.fn()}
+        onStartSession={vi.fn()}
+        currentSettings={{ question_count: 10, module_ids: [], intensity: 'standard', tour_dismissed: true }}
+      />
+    );
+
+    expect(screen.getByText('Currently suppressed on app startup')).toBeInTheDocument();
+    const toggleBtn = screen.getByRole('button', { name: /Re-enable on Startup/i });
+    fireEvent.click(toggleBtn);
+
+    expect(screen.getByText('Will show automatically on app startup')).toBeInTheDocument();
+    expect(fetchMock).toHaveBeenCalledWith('/api/settings', expect.objectContaining({
+      method: 'POST',
+      body: expect.stringContaining('"tour_dismissed":false'),
+    }));
+  });
 });

@@ -15,6 +15,7 @@ interface ArcadeGameProps {
   onExit: () => void;
   seed?: number;
   initialMode?: 'attract' | 'manual';
+  initialState?: ArcadeState;
 }
 
 const LOCAL_STORAGE_SCORES_KEY = 'quant_arcade_leaderboard';
@@ -24,6 +25,7 @@ export const ArcadeGame: React.FC<ArcadeGameProps> = ({
   onExit,
   seed = Date.now(),
   initialMode = 'attract',
+  initialState,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -36,7 +38,7 @@ export const ArcadeGame: React.FC<ArcadeGameProps> = ({
   });
 
   const [gameState, setGameState] = useState<ArcadeState>(() =>
-    createInitialState(seed, initialMode)
+    initialState ? { ...initialState } : createInitialState(seed, initialMode)
   );
 
   const [leaderboard, setLeaderboard] = useState<ArcadeScoreEntry[]>(() => {
@@ -354,16 +356,16 @@ export const ArcadeGame: React.FC<ArcadeGameProps> = ({
   };
 
   const handleInitialsKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') {
+    if (e.key === 'ArrowUp') {
       e.preventDefault();
       changeInitialLetter(activeSlot, 1);
-    } else if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') {
+    } else if (e.key === 'ArrowDown') {
       e.preventDefault();
       changeInitialLetter(activeSlot, -1);
-    } else if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
+    } else if (e.key === 'ArrowLeft') {
       e.preventDefault();
       setActiveSlot((prev) => Math.max(0, prev - 1));
-    } else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
+    } else if (e.key === 'ArrowRight') {
       e.preventDefault();
       setActiveSlot((prev) => Math.min(2, prev + 1));
     } else if (/^[a-zA-Z]$/.test(e.key)) {
@@ -670,6 +672,11 @@ export const ArcadeGame: React.FC<ArcadeGameProps> = ({
         {/* Modal: Game Over 3-Letter Initials Entry */}
         {gameState.gameOver && gameState.mode === 'manual' && !scoreSubmitted && !showLeaderboard && (
           <div
+            id="arcade-initials-modal"
+            tabIndex={0}
+            autoFocus
+            ref={(el) => el?.focus()}
+            onKeyDown={handleInitialsKeyDown}
             style={{
               position: 'absolute',
               inset: 0,
@@ -682,8 +689,6 @@ export const ArcadeGame: React.FC<ArcadeGameProps> = ({
               backdropFilter: 'blur(4px)',
               zIndex: 15,
             }}
-            tabIndex={0}
-            onKeyDown={handleInitialsKeyDown}
           >
             <div
               style={{
@@ -748,6 +753,7 @@ export const ArcadeGame: React.FC<ArcadeGameProps> = ({
                         ▲
                       </button>
                       <div
+                        data-testid={`initial-slot-${idx}`}
                         style={{
                           width: 48,
                           height: 56,
@@ -789,7 +795,7 @@ export const ArcadeGame: React.FC<ArcadeGameProps> = ({
               </div>
 
               <p style={{ margin: '0 0 1.25rem', fontSize: '0.75rem', color: '#64748b' }}>
-                Use <kbd className="kbd">Arrows</kbd> / <kbd className="kbd">WASD</kbd> or type letters to change. Press <kbd className="kbd">Enter</kbd> to record.
+                Use <kbd className="kbd">Arrows</kbd> to cycle/move, or type letters directly. Press <kbd className="kbd">Enter</kbd> to record.
               </p>
 
               <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center' }}>

@@ -1,5 +1,137 @@
 # Handoff
 
+## README Functionality Expansion & Non-Developer Contributing / Issues Guide - October 12, 2026 (Windows)
+
+- **Objective**: Synchronized `README.md` with all recently implemented features (interactive guided spotlight product tour, Reference Library software cheatsheets, local offline LLMs, worksheets, exams, and arcade), purged all references to `curriculum`, `UW`, or `Foster` to preserve offline self-contained privacy, and added a friendly, non-programmer guide to filing issues and contributing.
+- **Key Enhancements**:
+  1. **Purged Institutional / Cloud References**: Completely eliminated any references to `curriculum`, `UW`, or `Foster` in `README.md`. Clarified that all 137 questions and templates are synthetic, self-contained, locally verified quantitative problem templates developed for business statistics and econometrics practice.
+  2. **Comprehensive Feature Documentation**:
+     - Documented the new **Interactive Guided Product Tour** with spotlight rings, directional speech bubbles, and SQLite preference persistence.
+     - Documented the **Reference Library & Software Cheatsheet Catalog** for Excel and R.
+     - Highlighted **100% Offline Local LLMs** (LM Studio & Ollama) with pedagogical Socratic guardrails.
+  3. **Non-GitHub User Contributing & Issues Section (`🤝 Contributing & Reporting Issues`)**:
+     - Plain-language explanation of what an "Issue" is (bug reports, math questions, typo notices, new feature/distribution requests).
+     - Step-by-step instructions on filing an issue for users who have never used GitHub before.
+     - Non-code contribution avenues: reviewing scenario narratives, verifying math recipes in spreadsheets, and proposing hints.
+     - Developer section linking to tests, build pipelines, and [docs/AGENT-CONTRACT.md](docs/AGENT-CONTRACT.md).
+- **Verification**: `python scripts/validate_scaffold.py` and `python scripts/check_content_coverage.py` passed with 0 errors. Verified 0 occurrences of `curriculum`, `UW`, or `Foster` in `README.md`.
+
+## Interactive Anchored Callout Product Tour & Startup Preference Reset - October 12, 2026 (Windows)
+
+- **Objective**: Upgraded the startup product tour from a static introductory dialog to an interactive, multi-page guided walkthrough with glowing spotlight highlights, anchored callout speech bubbles with directional pointers, and automatic page/tab navigation across all major sections of the application. Also added an in-app toggle in Settings to reset or re-enable the tour on startup after dismissal.
+- **Key Enhancements**:
+  1. **8-Step Interactive Walkthrough Across Core Pages**:
+     - *Step 1: Multi-Stage Practice Drills* (`tabTarget: 'drill'`) — Anchored to `#stage-pipeline-tracker` (`.strip-container`), explaining 7-stage cognitive scaffolding from Target to Reflection.
+     - *Step 2: Calculations & Non-Punitive Hints* (`tabTarget: 'drill'`) — Anchored to `#stage-action-row`, explaining numerical inputs, choice shortcuts (1-4), causal hints (`?`), and deterministic Go engine scoring.
+     - *Step 3: Socratic AI Tutor & Local LLMs* — Anchored to `#tab-tutor`, explaining 100% offline local loopback models (LM Studio `:1234` / Ollama `:11434`) and Socratic guardrails.
+     - *Step 4: Evidence-Based Concept Mastery* (`tabTarget: 'mastery'`) — Anchored to `#mastery-stats`, explaining retention half-life decay, transfer groups, and independent vs assisted tracking.
+     - *Step 5: Reference Library & Excel / R Cheatsheets* (`tabTarget: 'reference'`) — Anchored to `#tab-ref-software`, spotlighting mathematical derivations alongside executable Excel and R cheatsheets.
+     - *Step 6: Full Solution Worksheets & Datasets* (`tabTarget: 'worksheets'`) — Anchored to `#worksheet-workspace-card`, spotlighting full-solution step-by-step problem sets and CSV dataset investigations.
+     - *Step 7: Interactive Distribution Visuals* (`tabTarget: 'visuals'`) — Anchored to `#visuals-explorer-card`, spotlighting real-time SVG probability distributions, parameter sliders, and CLT simulations.
+     - *Step 8: Timed Exams & Assessment Replays* (`tabTarget: 'exams'`) — Anchored to `#exam-config-card`, spotlighting timed assessment conditions and SQLite audit replay.
+  2. **Anchored Callout Speech Bubble & Spotlight Ring**:
+     - Modern glassmorphic callout card (`rgba(15, 23, 42, 0.96)`) with backdrop blur and smooth entry animation (`tourBubblePop`).
+     - Animated spotlight ring (`.tour-spotlight-highlight`) with outer darkened box-shadow scrim (`rgba(5, 8, 16, 0.76)`) and glowing cyan border framing the active target element.
+     - Dynamic directional arrow pointers (`arrow-top`, `arrow-bottom`, `arrow-left`, `arrow-right`) that calculate target element geometry via `getBoundingClientRect()` and point directly to the target.
+     - Horizontal and vertical boundary collision clamping ensuring bubbles never overflow off-screen on any display size.
+     - Smooth scrolling into view (`scrollIntoView({ behavior: 'smooth', block: 'nearest' })`) when jumping between tabs and elements.
+  3. **Startup Preference Management in Settings**:
+     - Added an "Interactive Product Tour" row inside `SettingsModal.tsx` showing current startup suppression status.
+     - "Reset Startup Tour" / "Re-enable on Startup" button that updates both local state and synchronizes with SQLite via `POST /api/settings`.
+  4. **Formula Gallery Clarification & Retention**:
+     - Retained the legacy Formula Gallery (`tab-gallery`) to preserve Stage 06 reading mode keyboard scrolling test suites (`j`/`k`, `u`/`d`, `gg`, `G`), while designating Reference Library as the comprehensive authoritative source.
+- **Artifacts Created & Updated**:
+  - `web/src/features/tour/tourData.ts`: 8 structured steps targeting element selectors across drills, tutor, mastery, reference, worksheets, visuals, and exams.
+  - `web/src/features/tour/ProductTourModal.tsx`: Complete anchored bubble engine with spotlight ring, directional arrows, viewport collision handling, tab navigation, and focus trapping.
+  - `web/src/features/tour/ProductTourModal.test.tsx`: 10 comprehensive unit tests for rendering, step navigation, step pip jumps, feature jumps, and persistence.
+  - `web/src/features/settings/SettingsModal.tsx` & `SettingsModal.test.tsx`: Added tour preference reset control and test verification.
+  - `web/src/features/practice/PracticeDrill.tsx`, `Exams.tsx`, `Worksheets.tsx`, `VisualsExplorer.tsx`: Added stable IDs for spotlight targeting.
+  - `web/src/index.css`: Added styles and keyframes for `.tour-spotlight-highlight`, `.tour-callout-bubble`, `.tour-bubble-arrow`, and `tourBubblePop`.
+  - `web/src/app/App.test.tsx`: Updated tests to verify 8-step startup tour and Reference Library toggling.
+- **Verification Run**:
+  - `powershell -ExecutionPolicy Bypass -File scripts\test.ps1`:
+    - Frontend: 25 test files, 166/166 tests passed (0 failed).
+    - TypeScript compilation & lint: 0 errors (`tsc --noEmit`, `eslint src`).
+    - Production bundle & native Go build: Succeeded (`bin\quant-practice.exe`).
+    - Browser end-to-end: 16/16 Playwright specs passed.
+    - Go test & vet: 16 Go packages passed with clean formatting and no issues.
+    - Release sandbox verification: All 6 checks passed.
+
+- **Objective**: Ensure that the "Don't show again" preference for the startup product tour persists across subsequent `.exe` launches (`bin\quant-practice.exe`).
+- **Root Cause**: By default, `cmd/quant-practice/main.go` binds to an ephemeral loopback port (`127.0.0.1:0`), assigning a random port on each execution. In modern browsers, `localStorage` is strictly partitioned by origin (`scheme://host:port`), meaning each new port created an isolated, empty `localStorage` origin that did not inherit previous tour dismissal flags.
+- **Solution & Implementation**:
+  1. **SQLite Database Persistence**:
+     - Extended the persistent user preferences stored in SQLite (`quant-methods.db`) via `GET /api/settings` and `POST /api/settings`.
+     - Added `tour_dismissed?: boolean` to `SessionConfig` in `web/src/features/settings/SettingsModal.tsx` and updated `handleSaveDefaults` to preserve it.
+     - Updated `persistTourDismissed(dismissed: boolean)` in `web/src/features/tour/ProductTourModal.tsx` to update both `localStorage` and immediately send `POST /api/settings` with `{ ...currentSettings, tour_dismissed: dismissed }`.
+  2. **Origin-Agnostic App Bootstrap**:
+     - Updated `initApp()` in `web/src/app/App.tsx` to read `prefData.tour_dismissed` from `GET /api/settings`.
+     - When `prefData.tour_dismissed === true`, the application synchronizes local storage (`setTourDismissed(true)`) and keeps `showTourModal` set to `false`.
+     - Tour modal only launches automatically if neither the SQLite database preference nor the local storage flag indicates dismissal.
+  3. **Verification**:
+     - Unit tests in `web/src/app/App.test.tsx` verifying database-backed suppression on startup even with empty `localStorage`, and verified that clicking "Don't show again" dispatches `POST /api/settings`.
+     - All 25 test files and 165 frontend unit tests passed cleanly.
+     - Verified end-to-end tests across all 16 Playwright specs pass.
+
+## Website-Like Product Tour on Startup with "Don't Show Again" - October 12, 2026 (Windows)
+
+- **Objective**: Implemented a modern, website-like guided product tour on startup that walks learners through the primary functionality of Quant Methods Practice, featuring interactive highlights, feature jumps, keyboard navigation, and explicit "Don't show again" preference persistence in `localStorage`.
+- **Key Enhancements**:
+  1. **6-Step Interactive Walkthrough**:
+     - *Step 1: Welcome to Quant Methods Practice* — Highlights 100% offline privacy, Go analytical math engine, and keyboard-first design.
+     - *Step 2: Multi-Stage Practice Drills* — Highlights 7-stage problem decomposition, first-error non-punitive hints, infinite clock PRNG variations, and quick jump into drill.
+     - *Step 3: Evidence-Based Concept Mastery* — Highlights independent vs assisted evidence tracking, transfer group validation, and SQLite audit logging.
+     - *Step 4: Formula Library & Software Recipes* — Highlights LaTeX derivations with explicit assumptions and multi-language execution recipes (R, Python SciPy, Excel, Stata, TI-84).
+     - *Step 5: Socratic AI Tutor & Local LLMs* — Highlights 100% offline local loopback LLMs (LM Studio `:1234` / Ollama `:11434`), pedagogical Socratic guardrails, and dual Markdown note persistence.
+     - *Step 6: Exams, Worksheets, Visuals & Arcade* — Highlights timed exams, printable solution worksheets, distribution math lab visuals, and the Quant Flight 60Hz vector arcade.
+  2. **Rich Dark Aesthetics & Micro-Animations**:
+     - Glassmorphic modal backdrop with blur (`rgba(5, 8, 16, 0.82)`), smooth entry scaling, animated multi-stop gradient progress bar (`#38bdf8` -> `#818cf8` -> `#34d399`), glowing ambient step icon containers, and interactive step pip indicator dots.
+  3. **"Don't Show Again" Persistence**:
+     - Dedicated `"Don't show again"` button in the modal footer for immediate dismissal and saving.
+     - Sticky checkbox `"Don't show again on startup"` (default checked) honored when clicking "Skip Tour" or "Get Started 🚀" on the final step.
+     - Saved under `localStorage['quant_tour_dismissed_v1']`.
+  4. **On-Demand Tour Access**:
+     - Added `🚀 Tour` button in the top application header (`#btn-header-tour`).
+     - Added `🚀 Launch Product Tour` button in the Keyboard Shortcuts Help modal (`F1`).
+  5. **Keyboard & Accessibility Compliance**:
+     - Arrow keys (`ArrowLeft` / `ArrowRight`) to navigate steps, `Escape` to dismiss/save, `role="dialog"`, `aria-modal="true"`, focus trapping, and restoration of previous focus on close.
+- **Artifacts Created & Updated**:
+  - `web/src/features/tour/tourData.ts`: 6 structured tour steps with badges, titles, descriptions, icons, keyboard hints, and tab targets.
+  - `web/src/features/tour/ProductTourModal.tsx`: Product tour modal component with animated progress bar, step pills, feature cards, and "Don't show again" handlers.
+  - `web/src/features/tour/ProductTourModal.test.tsx`: 10 comprehensive unit tests covering rendering, navigation, pip jumps, keyboard shortcuts, feature jumps, and `localStorage` persistence.
+  - `web/src/index.css`: Added keyframe animations (`tourFadeIn`, `backdropFadeIn`).
+  - `web/src/app/App.tsx`: Wired tour state on startup, header button, Help modal button, and tab jumping.
+  - `web/src/app/App.test.tsx`: Added integration tests verifying startup tour presence, dismissal, and reopening.
+- **Verification Run**:
+  - `powershell -ExecutionPolicy Bypass -File scripts\test.ps1`:
+    - Scaffold validation: 35 Markdown files, 94 links, 298 JSON files.
+    - Frontend: 25 test files, 164/164 tests passed (0 failed).
+    - TypeScript typecheck: 0 errors (`tsc --noEmit`).
+    - ESLint: 0 errors, 0 warnings (`eslint src`).
+    - Production build: Asset compilation and native Go binary build succeeded.
+    - Browser end-to-end tests: 16/16 Playwright tests passed.
+    - Go test & vet: All 16 Go packages passed with clean formatting and no vet issues.
+    - Release verification: All 6 sandbox checks passed.
+
+## LM Studio Setup Instructions Update - October 12, 2026 (Windows)
+
+- **Objective**: Upgraded the LM Studio setup instructions in the application setup modal (`ProviderSettings.tsx`), frontend tests (`ProviderSettings.test.tsx`), provider documentation (`docs/PROVIDERS.md`), and main `README.md` to production-ready, clear step-by-step guidance.
+- **Key Enhancements**:
+  1. **5-Step Sequenced Walkthrough**: Structured into Install (`lmstudio.ai`), Model Download (recommending `Qwen2.5-7B-Instruct-GGUF` and `Meta-Llama-3.1-8B-Instruct-GGUF` at `Q4_K_M`), Model Loading & Server Start (Developer tab `<->`, RAM/VRAM indicator, green running indicator at `http://localhost:1234`), App Connection Settings table, and Advanced/Environment Settings.
+  2. **Explicit Verification Checkpoints**: Added checkmarks and concrete verification states for each step.
+  3. **Clear Settings Matrix**: Formatted table for API Base URL (`http://localhost:1234/v1`), API Key (`lm-studio`), and Model Name / ID (probe auto-detect).
+  4. **Advanced Environment Toggles**: Guidance on Browser-Based Apps (CORS toggle ON), Docker/WSL2/remote clients (`0.0.0.0` / `host.docker.internal`), and GPU Offload / context window size.
+  5. **Terminal Verification Checklist**: Actionable `curl http://localhost:1234/v1/models` command with exact expected JSON response format.
+- **Artifacts Updated**:
+  - `web/src/features/providers/ProviderSettings.tsx`: In-app setup walkthrough with styled steps, table, verification points, and curl snippet.
+  - `web/src/features/providers/ProviderSettings.test.tsx`: Expanded unit test assertions verifying step headers, curl check, CORS guidance, and model recommendations.
+  - `docs/PROVIDERS.md`: Complete markdown guide under `Connecting to Local LLMs via LM Studio`.
+  - `README.md`: Added top navigation anchor and dedicated `Connecting to Local LLMs via LM Studio` section.
+- **Verification Run**:
+  - `python scripts/validate_scaffold.py`: Passed (35 markdown files, 94 links, 298 JSON files).
+  - `npm test -- ProviderSettings.test.tsx`: All 7 tests passed.
+  - `npm test -- --run`: All 24 test files, 151 tests passed.
+
 ## Backlog Items 2 & 4 Complete: Multi-Turn Interactive AI Tutor & Local LLM Provider - October 12, 2026 (Windows)
 
 - **Objective**: Implemented Backlog Item 2 (Interactive Multi-Turn AI Tutor Chat) and Backlog Item 4 (Local Offline LLM Provider - LM Studio / Ollama) from [PLAN.md](../PLAN.md), delivering:

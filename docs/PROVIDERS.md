@@ -28,6 +28,56 @@ Key properties:
 - **Dynamic model discovery:** Queries `GET /v1/models` on the local port to auto-detect whatever model is currently loaded in memory.
 - **True offline generative tutoring:** Enables generative hints, alternative explanations, and multi-turn chat completely offline.
 
+### Connecting to Local LLMs via LM Studio
+
+Follow these steps to run a local language model on your machine and connect it to this application.
+
+#### Step 1: Install LM Studio
+1. Download and install LM Studio for your operating system from [lmstudio.ai](https://lmstudio.ai).
+2. Launch the application.
+3. **Verification:** The LM Studio home screen opens with the sidebar visible on the left.
+
+#### Step 2: Download a Model
+1. Click the Search / Discover icon (magnifying glass) in the left-hand navigation sidebar.
+2. Search for a supported instruction-tuned model (e.g., `Qwen2.5-7B-Instruct-GGUF` or `Meta-Llama-3.1-8B-Instruct-GGUF`).
+3. Under the model variants, select a quantization level suited to your hardware (e.g., `Q4_K_M` for standard GPU/RAM setups) and click **Download**.
+4. **Verification:** Once downloaded, the model will appear in your local library under the **My Models** tab (folder icon).
+
+#### Step 3: Load the Model and Start the Server
+1. Click the **Developer tab** (the `<->` / server icon) in the left-hand navigation sidebar (labeled *Developer* or *Local Server* depending on version).
+2. At the top of the Developer screen, click the **Select a model to load** dropdown and choose your downloaded model.
+3. Wait for the model to load into memory. The top bar will display the active model name along with estimated RAM/VRAM consumption.
+4. Locate the server controls at the top right and click the **Start Server** toggle/button.
+5. **Verification:** The status indicator switches to green, displaying `Server running on http://localhost:1234`, and live server logs appear in the central console.
+
+#### Step 4: Configure App Connection Settings
+Enter the following values into this application's AI / LLM configuration settings:
+
+| Setting | Value | Notes |
+|---|---|---|
+| API Base URL | `http://localhost:1234/v1` | LM Studio exposes an OpenAI-compatible endpoint. |
+| API Key | `lm-studio` | LM Studio does not require authentication, but most clients require a non-empty string. |
+| Model Name / ID | Exact identifier from LM Studio | Found in the Developer tab (or use whatever model is currently loaded). |
+
+#### Step 5: Advanced & Environment Settings
+Depending on where this application runs relative to LM Studio, adjust the following toggles in LM Studio's right-hand Server Settings panel:
+- **Browser-Based Apps (CORS):** If this application runs in a web browser (e.g., `http://localhost:3000`), toggle **Enable CORS** to **ON**. Leaving this off causes the browser to block requests due to cross-origin security policies.
+- **Docker / WSL / Remote Clients:** If this application runs inside Docker, WSL2, or a different device on your network, toggle **Serve on Local Network** to **ON** (binds to `0.0.0.0` instead of `127.0.0.1`). Use your host machine’s local IP address or `http://host.docker.internal:1234/v1` as the Base URL.
+- **Context Length & Hardware Offload:** In the model settings panel on the right, ensure **GPU Offload** is enabled to maximize inference speed, and verify the context window size matches your application's token requirements.
+
+#### Connection Verification Checklist
+To confirm the server is operating before running the app, execute this check in your terminal:
+```bash
+curl http://localhost:1234/v1/models
+```
+
+**Expected Result:** A JSON response listing the active model:
+```json
+{ "object": "list", "data": [ { "id": "model-identifier", "object": "model", "owned_by": "organization" } ] }
+```
+
+Once the terminal returns this JSON object and LM Studio shows incoming request logs, launch the application and initiate a prompt.
+
 ## ChatGPT plan implementation
 
 Use the local/open-source integration, not the separate limited-partner website identity flow. Persist this installation's host identifier. Initial authorization uses the documented dynamic-registration entry point; save the account/workspace's issued client ID, not the entry-point identifier. Use the app's own name and registration. Generate fresh PKCE/state/nonce, receive the callback on loopback, validate identity and granted plan permission, and store backend credentials. Keep account registrations separate, refresh/revoke per official metadata, and show the selected account/route. Recheck current eligible-account availability at implementation.
