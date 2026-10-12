@@ -36,7 +36,7 @@ Experience the full capabilities of **Quant Methods Practice** in this 720p 60&n
 </video>
 
 <p align="center">
-  <sub><strong>Walkthrough Recording:</strong> <code>recordings/quant_methods_demo_tour.webm</code> (1280×720 @ 60 FPS, 11.9 MB)</sub>
+  <sub><strong>Walkthrough Recording:</strong> <code>recordings/quant_methods_demo_tour.mp4</code> (1280×720 @ 60 FPS, 11.9 MB)</sub>
 </p>
 
 </div>
